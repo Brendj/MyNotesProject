@@ -153,6 +153,11 @@ public class ClientService {
     }
 
     @Transactional
+    public List<ClientNotificationSettingType> getNotificationSettings() {
+        return ClientNotificationSettingType.getAllTypes();
+    }
+
+    @Transactional
     public void setLimit(@NotNull Long contractId, @NotNull Long limit) {
         Client c = clientReadOnlyRepo.getClientByContractId(contractId)
                 .orElseThrow(() -> new NotFoundException(String.format("Не найден клиент по л/с %d", contractId)));

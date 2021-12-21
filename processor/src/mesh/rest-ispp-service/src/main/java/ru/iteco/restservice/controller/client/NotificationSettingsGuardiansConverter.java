@@ -6,11 +6,13 @@ package ru.iteco.restservice.controller.client;
 
 import ru.iteco.restservice.controller.base.BaseConverter;
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDTO;
+import ru.iteco.restservice.controller.client.responsedto.NotificationResponseErrorDTO;
 import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
 import ru.iteco.restservice.model.enums.ClientNotificationSettingType;
 
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,5 +55,17 @@ public class NotificationSettingsGuardiansConverter extends BaseConverter<Notifi
             res.add(dto);
         }
         return res;
+    }
+
+    public List<NotificationResponseDTO> toDTOs(@NotNull List<ClientNotificationSettingType> settings) {
+        List<NotificationResponseDTO> result = new LinkedList<>();
+        for (ClientNotificationSettingType type: settings)
+        {
+            NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO();
+            notificationResponseDTO.setNameOfNotification(type.toString());
+            notificationResponseDTO.setTypeOfNotification(type.getCode());
+            result.add(notificationResponseDTO);
+        }
+        return result;
     }
 }

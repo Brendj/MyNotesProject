@@ -13,6 +13,7 @@ import ru.iteco.restservice.controller.client.responsedto.NotificationResponseDT
 import ru.iteco.restservice.controller.client.responsedto.NotificationResponseErrorDTO;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.ClientGuardianNotificationSettings;
+import ru.iteco.restservice.model.enums.ClientNotificationSettingType;
 import ru.iteco.restservice.servise.ClientService;
 
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class ClientController {
     @GetMapping("/notifications")
     @ResponseBody
     @Operation(
-            summary = "Получение списока типов оповещений о событиях обучающегося в ОО",
+            summary = "Получение списка типов оповещений о событиях обучающегося в ОО",
             description = "Позволяет получить список типов оповещения клиента по номеру лицевого счета"
     )
     public List<NotificationResponseDTO> getNotifications(
@@ -97,6 +98,17 @@ public class ClientController {
             @Parameter(description = "Номер телефона представителя", example = "79000000000")
             String guardianMobile) {
         List<ClientGuardianNotificationSettings> settings = clientService.getNotificationSettingsByClients(contractId, guardianMobile);
+        return notificationSettingsGuardiansConverter.toDTOs(settings);
+    }
+
+    @GetMapping("/notificationsTypes")
+    @ResponseBody
+    @Operation(
+            summary = "Получение списка типов оповещений о событиях",
+            description = "Позволяет получить список поддерживаемых типов оповещения клиента"
+    )
+    public List<NotificationResponseDTO> getNotificationsTypes() {
+        List<ClientNotificationSettingType> settings = clientService.getNotificationSettings();
         return notificationSettingsGuardiansConverter.toDTOs(settings);
     }
 

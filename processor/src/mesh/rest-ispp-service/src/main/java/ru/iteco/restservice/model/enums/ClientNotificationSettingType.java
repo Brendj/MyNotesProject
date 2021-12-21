@@ -69,6 +69,14 @@ public enum ClientNotificationSettingType {
         return result;
     }
 
+    public static List<ClientNotificationSettingType> getAllTypes(){
+        List<ClientNotificationSettingType> result = new ArrayList<>();
+        for(ClientNotificationSettingType t : ClientNotificationSettingType.values()){
+            result.add(t);
+        }
+        return result;
+    }
+
     public Long getCode() {
         return code;
     }
