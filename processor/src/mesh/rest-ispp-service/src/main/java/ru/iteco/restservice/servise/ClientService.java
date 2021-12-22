@@ -306,7 +306,7 @@ public class ClientService {
         ClientGuardian clientGuardianRelations = guardianReadOnlyRepo
                 .getClientGuardianByChildrenAndGuardianAndDeletedStateIsFalse(child, guardian)
                 .orElseThrow(() -> new NotFoundException("Не найдена активная связь между клиентом и представителем"));
-        if (types.isEmpty())
+        if (types.isEmpty() && typesError.isEmpty())
         {
             //Если перадали пустой массив, то делаем все виды оповещений неактивными
             List<ClientGuardianNotificationSettings> settings = getNotificationSettingsByClients(req.getContractId(), req.getGuardianMobile());
