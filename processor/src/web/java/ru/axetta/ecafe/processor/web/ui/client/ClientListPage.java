@@ -442,9 +442,11 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
             tr.commit();
+            tr = null;
         } catch (Exception ex) {
-            HibernateUtils.rollback(tr, null);
+            getLogger().error("Error in removeClientFromList: ", ex);
         } finally {
+            HibernateUtils.rollback(tr, null);
             HibernateUtils.close(session, null);
         }
     }
