@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
@@ -134,6 +135,10 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
                 DAOService.getInstance().writeAuthJournalRecord(record);
             }
         } catch (Exception e) {
+            if (e instanceof javax.persistence.OptimisticLockException){
+                printError("Кто-то под вашей учетной записью уже изменил эти настройки, перезайдите в учетную запись и попробуйте еще раз");
+                return false;
+            }
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(eventType, request.getRemoteAddr(), userName, currUser, false,
                             SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());

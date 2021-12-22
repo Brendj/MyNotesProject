@@ -32,11 +32,11 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
         return "option/categorydiscountdszn/create";
     }
 
-    private Integer code;
+    private String code = "";
     private String description = "";
     private CategoryDiscount categoryDiscount;
     private String categoryName;
-    private Long ETPCode;
+    private String ETPCode = "";
 
     @Override
     public void onShow() throws Exception {
@@ -58,6 +58,41 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
     @Transactional
     public Object onSave(){
         String guid;
+        Integer convertCode;
+        Long convertETPCode;
+
+        if(StringUtils.isEmpty(code)) {
+            printError("Добавьте код льготы ДТиСЗН");
+            return null;
+        }
+
+        if(StringUtils.isEmpty(ETPCode)) {
+            printError("Добавьте код льготы ЕТП");
+            return null;
+        }
+
+        try {
+            convertCode = Integer.parseInt(code);
+        } catch (NumberFormatException e) {
+            printError("Код льготы ДТиСЗН должен быть числом");
+            convertCode = null;
+        }
+
+        try {
+            convertETPCode = Long.parseLong(ETPCode);
+        } catch (NumberFormatException e) {
+            printError("Код льготы ЕТП должен быть числом");
+            convertETPCode = null;
+        }
+
+        if(convertCode == null || convertETPCode == null)
+            return null;
+
+        if(convertCode < 0) {
+            printError("Неверный код ДТиСЗН");
+            return null;
+        }
+
         if (categoryDiscount != null && (categoryDiscount.getIdOfCategoryDiscount() < 0
                 || !categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT))) {
             printError("Неверная категория льготы ИСПП");
@@ -67,13 +102,9 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
             printError("Добавьте описание льготы ДТиСЗН");
             return null;
         }
-        if(code == null || code < 0) {
-            printError("Неверный код ДТиСЗН");
-            return null;
-        }
         try {
             Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
-            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNByCode(entityManager, code);
+            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNByCode(entityManager, convertCode);
             if(categoryDiscountDSZN != null) {
                 if(!categoryDiscountDSZN.getDeleted()) {
                     printError("Категория льготы ДТиСЗН с таким кодом уже существует");
@@ -85,7 +116,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
                 guid = UUID.randomUUID().toString();
-                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, ETPCode, nextVersion, guid);
+                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, nextVersion, guid);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;
@@ -99,11 +130,11 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
         return null;
     }
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
@@ -131,11 +162,11 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
         this.categoryName = categoryName;
     }
 
-    public Long getETPCode() {
+    public String getETPCode() {
         return ETPCode;
     }
 
-    public void setETPCode(Long ETPCode) {
+    public void setETPCode(String ETPCode) {
         this.ETPCode = ETPCode;
     }
 }
