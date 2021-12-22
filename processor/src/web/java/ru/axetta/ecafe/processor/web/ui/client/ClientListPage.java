@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -440,6 +441,9 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 cg = DAOUtils.createClientGroup(session, client.getOrg().getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_DELETED);
             }
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), cg.getCompositeIdOfClientGroup().getIdOfClientGroup(),
+                    cg.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser(), null);
             client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
             tr.commit();
             tr = null;
