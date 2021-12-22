@@ -71,33 +71,57 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             date = timeFormat.format(new Date());
             stringBuilder.append(String.format("<REG_DATE>%s</REG_DATE>", date));
         }
-        SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
-        int resultCode = result.getCode();
-        stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));
 
         if(action.equals(ACTION_CHECK)) {
-            stringBuilder.append(String.format("<FIO>%s</FIO>", response.processFio()));
-            stringBuilder.append(String.format("<INN>%s</INN>", response.getInn()));
-            stringBuilder.append(String.format("<NAZN>%s</NAZN>", response.getNazn()));
-            stringBuilder.append(String.format("<BIC>%s</BIC>", response.getBic()));
-            stringBuilder.append(String.format("<RASCH>%s</RASCH>", response.getRasch()));
-            if (response.getBalance() != null) {
-                BigDecimal balance = new BigDecimal(response.getBalance() / 100.0); //  rounding error if use double
-                stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
+            SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymentProcessResultCode(response.getResultCode(), action);
+            if (sbmskPaymentsDesc == null) {
+                SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
+                int resultCode = result.getCode();
+                stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+                stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", result.toString()));
+                stringBuilder.append(String.format("<FIO>%s</FIO>", response.processFio()));
+                stringBuilder.append(String.format("<INN>%s</INN>", response.getInn()));
+                stringBuilder.append(String.format("<NAZN>%s</NAZN>", response.getNazn()));
+                stringBuilder.append(String.format("<BIC>%s</BIC>", response.getBic()));
+                stringBuilder.append(String.format("<RASCH>%s</RASCH>", response.getRasch()));
+                if (response.getBalance() != null) {
+                    BigDecimal balance = new BigDecimal(response.getBalance() / 100.0); //  rounding error if use double
+                    stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
+                }
+            }
+            else
+            {
+                stringBuilder.append(String.format("<CODE>%d</CODE>", sbmskPaymentsDesc.getCode()));
+                stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", sbmskPaymentsDesc.toString()));
             }
         } else if (action.equals(ACTION_PAYMENT) && response.getIdOfClientPayment() != null) {
+            SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
+            int resultCode = result.getCode();
+            stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+            stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", result.toString()));
             stringBuilder.append(String.format("<EXT_ID>%s</EXT_ID>", response.getIdOfClientPayment()));
         } else if (action.equals(ACTION_SUMMARY)){
-            SBMSKSummaryResponse summaryResponse = (SBMSKSummaryResponse) response;
-            for(SBMSKClientSummaryBase c : summaryResponse.getClientList()){
-                stringBuilder.append("<clientSummary>");
-                stringBuilder.append(String.format("<CONTRACTID>%d</CONTRACTID>", c.getContractId()));
-                stringBuilder.append(String.format("<BALANCE>%s</BALANCE>", c.getBalance()));
-                stringBuilder.append(String.format("<FIO>%s</FIO>", c.getFio()));
-                stringBuilder.append(String.format("<NAZN>%s</NAZN>", c.getNazn()));
-                stringBuilder.append(String.format("<INN>%s</INN>", c.getInn()));
-                stringBuilder.append("</clientSummary>");
+            SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymentProcessResultCode(response.getResultCode(), action);
+            if (sbmskPaymentsDesc == null) {
+                SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
+                int resultCode = result.getCode();
+                stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+                stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", result.toString()));
+                SBMSKSummaryResponse summaryResponse = (SBMSKSummaryResponse) response;
+                for (SBMSKClientSummaryBase c : summaryResponse.getClientList()) {
+                    stringBuilder.append("<clientSummary>");
+                    stringBuilder.append(String.format("<CONTRACTID>%d</CONTRACTID>", c.getContractId()));
+                    stringBuilder.append(String.format("<BALANCE>%s</BALANCE>", c.getBalance()));
+                    stringBuilder.append(String.format("<FIO>%s</FIO>", c.getFio()));
+                    stringBuilder.append(String.format("<NAZN>%s</NAZN>", c.getNazn()));
+                    stringBuilder.append(String.format("<INN>%s</INN>", c.getInn()));
+                    stringBuilder.append("</clientSummary>");
+                }
+            }
+            else
+            {
+                stringBuilder.append(String.format("<CODE>%d</CODE>", sbmskPaymentsDesc.getCode()));
+                stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", sbmskPaymentsDesc.toString()));
             }
         }
         stringBuilder.append("</response>");
@@ -129,10 +153,17 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
     throws Exception {
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
-
-        int resultCode = error.getCode();
-        stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",error.toString()));
+        SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymenResultCode(error.getCode(), action);
+        if (sbmskPaymentsDesc != null) {
+            int resultCode = sbmskPaymentsDesc.getCode();
+            stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+            stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", sbmskPaymentsDesc.toString()));
+        } else
+        {
+            int resultCode = error.getCode();
+            stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
+            stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>", error.toString()));
+        }
 
         stringBuilder.append("</response>");
         printToStream(stringBuilder.toString(), httpResponse);

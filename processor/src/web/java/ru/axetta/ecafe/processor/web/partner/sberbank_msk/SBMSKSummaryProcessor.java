@@ -26,33 +26,42 @@ import java.util.Map;
 public class SBMSKSummaryProcessor {
     private Logger logger = LoggerFactory.getLogger(SBMSKSummaryProcessor.class);
 
-    public SBMSKClientSummaryBaseListResult processByGuardMobile(String guardMobile) {
+    public SBMSKClientSummaryBaseListResult processByGuardMobile(String guardMobile) throws InvalidINNException {
         Session session = null;
         Transaction transaction = null;
+        boolean exeptionINN = false;
         try {
             List<SBMSKClientSummaryBase> clientSummaries = new LinkedList<>();
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             transaction = session.beginTransaction();
             ClientsWithResultCode cd = RuntimeContext.getAppContext().getBean(CommonMethodUtil.class)
                     .getClientsByGuardMobile(guardMobile, session, SBMSKPaymentsCodes.OK.getCode(),
-                            PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
+                            SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode(), SBMSKPaymentsCodes.INTERNAL_ERROR.getCode());
 
+            SBMSKClientSummaryBaseListResult clientSummaryBaseListResult = new SBMSKClientSummaryBaseListResult();
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
                     if (entry.getValue().isDisabled()) {
                         continue;
                     }
                     SBMSKClientSummaryBase base = processSummaryBase(entry.getKey());
-                    if (base != null) {
+                    if (base.getInn() != null && !base.getInn().trim().isEmpty() && base.getContractId() != null)
                         clientSummaries.add(base);
-                    }
+                }
+                if (clientSummaries.isEmpty())
+                {
+                    clientSummaryBaseListResult.resultCode = SBMSKPaymentsCodes.NOT_FOUND_INN.getCode().longValue();
+                    clientSummaryBaseListResult.description = SBMSKPaymentsCodes.NOT_FOUND_INN.toString();
+
+                    exeptionINN = true;
                 }
             }
-
-            SBMSKClientSummaryBaseListResult clientSummaryBaseListResult = new SBMSKClientSummaryBaseListResult();
             clientSummaryBaseListResult.setClientSummary(clientSummaries);
-            clientSummaryBaseListResult.resultCode = cd.resultCode;
-            clientSummaryBaseListResult.description = cd.description;
+            if (!exeptionINN) {
+                clientSummaryBaseListResult.resultCode = cd.resultCode;
+                clientSummaryBaseListResult.description = cd.description;
+            }
+
             transaction.commit();
             transaction = null;
 
@@ -60,6 +69,8 @@ public class SBMSKSummaryProcessor {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+            if (exeptionINN)
+                throw new InvalidINNException("Invalid INN");
         }
     }
 
@@ -71,7 +82,7 @@ public class SBMSKSummaryProcessor {
         return result;
     }
 
-    public SBMSKSummaryResponse processRequest(SBMSKSummaryRequest request) {
+    public SBMSKSummaryResponse processRequest(SBMSKSummaryRequest request) throws InvalidINNException {
         SBMSKClientSummaryBaseListResult clientSummaryBaseListResult = processByGuardMobile(request.getMobile());
         return new SBMSKSummaryResponse(0, true, clientSummaryBaseListResult.resultCode.intValue(),
                 clientSummaryBaseListResult.description, null, null, null,
