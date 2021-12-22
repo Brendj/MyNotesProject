@@ -256,7 +256,7 @@
                             <h:outputText styleClass="output-text" escape="true" value="Удалить"/>
                         </f:facet>
                         <!-- TODO -->
-                        <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                        <a4j:commandLink styleClass="command-link"
                                          oncomplete="#{rich:component('removedClientDeletePanel')}.show()"
                                          render="removedClientDeletePanel">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
@@ -382,6 +382,7 @@
         <f:facet name="header">
             <h:outputText value="Удаление клиента" styleClass="output-text"/>
         </f:facet>
+        <h:form id="removedClientDeleteForm" styleClass="borderless-form">
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: center;">
@@ -391,7 +392,7 @@
             <tr>
                 <td style="text-align: center;">
                     <h:panelGroup styleClass="borderless-div">
-                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeClientFromList}"
+                        <a4j:commandButton value="Да" action="#{mainPage.removeClientFromList}"
                                            oncomplete="#{rich:component('removedClientDeletePanel')}.hide();"
                                            render="mainMenu, clientListTable"
                                            styleClass="command-button">
@@ -402,5 +403,6 @@
                 </td>
             </tr>
         </table>
+        </h:form>
     </rich:popupPanel>
 </ui:composition>
