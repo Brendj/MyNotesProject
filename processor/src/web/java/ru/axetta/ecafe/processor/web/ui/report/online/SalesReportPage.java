@@ -4,15 +4,20 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import ru.axetta.ecafe.processor.core.report.SalesReport;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.hibernate.Session;
+import ru.axetta.ecafe.processor.web.ui.report.excel.SalesReportService;
+import ru.axetta.ecafe.processor.web.ui.report.excel.WriteExcelHelper;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 
 public class SalesReportPage extends OnlineReportPage {
+
     private SalesReport salesReport;
 
     public String getPageFilename() {
@@ -33,5 +38,16 @@ public class SalesReportPage extends OnlineReportPage {
         this.salesReport = reportBuilder.build(session, startDate, endDate, idOfOrgList);
         facesContext.addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+    }
+
+    public void buildExcelReport(SalesReportService salesReportService, FacesContext facesContext) throws Exception {
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                .getResponse();
+        try {
+            Workbook wb = salesReportService.buildReport(salesReport.getSalesItems());
+            WriteExcelHelper.saveExcelReport(wb, response);
+        }catch (NullPointerException e) {
+            printError("Нет данных для выгрузки отчета");
+        }
     }
 }

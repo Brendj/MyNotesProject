@@ -6,6 +6,7 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+
 <h:panelGrid>
     <h:panelGrid id="salesReportPanelGrid" binding="#{mainPage.salesReportPage.pageComponent}" styleClass="borderless-grid">
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -120,7 +121,7 @@
                     </rich:dataScroller>
                 </f:facet>
             </rich:dataTable>
-            <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />
+            <h:commandButton value="Выгрузить в CSV" action="#{mainPage.buildSalesReportExcel()}" styleClass="command-button" />
         </h:panelGrid>
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
