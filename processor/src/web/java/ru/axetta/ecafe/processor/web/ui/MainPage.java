@@ -63,6 +63,7 @@ import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
 import ru.axetta.ecafe.processor.web.ui.org.settings.*;
 import ru.axetta.ecafe.processor.web.ui.pos.*;
+import ru.axetta.ecafe.processor.web.ui.report.excel.SalesReportService;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
@@ -505,6 +506,8 @@ public class MainPage implements Serializable {
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
+
+    private final SalesReportService salesReportService = new SalesReportService();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -7677,10 +7680,20 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
+    }
+
+    public void buildSalesReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            salesReportPage.buildExcelReport(salesReportService, facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
     }
 
     public String showFreeComplexCSVList() {
@@ -7734,8 +7747,6 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }

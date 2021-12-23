@@ -44,4 +44,6 @@
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/back-office/login.xhtml?faces-redirect=true</location>
     </error-page>
+
+
 </web-app>
