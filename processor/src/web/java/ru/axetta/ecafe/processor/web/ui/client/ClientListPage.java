@@ -445,6 +445,8 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                     cg.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                             .getExternalContext().getRemoteUser(), null);
             client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(session));
+            session.update(client);
             tr.commit();
             tr = null;
         } catch (Exception ex) {
