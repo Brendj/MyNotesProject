@@ -6,20 +6,23 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class AbstractReportService<T> {
+
+    protected abstract String fileName();
+
     protected abstract String name();
 
     protected abstract String[] columns();
 
     protected abstract void buildReportBody(Sheet sheet, T data, int currentRow);
 
-    protected abstract String shortName();
-
     public Workbook buildReport(T data) {
         Workbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet(shortName());
+        Sheet sheet = wb.createSheet(fileName());
         int currentRow;
         currentRow = this.buildReportHeader(sheet);
         currentRow = this.buildReportColumns(sheet, currentRow);
@@ -90,6 +93,20 @@ public abstract class AbstractReportService<T> {
         int columnsSize = columns().length;
         for (int i = 0; i < columnsSize; i += 1) {
             sheet.autoSizeColumn(i, true);
+        }
+    }
+
+    protected void buildReportBody(Sheet sheet, int currentRow, List<Function<Integer, String>> columnFillers, int size){
+        CellStyle cs = buildTableStyle(sheet.getWorkbook());
+
+        for (int i = 0; i < size; i++) {
+            Row row = sheet.createRow(currentRow++);
+            int selectedCell = 0;
+            for (Function<Integer, String> columnFiller : columnFillers) {
+                Cell cell = row.createCell(selectedCell++);
+                cell.setCellValue(columnFiller.apply(i));
+                cell.setCellStyle(cs);
+            }
         }
     }
 }

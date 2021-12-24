@@ -10153,6 +10153,20 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void buildAllComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            allComplexReportPage.buildExcelReport(facesContext);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build all complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     public String showAllComplexCSVList() {
         return "showAllComplexCSVList";
     }
