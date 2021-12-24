@@ -10157,8 +10157,6 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             allComplexReportPage.buildExcelReport(facesContext);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to build all complex report", e);
             facesContext.addMessage(null,

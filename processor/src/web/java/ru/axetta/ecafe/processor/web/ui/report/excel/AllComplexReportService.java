@@ -1,22 +1,20 @@
 package ru.axetta.ecafe.processor.web.ui.report.excel;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.report.AllComplexReport;
-import ru.axetta.ecafe.processor.core.report.SalesReport;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+@Service
 public class AllComplexReportService extends AbstractReportService<List<AllComplexReport.ComplexItem>>{
 
     @Override
     protected String fileName() {
-        return "complexes";
+        return "complexes.xlsx";
     }
 
     @Override

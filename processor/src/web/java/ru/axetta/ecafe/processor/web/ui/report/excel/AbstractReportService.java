@@ -104,7 +104,11 @@ public abstract class AbstractReportService<T> {
             int selectedCell = 0;
             for (Function<Integer, String> columnFiller : columnFillers) {
                 Cell cell = row.createCell(selectedCell++);
-                cell.setCellValue(columnFiller.apply(i));
+                try {
+                    cell.setCellValue(columnFiller.apply(i));
+                }catch (NullPointerException ignored){
+                    cell.setCellValue("");
+                }
                 cell.setCellStyle(cs);
             }
         }
