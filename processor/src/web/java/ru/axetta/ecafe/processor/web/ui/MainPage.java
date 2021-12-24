@@ -507,8 +507,6 @@ public class MainPage implements Serializable {
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
-    private final SalesReportService salesReportService = new SalesReportService();
-
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
     }
@@ -7687,7 +7685,7 @@ public class MainPage implements Serializable {
     public void buildSalesReportExcel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
-            salesReportPage.buildExcelReport(salesReportService, facesContext);
+            salesReportPage.buildExcelReport(facesContext);
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,

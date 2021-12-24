@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.ui.report.excel;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.Arrays;
@@ -64,11 +65,11 @@ public abstract class AbstractReportService<T> {
 
     protected CellStyle buildBoldStyle(Workbook wb, boolean isCenter) {
         Font font = wb.createFont();
-        font.setBold(true);
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
         if (isCenter) {
-            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setAlignment(CellStyle.ALIGN_CENTER);
         }
         return cs;
     }
@@ -77,11 +78,11 @@ public abstract class AbstractReportService<T> {
         Font font = wb.createFont();
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
-        cs.setAlignment(HorizontalAlignment.CENTER);
-        cs.setBorderBottom(BorderStyle.THIN);
-        cs.setBorderLeft(BorderStyle.THIN);
-        cs.setBorderRight(BorderStyle.THIN);
-        cs.setBorderTop(BorderStyle.THIN);
+        cs.setAlignment(CellStyle.ALIGN_CENTER);
+        cs.setBorderBottom(XSSFCellStyle.BORDER_MEDIUM);
+        cs.setBorderLeft(XSSFCellStyle.BORDER_MEDIUM);
+        cs.setBorderRight(XSSFCellStyle.BORDER_MEDIUM);
+        cs.setBorderTop(XSSFCellStyle.BORDER_MEDIUM);
         return cs;
     }
 

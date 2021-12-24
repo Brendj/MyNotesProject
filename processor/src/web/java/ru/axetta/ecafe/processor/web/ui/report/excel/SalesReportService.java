@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.report.SalesReport;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
