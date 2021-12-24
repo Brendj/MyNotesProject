@@ -560,7 +560,8 @@ public interface ClientRoomController {
     public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn);
 
     @WebMethod()
-    Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders, @WebParam(name="guardianMobile") String guardianMobile);
+    Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders,
+            @WebParam(name="guardianMobile") String guardianMobile, @WebParam(name = "externalSystem") Integer externalSystem);
 
     @WebMethod(operationName = "addRegistrationCard")
     AddRegistrationCardResult addRegistrationCard(@WebParam(name = "regid") String regid, @WebParam(name = "suid") String suid,
