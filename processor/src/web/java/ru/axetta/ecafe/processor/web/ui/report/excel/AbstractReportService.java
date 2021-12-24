@@ -96,7 +96,7 @@ public abstract class AbstractReportService<T> {
         }
     }
 
-    protected void buildReportBody(Sheet sheet, int currentRow, List<Function<Integer, String>> columnFillers, int size){
+    protected void printReportBody(Sheet sheet, int currentRow, List<Function<Integer, String>> columnFillers, int size) {
         CellStyle cs = buildTableStyle(sheet.getWorkbook());
 
         for (int i = 0; i < size; i++) {
@@ -106,7 +106,7 @@ public abstract class AbstractReportService<T> {
                 Cell cell = row.createCell(selectedCell++);
                 try {
                     cell.setCellValue(columnFiller.apply(i));
-                }catch (NullPointerException ignored){
+                } catch (NullPointerException ignored) {
                     cell.setCellValue("");
                 }
                 cell.setCellStyle(cs);

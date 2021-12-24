@@ -34,7 +34,7 @@ public class SalesReportService extends AbstractReportService<List<SalesReport.S
             data.get(i).setNumber(i + 1);
         }
         List<Function<Integer, String>> columnFillers = getColumnFillers(data);
-        buildReportBody(sheet, currentRow, columnFillers, data.size());
+        printReportBody(sheet, currentRow, columnFillers, data.size());
     }
 
     private List<Function<Integer, String>> getColumnFillers(List<SalesReport.SalesItem> data) {

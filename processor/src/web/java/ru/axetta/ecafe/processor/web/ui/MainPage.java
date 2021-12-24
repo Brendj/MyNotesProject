@@ -7037,6 +7037,18 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void buildPayComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            payComplexReportPage.buildReportExcel(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build pay complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     public SalesReportPage getSalesReportPage() {
         return salesReportPage;
     }
@@ -11226,4 +11238,5 @@ public class MainPage implements Serializable {
     public BasicWorkspacePage getEspHelpdeskGroupPage() {
         return espHelpdeskGroupPage;
     }
+
 }

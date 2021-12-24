@@ -22,8 +22,7 @@ public class WriteExcelHelper {
             response.getOutputStream().flush();
             response.getOutputStream().close();
             response.flushBuffer();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new Exception("Error with response output stream");
         }
     }
