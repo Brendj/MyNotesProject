@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SalesReportPage extends OnlineReportPage {
 
     private SalesReport salesReport;
+    private final SalesReportService salesReportService = new SalesReportService();
 
     public String getPageFilename() {
         return "report/online/sales_report";
@@ -40,7 +41,7 @@ public class SalesReportPage extends OnlineReportPage {
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
     }
 
-    public void buildExcelReport(SalesReportService salesReportService, FacesContext facesContext) throws Exception {
+    public void buildExcelReport(FacesContext facesContext) throws Exception {
         HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
                 .getResponse();
         try {
