@@ -21,10 +21,7 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
@@ -42,6 +39,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.persistence.Query;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -783,6 +781,43 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setGuidForDiscountsUpdate(String guidForDiscountsUpdate) {
         this.guidForDiscountsUpdate = guidForDiscountsUpdate;
+    }
+
+    public void runDeleteDoubleGuardians() {
+        if (CollectionUtils.isEmpty(idOfOrgList)) {
+            printError("не выбраны организации для обработки дублей представителей");
+            return;
+        }
+        for (long idOfOrg : idOfOrgList) {
+            processDeleteDoubleGuardiansForOrg(idOfOrg);
+        }
+
+    }
+
+    public void processDeleteDoubleGuardiansForOrg(long idOfOrg) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            String query_str = "select c.idofclient, cg.idofguardian, cg.deletedstate, pg.surname, pg.firstname, " +
+                    "pg.secondname, g.mobile, ca.cardno, ca.state " +
+                    "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
+                    "join cf_clients g on g.idofclient = cg.idofguardian " +
+                    "join cf_persons pg on pg.idofperson = g.idofperson " +
+                    "left join cf_cards ca on ca.idofclient = g.idofclient " +
+                    "where c.idoforg = :idOfOrg " +
+                    "order by c.idofclient";
+            Query query = session.createNativeQuery(query_str);
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error(String.format("Error in processDeleteDoubleGuardiansForOrg. IdOrg = %s: ", idOfOrg), e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
     }
 
     public void runUpdateSpbCardUids() throws Exception {
