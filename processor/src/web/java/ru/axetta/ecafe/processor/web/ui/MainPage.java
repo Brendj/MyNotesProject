@@ -6989,6 +6989,18 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void buildFreeComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            freeComplexReportPage.buildReportExcel(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build free complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     /*
         Платные комплексы
      */

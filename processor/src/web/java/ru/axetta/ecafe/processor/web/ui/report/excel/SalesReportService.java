@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.excel;
 
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.report.SalesReport;
 
 import java.text.SimpleDateFormat;
@@ -9,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-@Service
 public class SalesReportService extends AbstractReportService<List<SalesReport.SalesItem>> {
     @Override
     protected String name() {

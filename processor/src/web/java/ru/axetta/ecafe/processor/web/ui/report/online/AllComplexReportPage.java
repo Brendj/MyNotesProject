@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class AllComplexReportPage extends OnlineReportPage {
     private AllComplexReport complexReport;
-    private final AllComplexReportService allComplexReportService = new AllComplexReportService();
+    private final AllComplexReportService allComplexReportService =
+            new AllComplexReportService("complexes.xlsx", "Все комплексы");
 
     public String getPageFilename() {
         return "report/online/all_complex_report";
@@ -46,7 +47,7 @@ public class AllComplexReportPage extends OnlineReportPage {
         try {
             Workbook wb = allComplexReportService.buildReport(complexReport.getComplexItems());
             WriteExcelHelper.saveExcelReport(wb, response);
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             printError("Нет данных для выгрузки отчета");
         }
     }
