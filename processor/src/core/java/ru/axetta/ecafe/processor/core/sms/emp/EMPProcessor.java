@@ -129,11 +129,8 @@ public class EMPProcessor {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
         String reqInstance = getConfigSyncServiceNode();
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
-                .equals(reqInstance.trim())) {
-            return false;
-        }
-        return true;
+        return !StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance) && instance.trim()
+                .equals(reqInstance.trim());
     }
 
     public EMPStatistics recalculateEMPClientsCount() {
