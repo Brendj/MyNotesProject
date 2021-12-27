@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.guardianservice.GuardianDoublesService;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
@@ -39,7 +40,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
-import javax.persistence.Query;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -789,33 +789,7 @@ public class OtherActionsPage extends OnlineReportPage {
             return;
         }
         for (long idOfOrg : idOfOrgList) {
-            processDeleteDoubleGuardiansForOrg(idOfOrg);
-        }
-
-    }
-
-    public void processDeleteDoubleGuardiansForOrg(long idOfOrg) {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            String query_str = "select c.idofclient, cg.idofguardian, cg.deletedstate, pg.surname, pg.firstname, " +
-                    "pg.secondname, g.mobile, ca.cardno, ca.state " +
-                    "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
-                    "join cf_clients g on g.idofclient = cg.idofguardian " +
-                    "join cf_persons pg on pg.idofperson = g.idofperson " +
-                    "left join cf_cards ca on ca.idofclient = g.idofclient " +
-                    "where c.idoforg = :idOfOrg " +
-                    "order by c.idofclient";
-            Query query = session.createNativeQuery(query_str);
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error(String.format("Error in processDeleteDoubleGuardiansForOrg. IdOrg = %s: ", idOfOrg), e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+            RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
         }
 
     }
