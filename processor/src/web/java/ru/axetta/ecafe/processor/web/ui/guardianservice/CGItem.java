@@ -8,16 +8,18 @@ public class CGItem {
     private Long cardno;
     private Integer state;
     private boolean sameOrg;
+    private Integer cardState;
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
-                  boolean sameOrg) {
+                  boolean sameOrg, Integer cardState) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio;
         this.mobile = mobile;
         this.cardno = cardno;
         this.state = state;
-        sameOrg = sameOrg;
+        this.sameOrg = sameOrg;
+        this.cardState = cardState;
     }
 
     public Long getIdOfClient() {
@@ -74,5 +76,13 @@ public class CGItem {
 
     public void setSameOrg(boolean sameOrg) {
         this.sameOrg = sameOrg;
+    }
+
+    public Integer getCardState() {
+        return cardState;
+    }
+
+    public void setCardState(Integer cardState) {
+        this.cardState = cardState;
     }
 }

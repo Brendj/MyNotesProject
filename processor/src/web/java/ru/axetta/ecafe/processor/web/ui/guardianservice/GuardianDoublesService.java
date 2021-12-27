@@ -35,7 +35,8 @@ public class GuardianDoublesService {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             String query_str = "select c.idofclient, cg.idofguardian, pg.surname, pg.firstname, " +
-                    "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg, g.idoforg " +
+                    "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg, g.idoforg, " +
+                    "ca.state " +
                     "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
@@ -60,7 +61,8 @@ public class GuardianDoublesService {
                         HibernateUtils.getDbString(row[5]),
                         HibernateUtils.getDbLong(row[6]),
                         HibernateUtils.getDbInt(row[7]),
-                        HibernateUtils.getDbLong(row[8]).equals(HibernateUtils.getDbLong(row[9])));
+                        HibernateUtils.getDbLong(row[8]).equals(HibernateUtils.getDbLong(row[9])),
+                        HibernateUtils.getDbInt(row[10]));
                 result.add(item);
             }
             transaction.commit();
