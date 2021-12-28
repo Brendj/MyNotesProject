@@ -8,10 +8,11 @@ public class CGItem {
     private Long cardno;
     private Integer state;
     private boolean sameOrg;
-    private Integer cardState;
+    private boolean processed;
+    private Long idOfClientGuardian;
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
-                  boolean sameOrg, Integer cardState) {
+                  boolean sameOrg, Long idOfClientGuardian) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio;
@@ -19,7 +20,12 @@ public class CGItem {
         this.cardno = cardno;
         this.state = state;
         this.sameOrg = sameOrg;
-        this.cardState = cardState;
+        processed = false;
+        this.idOfClientGuardian = idOfClientGuardian;
+    }
+
+    public String getFioPlusMobile() {
+        return fio.concat(mobile);
     }
 
     public Long getIdOfClient() {
@@ -78,11 +84,19 @@ public class CGItem {
         this.sameOrg = sameOrg;
     }
 
-    public Integer getCardState() {
-        return cardState;
+    public boolean isProcessed() {
+        return processed;
     }
 
-    public void setCardState(Integer cardState) {
-        this.cardState = cardState;
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
+    }
+
+    public Long getIdOfClientGuardian() {
+        return idOfClientGuardian;
+    }
+
+    public void setIdOfClientGuardian(Long idOfClientGuardian) {
+        this.idOfClientGuardian = idOfClientGuardian;
     }
 }
