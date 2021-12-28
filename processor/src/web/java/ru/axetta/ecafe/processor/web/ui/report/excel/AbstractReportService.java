@@ -46,7 +46,7 @@ public abstract class AbstractReportService<T> {
     }
 
     private int buildReportColumns(Sheet sheet, int currentRow) {
-        CellStyle cs = buildBoldStyle(sheet.getWorkbook());
+        CellStyle cs = buildBoldStyle(sheet.getWorkbook(), false);
         String[] columns = columns();
         for (int i = 0; i < currentRow; i += 1) {
             sheet.addMergedRegion(new CellRangeAddress(i, i, 0, columns.length - 1));
@@ -62,18 +62,17 @@ public abstract class AbstractReportService<T> {
         return currentRow;
     }
 
-    protected CellStyle buildBoldStyle(Workbook wb) {
-        return buildBoldStyle(wb, false);
-    }
-
     protected CellStyle buildBoldStyle(Workbook wb, boolean isCenter) {
         Font font = wb.createFont();
         font.setBoldweight(Font.BOLDWEIGHT_BOLD);
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
-        if (isCenter) {
+        cs.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        if (isCenter)
             cs.setAlignment(CellStyle.ALIGN_CENTER);
-        }
         return cs;
     }
 
@@ -82,10 +81,10 @@ public abstract class AbstractReportService<T> {
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
         cs.setAlignment(CellStyle.ALIGN_CENTER);
-        cs.setBorderBottom(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderLeft(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderRight(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderTop(XSSFCellStyle.BORDER_MEDIUM);
+        cs.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderTop(XSSFCellStyle.BORDER_THIN);
         return cs;
     }
 
