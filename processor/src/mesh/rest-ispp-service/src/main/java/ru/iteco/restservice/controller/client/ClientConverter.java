@@ -6,6 +6,7 @@ package ru.iteco.restservice.controller.client;
 
 import ru.iteco.restservice.controller.base.BaseConverter;
 import ru.iteco.restservice.controller.client.responsedto.ClientResponseDTO;
+import ru.iteco.restservice.controller.client.responsedto.NotificationResponseErrorDTO;
 import ru.iteco.restservice.model.CategoryDiscount;
 import ru.iteco.restservice.model.Client;
 import ru.iteco.restservice.model.PreorderFlag;
@@ -63,5 +64,16 @@ public class ClientConverter extends BaseConverter<ClientResponseDTO, Client> {
         return new ClientResponseDTO(contractId, balance, firstName, lastname, middleName, grade, orgName, orgType,
                 address, isInside, meshGUID, specialMenu, gender, categoryDiscount, preorderAllowed, limit);
 
+    }
+
+    public List<NotificationResponseErrorDTO> toDTOs(@NotNull List<Long> codes) {
+        List<NotificationResponseErrorDTO> result = new LinkedList<>();
+        for (Long code: codes)
+        {
+            NotificationResponseErrorDTO notificationResponseErrorDTO = new NotificationResponseErrorDTO();
+            notificationResponseErrorDTO.setSettingsCode(code);
+            result.add(notificationResponseErrorDTO);
+        }
+        return result;
     }
 }

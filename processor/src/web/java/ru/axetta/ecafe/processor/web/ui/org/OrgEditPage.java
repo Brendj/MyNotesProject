@@ -258,7 +258,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReports1(mailingListReports1);
         org.setMailingListReports2(mailingListReports2);
         org.setGuid(guid);
-        org.setEkisId(ekisId.equals(0L) ? null : ekisId);
+        org.setEkisId(ekisId == null ? null : ekisId.equals(0L) ? null : ekisId);
         org.setEgissoId(egissoId);
         org.setCategoriesInternal(new HashSet<CategoryOrg>());
         if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
@@ -448,7 +448,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
         org.setGooddatecheck(goodDateCheck);
-        org.setOrgIdFromNsi(orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
+        org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
 

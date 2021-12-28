@@ -3270,7 +3270,7 @@ public class DAOUtils {
     public static long nextVersionByOrgStucture(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
-                "select o.orgStructureVersion from cf_orgs as o order by o.orgStructureVersion desc limit 1 for update");
+                "select o.orgStructureVersion from cf_orgs as o order by o.orgStructureVersion desc limit 1");
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;

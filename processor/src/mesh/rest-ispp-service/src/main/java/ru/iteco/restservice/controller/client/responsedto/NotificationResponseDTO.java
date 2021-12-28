@@ -8,29 +8,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-@Schema(name = "NotificationResponseDTO", description = "Параметры настроек оповещения клиента")
+@Schema(name = "NotificationResponseDTO", description = "Список доступных типов уведомлений")
 public class NotificationResponseDTO {
 
-    @Schema(title = "Код настройки", example = "1000000000")
-    private Long settingsCode;
+    @Schema(title = "Наименование уведомления", example = "Оповещение о пополнениях")
+    private String nameOfNotification;
 
-    @Schema(title = "Расшифровка кода", example = "Оповещение о пополнениях")
-    private String settingsName;
+    @Schema(title = "Тип уведомления", example = "1000000000")
+    private Long typeOfNotification;
 
-    public Long getSettingsCode() {
-        return settingsCode;
+    public Long getTypeOfNotification() {
+        return typeOfNotification;
     }
 
-    public void setSettingsCode(Long settingsCode) {
-        this.settingsCode = settingsCode;
+    public void setTypeOfNotification(Long typeOfNotification) {
+        this.typeOfNotification = typeOfNotification;
     }
 
-    public String getSettingsName() {
-        return settingsName;
+    public String getNameOfNotification() {
+        return nameOfNotification;
     }
 
-    public void setSettingsName(String settingsName) {
-        this.settingsName = settingsName;
+    public void setNameOfNotification(String nameOfNotification) {
+        this.nameOfNotification = nameOfNotification;
     }
 
     @Override
@@ -42,11 +42,11 @@ public class NotificationResponseDTO {
             return false;
         }
         NotificationResponseDTO that = (NotificationResponseDTO) o;
-        return Objects.equals(settingsCode, that.settingsCode) && Objects.equals(settingsName, that.settingsName);
+        return Objects.equals(typeOfNotification, that.typeOfNotification) && Objects.equals(nameOfNotification, that.nameOfNotification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(settingsCode, settingsName);
+        return Objects.hash(typeOfNotification, nameOfNotification);
     }
 }
