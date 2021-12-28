@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.excel;
 
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.report.SalesReport;
 
 import java.text.SimpleDateFormat;
@@ -9,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-@Service
 public class SalesReportService extends AbstractReportService<List<SalesReport.SalesItem>> {
     @Override
     protected String name() {
@@ -24,7 +22,7 @@ public class SalesReportService extends AbstractReportService<List<SalesReport.S
     }
 
     @Override
-    protected String shortName() {
+    protected String fileName() {
         return "sales.xlsx";
     }
 
@@ -34,18 +32,7 @@ public class SalesReportService extends AbstractReportService<List<SalesReport.S
             data.get(i).setNumber(i + 1);
         }
         List<Function<Integer, String>> columnFillers = getColumnFillers(data);
-        CellStyle cs = buildTableStyle(sheet.getWorkbook());
-
-        for (int i = 0; i < data.size(); i++) {
-            Row row = sheet.createRow(currentRow++);
-            int selectedCell = 0;
-            for (Function<Integer, String> columnFiller : columnFillers) {
-                Cell cell = row.createCell(selectedCell++);
-                cell.setCellValue(columnFiller.apply(i));
-                cell.setCellStyle(cs);
-            }
-        }
-
+        printReportBody(sheet, currentRow, columnFillers, data.size());
     }
 
     private List<Function<Integer, String>> getColumnFillers(List<SalesReport.SalesItem> data) {

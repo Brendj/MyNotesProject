@@ -678,16 +678,16 @@ public class MainPage implements Serializable {
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
-            HttpServletRequest request = (HttpServletRequest)facesExternalContext.getRequest();
+            HttpServletRequest request = (HttpServletRequest) facesExternalContext.getRequest();
             request.logout();
             SecurityContextHolder.clearContext();
 
-            ((HttpServletResponse)facesExternalContext.getResponse()).sendRedirect(request.getContextPath() + "/login.xhtml");
+            ((HttpServletResponse) facesExternalContext.getResponse()).sendRedirect(request.getContextPath() + "/login.xhtml");
         }
         return outcome;
     }
 
-    private User getUserByLogin(String login) throws Exception{
+    private User getUserByLogin(String login) throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2115,7 +2115,7 @@ public class MainPage implements Serializable {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             String classType;
-            if(isPaymentContragent){
+            if (isPaymentContragent) {
                 classType = "2";
             } else {
                 classType = "1";
@@ -2144,7 +2144,7 @@ public class MainPage implements Serializable {
         }
     }
 
-    public Object clearOrgSelectPage(){
+    public Object clearOrgSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -2825,7 +2825,7 @@ public class MainPage implements Serializable {
 
 
     public Object showContragentListSelectPage() {
-        return showContragentListSelectPage(null) ;
+        return showContragentListSelectPage(null);
     }
 
     public Object showContragentListSelectPage(List<Long> idOfOrgs) {
@@ -2840,7 +2840,7 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                if(contragentListSelectPage.getClassTypesString() != null){
+                if (contragentListSelectPage.getClassTypesString() != null) {
                     classTypes = contragentListSelectPage.getClassTypesString();
                 }
                 contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes, idOfOrgs);
@@ -3486,7 +3486,6 @@ public class MainPage implements Serializable {
     }
 
 
-
     public ClientEditPage getClientEditPage() {
         return clientEditPage;
     }
@@ -3643,7 +3642,7 @@ public class MainPage implements Serializable {
             } catch (IllegalArgumentException e) {
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Необходимо выбрать организацию!", null));
-            }catch (Exception e) {
+            } catch (Exception e) {
                 logger.error("Failed to create client", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при регистрации клиента: " + e.getMessage(), null));
@@ -3681,7 +3680,7 @@ public class MainPage implements Serializable {
         } catch (IllegalArgumentException e) {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Необходимо выбрать организацию!", null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to create client", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при регистрации клиента: " + e.getMessage(), null));
@@ -6775,25 +6774,25 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showOrgParametersGroupPage(){
+    public Object showOrgParametersGroupPage() {
         currentWorkspacePage = orgParametersGroup;
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showWebTechnologistGroupPage(){
+    public Object showWebTechnologistGroupPage() {
         currentWorkspacePage = webTechnologistGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showWebTechnologistCatalogGroupPage(){
+    public Object showWebTechnologistCatalogGroupPage() {
         currentWorkspacePage = webTechnologistCatalogGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showEspHelpdeskGroupPage(){
+    public Object showEspHelpdeskGroupPage() {
         currentWorkspacePage = espHelpdeskGroupPage;
         updateSelectedMainMenu();
         return null;
@@ -6989,6 +6988,18 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void buildFreeComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            freeComplexReportPage.buildReportExcel(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build free complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     /*
         Платные комплексы
      */
@@ -7035,6 +7046,18 @@ public class MainPage implements Serializable {
 
         }
         return null;
+    }
+
+    public void buildPayComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            payComplexReportPage.buildReportExcel(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build pay complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
     }
 
     public SalesReportPage getSalesReportPage() {
@@ -8074,6 +8097,18 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void buildClientReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            clientReportPage.buildReportExcel(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build client report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     public TotalSalesPage getTotalSalesPage() {
         return totalSalesPage;
     }
@@ -8115,6 +8150,7 @@ public class MainPage implements Serializable {
     public DishMenuWebARMPPReportPage getDishMenuReportWebArmPP() {
         return dishMenuReportWebArmPP;
     }
+
     public ComplexMenuReportPage getComplexMenuReportPage() {
         return complexMenuReportPage;
     }
@@ -9639,7 +9675,7 @@ public class MainPage implements Serializable {
         return ruleGroupPage;
     }
 
-    public BasicWorkspacePage getCodeMSPGroupPage(){
+    public BasicWorkspacePage getCodeMSPGroupPage() {
         return codeMSPGroupPage;
     }
 
@@ -9719,16 +9755,14 @@ public class MainPage implements Serializable {
 
     public void testSms() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest)facesContext.getExternalContext().getRequest();
-        HttpServletResponse response = (HttpServletResponse)facesContext.getExternalContext().getResponse();
+        HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
         try {
             if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
                 String mainPage;
                 if (User.isSuccessfullySendEMP()) {
                     mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
-                }
-                else
-                {
+                } else {
                     mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/emp_server_not_answer.faces");
                 }
                 response.sendRedirect(mainPage);
@@ -9970,7 +10004,7 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_VISITORDOGM_EDIT);
     }
 
-    public boolean isEligibleToViewElectronicReconciliationReport() throws  Exception {
+    public boolean isEligibleToViewElectronicReconciliationReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
     }
 
@@ -10151,6 +10185,18 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
         }
         return null;
+    }
+
+    public void buildAllComplexReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            allComplexReportPage.buildExcelReport(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build all complex report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
     }
 
     public String showAllComplexCSVList() {
@@ -10421,11 +10467,11 @@ public class MainPage implements Serializable {
 
     public Object sendSMSagain() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest)context.getRequest();
-        HttpServletResponse response = (HttpServletResponse)context.getResponse();
+        HttpServletRequest request = (HttpServletRequest) context.getRequest();
+        HttpServletResponse response = (HttpServletResponse) context.getResponse();
         String userName = context.getRemoteUser();
         Boolean requstSMS = User.sendSmsAgain(userName);
-        if (requstSMS){
+        if (requstSMS) {
             setCanSendAgain(true);
             response.sendRedirect(ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces"));
         } else {
@@ -10665,7 +10711,7 @@ public class MainPage implements Serializable {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            FeedingSetting setting = (FeedingSetting)persistenceSession.load(FeedingSetting.class, selectedIdOfFeedingSetting);
+            FeedingSetting setting = (FeedingSetting) persistenceSession.load(FeedingSetting.class, selectedIdOfFeedingSetting);
             persistenceSession.delete(setting);
             feedingSettingsListPage.fill(persistenceSession);
             persistenceTransaction.commit();
@@ -10866,7 +10912,7 @@ public class MainPage implements Serializable {
         return cardRegistrationConfirm;
     }
 
-    public Object verificationCardData(){
+    public Object verificationCardData() {
         Long timeStamp = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_VALID_REGISTRY_DATE);
         Date validRegistryDate = CalendarUtils.endOfDay(new Date(timeStamp));
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -10878,15 +10924,15 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(cardRegistrationAndIssuePage.isClientHasNotBlockedCard()){
+            if (cardRegistrationAndIssuePage.isClientHasNotBlockedCard()) {
                 throw new Exception("Данный клиент имеет незаблокированную(ые) карту(ы).");
             }
             String cardType = Card.TYPE_NAMES[cardRegistrationAndIssuePage.getCardType()];
-            if(cardType.equals("Mifare") && !CardManagerProcessor.getPriceOfMifare().equals(0L) ||
-                    cardType.equals("Браслет (Mifare)" ) && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)){
+            if (cardType.equals("Mifare") && !CardManagerProcessor.getPriceOfMifare().equals(0L) ||
+                    cardType.equals("Браслет (Mifare)") && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)) {
                 Client client = (Client) persistenceSession.load(Client.class, cardRegistrationAndIssuePage.getClient().getIdOfClient());
                 Card lastCard = DAOUtils.getLastCardByClient(persistenceSession, client);
-                if(lastCard != null) {
+                if (lastCard != null) {
                     String cardLockReason = lastCard.getLockReason();
                     Date createDate = lastCard.getCreateTime();
                     String typeOfLastCard = Card.TYPE_NAMES[lastCard.getCardType()];
@@ -10896,18 +10942,18 @@ public class MainPage implements Serializable {
                             modalPages.push(cardRegistrationConfirm);
                             cardRegistrationConfirm.prepareADialogue(cardType);
                         } else doCreateCard = true;
-                    } else if(createDate.before(validRegistryDate) || (typeOfLastCard.equals("Mifare") && cardType.equals("Браслет (Mifare)"))){
+                    } else if (createDate.before(validRegistryDate) || (typeOfLastCard.equals("Mifare") && cardType.equals("Браслет (Mifare)"))) {
                         modalPages.push(cardRegistrationConfirm);
                         cardRegistrationConfirm.prepareADialogue(cardType);
                     } else {
                         doCreateCard = true;
                     }
-                } else if(cardType.equals("Браслет (Mifare)" ) && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)){
+                } else if (cardType.equals("Браслет (Mifare)") && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)) {
                     modalPages.push(cardRegistrationConfirm);
                     cardRegistrationConfirm.prepareADialogue(cardType);
                 } else doCreateCard = true;
             } else doCreateCard = true;
-            if(doCreateCard) cardRegistrationAndIssuePage.createCard();
+            if (doCreateCard) cardRegistrationAndIssuePage.createCard();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -10928,7 +10974,7 @@ public class MainPage implements Serializable {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try{
+        try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -10937,7 +10983,7 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карта зарегистрирована успешно", null));
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.error("Failed to re-issue card", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при заказе карты: " + e.getMessage(), null));
@@ -11203,6 +11249,7 @@ public class MainPage implements Serializable {
     public DishListSelectPage getDishWebListSelectPage() {
         return dishWebListSelectPage;
     }
+
     public EmiasReportPage getEmiasReportPage() {
         return emiasReportPage;
     }
@@ -11214,4 +11261,5 @@ public class MainPage implements Serializable {
     public BasicWorkspacePage getEspHelpdeskGroupPage() {
         return espHelpdeskGroupPage;
     }
+
 }

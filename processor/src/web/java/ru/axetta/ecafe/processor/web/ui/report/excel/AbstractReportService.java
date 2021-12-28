@@ -6,20 +6,23 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class AbstractReportService<T> {
+
+    protected abstract String fileName();
+
     protected abstract String name();
 
     protected abstract String[] columns();
 
     protected abstract void buildReportBody(Sheet sheet, T data, int currentRow);
 
-    protected abstract String shortName();
-
     public Workbook buildReport(T data) {
         Workbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet(shortName());
+        Sheet sheet = wb.createSheet(fileName());
         int currentRow;
         currentRow = this.buildReportHeader(sheet);
         currentRow = this.buildReportColumns(sheet, currentRow);
@@ -43,7 +46,7 @@ public abstract class AbstractReportService<T> {
     }
 
     private int buildReportColumns(Sheet sheet, int currentRow) {
-        CellStyle cs = buildBoldStyle(sheet.getWorkbook());
+        CellStyle cs = buildBoldStyle(sheet.getWorkbook(), false);
         String[] columns = columns();
         for (int i = 0; i < currentRow; i += 1) {
             sheet.addMergedRegion(new CellRangeAddress(i, i, 0, columns.length - 1));
@@ -59,18 +62,17 @@ public abstract class AbstractReportService<T> {
         return currentRow;
     }
 
-    protected CellStyle buildBoldStyle(Workbook wb) {
-        return buildBoldStyle(wb, false);
-    }
-
     protected CellStyle buildBoldStyle(Workbook wb, boolean isCenter) {
         Font font = wb.createFont();
         font.setBoldweight(Font.BOLDWEIGHT_BOLD);
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
-        if (isCenter) {
+        cs.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        if (isCenter)
             cs.setAlignment(CellStyle.ALIGN_CENTER);
-        }
         return cs;
     }
 
@@ -79,10 +81,10 @@ public abstract class AbstractReportService<T> {
         CellStyle cs = wb.createCellStyle();
         cs.setFont(font);
         cs.setAlignment(CellStyle.ALIGN_CENTER);
-        cs.setBorderBottom(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderLeft(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderRight(XSSFCellStyle.BORDER_MEDIUM);
-        cs.setBorderTop(XSSFCellStyle.BORDER_MEDIUM);
+        cs.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        cs.setBorderTop(XSSFCellStyle.BORDER_THIN);
         return cs;
     }
 
@@ -90,6 +92,24 @@ public abstract class AbstractReportService<T> {
         int columnsSize = columns().length;
         for (int i = 0; i < columnsSize; i += 1) {
             sheet.autoSizeColumn(i, true);
+        }
+    }
+
+    protected void printReportBody(Sheet sheet, int currentRow, List<Function<Integer, String>> columnFillers, int size) {
+        CellStyle cs = buildTableStyle(sheet.getWorkbook());
+
+        for (int i = 0; i < size; i++) {
+            Row row = sheet.createRow(currentRow++);
+            int selectedCell = 0;
+            for (Function<Integer, String> columnFiller : columnFillers) {
+                Cell cell = row.createCell(selectedCell++);
+                try {
+                    cell.setCellValue(columnFiller.apply(i));
+                } catch (NullPointerException ignored) {
+                    cell.setCellValue("");
+                }
+                cell.setCellStyle(cs);
+            }
         }
     }
 }
