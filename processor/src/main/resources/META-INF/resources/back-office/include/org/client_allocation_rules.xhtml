@@ -96,7 +96,7 @@
                     <f:facet name="header">
                         <h:outputText value="Удалить" escape="true"/>
                     </f:facet>
-                    <a4j:commandLink render="clientAllocationRulesTable"
+                    <a4j:commandLink render="clientAllocationRulesPage"
                                      action="#{clientAllocationRulesPage.deleteRule(row)}"
                                      styleClass="command-link">
                         <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
@@ -109,17 +109,16 @@
                                    render="clientAllocationRulesTable"/>
                 <h:panelGroup style="margin-top: 10px">
                     <a4j:commandButton value="Сохранить" action="#{clientAllocationRulesPage.save}"
-                                       render="clientAllocationRulesTable"/>
+                                       render="clientAllocationRulesPage"/>
                     <a4j:commandButton id="resetRules" value="Отмена" action="#{clientAllocationRulesPage.cancel}"
                                        render="clientAllocationRulesTable"/>
-                    <a4j:status>
-                        <f:facet name="start">
-                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-                        </f:facet>
-                    </a4j:status>
                 </h:panelGroup>
             </h:panelGrid>
-
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages"/>
         </h:panelGrid>
