@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.daoservices.org.ClientAllocationRuleDao;
@@ -80,6 +81,7 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         }
     }
 
+    @Transactional
     public Object save() throws Exception {
         Session session = null;
         for (int i = 0; i < rules.size(); i++) {
@@ -203,12 +205,14 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         item.setEditable(true);
     }
 
-    public void deleteRule(int row) {
+    public Object deleteRule(int row) throws Exception{
+        onShow();
         ClientAllocationRuleItem item = rules.remove(row);
         if (item.getId() != null) {
             dao.delete(item.getId());
         }
         this.printMessage("Правило удалено.");
+        return null;
     }
 
     public Object cancel() throws Exception {
