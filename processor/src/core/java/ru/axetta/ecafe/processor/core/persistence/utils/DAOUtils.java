@@ -2728,6 +2728,41 @@ public class DAOUtils {
         Org.sendInvalidateCache(idOfOrg);
     }
 
+    public static void saveCardDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set cardSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveFoodApplicationDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set foodApplicationSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void savePhotoDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set photoSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveZeroTransactionsDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set zeroTransactionsSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveDiscountPreordersDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set discountPreordersSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,
             final Set<Org> friendlyOrg, final List<Long> errorClientIds) {
         final Query query = persistenceSession.createQuery(

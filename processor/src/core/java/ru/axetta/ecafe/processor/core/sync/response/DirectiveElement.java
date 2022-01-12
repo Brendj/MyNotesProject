@@ -22,6 +22,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class DirectiveElement implements AbstractToElement{
 
     public void process(Session session, Org org) throws Exception{
 
-        directiveItemList = new ArrayList<DirectiveItem>();
+        directiveItemList = new LinkedList<>();
 
         Boolean fullSync = org.getFullSyncParam();
         if(fullSync) {
@@ -46,6 +47,11 @@ public class DirectiveElement implements AbstractToElement{
             DAOUtils.setValueForMenusSyncByOrg(session, org.getIdOfOrg(), false);
             DAOUtils.setValueForOrgSettingsSyncByOrg(session, org.getIdOfOrg(), false);
             DAOUtils.setValueForClientsSyncByOrg(session, org.getIdOfOrg(), false);
+            DAOUtils.saveCardDirectiveWithValue(session, org.getIdOfOrg(), false);
+            DAOUtils.savePhotoDirectiveWithValue(session, org.getIdOfOrg(), false);
+            DAOUtils.saveZeroTransactionsDirectiveWithValue(session, org.getIdOfOrg(), false);
+            DAOUtils.saveDiscountPreordersDirectiveWithValue(session, org.getIdOfOrg(), false);
+            DAOUtils.saveFoodApplicationDirectiveWithValue(session, org.getIdOfOrg(), false);
         } else {
             Boolean menusSyncParam = org.getMenusSyncParam();
             if (menusSyncParam) {
@@ -63,6 +69,36 @@ public class DirectiveElement implements AbstractToElement{
             if (clientSyncParam) {
                 directiveItemList.add(new DirectiveItem("DoClientsSync", "1"));
                 DAOUtils.setValueForClientsSyncByOrg(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean cardSyncParam = org.getCardSyncParam();
+            if(cardSyncParam != null && cardSyncParam){
+                directiveItemList.add(new DirectiveItem("DoCardSync", "1"));
+                DAOUtils.saveCardDirectiveWithValue(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean photoSyncParam = org.getPhotoSyncParam();
+            if(photoSyncParam != null && photoSyncParam){
+                directiveItemList.add(new DirectiveItem("DoPhotoSync", "1"));
+                DAOUtils.savePhotoDirectiveWithValue(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean zeroTransactionsSyncParam = org.getZeroTransactionsSyncParam();
+            if(zeroTransactionsSyncParam != null && zeroTransactionsSyncParam){
+                directiveItemList.add(new DirectiveItem("DoZeroTransactionsSync", "1"));
+                DAOUtils.saveZeroTransactionsDirectiveWithValue(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean discountPreordersSyncParam = org.getDiscountPreordersSyncParam();
+            if(discountPreordersSyncParam != null && discountPreordersSyncParam){
+                directiveItemList.add(new DirectiveItem("DoDiscountPreordersSync", "1"));
+                DAOUtils.saveDiscountPreordersDirectiveWithValue(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean foodApplicationSyncParam = org.getFoodApplicationSyncParam();
+            if(foodApplicationSyncParam != null && foodApplicationSyncParam){
+                directiveItemList.add(new DirectiveItem("DoFoodApplicationSync", "1"));
+                DAOUtils.saveFoodApplicationDirectiveWithValue(session, org.getIdOfOrg(), false);
             }
         }
 
