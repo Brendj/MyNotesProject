@@ -82,8 +82,13 @@
                   not-null="true"/>
 
         <property name="orgSettingsSyncParam" column="orgSettingsSyncParam"
-                  type="boolean"
-                  not-null="true"/>
+                  type="boolean"/>
+
+        <property name="cardSyncParam" column="cardSyncParam" type="boolean"/>
+        <property name="photoSyncParam" column="photoSyncParam" type="boolean"/>
+        <property name="zeroTransactionsSyncParam" column="zeroTransactionsSyncParam" type="boolean"/>
+        <property name="discountPreordersSyncParam" column="discountPreordersSyncParam" type="boolean"/>
+        <property name="foodApplicationSyncParam" column="foodApplicationSyncParam" type="boolean"/>
 
         <property name="preorderSyncParam" column="PreorderSyncParam" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
 
