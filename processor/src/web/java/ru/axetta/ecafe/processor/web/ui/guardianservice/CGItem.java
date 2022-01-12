@@ -1,6 +1,8 @@
 package ru.axetta.ecafe.processor.web.ui.guardianservice;
 
-public class CGItem {
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
+
+public class CGItem implements Comparable {
     private Long idOfClient;
     private Long idOfGuardin;
     private String fio;
@@ -10,9 +12,13 @@ public class CGItem {
     private boolean sameOrg;
     private boolean processed;
     private Long idOfClientGuardian;
+    private Long cardLastUpdate;
+    private Long balance;
+    private Long idOfClientGroup;
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
-                  boolean sameOrg, Long idOfClientGuardian) {
+                  boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
+                  Long idOfClientGroup) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio;
@@ -22,6 +28,33 @@ public class CGItem {
         this.sameOrg = sameOrg;
         processed = false;
         this.idOfClientGuardian = idOfClientGuardian;
+        this.cardLastUpdate = cardLastUpdate;
+        this.balance = balance;
+        this.idOfClientGroup = idOfClientGroup;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof CGItem)) {
+            return 1;
+        }
+        CGItem item = (CGItem) o;
+        if (this.getCardno() != null && item.getCardno() == null) return 1;
+        if (this.getCardno() == null && item.getCardno() == null) return 0;
+        if (this.getCardno() == null && item.getCardno() != null) return -1;
+        if (this.getCardno() != null && item.getCardno() != null) {
+            return this.getCardLastUpdate().compareTo(item.getCardLastUpdate());
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CGItem)) {
+            return false;
+        }
+        if (((CGItem) o).getIdOfClientGuardian().equals(this.getIdOfClientGuardian())) return true;
+        return false;
     }
 
     public String getFioPlusMobile() {
@@ -98,5 +131,29 @@ public class CGItem {
 
     public void setIdOfClientGuardian(Long idOfClientGuardian) {
         this.idOfClientGuardian = idOfClientGuardian;
+    }
+
+    public Long getCardLastUpdate() {
+        return cardLastUpdate;
+    }
+
+    public void setCardLastUpdate(Long cardLastUpdate) {
+        this.cardLastUpdate = cardLastUpdate;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
     }
 }
