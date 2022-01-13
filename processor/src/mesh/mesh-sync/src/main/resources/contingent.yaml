@@ -17,6 +17,8 @@ tags:
   description: Операции с классом
 - name: Person
   description: Операции с персоной
+- name: Event
+  description: Операции с событиями
 - name: Create
   description: Создание данных
 - name: Update
@@ -47,12 +49,13 @@ paths:
                 birthdate: "2000-07-20"
                 birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
                 gender_id: 1
-                citizenship_id: 1
+                citizenship_id: 643
                 validation_state_id: 1
                 validated_at: "2019-09-12T15:34:12.234Z"
                 validation_errors: ""
                 addresses:
                   - id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     address_type_id: 1
                     validation_state_id: 1
                     validated_at: "2019-09-12T15:37:12.232Z"
@@ -65,6 +68,7 @@ paths:
                       flat: "111/13"
                 documents:
                   - id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     document_type_id: 1
                     series: "II-МЮ"
                     number: "135676"
@@ -74,8 +78,18 @@ paths:
                     validation_state_id: 1
                     validated_at: "2019-09-12T15:39:12.234Z"
                     validation_errors: ""
+                    attachments:
+                      - id: "7cef2bda-c499-4688-bd63-81737f732342"
+                        name: "scan1.pdf"
+                        mimetype: "application/pdf"
+                        uploaded_at: "2021-03-22 19:13:38"
+                      - id: "7cef2bda-c499-4688-bd63-81737f732355"
+                        name: "scan2.pdf"
+                        mimetype: "application/pdf"
+                        uploaded_at: "2021-03-20 15:14:38"
                 contacts:
                   - id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     type_id: 1
                     data: "9202703203"
                     validation_state_id: 1
@@ -83,7 +97,9 @@ paths:
                     validation_errors: ""
                 categories:
                   - id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     category_id: 7
+                    external_id: "124098"
                     parameter_values:
                       - value_1
                       - value_2
@@ -91,24 +107,27 @@ paths:
                     actual_to: '2099-01-01T00:00:00+03:00'
                 agents:
                   - id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     agent_type_id: 1
                     validation_state_id: 1
                     validated_at: "2019-09-12T15:42:12.234Z"
                     validation_errors: ""
                     agent_person:
                       id: 0
+                      person_id: "00000000-0000-0000-0000-000000000000"
                       lastname: "Агеева"
                       firstname: "Никитаа"
                       patronymic: "Сергеевична"
                       birthdate: "1938-07-20"
                       birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
                       gender_id: 1
-                      citizenship_id: 1
+                      citizenship_id: 643
                       validation_state_id: 1
                       validated_at: "2019-09-12T15:40:12.234Z"
                       validation_errors: ""
                       addresses:
                         - id: 0
+                          person_id: "00000000-0000-0000-0000-000000000000"
                           address_type_id: 1
                           validation_state_id: 1
                           validated_at: "2019-09-12T15:45:12.234Z"
@@ -120,6 +139,7 @@ paths:
                             flat: "111/13"
                       documents:
                         - id: 0
+                          person_id: "00000000-0000-0000-0000-000000000000"
                           document_type_id: 2
                           series: "0123"
                           number: "321321"
@@ -129,8 +149,18 @@ paths:
                           validation_state_id: 1
                           validated_at: "2019-09-12T15:48:12.234Z"
                           validation_errors: ""
+                          attachments:
+                            - id: "7cef2bda-c499-4688-bd63-81737f732342"
+                              name: "scan1.pdf"
+                              mimetype: "application/pdf"
+                              uploaded_at: "2021-03-22 19:13:38"
+                            - id: "7cef2bda-c499-4688-bd63-81737f732355"
+                              name: "scan2.pdf"
+                              mimetype: "application/pdf"
+                              uploaded_at: "2021-03-20 15:14:38"
                       contacts:
                         - id: 0
+                          person_id: "00000000-0000-0000-0000-000000000000"
                           type_id: 1
                           data: "9202703202"
                           validation_state_id: 1
@@ -157,6 +187,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     get:
       tags:
       - Person
@@ -206,6 +238,11 @@ paths:
         schema:
           type: string
           format: date
+      - in: query
+        name: exact
+        description: (по умолчанию false) если true, то поиск по ФИО выполняется по полям lastname,fistname,patronymic, а не по их хэшу
+        schema:
+          type: boolean
       responses:
         200:
           description: OK - операция завершилась успешно
@@ -227,6 +264,57 @@ paths:
           $ref: '#/components/responses/409'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
+  /persons/like:
+    get:
+      tags:
+      - Person
+      - Search
+      summary: Поиск похожих персон
+      parameters:
+      - in: query
+        name: person
+        description: сериализованная коллекция /components/schemas/PersonInfo
+        required: true
+        schema:
+          $ref: '#/components/schemas/PersonInfo'
+      - in: query
+        name: limit
+        description: Максимальное количество возвращаемых записей
+        required: true
+        schema:
+          type: integer
+          example: 10
+      - in: query
+        name: expand
+        description: Список полей, которые должны быть "раскрыты" в ответе. Перечисляются через запятую. Если параметр не указан, возвращаются только основные данные персоны.
+        schema:
+          type: string
+          example: documents,contacts
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimilarPerson'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{id}:
     get:
       tags:
@@ -247,6 +335,12 @@ paths:
         schema:
           type: string
           format: date-time
+      - in: query
+        name: training_on
+        description: "Дата нахождения в ОО/классе. Пример: 2019-12-01. По умолчанию, не установлена для возможности искать персоны, которые нигде не обучаются."
+        schema:
+          type: string
+          format: date
       - in: query
         name: expand
         description: Список полей, которые должны быть "раскрыты" в ответе. Перечисляются через запятую. Если параметр не указан, возвращаются только основные данные персоны.
@@ -272,6 +366,8 @@ paths:
           $ref: '#/components/responses/409'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     put:
       tags:
       - Person
@@ -283,6 +379,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PersonInfo'
             example:
+                id: 132765
                 person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
                 lastname: "Агеев"
                 firstname: "Никита"
@@ -290,7 +387,7 @@ paths:
                 birthdate: "2000-07-20"
                 birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
                 gender_id: 1
-                citizenship_id: 1
+                citizenship_id: 643
                 validation_state_id: 1
                 validated_at: "2019-09-12T16:37:12.232Z"
                 validation_errors: ""
@@ -323,6 +420,45 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
+
+  /persons/{id}/versions:
+    get:
+      tags:
+        - Person
+      summary: Получить журнал изменения персоны и вложенных объектов по идентификатору
+      parameters:
+        - in: path
+          name: id
+          description: Идентификатор персоны</br> (пример "449ab5bd-4f09-47a0-ba89-70ae2cd49692")
+          required: true
+          schema:
+            type: string
+            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Version'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/merges:
     get:
@@ -359,6 +495,8 @@ paths:
           $ref: '#/components/responses/409'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/merge:
     post:
@@ -410,6 +548,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/unmerge:
     post:
@@ -456,6 +596,63 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
+  /persons/categories:
+    get:
+      tags:
+        - Person
+        - Get
+        - Search
+      summary: Поиск категорий персон
+      parameters:
+        - in: query
+          name: filter
+          description: сериализованная коллекция /components/schemas/Filter
+          example: '{"and":[{ "field":"category_id","op":"equal","value":"1"},{ "field":"person_id","op":"in","value": ["3dc09d43-f36a-4950-ba40-be478dee0eea", "a34947e4-790c-4096-ba8f-ecd943856159"]}]}'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: top
+          description: Количество возвращаемых записей. Значение по умолчанию задается в параметрах Системы.
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: Количество пропускаемых записей. По умолчанию, 0.
+          schema:
+            type: string
+        - in: query
+          name: orderby
+          description: Cписок полей, по которым требуется сортировать, через запятую
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonCategory'
+        401:
+          $ref: '#/components/responses/401'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{person_id}/category:
     post:
       tags:
@@ -477,7 +674,9 @@ paths:
               $ref: '#/components/schemas/PersonCategory'
             example:
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               category_id: 7
+              external_id: "124098"
               parameter_values:
                 - value_1
                 - value_2
@@ -502,6 +701,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{person_id}/category/{id}:
     put:
       tags:
@@ -530,7 +731,9 @@ paths:
               $ref: '#/components/schemas/PersonCategory'
             example:
               id: 5
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               category_id: 7
+              external_id: "124098"
               parameter_values:
                 - value_3
                 - value_4
@@ -556,6 +759,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
         - Delete
@@ -591,6 +796,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{person_id}/documents:
     post:
       tags:
@@ -613,6 +820,7 @@ paths:
               $ref: '#/components/schemas/PersonDocument'
             example:   # Sample object
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               document_type_id: 1
               series: "II-МЮ"
               number: "123123"
@@ -623,6 +831,15 @@ paths:
               validation_state_id: 1
               validated_at: "2019-09-12T16:37:12.232Z"
               validation_errors: ""
+              attachments:
+                - id: "7cef2bda-c499-4688-bd63-81737f732342"
+                  name: "scan1.pdf"
+                  mimetype: "application/pdf"
+                  uploaded_at: "2021-03-22 19:13:38"
+                - id: "7cef2bda-c499-4688-bd63-81737f732355"
+                  name: "scan2.pdf"
+                  mimetype: "application/pdf"
+                  uploaded_at: "2021-03-20 15:14:38"
       responses:
         200:
           description: OK - операция завершилась успешно
@@ -644,6 +861,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/documents/{id}:
     put:
@@ -679,6 +898,7 @@ paths:
               $ref: '#/components/schemas/PersonDocument'
             example:
               id: 5326
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               document_type_id: 1
               series: "II-МЮ"
               number: "123123"
@@ -689,6 +909,15 @@ paths:
               validation_state_id: 1
               validated_at: "2019-09-12T16:37:12.232Z"
               validation_errors: ""
+              attachments:
+                - id: "7cef2bda-c499-4688-bd63-81737f732342"
+                  name: "scan1.pdf"
+                  mimetype: "application/pdf"
+                  uploaded_at: "2021-03-22 19:13:38"
+                - id: "7cef2bda-c499-4688-bd63-81737f732355"
+                  name: "scan2.pdf"
+                  mimetype: "application/pdf"
+                  uploaded_at: "2021-03-20 15:14:38"
       responses:
         200:
           description: OK - операция завершилась успешно
@@ -710,6 +939,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Person
@@ -747,6 +978,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/addresses:
     post:
@@ -769,6 +1002,7 @@ paths:
               $ref: '#/components/schemas/PersonAddress'
             example:
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               address_type_id: 1
               validation_state_id: 1
               validated_at: "2019-09-13T15:18:12.232Z"
@@ -801,6 +1035,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/addresses/{id}:
     put:
@@ -830,6 +1066,7 @@ paths:
               $ref: '#/components/schemas/PersonAddress'
             example:
               id: 532623
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               address_type_id: 1
               validation_state_id: 1
               validated_at: "2019-09-17T17:37:12.232Z"
@@ -862,6 +1099,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Person
@@ -899,6 +1138,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/contacts:
     post:
@@ -921,6 +1162,7 @@ paths:
               $ref: '#/components/schemas/PersonContact'
             example:
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               type_id: 2
               data: 'ivanov@test.org'
       responses:
@@ -944,6 +1186,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/contacts/{id}:
     put:
@@ -973,6 +1217,7 @@ paths:
               $ref: '#/components/schemas/PersonContact'
             example:
               id: 29423
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               type_id: 1
               data: '9202703205'
               validation_state_id: 1
@@ -999,6 +1244,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Person
@@ -1036,52 +1283,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
-
-  /persons/{person_id}/ids:
-    put:
-      tags:
-        - Update
-        - Person
-      summary: Изменение идентификаторов персоны
-      parameters:
-        - in: path
-          name: person_id
-          description: Идентификатор персоны
-          required: true
-          schema:
-            type: string
-            example: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Person'
-            example:
-              id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
-              contingent_id: "49c1a1f3-2daa-4632-91be-87cf42dce63b"
-              sso_id: "1aa5fb27-c8ae-415a-b781-3092c802b36e"
-              msr_id: "294598f0-43cb-4031-a45e-0f90bef25cdb"
-      responses:
-        200:
-          description: OK - операция завершилась успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Person'
-        400:
-          $ref: '#/components/responses/400'
-        401:
-          $ref: '#/components/responses/401'
-        404:
-          $ref: '#/components/responses/404'
-        405:
-          $ref: '#/components/responses/405'
-        409:
-          $ref: '#/components/responses/409'
-        422:
-          $ref: '#/components/responses/422'
-        500:
-          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/agents:
     post:
@@ -1109,21 +1312,24 @@ paths:
                 summary: Создание персоны представителя с привязкой к персоне
                 value:
                   id: 0
+                  person_id: "00000000-0000-0000-0000-000000000000"
                   agent_type_id: 1
                   validation_state_id: 1
                   validated_at: "2019-09-25T17:38:12.232Z"
                   validation_errors: ""
                   agent_person:
                     id: 0
+                    person_id: "00000000-0000-0000-0000-000000000000"
                     lastname: Агеев
                     firstname: Кирилл
                     patronymic: Сергеевич
                     birthdate: "1983-07-20"
                     birthplace: "Запорожская область, каменский район, хутор далекий, путь не близкий"
                     gender_id: 1
-                    citizenship_id: 1
+                    citizenship_id: 643
                     addresses:
                       - id: 0
+                        person_id: "00000000-0000-0000-0000-000000000000"
                         address_type_id: 1
                         validation_state_id: 1
                         validated_at: "2019-09-19T14:31:12.232Z"
@@ -1135,6 +1341,7 @@ paths:
                           flat: "111/13"
                     documents:
                        -  id: 0
+                          person_id: "00000000-0000-0000-0000-000000000000"
                           document_type_id: 2
                           series: "1243"
                           number: "923432"
@@ -1144,8 +1351,18 @@ paths:
                           validation_state_id: 1
                           validated_at: "2019-09-15T15:23:12.232Z"
                           validation_errors: ""
+                          attachments:
+                            - id: "7cef2bda-c499-4688-bd63-81737f732342"
+                              name: "scan1.pdf"
+                              mimetype: "application/pdf"
+                              uploaded_at: "2021-03-22 19:13:38"
+                            - id: "7cef2bda-c499-4688-bd63-81737f732355"
+                              name: "scan2.pdf"
+                              mimetype: "application/pdf"
+                              uploaded_at: "2021-03-20 15:14:38"
                     contacts:
                       - id: 0
+                        person_id: "00000000-0000-0000-0000-000000000000"
                         type_id: 1
                         data: "777773203"
                         validation_state_id: 1
@@ -1155,6 +1372,7 @@ paths:
                 summary: Привязка к персоне существующего представителя
                 value:
                   id: 0
+                  person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
                   agent_type_id: 1
                   agent_person_id: "f2405b24-20bf-4579-97a7-c44c23246e57"
                   validation_state_id: 1
@@ -1181,6 +1399,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/agents/{id}:
     put:
@@ -1212,11 +1432,14 @@ paths:
               LinkOnly:
                 summary: "Изменение типа представительства"
                 value:
+                  id: 154707
+                  person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
                   agent_type_id: 1
               withAgentUpdate:
                 summary: "Изменение связи и основные данные представителя"
                 value:
                   id: 154707
+                  person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
                   agent_type_id: 1
                   validation_state_id: 1
                   validated_at: "2019-10-18T15:37:12.232Z"
@@ -1228,7 +1451,7 @@ paths:
                     birthdate: "1983-07-20"
                     birthplace: "Запорожская область, каменский район, хутор далекий, путь не близкий"
                     gender_id: 1
-                    citizenship_id: 1
+                    citizenship_id: 643
                     validation_state_id: 1
                     validated_at: "2019-09-18T16:37:12.232Z"
                     validation_errors: ""
@@ -1253,6 +1476,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Person
@@ -1288,6 +1513,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   
   /persons/{person_id}/education:
     post:
@@ -1310,6 +1537,7 @@ paths:
               $ref: '#/components/schemas/PersonEducation'
             example:
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               organization_id: 2398304
               class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
               education_form_id: 1
@@ -1337,6 +1565,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{person_id}/education/{id}:
     put:
       tags:
@@ -1365,6 +1595,7 @@ paths:
               $ref: '#/components/schemas/PersonEducation'
             example:
               id: 14
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               organization_id: 2398304
               class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
               education_form_id: 1
@@ -1394,6 +1625,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Delete
@@ -1429,6 +1662,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/batch/education:
     post:
@@ -1445,7 +1680,7 @@ paths:
                 $ref: '#/components/schemas/PersonEducation'
             example:
               - id: 0
-                person_id: '449ab5bd-4f09-47a0-ba89-70ae2cd49692'
+                person_id: "00000000-0000-0000-0000-000000000000"
                 organization_id: 2398304
                 class_uid: 'f3762cce-9ec1-4e29-ac8a-566c4972197c'
                 education_form_id: 1
@@ -1454,7 +1689,7 @@ paths:
                 training_begin_at: '2019-09-01'
                 notes: 'Примечание'
               - id: 0
-                person_id: '63475dca-f6d1-4942-8cee-f128e277ba2d'
+                person_id: "00000000-0000-0000-0000-000000000000"
                 organization_id: 2398304
                 class_uid: '7fa62cd2-0ba8-4af3-98d4-16386731a4ac'
                 education_form_id: 1
@@ -1479,6 +1714,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     put:
       tags:
         - Update
@@ -1529,6 +1766,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /persons/{person_id}/preventions:
     post:
@@ -1551,6 +1790,7 @@ paths:
               $ref: '#/components/schemas/PersonPrevention'
             example:
               id: 0
+              person_id: "00000000-0000-0000-0000-000000000000"
               prevention_type_id: 1
               started_at: '2019-09-01'
               started_document_issued: '2019-09-01'
@@ -1580,6 +1820,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /persons/{person_id}/preventions/{id}:
     put:
       tags:
@@ -1608,6 +1850,7 @@ paths:
               $ref: '#/components/schemas/PersonPrevention'
             example:
               id: 14
+              person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
               prevention_type_id: 1
               started_at: '2019-09-01'
               started_document_issued: '2019-09-01'
@@ -1641,6 +1884,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
         - Delete
@@ -1676,6 +1921,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
   /classes:
     get:
@@ -1741,6 +1988,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     post:
       tags:
       - Class
@@ -1791,6 +2040,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /classes/{id}:
     get:
       tags:
@@ -1828,6 +2079,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     put:
       tags:
       - Class
@@ -1885,6 +2138,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
       - Class
@@ -1919,6 +2174,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /categories:
     post:
       tags:
@@ -1962,6 +2219,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     get:
       tags:
         - Category
@@ -2015,6 +2274,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /categories/{id}:
     get:
       tags:
@@ -2052,6 +2313,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     put:
       tags:
         - Category
@@ -2102,6 +2365,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
     delete:
       tags:
         - Category
@@ -2137,6 +2402,98 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
+  /events:
+    get:
+      tags:
+        - Event
+        - Get
+        - Search
+      summary: Поиск событий
+      parameters:
+        - in: query
+          name: filter
+          description: сериализованная коллекция /components/schemas/Filter
+          example: '{"and":[{ "field":"updated_at","op":"equal","value":"2020-01-01"},{ "field":"notify_state","op":"equal","value":"processed"}]}'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: top
+          description: Количество возвращаемых записей. Значение по умолчанию задается в параметрах Системы.
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: Количество пропускаемых записей. По умолчанию, 0.
+          schema:
+            type: string
+        - in: query
+          name: orderby
+          description: Cписок полей, по которым требуется сортировать, через запятую
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        401:
+          $ref: '#/components/responses/401'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        422:
+          $ref: '#/components/responses/422'
+        500:
+          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
+  /events/{id}:
+    get:
+      tags:
+        - Event
+      summary: Получить событие по идентификатору
+      parameters:
+        - in: path
+          name: id
+          description: Идентификатор события</br> (пример "123876")
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: '123876'
+      responses:
+        200:
+          description: OK - операция завершилась успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
   /transaction:
     post:
       tags:
@@ -2157,7 +2514,7 @@ paths:
                 resource: "/person/education"
                 items:
                   - id: 0
-                    person_id: e1bd6562-fc1f-4916-8697-1e29f060a564
+                    person_id: 00000000-0000-0000-0000-000000000000
                     organization_id: 2398304
                     class_uid: e266b41c-cbec-488b-bb7c-d650970dfbc8
                     education_form_id: 5
@@ -2181,13 +2538,76 @@ paths:
               - method: POST
                 resource: "/person/education"
                 items:
-                  - person_id: f98e1848-1a0d-4219-97a2-3d242025a680
+                  - id: 0
+                    person_id: 00000000-0000-0000-0000-000000000000
                     organization_id: 2398304
                     class_uid: 385028f2-9443-4135-a63a-17d324bd999e
                     education_form_id: 5
                     financing_type_id: 1
                     service_type_id: 1
                     training_begin_at: '2020-01-04'
+              - method: PUT
+                resource: "/person"
+                items:
+                  - id: 1423
+                    person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+                    lastname: "Агеев"
+                    firstname: "Никита"
+                    patronymic: "Сергеевич"
+                    birthdate: "2000-07-20"
+                    birthplace: "Украина, запорожская область, каменский район, хутор далекий, путь не близкий"
+                    gender_id: 1
+                    citizenship_id: 643
+                    validation_state_id: 1
+                    validated_at: "2019-09-12T16:37:12.232Z"
+                    validation_errors: ""
+              - method: PUT
+                resource: "/person/addresses"
+                items:
+                  - id: 532623
+                    person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+                    address_type_id: 1
+                    validation_state_id: 1
+                    validated_at: "2019-09-17T17:37:12.232Z"
+                    validation_errors: ""
+                    address:
+                      id: 0
+                      address: "Виноградова Академика ул., дом 1, корпус 1, кв. 110"
+                      fias_id: "1429aa81-57ea-43c6-95b4-72e3b2bfdf17"
+                      unom: 280190
+                      flat: "110"
+                      global_id: 1239872
+              - method: PUT
+                resource: "/person/contacts"
+                items:
+                  - id: 29423
+                    person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+                    type_id: 1
+                    data: '9202703205'
+                    validation_state_id: 1
+                    validated_at: "2019-09-19T17:37:12.232Z"
+                    validation_errors: ""
+              - method: PUT
+                resource: "/person/documents"
+                items:
+                  - id: 5326
+                    person_id: "449ab5bd-4f09-47a0-ba89-70ae2cd49692"
+                    document_type_id: 1
+                    series: "II-МЮ"
+                    number: "123123"
+                    subdivision_code: "071-001"
+                    issuer: "УВД Северозападного административного округа"
+                    issued: "2019-07-15"
+                    expiration: "2045-07-15"
+                    validation_state_id: 1
+                    validated_at: "2019-09-12T16:37:12.232Z"
+                    validation_errors: ""
+              - method: PUT
+                resource: "/person/agents"
+                items:
+                  - id: 29837
+                    person_id: 449ab5bd-4f09-47a0-ba89-70ae2cd49692
+                    agent_type_id: 1
         required: true
       responses:
         200:
@@ -2206,6 +2626,8 @@ paths:
           $ref: '#/components/responses/422'
         500:
           $ref: '#/components/responses/500'
+        503:
+          $ref: '#/components/responses/503'
 
 security:
   - ApiKeyAuth: []
@@ -2283,6 +2705,9 @@ components:
           type: integer
           format: int32
           description: Справочник возрастных категорий (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18394236">AGE_GROUP</href>)
+        data:
+          type: object
+          description: Дополнительная информация о классе/группе
         notes:
           type: string
           format: text
@@ -2454,6 +2879,7 @@ components:
           description: Операция
           enum:
             - equal
+            - not_equal
             - like
             - greater_then
             - less_then
@@ -2500,6 +2926,7 @@ components:
       required:
        - id
        - address_type_id
+       - person_id
       properties: 
         id:
           type: integer
@@ -2621,6 +3048,9 @@ components:
           type: integer
           format: int32
           description: Идентификатор категории
+        external_id:
+          type: string
+          description: Идентификатор значения категории. Обеспечивает уникальность значения категории в рамках категории и персоны.
         parameter_values:
           type: object
           description: Произвольный набор значений параметров
@@ -2655,6 +3085,7 @@ components:
         - id
         - type_id
         - data
+        - person_id
       properties:
         id:
           type: integer
@@ -2811,6 +3242,7 @@ components:
         - id
         - document_type_id
         - number
+        - person_id
       properties:
         id:
           type: integer
@@ -2876,34 +3308,14 @@ components:
           type: string
           format: date
           description: Дата истечения срока действия документа
+        attachments:
+          type: object
+          description: Вложения (ссылки на сканы документов и т.п.)
         document_type:
           $ref: "#/components/schemas/DocumentType"
         validation_errors:
           type: string
           description: Ошибки валидации из внешних систем
-    Person:
-      type: object
-      description: Песона
-      required:
-       - id
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Уникальный идентификатор персоны. Заполняется автоматически. При создании персоны заполнять 0000-0000-0000-0000
-          example: '0000-0000-0000-0000'
-        msr_id:
-          type: string
-          format: uuid
-          description: Идентификатор МСР
-        sso_id:
-          type: string
-          format: uuid
-          description: Идентификатор СУДИР
-        contingent_id:
-          type: string
-          format: uuid
-          description: Идентификатор в системе-источнике
     PersonInfo:
       type: object
       description: Основные данные персоны
@@ -3010,8 +3422,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PersonCategory"
-        ids:
-          $ref: "#/components/schemas/Person"
         agents:
           description: Список представителей
           type: array
@@ -3032,6 +3442,31 @@ components:
         validation_errors:
           type: string
           description: Ошибки валидации из внешних систем
+    SimilarPerson:
+      type: object
+      description: Похожая персона
+      properties:
+        person:
+          $ref: "#/components/schemas/PersonInfo"
+        degree:
+          type: integer
+          format: int32
+          description: Степень схожести
+        degree_description:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimilarPersonDegree'
+    SimilarPersonDegree:
+      type: object
+      description: Похожая персона
+      properties:
+        degree:
+          type: integer
+          format: int32
+          description: Степень схожести
+        method:
+          type: string
+          description: Метод, которым найдена персона
     AddressType:
       type: object
       description: Типы адресов
@@ -3127,6 +3562,7 @@ components:
       required:
        - id
        - agent_type_id
+       - person_id
       properties: 
         id:
           type: integer
@@ -3143,7 +3579,7 @@ components:
         agent_type_id:
           type: integer
           format: int32
-          description: Идентификатор типа представительства (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18393963">LEGAL_REPRESENT</href>)
+          description: Идентификатор типа представительства (каталог НСИ3 <a href="https://wiki.edu.mos.ru/pages/viewpage.action?pageId=18393963">PERSON_AGENT_TYPE</href>)
         validation_state_id:
           type: integer
           format: int32
@@ -3294,6 +3730,26 @@ components:
           $ref: "#/components/schemas/ServiceType"
         organization:
           $ref: "#/components/schemas/Organization"
+    Version:
+      type: object
+      description: Журнал изменений объекта
+      properties:
+        actual_from:
+          type: string
+          format: date-time
+          description: Дата и время начала актуальности
+        actual_to:
+          type: string
+          format: date-time
+          description: Дата и время окончания актуальности
+        object_type:
+          type: string
+          description: Тип объекта (person_info,person_document,person_agent) и т.д.
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор версии
+
     EducationForm:
       type: object
       description: Справочник формы обучения
@@ -3468,6 +3924,52 @@ components:
           type: string
           format: date-time
           description: Дата и время изменения
+    Event:
+      type: object
+      description: Событие
+      required:
+        - id
+        - name
+        - notify_state_id
+        - entity_type
+        - entity_id
+        - created_by
+        - created_at
+        - updated_at
+        - content
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор
+        notify_state_id:
+          type: integer
+          description: Состояние отправки
+        entity_type:
+          type: string
+          description: Тип сущности
+        entity_id:
+          type: integer
+          format: int64
+          description: Идентификатор сущности
+        created_by:
+          type: string
+          format: uuid
+          description: Идентификатор системы-источника, которое породило событие
+        created_at:
+          type: string
+          format: date-time
+          description: Дата/время возникновения события
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата/время изменения статуса события
+        content:
+          type: string
+          description: Сущность
+        legacy_content:
+          type: string
+          description: Сообщение в старом формате
     Transaction:
       type: object
       description: Данные для вызова операции в рамках транзакции
@@ -3484,7 +3986,7 @@ components:
           description: Метод передачи
         resource:
           type: string
-          description: Операция
+          description: Операция. Возможные значения /person/education, /person/contacts, /person/addresses, /person/documents, /person/agents, /person
         items:
           type: array
           items: object
@@ -3550,4 +4052,14 @@ components:
           example:
             error_code: "500"
             error_description: "Internal server error"
+            details: null
+    503:
+      description: Сервис находится в сервисном режиме
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error_code: "503"
+            error_description: "Система переведена в сервисный режим. Работа возобновится в ближайшее время"
             details: null

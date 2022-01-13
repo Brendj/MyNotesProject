@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -52,6 +54,8 @@ public class MeshPersonsSyncService {
     private static final String FILTER_VALUE_PATRONYMIC = "patronymic";
 
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
+
+    private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     private MeshRestClient meshRestClient;
 
@@ -184,9 +188,9 @@ public class MeshPersonsSyncService {
                     meshClass = new MeshClass(class_.getId(), classuid);
                 }
                 meshClass.setLastUpdate(new Date());
-                meshClass.setName(classname);
+                meshClass.setName(class_.getName());
                 meshClass.setParallelId(parallelid);
-                meshClass.setEducationStageId(educationstageid);
+                meshClass.setEducationStageId(class_.getEducationStageId());
                 meshClass.setOrganizationId(organizationid);
                 session.saveOrUpdate(meshClass);
             }
@@ -229,14 +233,27 @@ public class MeshPersonsSyncService {
 
     protected Education findEducation(ResponsePersons person) {
         try {
-            Iterator<Education> iterator = person.getEducation().iterator();
-            while (iterator.hasNext()) {
-                Education education = iterator.next();
-                if (education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())) {
-                    iterator.remove();
+            Date now = CalendarUtils.startOfDay(new Date());
+            List<Education> educations = person.getEducation();
+            educations.removeIf(
+                    education -> education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())
+            );
+            Collections.sort(educations);
+
+            if(educations.size() > 1) {
+                List<Education> educationsOnBudget = new LinkedList<>();
+                for (Education e : educations) {
+                    Date trainingEndAt = format.parse(e.getTrainingEndAt());
+
+                    if (trainingEndAt.after(now) && e.getFinancingType().getName().equals("Бюджет")) {
+                        educationsOnBudget.add(e);
+                    }
+                }
+                if(!educationsOnBudget.isEmpty()){
+                    return educationsOnBudget.get(educationsOnBudget.size() - 1);
                 }
             }
-            Collections.sort(person.getEducation());
+
             return person.getEducation().get(person.getEducation().size() - 1);
         } catch (Exception e) {
             logger.error("Can not find education from person with guid " + person.getPersonId());

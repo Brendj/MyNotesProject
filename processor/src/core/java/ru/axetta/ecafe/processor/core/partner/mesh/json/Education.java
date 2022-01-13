@@ -5,10 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonPropertyOrder({
@@ -38,8 +35,8 @@ import java.util.Map;
 })
 public class Education implements Comparable {
 
-    public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 3, 4);
-    public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Arrays.asList(3, 4);
+    public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 4);
+    public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Collections.singletonList(4);
 
     @JsonProperty("id")
     private Integer id;
