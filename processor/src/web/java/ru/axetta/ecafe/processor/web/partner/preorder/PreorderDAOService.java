@@ -473,7 +473,7 @@ public class PreorderDAOService {
                 // если нет - режим фиксированной цены
                 Integer complexType = preorderComplex.getModeOfAdd();
                 Long complexPrice = (preorderComplex.getComplexPrice() == null) ? 0L :
-                        preorderComplex.getComplexPrice() * 100;
+                        preorderComplex.getComplexPrice();
                 Integer amount = preorderComplex.getAmount();
                 boolean isRegular = getRegularSignForPreorderComplex(client, idOfComplex, startDate, endDate);
 
@@ -917,7 +917,7 @@ public class PreorderDAOService {
             menuItemExt.setGroup(preorderMenuDetail.getGroupName());
             menuItemExt.setName(preorderMenuDetail.getShortName());
             menuItemExt.setFullName(preorderMenuDetail.getMenuDetailName());
-            menuItemExt.setPrice(isComposite ? preorderMenuDetail.getUsedSum() : 0L);
+            menuItemExt.setPrice(isComposite ? preorderMenuDetail.getMenuDetailPrice() : 0L);
             menuItemExt.setCalories(preorderMenuDetail.getCalories() == null ? (double) 0 : preorderMenuDetail.getCalories());
             menuItemExt.setOutput(preorderMenuDetail.getAmount() == null ? "" : preorderMenuDetail.getAmount().toString());
             menuItemExt.setAvailableNow(0);
