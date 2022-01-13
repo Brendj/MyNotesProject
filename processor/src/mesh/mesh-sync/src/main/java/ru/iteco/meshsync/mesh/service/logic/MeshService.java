@@ -1,5 +1,6 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
+import org.threeten.bp.LocalDate;
 import ru.iteco.client.ApiException;
 import ru.iteco.client.model.ModelClass;
 import ru.iteco.client.model.PersonCategory;
@@ -41,14 +42,14 @@ public class MeshService {
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
 
-    private static final List<Integer> notInOrganization = Arrays.asList(
-            ServiceType.ATTESTATION.getCode(),
+    private static final List<Integer> notInOrganization = Collections.singletonList(
+            //ServiceType.ATTESTATION.getCode(),
             ServiceType.ACADEMIC_LEAVE.getCode()
     );
 
     private static final List<Integer> enabledServiceTypeIds = Arrays.asList(
             ServiceType.EDUCATION.getCode(),
-            ServiceType.ATTESTATION.getCode(),
+            //ServiceType.ATTESTATION.getCode(),
             ServiceType.ACADEMIC_LEAVE.getCode()
     );
 
@@ -313,6 +314,24 @@ public class MeshService {
                 .filter((e) -> enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
                 .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
+
+        if(allEdu.size() > 1) {
+            LocalDate now = LocalDate.now();
+
+            List<PersonEducation> educationsOnBudget = new LinkedList<>();
+            for (PersonEducation e : allEdu) {
+                LocalDate trainingEndAt = e.getTrainingEndAt();
+
+
+                if (trainingEndAt.isAfter(now) && e.getFinancingType().getName().equals("Бюджет")) {
+                    educationsOnBudget.add(e);
+                }
+            }
+            if(!educationsOnBudget.isEmpty()){
+                return educationsOnBudget.get(educationsOnBudget.size() - 1);
+            }
+        }
+
         return allEdu.get(allEdu.size() - 1);
     }
 }
