@@ -64,6 +64,7 @@ public class ContragentSelectPage extends BasicPage {
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
     private List<Item> items = Collections.emptyList();
     private Item selectedItem = new Item();
+    private String name = "";
     private String filter, classTypesString;
     private int multiContrFlag;
 
@@ -94,6 +95,7 @@ public class ContragentSelectPage extends BasicPage {
 
     public Object cancelFilter() {
         selectedItem = new Item();
+        name = "";
         return null;
     }
 
@@ -103,6 +105,7 @@ public class ContragentSelectPage extends BasicPage {
         } else {
             this.selectedItem = selected;
         }
+        this.name = selectedItem.contragentName;
     }
 
     public String getFilter() {
@@ -111,6 +114,14 @@ public class ContragentSelectPage extends BasicPage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {

@@ -5713,4 +5713,10 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         return (Contragent) query.uniqueResult();
     }
+
+    public static List<Long> findOrgByContragent(Session session, Contragent defaultSupplier) {
+        Query query = session.createQuery("SELECT org.idOfOrg FROM Org org where org.defaultSupplier = :defaultSupplier");
+        query.setParameter("defaultSupplier", defaultSupplier);
+        return query.list();
+    }
 }

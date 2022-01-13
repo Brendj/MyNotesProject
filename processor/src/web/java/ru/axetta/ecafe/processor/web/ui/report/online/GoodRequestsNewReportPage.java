@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
 import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
@@ -20,6 +21,8 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
 
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +51,7 @@ import java.util.*;
  * Time: 15:52
  * To change this template use File | Settings | File Templates.
  */
-public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
+public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage implements ContragentSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportPage.class);
     private final static String generateBeginDateKey = "goodRequestsReport.generateBeginDate";
@@ -69,6 +72,17 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private Date lastGoodRequestUpdateDateTime;
     private List<SelectItem> preorderTypeItems = readAllPreordersPresenceItems();
     private PreordersPresenceTypeEnum preorderType = PreordersPresenceTypeEnum.WITH_PREORDERS;
+    private Contragent defaultSupplier;
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        if (null != idOfContragent) {
+            this.defaultSupplier = (Contragent) session.get(Contragent.class, idOfContragent);
+        } else {
+            defaultSupplier = null;
+        }
+    }
+
 
     public enum PreordersPresenceTypeEnum {
         WITH_PREORDERS("Включить предзаказы"),
@@ -100,15 +114,14 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                     User user = (User) persistenceSession.get(User.class, currentUser.getIdOfUser());
 
                     idOfOrgList = new ArrayList<Long>();
-                    if (user.getUserOrgses().isEmpty()){
+                    if (user.getUserOrgses().isEmpty()) {
                         filter = "Не выбрано";
                         printMessage("Список организаций рассылки не заполнен");
                         idOfOrgList = null;
 
-                    }
-                    else {
+                    } else {
                         filter = "";
-                        for(UserOrgs userOrgs: user.getUserOrgses()) {
+                        for (UserOrgs userOrgs : user.getUserOrgses()) {
                             idOfOrgList.add(userOrgs.getOrg().getIdOfOrg());
                             filter = filter.concat(userOrgs.getOrg().getShortName() + "; ");
                         }
@@ -137,7 +150,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         generateEndDate = new Date();
         Properties properties = DAOUtils.extractPropertiesByUserReportSetting(persistenceSession, currentUser,
                 UserReportSetting.GOOD_REQUEST_REPORT);
-        if(!properties.isEmpty()){
+        if (!properties.isEmpty()) {
             Date dateTime = new Date();
             String generateBeginDateStr = properties.getProperty(generateBeginDateKey,
                     CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateTime));
@@ -160,25 +173,33 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     public void onGeneratePeriodChanged(ActionEvent event) {
-        generateEndDate = new Date(generateBeginDate.getTime()+60*60*1000);
+        generateEndDate = new Date(generateBeginDate.getTime() + 60 * 60 * 1000);
     }
 
     public void onEndDateSpecified() {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+        if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         } else {
-            long diff=end.getTime()-startDate.getTime();
-            int noOfDays=(int)(diff/(24*60*60*1000));
-            switch (noOfDays){
-                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
-                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
-                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
-                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            long diff = end.getTime() - startDate.getTime();
+            int noOfDays = (int) (diff / (24 * 60 * 60 * 1000));
+            switch (noOfDays) {
+                case 0:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
+                    break;
+                case 6:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+                    break;
+                case 13:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK);
+                    break;
+                default:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
+                    break;
             }
         }
-        if(startDate.after(endDate)){
+        if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
         }
     }
@@ -189,7 +210,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     public Object reportHTMLSendEmail() {
-        if (validateFormData())  return null;
+        if (validateFormData()) return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile("_notify.jasper");
         //String templateFilename = checkIsExistFile("_summary.jasper");
@@ -198,7 +219,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             return null;
         }
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -206,7 +226,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+                builder.setReportProperties(buildProperties(persistenceSession));
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -238,8 +259,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 //eventNotificationService.sendEmailAsync("dizzarg@mail.ru",
                 //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
@@ -254,7 +275,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             return null;
         }
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -262,7 +282,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+                builder.setReportProperties(buildProperties(persistenceSession));
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -289,7 +310,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 exporter.exportReport();
                 htmlReport = os.toString("UTF-8");
                 os.close();
-                if(hideGeneratePeriod){
+                if (hideGeneratePeriod) {
                     try {
                         // идет запись
                         persistenceSession = runtimeContext.createPersistenceSession();
@@ -307,8 +328,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                     }
                 }
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
@@ -318,7 +339,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + suffix;
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
+        if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
             return null;
         }
@@ -326,32 +347,36 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList) && !applyUserSettings){
-            printError("Выберите список организаций или поставщиков");
+        if (CollectionUtils.isEmpty(idOfContragentOrgList) && !applyUserSettings && defaultSupplier == null && CollectionUtils.isEmpty(idOfOrgList)) {
+            printError("Выберите производственную конфигурацию и организацию или поставщика");
             return true;
         }
-        if(startDate==null){
+        if (CollectionUtils.isEmpty(idOfOrgList) && defaultSupplier == null) {
+            printError("Выберите организацию");
+            return true;
+        }
+        if (startDate == null) {
             printError("Не указано дата выборки от");
             return true;
         }
-        if(endDate==null){
+        if (endDate == null) {
             printError("Не указано дата выборки до");
             return true;
         }
-        if(startDate.after(endDate)){
+        if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
             return true;
         }
-        if(hideGeneratePeriod){
-            if(generateBeginDate==null){
+        if (hideGeneratePeriod) {
+            if (generateBeginDate == null) {
                 printError("Не указано время генерации от");
                 return true;
             }
-            if(generateEndDate==null){
+            if (generateEndDate == null) {
                 printError("Не указано время генерации до");
                 return true;
             }
-            if(generateBeginDate.after(generateEndDate)){
+            if (generateBeginDate.after(generateEndDate)) {
                 printError("Время генерации от меньше время генерации до");
                 return true;
             }
@@ -359,21 +384,21 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         return false;
     }
 
-    public void exportToXLS(ActionEvent actionEvent){
+    public void exportToXLS(ActionEvent actionEvent) {
         if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile("_export.jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            builder.setReportProperties(buildProperties(persistenceSession));
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -384,7 +409,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             HibernateUtils.close(persistenceSession, logger);
         }
 
-        if(report!=null){
+        if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -406,7 +431,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 xlsExport.exportReport();
                 servletOutputStream.flush();
                 servletOutputStream.close();
-                if(hideGeneratePeriod){
+                if (hideGeneratePeriod) {
                     try {
                         // идет запись
                         persistenceSession = runtimeContext.createPersistenceSession();
@@ -431,9 +456,9 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         }
     }
 
-    public Object clear(){
-        idOfOrg=null;
-        filter=null;
+    public Object clear() {
+        idOfOrg = null;
+        filter = null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -451,17 +476,20 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         return null;
     }
 
-    private Properties buildProperties() {
+    private Properties buildProperties(Session persistenceSession) {
         Properties properties = new Properties();
         String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, sourceMenuOrgId);
         String idOfOrgString = "";
-        if(idOfOrgList != null) {
+        if (defaultSupplier != null) {
+            idOfOrgList.addAll(DAOUtils.findOrgByContragent(persistenceSession, defaultSupplier));
+        }
+        if (idOfOrgList != null) {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty(GoodRequestsNewReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(hideGeneratePeriod));
-        if(hideGeneratePeriod){
+        if (hideGeneratePeriod) {
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(generateBeginDate.getTime()));
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(generateEndDate.getTime()));
         } else {
@@ -478,10 +506,20 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
         boolean hidePreorders = false, preordersOnly = false;
         switch (preorderType) {
-            case ONLY_PREORDERS: preordersOnly = true; hidePreorders = false; break;
-            case WITH_PREORDERS: preordersOnly = false; hidePreorders = false; break;
-            case WITHOUT_PREORDERS: preordersOnly = false; hidePreorders = true; break;
-            default: break;
+            case ONLY_PREORDERS:
+                preordersOnly = true;
+                hidePreorders = false;
+                break;
+            case WITH_PREORDERS:
+                preordersOnly = false;
+                hidePreorders = false;
+                break;
+            case WITHOUT_PREORDERS:
+                preordersOnly = false;
+                hidePreorders = true;
+                break;
+            default:
+                break;
         }
 
         properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(hidePreorders));
@@ -494,6 +532,13 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         String reportDistinctText = basicReportJob.getReportDistinctText();
         String format = timeFormat.format(generateTime);
         return String.format("%s-%s-%s", "GoodRequestsReport", reportDistinctText, format);
+    }
+
+    public Object showContragentSelectPage() {
+        idOfOrgList.clear();
+        filter = "Не выбрано";
+        MainPage.getSessionInstance().showContragentSelectPage();
+        return null;
     }
 
     @Override
@@ -601,5 +646,15 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             items.add(new SelectItem(type, type.toString()));
         }
         return items;
+    }
+
+    public String getDefaultSupplier() {
+        if (defaultSupplier == null)
+            return "Не выбрано";
+        return defaultSupplier.getContragentName();
+    }
+
+    public void setDefaultSupplier(Contragent defaultSupplier) {
+        this.defaultSupplier = defaultSupplier;
     }
 }
