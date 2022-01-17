@@ -117,7 +117,6 @@ public class GuardianDoublesService {
             if (processList.size() == 1) continue;
             //Есть дубли, дальше обрабатываем
             processDoubles(processList);
-            logger.info("Doubles: idofclient = " + idOfClient + " - " + processList.size());
         }
     }
 

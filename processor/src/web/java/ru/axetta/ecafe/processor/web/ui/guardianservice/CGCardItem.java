@@ -36,9 +36,9 @@ public class CGCardItem implements Comparable {
         }
         CGCardItem item = (CGCardItem) o;
         if (this.cardLastUpdate == null && item.getCardLastUpdate() == null) return 0;
-        if (this.cardLastUpdate != null && item.getCardLastUpdate() == null) return 1;
-        if (this.cardLastUpdate == null && item.getCardLastUpdate() != null) return -1;
-        return cardLastUpdate.compareTo(item.getCardLastUpdate());
+        if (this.cardLastUpdate != null && item.getCardLastUpdate() == null) return -1;
+        if (this.cardLastUpdate == null && item.getCardLastUpdate() != null) return 1;
+        return -cardLastUpdate.compareTo(item.getCardLastUpdate());
     }
 
     @Override
