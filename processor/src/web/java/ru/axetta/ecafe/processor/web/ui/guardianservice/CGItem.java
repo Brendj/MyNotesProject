@@ -2,6 +2,9 @@ package ru.axetta.ecafe.processor.web.ui.guardianservice;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CGItem implements Comparable {
     private Long idOfClient;
     private Long idOfGuardin;
@@ -15,10 +18,14 @@ public class CGItem implements Comparable {
     private Long cardLastUpdate;
     private Long balance;
     private Long idOfClientGroup;
+    private Long guardianLastUpdate;
+
+    public static final List<Long> GROUPS = Arrays.asList(1100000000L, 1100000010L, 1100000050L, 1100000020L,
+            1100000030L, 1100000100L, 1100000110L);
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
                   boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
-                  Long idOfClientGroup) {
+                  Long idOfClientGroup, Long guardianLastUpdate) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio;
@@ -31,6 +38,7 @@ public class CGItem implements Comparable {
         this.cardLastUpdate = cardLastUpdate;
         this.balance = balance;
         this.idOfClientGroup = idOfClientGroup;
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 
     @Override
@@ -39,13 +47,22 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
-        if (this.getCardno() != null && item.getCardno() == null) return 1;
+        /*if (this.getCardno() != null && item.getCardno() == null) return 1;
         if (this.getCardno() == null && item.getCardno() == null) return 0;
         if (this.getCardno() == null && item.getCardno() != null) return -1;
         if (this.getCardno() != null && item.getCardno() != null) {
             return this.getCardLastUpdate().compareTo(item.getCardLastUpdate());
         }
-        return 0;
+        return 0;*/
+        if (this.balance > 0 && item.getBalance() == 0) return -1;
+        if (this.balance == 0 && item.getBalance() > 0) return 1;
+        int indexThis = GROUPS.indexOf(this.idOfClientGroup);
+        int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
+        if ((indexThis == -1) && (indexItem == -1)) return 0;
+        if ((indexThis == -1) && (indexItem > -1)) return -1;
+        if ((indexThis > -1) && (indexItem == -1)) return 1;
+
+        return Integer.valueOf(indexThis).compareTo(indexItem);
     }
 
     @Override
@@ -155,5 +172,13 @@ public class CGItem implements Comparable {
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getGuardianLastUpdate() {
+        return guardianLastUpdate;
+    }
+
+    public void setGuardianLastUpdate(Long guardianLastUpdate) {
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 }
