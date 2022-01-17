@@ -21,15 +21,13 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.guardianservice.GuardianDoublesService;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
@@ -783,6 +781,17 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setGuidForDiscountsUpdate(String guidForDiscountsUpdate) {
         this.guidForDiscountsUpdate = guidForDiscountsUpdate;
+    }
+
+    public void runDeleteDoubleGuardians() {
+        if (CollectionUtils.isEmpty(idOfOrgList)) {
+            printError("не выбраны организации для обработки дублей представителей");
+            return;
+        }
+        for (long idOfOrg : idOfOrgList) {
+            RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
+        }
+
     }
 
     public void runUpdateSpbCardUids() throws Exception {
