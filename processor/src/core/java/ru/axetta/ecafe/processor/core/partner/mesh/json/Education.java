@@ -35,8 +35,8 @@ import java.util.*;
 })
 public class Education implements Comparable {
 
-    public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 4);
-    public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Collections.singletonList(4);
+    public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 3, 4);
+    public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Arrays.asList(3, 4);
 
     @JsonProperty("id")
     private Integer id;
