@@ -292,6 +292,31 @@
                 <h:outputText value="Ид. организаций:"/>
                 <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
             </rich:panel>
+            <rich:panel id="loadMeshGuidsForGuardiansPanel">
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
+                                  styleClass="output-text"/><br/>
+                    <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
+                    <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
+                                     addLabel="Добавить..."
+                                     clearAllLabel="Очистить"
+                                     uploadLabel="Загрузить"
+                                     doneLabel="Готово"
+                                     onuploadcomplete="alert('Загрузка mesh гуидов выполнена');"
+                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}">
+                        <f:facet name="label">
+                            <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                        </f:facet>
+                        <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
+                        <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
+                    </rich:fileUpload>
+
+                    <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
+                                       action="#{otherActionsPage.runDeleteDoubleGuardians()}"
+                                       id="deleteDoubleGuardians"
+                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
 
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
