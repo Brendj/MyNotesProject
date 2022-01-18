@@ -302,19 +302,15 @@
                                      clearAllLabel="Очистить"
                                      uploadLabel="Загрузить"
                                      doneLabel="Готово"
-                                     onuploadcomplete="alert('Загрузка mesh гуидов выполнена');"
-                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}">
+                                     onuploadcomplete="alert('Загрузка mesh гуидов представителей выполнена');"
+                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
+                                     listHeight="100">
                         <f:facet name="label">
                             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
                         </f:facet>
                         <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
                         <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
                     </rich:fileUpload>
-
-                    <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
-                                       action="#{otherActionsPage.runDeleteDoubleGuardians()}"
-                                       id="deleteDoubleGuardians"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
                 </h:panelGrid>
             </rich:panel>
         </h:panelGrid>

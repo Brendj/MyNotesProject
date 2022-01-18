@@ -562,6 +562,7 @@ public class OtherActionsPage extends OnlineReportPage {
     private void loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
         Session session = null;
         Transaction transaction = null;
+        long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -572,10 +573,12 @@ public class OtherActionsPage extends OnlineReportPage {
             String currLine = reader.readLine();
             Long idOfClient;
             String meshGuid;
-            long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             Query temp_query = session.createNativeQuery("insert into temp_guids(idofclient, guid) values(:idOfClient, :meshGuid)");
             while (null != currLine) {
-                if (lineNo == 0) continue; //пропускаем заголовок
+                if (lineNo == 0) {
+                    lineNo++;
+                    continue; //пропускаем заголовок
+                }
                 try {
                     String[] arr = currLine.split("#");
                     idOfClient = Long.valueOf(arr[0]);
@@ -597,8 +600,8 @@ public class OtherActionsPage extends OnlineReportPage {
                 currLine = reader.readLine();
                 lineNo++;
             }
-            Query update_query = session.createNativeQuery("update cf_clients set meshuid = temp.guid, clientregistryversion = :version " +
-                    "from temp_guids temp where idofclient = temp.idofclient");
+            Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
+                    "from temp_guids temp where c.idofclient = temp.idofclient");
             update_query.setParameter("version", nextVersion);
             int res = update_query.executeUpdate();
             logger.info(String.format("Updated %s client records", res));
