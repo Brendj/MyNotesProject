@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import org.hibernate.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -534,6 +536,81 @@ public class OtherActionsPage extends OnlineReportPage {
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants: ", e);
             printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void loadMeshGuidsForGuardians(FileUploadEvent event) {
+        UploadedFile item = event.getUploadedFile();
+        InputStream inputStream = null;
+        try {
+            byte[] data = item.getData();
+            inputStream = new ByteArrayInputStream(data);
+            logger.info("Start loadMeshGuidsForGuardians");
+            loadMeshGuidsForGuardiansFile(inputStream);
+            logger.info("End loadMeshGuidsForGuardians");
+            printMessage("Файл загружен успешно");
+        } catch (Exception e) {
+            getLogger().error("Failed to load guardians mesh guids", e);
+            printMessage("Ошибка при загрузке файла с mesh гуидами представителей : " + e.getMessage());
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    private void loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Query query = session.createNativeQuery("create temp table temp_guids (idOfClient bigint, guid character varying(36)) on commit drop");
+            query.executeUpdate();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            int lineNo = 0;
+            String currLine = reader.readLine();
+            Long idOfClient;
+            String meshGuid;
+            Query temp_query = session.createNativeQuery("insert into temp_guids(idofclient, guid) values(:idOfClient, :meshGuid)");
+            while (null != currLine) {
+                if (lineNo == 0) {
+                    currLine = reader.readLine();
+                    lineNo++;
+                    continue; //пропускаем заголовок
+                }
+                try {
+                    String[] arr = currLine.split("#");
+                    idOfClient = Long.valueOf(arr[0]);
+                    meshGuid = arr[1];
+                    if (meshGuid.startsWith("\"")) {
+                        meshGuid = meshGuid.substring(1, meshGuid.length()-1);
+                    }
+                } catch (Exception e) {
+                    idOfClient = null;
+                    meshGuid = null;
+                    logger.error("Error in loadMeshGuidsForGuardiansFile. LineNo=" + lineNo, e);
+                }
+                if (idOfClient != null) {
+                    temp_query.setParameter("idOfClient", idOfClient);
+                    temp_query.setParameter("meshGuid", meshGuid);
+                    temp_query.executeUpdate();
+                }
+
+                currLine = reader.readLine();
+                lineNo++;
+            }
+            Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
+                    "from temp_guids temp where c.idofclient = temp.idofclient");
+            update_query.setParameter("version", nextVersion);
+            int res = update_query.executeUpdate();
+            logger.info(String.format("Updated %s client records", res));
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in loadMeshGuidsForGuardiansFile: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
