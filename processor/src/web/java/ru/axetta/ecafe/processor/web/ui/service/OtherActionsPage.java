@@ -576,6 +576,7 @@ public class OtherActionsPage extends OnlineReportPage {
             Query temp_query = session.createNativeQuery("insert into temp_guids(idofclient, guid) values(:idOfClient, :meshGuid)");
             while (null != currLine) {
                 if (lineNo == 0) {
+                    currLine = reader.readLine();
                     lineNo++;
                     continue; //пропускаем заголовок
                 }
