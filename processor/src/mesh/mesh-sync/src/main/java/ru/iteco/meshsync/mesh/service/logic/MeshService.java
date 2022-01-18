@@ -42,14 +42,14 @@ public class MeshService {
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
 
-    private static final List<Integer> notInOrganization = Collections.singletonList(
-            //ServiceType.ATTESTATION.getCode(),
+    private static final List<Integer> notInOrganization = Arrays.asList(
+            ServiceType.ATTESTATION.getCode(),
             ServiceType.ACADEMIC_LEAVE.getCode()
     );
 
     private static final List<Integer> enabledServiceTypeIds = Arrays.asList(
             ServiceType.EDUCATION.getCode(),
-            //ServiceType.ATTESTATION.getCode(),
+            ServiceType.ATTESTATION.getCode(),
             ServiceType.ACADEMIC_LEAVE.getCode()
     );
 
