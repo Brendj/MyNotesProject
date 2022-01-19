@@ -597,7 +597,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 if (idOfClient != null) {
                     temp_query_str += String.format("(%d, '%s'),", idOfClient, meshGuid);
                 }
-                if (lineNo % 1000 == 0) {
+                if (lineNo % 10000 == 0) {
                     temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
                     Query temp_query = session.createNativeQuery(temp_query_str);
                     temp_query.executeUpdate();
@@ -619,19 +619,20 @@ public class OtherActionsPage extends OnlineReportPage {
                             "where c.idofclientgroup not in (1100000060, 1100000070) " +
                             "group by guid having count(t.idofclient) > 1 order by 1 desc");
             List list = temp_doubles_query.getResultList();
-            List<String> doubleGuidList = new ArrayList();
+            String doubleGuidList = "";
             if (list.size() > 0) {
                 for (Object o : list) {
                     Object[] row = (Object[]) o;
                     logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
-                    doubleGuidList.add((String)row[1]);
+                    doubleGuidList += (String)row[1] + ",";
                 }
+                doubleGuidList = doubleGuidList.substring(0, doubleGuidList.length()-1);
             }
             Query temp_guids_filter = session.createNativeQuery("create temp table temp_double_guids (guid character varying(36)) on commit drop");
             temp_guids_filter.executeUpdate();
-            if (doubleGuidList.size() > 0) {
-                temp_guids_filter = session.createNativeQuery("insert into temp_double_guids(guid) values(:guidList)");
-                temp_guids_filter.setParameterList("guidList", doubleGuidList);
+            if (doubleGuidList.length() > 0) {
+                temp_guids_filter = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", doubleGuidList));
                 temp_guids_filter.executeUpdate();
             }
 
