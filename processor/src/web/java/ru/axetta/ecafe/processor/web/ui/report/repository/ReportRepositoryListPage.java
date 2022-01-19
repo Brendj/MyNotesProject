@@ -86,13 +86,13 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
         return items;
     }
 
-    public void downloadFile()
+    public void downloadFile(ReportRepositoryItem selectedItem)
             throws IOException {
+        this.selectedItem = selectedItem;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
         File f = getFileToDownload();
-
         SecurityJournalReport process = SecurityJournalReport.createJournalRecord(extractTemplateName(f.getName()), new Date());
 
         if (!f.exists()) {

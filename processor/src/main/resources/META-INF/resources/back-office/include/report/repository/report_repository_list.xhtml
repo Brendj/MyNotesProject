@@ -79,6 +79,10 @@
                     </f:facet>
                 </a4j:status>
             </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid">
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
         </rich:togglePanel>
         <rich:popupPanel modal="true" id="errorPanel" width="600" height="600" style="overflow: scroll;">
             <f:facet name="header">
@@ -167,9 +171,8 @@
                     <h:outputText escape="true" value="Загрузить файл"/>
                 </f:facet>
 
-                <h:commandLink value="#{item.reportFile}" actionListener="#{reportRepositoryListPage.downloadFile()}"
+                <h:commandLink value="#{item.reportFile}" actionListener="#{reportRepositoryListPage.downloadFile(item)}"
                                styleClass="command-button">
-                    <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}"/>
                 </h:commandLink>
 
             </rich:column>
@@ -213,10 +216,5 @@
             </f:facet>
         </rich:dataTable>
 
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
     </h:panelGrid>
 </ui:composition>
