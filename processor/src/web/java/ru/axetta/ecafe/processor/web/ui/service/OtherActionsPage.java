@@ -614,21 +614,30 @@ public class OtherActionsPage extends OnlineReportPage {
                 logger.info(String.format("Processed %s lines", lineNo));
             }
             Query temp_doubles_query =
-                    session.createNativeQuery("select cast(count(idofclient) as bigint) as amount, guid " +
-                            "from temp_guids group by guid having count(idofclient) > 1 order by 1 desc");
+                    session.createNativeQuery("select cast(count(t.idofclient) as bigint) as amount, guid " +
+                            "from temp_guids t join cf_clients c on t.idofclient = c.idofclient " +
+                            "where c.idofclientgroup not in (1100000060, 1100000070) " +
+                            "group by guid having count(t.idofclient) > 1 order by 1 desc");
             List list = temp_doubles_query.getResultList();
+            List<String> doubleGuidList = new ArrayList();
             if (list.size() > 0) {
                 for (Object o : list) {
                     Object[] row = (Object[]) o;
                     logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
+                    doubleGuidList.add((String)row[1]);
                 }
-                transaction.commit();
-                transaction = null;
-                return 0;
+            }
+            Query temp_guids_filter = session.createNativeQuery("create temp table temp_double_guids (guid character varying(36)) on commit drop");
+            temp_guids_filter.executeUpdate();
+            if (doubleGuidList.size() > 0) {
+                temp_guids_filter = session.createNativeQuery("insert into temp_double_guids(guid) values(:guidList)");
+                temp_guids_filter.setParameterList("guidList", doubleGuidList);
+                temp_guids_filter.executeUpdate();
             }
 
             Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
-                    "from temp_guids temp where c.idofclient = temp.idofclient");
+                    "from temp_guids temp where c.idofclient = temp.idofclient and c.idofclientgroup not in (1100000060, 1100000070) " +
+                    "and not exists (select guid from temp_double_guids t where t.guid = temp.guid)");
             update_query.setParameter("version", nextVersion);
             int res = update_query.executeUpdate();
             logger.info(String.format("Updated %s client records", res));
