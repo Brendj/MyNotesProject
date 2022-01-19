@@ -302,7 +302,6 @@
                                      clearAllLabel="Очистить"
                                      uploadLabel="Загрузить"
                                      doneLabel="Готово"
-                                     onuploadcomplete="alert('Загрузка mesh гуидов представителей выполнена');"
                                      fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
                                      listHeight="100">
                         <f:facet name="label">
@@ -311,6 +310,8 @@
                         <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
                         <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
                     </rich:fileUpload>
+                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
+                                  styleClass="report-error-output-text" rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
                 </h:panelGrid>
             </rich:panel>
         </h:panelGrid>

@@ -75,6 +75,8 @@ public class OtherActionsPage extends OnlineReportPage {
     private boolean allowGenerateGuardians = true;
     private String orgsforCleaninig;
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
+    private Integer processedMeshGuids;
+    private Boolean showProcessedMeshGuids = false;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -548,7 +550,9 @@ public class OtherActionsPage extends OnlineReportPage {
             byte[] data = item.getData();
             inputStream = new ByteArrayInputStream(data);
             logger.info("Start loadMeshGuidsForGuardians");
-            loadMeshGuidsForGuardiansFile(inputStream);
+            showProcessedMeshGuids = false;
+            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream);
+            showProcessedMeshGuids = true;
             logger.info("End loadMeshGuidsForGuardians");
             printMessage("Файл загружен успешно");
         } catch (Exception e) {
@@ -559,7 +563,7 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
-    private void loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
+    private int loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
         Session session = null;
         Transaction transaction = null;
         long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -573,7 +577,7 @@ public class OtherActionsPage extends OnlineReportPage {
             String currLine = reader.readLine();
             Long idOfClient;
             String meshGuid;
-            Query temp_query = session.createNativeQuery("insert into temp_guids(idofclient, guid) values(:idOfClient, :meshGuid)");
+            String temp_query_str = "insert into temp_guids(idofclient, guid) values";
             while (null != currLine) {
                 if (lineNo == 0) {
                     currLine = reader.readLine();
@@ -593,14 +597,38 @@ public class OtherActionsPage extends OnlineReportPage {
                     logger.error("Error in loadMeshGuidsForGuardiansFile. LineNo=" + lineNo, e);
                 }
                 if (idOfClient != null) {
-                    temp_query.setParameter("idOfClient", idOfClient);
-                    temp_query.setParameter("meshGuid", meshGuid);
-                    temp_query.executeUpdate();
+                    temp_query_str += String.format("(%d, '%s'),", idOfClient, meshGuid);
                 }
-
+                if (lineNo % 1000 == 0) {
+                    temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                    Query temp_query = session.createNativeQuery(temp_query_str);
+                    temp_query.executeUpdate();
+                    temp_query_str = "insert into temp_guids(idofclient, guid) values";
+                    logger.info(String.format("Processed %s lines", lineNo));
+                }
                 currLine = reader.readLine();
                 lineNo++;
             }
+            if (temp_query_str.length() > 50) {
+                temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                Query temp_query = session.createNativeQuery(temp_query_str);
+                temp_query.executeUpdate();
+                logger.info(String.format("Processed %s lines", lineNo));
+            }
+            Query temp_doubles_query =
+                    session.createNativeQuery("select cast(count(idofclient) as bigint) as amount, guid " +
+                            "from temp_guids group by guid having count(idofclient) > 1 order by 1 desc");
+            List list = temp_doubles_query.getResultList();
+            if (list.size() > 0) {
+                for (Object o : list) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
+                }
+                transaction.commit();
+                transaction = null;
+                return 0;
+            }
+
             Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
                     "from temp_guids temp where c.idofclient = temp.idofclient");
             update_query.setParameter("version", nextVersion);
@@ -608,8 +636,10 @@ public class OtherActionsPage extends OnlineReportPage {
             logger.info(String.format("Updated %s client records", res));
             transaction.commit();
             transaction = null;
+            return res;
         } catch (Exception e) {
             logger.error("Error in loadMeshGuidsForGuardiansFile: ", e);
+            return 0;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -948,5 +978,21 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Integer getProcessedMeshGuids() {
+        return processedMeshGuids;
+    }
+
+    public void setProcessedMeshGuids(Integer processedMeshGuids) {
+        this.processedMeshGuids = processedMeshGuids;
+    }
+
+    public Boolean getShowProcessedMeshGuids() {
+        return showProcessedMeshGuids;
+    }
+
+    public void setShowProcessedMeshGuids(Boolean showProcessedMeshGuids) {
+        this.showProcessedMeshGuids = showProcessedMeshGuids;
     }
 }
