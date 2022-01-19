@@ -85,7 +85,9 @@
                 <h:outputText value="Текст ошибки"/>
             </f:facet>
             <f:facet name="controls">
-                <a4j:commandLink onclick="Richfaces.hideModalPanel('errorPanel')" render="this" style="color: white;">
+                <a4j:commandLink
+                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('errorPanel')}.hide();"
+                        render="this" style="color: white;">
                     <h:outputText value="Закрыть"/>
                 </a4j:commandLink>
             </f:facet>
@@ -164,10 +166,12 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Загрузить файл"/>
                 </f:facet>
-                <a4j:commandLink value="#{item.reportFile}" action="#{reportRepositoryListPage.downloadReportFile}"
-                                 styleClass="command-link" render="mainMenu, workspaceForm">
+
+                <h:commandLink value="#{item.reportFile}" actionListener="#{reportRepositoryListPage.downloadFile()}"
+                               styleClass="command-button">
                     <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}"/>
-                </a4j:commandLink>
+                </h:commandLink>
+
             </rich:column>
 
             <rich:column headerClass="column-header">
@@ -175,7 +179,7 @@
                     <h:outputText escape="true" value="Ошибка"/>
                 </f:facet>
                 <a4j:commandLink value="Текст ошибки" rendered="#{item.errorButtonRendered}" ajaxSingle="true"
-                                 oncomplete="Richfaces.showModalPanel('errorPanel');"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('errorPanel')}.show();"
                                  render="errorPanel" styleClass="command-link">
                     <f:setPropertyActionListener value="#{item.errorString}"
                                                  target="#{reportRepositoryListPage.displayedError}"/>
