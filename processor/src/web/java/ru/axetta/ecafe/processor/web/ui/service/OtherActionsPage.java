@@ -599,7 +599,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 if (idOfClient != null) {
                     temp_query_str += String.format("(%d, '%s'),", idOfClient, meshGuid);
                 }
-                if (lineNo % 10000 == 0) {
+                if (lineNo % 5000 == 0) {
                     temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
                     Query temp_query = session.createNativeQuery(temp_query_str);
                     temp_query.executeUpdate();
@@ -615,6 +615,7 @@ public class OtherActionsPage extends OnlineReportPage {
                 temp_query.executeUpdate();
                 logger.info(String.format("Processed %s lines", lineNo));
             }
+            //дубли гуидов по выгрузке
             Query temp_doubles_query =
                     session.createNativeQuery("select cast(count(t.idofclient) as bigint) as amount, guid " +
                             "from temp_guids t join cf_clients c on t.idofclient = c.idofclient " +
@@ -636,6 +637,25 @@ public class OtherActionsPage extends OnlineReportPage {
                 temp_guids_filter = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
                         "select unnest(string_to_array('%s', ','))", doubleGuidList));
                 temp_guids_filter.executeUpdate();
+            }
+
+            //отсеиваем существующие в БД гуиды
+            Query exist_guids_query = session.createNativeQuery("select t.idofclient, t.guid " +
+                    "from temp_guids t join cf_clients c on t.guid = c.meshguid");
+            List list2 = exist_guids_query.getResultList();
+            String existingGuids = "";
+            if (list2.size() > 0) {
+                for (Object o : list2) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Existing guids: %s - idofclient = %d", (String) row[1], HibernateUtils.getDbLong(row[0])));
+                    existingGuids += (String) row[1] + ",";
+                }
+                existingGuids = existingGuids.substring(0, existingGuids.length()-1);
+            }
+            if (existingGuids.length() > 0) {
+                exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", existingGuids));
+                exist_guids_query.executeUpdate();
             }
 
             Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
