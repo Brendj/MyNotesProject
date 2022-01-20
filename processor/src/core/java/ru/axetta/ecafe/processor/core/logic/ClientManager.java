@@ -1927,10 +1927,10 @@ public class ClientManager {
 
         if (!clientGuardians.isEmpty()) {
             CriteriaQuery<ClientGuardianNotificationSetting> clientGuardianNotificationSettingCriteriaQuery = builder.createQuery(ClientGuardianNotificationSetting.class);
-            Root<ClientGuardianNotificationSetting> clientGuardianNotificationSettingRoot = criteria.from(ClientGuardianNotificationSetting.class);
+            Root<ClientGuardianNotificationSetting> clientGuardianNotificationSettingRoot = clientGuardianNotificationSettingCriteriaQuery.from(ClientGuardianNotificationSetting.class);
             clientGuardianNotificationSettingCriteriaQuery.select(clientGuardianNotificationSettingRoot);
             clientGuardianNotificationSettingCriteriaQuery.where(
-                    builder.equal(clientGuardianNotificationSettingRoot.get("idOfClientGuardian"), clientGuardians.get(0).getIdOfClientGuardian()));
+                    builder.equal(clientGuardianNotificationSettingRoot.get("clientGuardian"), clientGuardians.get(0)));
             List<ClientGuardianNotificationSetting> clientGuardianNotificationSettings = session.createQuery(clientGuardianNotificationSettingCriteriaQuery).getResultList();
             if (clientGuardianNotificationSettings.isEmpty() && predefined.isEnabledAtDefault()) {
                 return true;
