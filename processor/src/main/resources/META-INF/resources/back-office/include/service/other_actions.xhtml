@@ -9,24 +9,22 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <script type="text/javascript">
-        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
-        element.click();
-        element.hidden = true;
-
-
         function disableButtons(value) {
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled = value;
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled = value;
         }
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
+        element.click();
+        element.hidden = true;
     </script>
 
-    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <a4j:commandLink id="otherActionsGridRender" value=""
                      render="otherActionsGrid"/>
+
+    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <!--Тест лога -->
-<h:panelGrid>
-    <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}"
-                 styleClass="borderless-grid borderless-grid-align-top" columns="2">
+<h:panelGrid id="otherActionsGrid">
+    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" columns="2">
         <h:panelGrid styleClass="borderless-grid">
 
             <a4j:commandButton value="Архивирование событий освобождения от посещения ОО"
@@ -354,7 +352,7 @@
             <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
         </rich:panel>
 
-        <a4j:status id="reportGenerateStatus">
+        <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
             </f:facet>
