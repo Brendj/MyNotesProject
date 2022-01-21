@@ -163,7 +163,7 @@ public class PreorderCancelNotificationService {
             String[] values = new String[]{
                     "balance", String.valueOf(client.getKey().getBalance())};
             List<Client> guardians = ClientManager
-                    .findGuardiansByClient(session, client.getKey().getIdOfClient(), null);
+                    .findGuardiansByClientNew(session, client.getKey().getIdOfClient());
             Iterator<Map.Entry<String, Object>> types =
                     ((Map<String, Object>)client.getValue()).entrySet().iterator();
             while (types.hasNext()) {
@@ -185,7 +185,7 @@ public class PreorderCancelNotificationService {
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
-                    if (ClientManager.allowedGuardianshipNotification(session, destGuardian.getIdOfClient(),
+                    if (ClientManager.allowedGuardianshipNotificationNew(session, destGuardian.getIdOfClient(),
                             client.getKey().getIdOfClient(),
                             ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())) {
                         notificationService
