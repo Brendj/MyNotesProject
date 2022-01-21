@@ -27,12 +27,7 @@ import java.util.Map;
 public class MeshPersonsSearchService extends MeshPersonsSyncService {
 
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSearchService.class);
-    private ThreadLocal<List<ResponsePersons>> meshResponses =  new ThreadLocal<List<ResponsePersons>>(){
-        @Override
-        protected ArrayList<ResponsePersons> initialValue() {
-            return new ArrayList<ResponsePersons>();
-        }
-    };
+    private final ThreadLocal<List<ResponsePersons>> meshResponses = ThreadLocal.withInitial(ArrayList::new);
     public ThreadLocal<List<ResponsePersons>> getMeshResponses() {
         return meshResponses;
     }

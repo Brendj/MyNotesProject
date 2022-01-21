@@ -159,7 +159,7 @@ public class MeshService {
                         }
                     }
 
-                    homeStudy = notInOrganization.contains(actualEdu.getServiceTypeId());
+                    homeStudy = isHomeStudy(info.getEducation(), actualEdu);
                     inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
                     if (person == null && !inSupportedOrg) {
@@ -215,6 +215,16 @@ public class MeshService {
             }
         }
         return !invalidData;
+    }
+
+    private boolean isHomeStudy(List<PersonEducation> education, PersonEducation actualEdu) throws Exception {
+        LocalDate now = LocalDate.now();
+        boolean isHomeStudy = notInOrganization.contains(actualEdu.getServiceTypeId()) || catalogService.educationFormIsHomeStudy(actualEdu);
+        List<PersonEducation> allActualEducation = education.stream().filter(
+                e -> (enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
+                && actualEdu.getTrainingEndAt().isAfter(now)).collect(Collectors.toList());
+        boolean toManyActualEducations = CollectionUtils.isNotEmpty(allActualEducation) && allActualEducation.size() > 1;
+        return isHomeStudy || toManyActualEducations;
     }
 
     private ClassEntity changeEntityClass(ClassEntity classEntity, ModelClass modelClass) {
@@ -309,7 +319,7 @@ public class MeshService {
 
         allEdu = allEdu
                 .stream()
-                .filter((e) -> enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
+                .filter(e -> (enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null))
                 .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
 
