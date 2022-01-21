@@ -52,6 +52,22 @@
                 <a4j:ajax event="change" render="clientBalanceByDayReportPanelGrid" />
             </h:selectOneMenu>
         </h:panelGroup>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Клиент" />
+            <h:panelGroup id="clientFilter">
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.showClientSelectListPage(mainPage.clientBalanceByDayReportPage.getClientList())}"
+                                   reRender="modalContractIdListSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalContractIdListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                              value=" {#{mainPage.clientBalanceByDayReportPage.filterClient}}" />
+            </h:panelGroup>
+        </h:panelGrid>
+
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.exportToHtmlOnePerUser}"
                                render="clientBalanceByDayReportTable, clientBalanceByDayReportTableDatascroller"
