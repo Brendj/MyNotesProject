@@ -164,6 +164,7 @@ public class Org implements Serializable {
     private Long ekisId;
     private Boolean preorderSyncParam;
     private Boolean useWebArm;
+    private Boolean useWebArmAdmin;
     private String egissoId;
     private String municipalDistrict;
     private String founder;
@@ -249,6 +250,7 @@ public class Org implements Serializable {
         this.requestForVisitsToOtherOrg = false;
         this.preordersEnabled = false;
         this.useWebArm = false;
+        this.useWebArmAdmin = false;
         this.governmentContract = false;
         this.useLongCardNo = false;
     }
@@ -1315,6 +1317,14 @@ public class Org implements Serializable {
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public Boolean getUseWebArmAdmin() {
+        return useWebArmAdmin;
+    }
+
+    public void setUseWebArmAdmin(Boolean useWebArmAdmin) {
+        this.useWebArmAdmin = useWebArmAdmin;
     }
 
     public String getFounder() {

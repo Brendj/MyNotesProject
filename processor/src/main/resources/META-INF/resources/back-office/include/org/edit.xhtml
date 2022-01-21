@@ -272,10 +272,12 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
             <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
         </a4j:repeat>
     </h:panelGrid>
-    <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
+    <h:outputText escape="true" value="Использовать Web-АРМ поставщика питания" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArm}" styleClass="input-text">
         <a4j:ajax event="click" render="orgEditGrid" action="#{mainPage.orgEditPage.changeSubscriptionFeeding}" />
     </h:selectBooleanCheckbox>
+    <h:outputText escape="true" value="Использовать Web-АРМ Администратора" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useWebArmAdmin}" styleClass="input-text"/>
     <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.goodDateCheck}" styleClass="input-text"/>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
