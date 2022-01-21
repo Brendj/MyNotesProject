@@ -839,6 +839,10 @@ public class EMPProcessor {
     public void updateNotificationParams(Client client) {
 
         StoragePortType storage = createStorageController();
+        if (storage == null)
+        {
+            return;
+        }
         UpdateEntriesRequest request = new UpdateEntriesRequest();
 
         request.setToken(getConfigToken());
