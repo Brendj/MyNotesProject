@@ -146,8 +146,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean multiCardModeEnabled;
     private Boolean participantOP;
     private Boolean preorderlp;
-
     private Boolean useWebArm;
+    private Boolean useWebArmAdmin;
     private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
     private Boolean useMealSchedule;
@@ -340,6 +340,7 @@ public class OrgEditPage extends BasicWorkspacePage
         for (Org fOrg : friendlyOrg) {
             if (!fOrg.getIdOfOrg().equals(org.getIdOfOrg())) {
                 fOrg.setUseWebArm(useWebArm);
+                fOrg.setUseWebArmAdmin(useWebArmAdmin);
                 if (useWebArm) {
                     fOrg.setUsePaydableSubscriptionFeeding(false);
                 }
@@ -447,6 +448,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
         org.setUseWebArm(useWebArm);
+        org.setUseWebArmAdmin(useWebArmAdmin);
         org.setGooddatecheck(goodDateCheck);
         org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
@@ -612,6 +614,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
         this.useWebArm = org.getUseWebArm();
+        this.useWebArmAdmin = org.getUseWebArmAdmin();
         this.goodDateCheck = org.getGooddatecheck();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
@@ -1258,6 +1261,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public Boolean getUseWebArmAdmin() {
+        return useWebArmAdmin;
+    }
+
+    public void setUseWebArmAdmin(Boolean useWebArmAdmin) {
+        this.useWebArmAdmin = useWebArmAdmin;
     }
 
     public String getEgissoId() {
