@@ -177,7 +177,7 @@ public class GuardianDoublesService {
                 if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
-                    item.getIdOfGuardin(), false, HISTORY_LABEL, CardState.TEMPBLOCKED);
+                    item.getIdOfGuardin(), false, HISTORY_LABEL, CardState.BLOCKED);
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
                 deleteGuardian(session, item, version);
