@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.ClientReport;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
@@ -11,7 +12,11 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
+import ru.axetta.ecafe.processor.web.ui.report.excel.ClientReportService;
+import ru.axetta.ecafe.processor.web.ui.report.excel.WriteExcelHelper;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +27,11 @@ import java.util.List;
  * Time: 12:01
  * To change this template use File | Settings | File Templates.
  */
-public class ClientReportPage extends OnlineReportPage  implements ContragentListSelectPage.CompleteHandler{
+public class ClientReportPage extends OnlineReportPage implements ContragentListSelectPage.CompleteHandler {
     private ClientReport clientReport;
 
     private final ClientFilter clientFilter = new ClientFilter();
+    private final ClientReportService clientReportService = new ClientReportService();
 
     public ClientFilter getClientFilter() {
         return clientFilter;
@@ -36,12 +42,10 @@ public class ClientReportPage extends OnlineReportPage  implements ContragentLis
     }
 
 
-
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
 
-    private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
-
+    private final List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
 
 
     public ClientReport getClientReport() {
@@ -72,7 +76,7 @@ public class ClientReportPage extends OnlineReportPage  implements ContragentLis
 
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
-            String classTypes) throws Exception {
+                                                String classTypes) throws Exception {
         contragentItems.clear();
         for (Long idOfContragent : idOfContragentList) {
             Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
@@ -99,6 +103,17 @@ public class ClientReportPage extends OnlineReportPage  implements ContragentLis
             contragentFilter = str.toString();
         }
         contragentIds = ids.toString();
+    }
+
+    public void buildReportExcel(FacesContext facesContext) throws Exception {
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                .getResponse();
+        try {
+            Workbook wb = clientReportService.buildReport(clientReport.getClientItems());
+            WriteExcelHelper.saveExcelReport(wb, response);
+        } catch (NullPointerException e) {
+            printError("Нет данных для выгрузки отчета");
+        }
     }
 
     public static class ContragentItem {

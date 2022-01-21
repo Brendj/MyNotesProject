@@ -153,8 +153,14 @@
                 </rich:dataScroller>
             </f:facet>
         </rich:dataTable>
-        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showFreeComplexCSVList}"
-                         styleClass="command-button" />
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showFreeComplexCSVList}"
+                             styleClass="command-button" />
+            <h:commandButton value="Выгрузить в Excel" action="#{mainPage.buildFreeComplexReportExcel}"
+                             styleClass="command-button"/>
+        </h:panelGrid>
+
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
