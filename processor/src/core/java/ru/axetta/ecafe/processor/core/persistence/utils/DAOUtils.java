@@ -112,6 +112,16 @@ public class DAOUtils {
         return (Contragent) persistenceSession.get(Contragent.class, idOfContragent);
     }
 
+    public static Contragent findContragentByName(Session session, String name){
+        Query query = session.createQuery("from Contragent c where c.contragentName=:name");
+        query.setParameter("name", name);
+        List res = query.list();
+        if (res != null && res.size() > 0) {
+            return (Contragent) res.get(0);
+        }
+        return null;
+    }
+
     public static Contract findContract(Session persistenceSession, long idOfContract) throws Exception {
         return (Contract) persistenceSession.load(Contract.class, idOfContract);
     }
