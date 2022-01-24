@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -39,6 +40,8 @@ import java.util.*;
 @Primary
 @Component("meshPersonsSyncService")
 public class MeshPersonsSyncService {
+    private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
+
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
     public static final String MESH_REST_PERSONS_TOP_PROPEERTY = "ecafe.processing.mesh.rest.persons.top";
@@ -70,7 +73,7 @@ public class MeshPersonsSyncService {
             this.meshRestClient = null;
         }
     }
-    protected void processMeshResponse(List<ResponsePersons> meshResponses){
+    protected void processMeshResponse(List<ResponsePersons> meshResponses) {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -91,7 +94,6 @@ public class MeshPersonsSyncService {
             HibernateUtils.close(session, logger);
         }
     }
-    private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
 
     public void loadPersons(long idOfOrg, String meshId, String lastName, String firstName, String patronymic) throws Exception {
         logger.info("Start load persons from MESH");
@@ -123,6 +125,9 @@ public class MeshPersonsSyncService {
     }
 
     protected boolean isHomeStudy(Education education, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
+        if(education.getSetHomeStudy()){
+            return true;
+        }
         if (education.getActualFrom() == null && education.getEducationFormId() == null)
             throw new Exception("Arguments educationForm and educationFormId are NULL");
         if (Education.OUT_OF_ORG_EDUCATIONS.contains(education.getServiceTypeId())) {
@@ -233,28 +238,27 @@ public class MeshPersonsSyncService {
 
     protected Education findEducation(ResponsePersons person) {
         try {
+            Education result = null;
             Date now = CalendarUtils.startOfDay(new Date());
             List<Education> educations = person.getEducation();
             educations.removeIf(
                     education -> education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())
             );
+            educations.removeIf(education -> {
+                try {
+                    return format.parse(education.getTrainingEndAt()).before(now);
+                } catch (ParseException e) {
+                    return true;
+                }
+            });
             Collections.sort(educations);
+            result = person.getEducation().get(person.getEducation().size() - 1);
 
-            if(educations.size() > 1) {
-                List<Education> educationsOnBudget = new LinkedList<>();
-                for (Education e : educations) {
-                    Date trainingEndAt = format.parse(e.getTrainingEndAt());
-
-                    if (trainingEndAt.after(now) && e.getFinancingType().getName().equals("Бюджет")) {
-                        educationsOnBudget.add(e);
-                    }
-                }
-                if(!educationsOnBudget.isEmpty()){
-                    return educationsOnBudget.get(educationsOnBudget.size() - 1);
-                }
+            if (educations.size() > 1) {
+                result.setSetHomeStudy(true);
             }
 
-            return person.getEducation().get(person.getEducation().size() - 1);
+            return result;
         } catch (Exception e) {
             logger.error("Can not find education from person with guid " + person.getPersonId());
             return null;

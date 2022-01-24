@@ -86,6 +86,8 @@ public class Education implements Comparable {
     private Organization organization;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonIgnore
+    private Boolean setHomeStudy = false;
 
     public boolean empty(String valueActualFrom) {
         return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
@@ -346,4 +348,11 @@ public class Education implements Comparable {
         this.additionalProperties.put(name, value);
     }
 
+    public Boolean getSetHomeStudy() {
+        return setHomeStudy;
+    }
+
+    public void setSetHomeStudy(Boolean setHomeStudy) {
+        this.setHomeStudy = setHomeStudy;
+    }
 }

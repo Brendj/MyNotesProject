@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.iteco.client.model.EducationForm;
+import ru.iteco.client.model.PersonEducation;
 import ru.iteco.meshsync.models.TrainingForm;
 import ru.iteco.meshsync.repo.TrainingFormRepo;
 
@@ -16,15 +17,15 @@ public class CatalogService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-    public boolean isHomeStudy(EducationForm educationForm, Integer educationFormId) throws Exception {
-        if(educationForm == null && educationFormId == null){
-            throw new IllegalArgumentException("Arguments educationForm and educationFormId is NULL");
+    public boolean educationFormIsHomeStudy(PersonEducation actualEdu) throws Exception {
+        EducationForm educationForm = actualEdu.getEducationForm();
+        if(educationForm == null){
+            throw new IllegalArgumentException("Arguments educationForm is NULL");
         }
-        Integer id = educationForm == null ? educationFormId : educationForm.getId();
 
-        TrainingForm form = trainingFormRepo.getByIdAndArchiveIsFalse(id);
+        TrainingForm form = trainingFormRepo.getByIdAndArchiveIsFalse(educationForm.getId());
         if(form == null){
-            throw new Exception(String.format("TrainingForm by ID %d does exists", id));
+            throw new Exception(String.format("TrainingForm by ID %d does exists", educationForm.getId()));
         }
         return form.getEducationForm().contains("Вне");
     }

@@ -8,16 +8,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum EntityType {
-    PERSON("info"),
-    PERSON_AGENT("agent"),
-    PERSON_ADDRESS("address"),
-    PERSON_CONTACT("contact"),
-    PERSON_DOCUMENT("document"),
-    PERSON_EDUCATION("education"),
-    PERSON_IDS("ids"),
-    CATEGORY("categories"),
-    PERSON_PREVENTION("prevention"),
-    VALIDATION("validation"),
+    PERSON("person"),
+    PERSON_AGENT("person_agent"),
+    PERSON_ADDRESS("person_address"),
+    PERSON_CONTACT("person_contact"),
+    PERSON_DOCUMENT("person_document"),
+    PERSON_EDUCATION("person_education"),
+    CATEGORY("person_category"),
+    PERSON_PREVENTION("person_prevention"),
     CLASS("class");
 
     EntityType(String apiField){
