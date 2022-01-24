@@ -28,7 +28,7 @@ public class CGItem implements Comparable {
                   Long idOfClientGroup, Long guardianLastUpdate) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
-        this.fio = fio;
+        this.fio = fio.replaceAll("ё", "е");
         this.mobile = mobile;
         this.cardno = cardno;
         this.state = state;
@@ -47,15 +47,6 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
-        /*if (this.getCardno() != null && item.getCardno() == null) return 1;
-        if (this.getCardno() == null && item.getCardno() == null) return 0;
-        if (this.getCardno() == null && item.getCardno() != null) return -1;
-        if (this.getCardno() != null && item.getCardno() != null) {
-            return this.getCardLastUpdate().compareTo(item.getCardLastUpdate());
-        }
-        return 0;*/
-        if (this.balance > 0 && item.getBalance() == 0) return -1;
-        if (this.balance == 0 && item.getBalance() > 0) return 1;
         int indexThis = GROUPS.indexOf(this.idOfClientGroup);
         int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
         if ((indexThis == -1) && (indexItem == -1)) return 0;
