@@ -72,8 +72,8 @@ public class GuardianDoublesService {
                 CGItem item = new CGItem(HibernateUtils.getDbLong(row[0]),
                         HibernateUtils.getDbLong(row[1]),
                         HibernateUtils.getDbString(row[2]).trim()
-                                .concat(HibernateUtils.getDbString(row[3]))
-                                .concat(HibernateUtils.getDbString(row[4])),
+                                .concat(HibernateUtils.getDbString(row[3]).trim())
+                                .concat(HibernateUtils.getDbString(row[4]).trim()),
                         HibernateUtils.getDbString(row[5]),
                         HibernateUtils.getDbLong(row[6]),
                         HibernateUtils.getDbInt(row[7]),
@@ -121,10 +121,6 @@ public class GuardianDoublesService {
     }
 
     private void processDoubles(List<CGItem> processList) {
-        List<CGItem> itemsWithBalance = new LinkedList<>();
-        for (CGItem item : processList) {
-            if (item.getBalance() > 0) itemsWithBalance.add(item);
-        }
         Set<CGCardItem> cardItems = new TreeSet<>(); //все карты
         for (CGItem item : processList) {
             if (item.getCardno() != null) {
@@ -135,20 +131,8 @@ public class GuardianDoublesService {
         if (cardItems.size() > 0) {
             priorityCard = cardItems.iterator().next();
         }
-        if (itemsWithBalance.size() == 1) {
-            deleteGuardians(itemsWithBalance.get(0), processList, priorityCard);
-        } else {
-            Collections.sort(processList);
-            deleteGuardians(processList.get(0), processList, priorityCard);
-            /*Set<CGGroupItem> groupItems = new TreeSet<>(); //все группы
-            for (CGItem item : processList) {
-                groupItems.add(new CGGroupItem(item.getIdOfClientGroup()));
-            }
-            //CGItem priorityByGroup
-            if (groupItems.size() == 1) {
-                CGItem itemWithCard = getCGItemWithActualCard(processList, cardItems);
-            }*/
-        }
+        Collections.sort(processList);
+        deleteGuardians(processList.get(0), processList, priorityCard);
         for (CGItem item : processList) {
             processedCG.add(item.getIdOfClientGuardian());
         }
