@@ -325,6 +325,9 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         if (this.classId.equals(3) || this.classId.equals(4) || this.classId.equals(5))
             if (DAOUtils.existContragentWithClass(session, this.classId))
                 throw new ContragentWithClassExistsException("Can't create more then 1 contragent for \"Operator\", \"Budget\" and \"Client\" types");
+        if(DAOUtils.findContragentByName(session, this.contragentName) != null) {
+            throw new Exception("Название контрагента уже существует");
+        }
         Person contactPerson = this.contactPerson.buildPerson();
         session.save(contactPerson);
         Date currentTime = new Date();

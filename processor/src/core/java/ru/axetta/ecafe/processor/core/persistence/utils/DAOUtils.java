@@ -112,6 +112,16 @@ public class DAOUtils {
         return (Contragent) persistenceSession.get(Contragent.class, idOfContragent);
     }
 
+    public static Contragent findContragentByName(Session session, String name){
+        Query query = session.createQuery("from Contragent c where c.contragentName=:name");
+        query.setParameter("name", name);
+        List res = query.list();
+        if (res != null && res.size() > 0) {
+            return (Contragent) res.get(0);
+        }
+        return null;
+    }
+
     public static Contract findContract(Session persistenceSession, long idOfContract) throws Exception {
         return (Contract) persistenceSession.load(Contract.class, idOfContract);
     }
@@ -2726,6 +2736,41 @@ public class DAOUtils {
         query.setParameter("value", value);
         query.executeUpdate();
         Org.sendInvalidateCache(idOfOrg);
+    }
+
+    public static void saveCardDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set cardSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveFoodApplicationDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set foodApplicationSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void savePhotoDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set photoSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveZeroTransactionsDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set zeroTransactionsSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void saveDiscountPreordersDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set discountPreordersSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
     }
 
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,

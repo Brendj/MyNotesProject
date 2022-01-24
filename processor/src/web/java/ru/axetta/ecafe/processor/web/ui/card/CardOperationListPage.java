@@ -90,6 +90,10 @@ public class CardOperationListPage extends BasicWorkspacePage {
         this.cardPaymentList.fill(session, card, this.startTime, this.endTime);
         this.cardOrderList.fill(session, card, this.startTime, this.endTime);
         this.cardSmsList.fill(session, card, this.startTime, this.endTime);
+        if (this.cardPaymentList.getItemCount() == 0 &&
+                this.cardOrderList.getItemCount() == 0 &&
+                this.cardSmsList.getItemCount() == 0) {
+            this.printMessage("Данных для построения отчёта не найдено");
+        }
     }
-
 }

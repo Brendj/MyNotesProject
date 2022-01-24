@@ -108,6 +108,7 @@ public class SalesReport extends BasicReport {
 
     public static class SalesItem {
 
+        private Integer number;
         private final String officialName; // Название организации
         private final String menuDetailName; // Название
         private final String rPrice; // Цена за ед
@@ -126,6 +127,14 @@ public class SalesReport extends BasicReport {
             this.total += total;
             this.discount += discount;
             this.qtyDiscount += qtyDiscount;
+        }
+
+        public Integer getNumber() {
+            return number;
+        }
+
+        public void setNumber(Integer number) {
+            this.number = number;
         }
 
         public String getOfficialName() {

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -56,8 +57,8 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
 
     @Override
     public void onShow() throws Exception {
-        reload();
-        //RuntimeContext.getAppContext().getBean(getClass()).reload();
+        //reload();
+        RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
 
     @Transactional

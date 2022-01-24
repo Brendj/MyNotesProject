@@ -56,7 +56,7 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
     }
 
     private List<SelectItem> buildListOfSyncType() {
-        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+        List<SelectItem> selectItemList = new LinkedList<>();
         try{
             for(SyncType type: SyncType.values()){
                 selectItemList.add(new SelectItem(type.ordinal(), type.description));
@@ -103,6 +103,24 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
                         break;
                     case ORG_SETTING_SYNC:
                         o.setOrgSettingsSyncParam(true);
+                        break;
+                    case CARD_SYNC:
+                        o.setCardSyncParam(true);
+                        break;
+                    case PREORDERS:
+                        o.setPreorderSyncParam(true);
+                        break;
+                    case PHOTOS:
+                        o.setPhotoSyncParam(true);
+                        break;
+                    case ZERO_TRANSACTIONS:
+                        o.setZeroTransactionsSyncParam(true);
+                        break;
+                    case DISCOUNT_PREORDERS:
+                        o.setDiscountPreordersSyncParam(true);
+                        break;
+                    case FOOD_APPLICATIONS:
+                        o.setFoodApplicationSyncParam(true);
                         break;
                     default:
                         throw new Exception("Unknown SyncType, ordinal: " + selectedSyncType);
@@ -225,13 +243,19 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
         FULL_SYNC("Полная"),
         CLIENT_SYNC("Данные по клиентам"),
         MENU_SYNC("Меню"),
-        ORG_SETTING_SYNC("Настройки ОО");
+        ORG_SETTING_SYNC("Настройки ОО"),
+        CARD_SYNC("Данные по картам"),
+        PREORDERS("Предзаказы"),
+        PHOTOS("Фотографии"),
+        ZERO_TRANSACTIONS("Нулевые транзакции"),
+        DISCOUNT_PREORDERS("Заявления на ЛП"),
+        FOOD_APPLICATIONS("Заявки на питание");
 
         SyncType(String description){
             this.description = description;
         }
 
-        static private Map<Integer, SyncType> map;
+        static private final Map<Integer, SyncType> map;
 
         static {
             map = new HashMap<>();
@@ -244,6 +268,6 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
             return map.get(i);
         }
 
-        private String description;
+        private final String description;
     }
 }

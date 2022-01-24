@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1750,6 +1752,30 @@ public class ClientManager {
         return clients;
     }
 
+    public static List<Client> findGuardiansByClientNew(Session session, Long idOfChildren) throws Exception {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ClientGuardian> criteria = builder.createQuery(ClientGuardian.class);
+        Root<ClientGuardian> clientGuardianRoot = criteria.from(ClientGuardian.class);
+        criteria.select(clientGuardianRoot);
+        criteria.where(builder.and(
+                builder.equal(clientGuardianRoot.get("idOfChildren"), idOfChildren),
+                builder.not(builder.equal(clientGuardianRoot.get("deletedState"), true)),
+                builder.equal(clientGuardianRoot.get("disabled"), false)));
+        List <ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
+        List <Long> clientsId = new ArrayList<>();
+        for (ClientGuardian clientGuardian: clientGuardians)
+        {
+            clientsId.add(clientGuardian.getIdOfGuardian());
+        }
+        if (clientsId.isEmpty())
+            return new ArrayList<>();
+        CriteriaQuery<Client> criteriaClient = builder.createQuery(Client.class);
+        Root<Client> clientRoot = criteriaClient.from(Client.class);
+        criteriaClient.select(clientRoot).distinct(true);
+        criteriaClient.where(builder.in(clientRoot.get("idOfClient")).value(clientsId));
+        return session.createQuery(criteriaClient).getResultList();
+    }
+
     public static void addClientMigrationEntry(Session session,Org oldOrg,ClientGroup beforeMigrationGroup,
             Org newOrg, Client client, String comment, String newGroupName){
         ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
@@ -1874,6 +1900,45 @@ public class ClientManager {
             BigInteger bi = (BigInteger) o;
             if (bi.longValue() == predefined.getValue()) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static Boolean allowedGuardianshipNotificationNew(Session session, Long guardianId, Long clientId,
+                                                          Long notifyType) throws Exception {
+        ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
+        if (predefined == null) {
+            return true;
+        }
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ClientGuardian> criteria = builder.createQuery(ClientGuardian.class);
+        Root<ClientGuardian> clientGuardianRoot = criteria.from(ClientGuardian.class);
+        criteria.select(clientGuardianRoot);
+        criteria.where(builder.and(
+                builder.equal(clientGuardianRoot.get("idOfChildren"), clientId),
+                builder.equal(clientGuardianRoot.get("idOfGuardian"), guardianId),
+                builder.not(builder.equal(clientGuardianRoot.get("deletedState"), true)),
+                builder.equal(clientGuardianRoot.get("disabled"), false)));
+        List <ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
+        if (clientGuardians.isEmpty() && predefined.isEnabledAtDefault()) {
+            return true;
+        }
+
+        if (!clientGuardians.isEmpty()) {
+            CriteriaQuery<ClientGuardianNotificationSetting> clientGuardianNotificationSettingCriteriaQuery = builder.createQuery(ClientGuardianNotificationSetting.class);
+            Root<ClientGuardianNotificationSetting> clientGuardianNotificationSettingRoot = clientGuardianNotificationSettingCriteriaQuery.from(ClientGuardianNotificationSetting.class);
+            clientGuardianNotificationSettingCriteriaQuery.select(clientGuardianNotificationSettingRoot);
+            clientGuardianNotificationSettingCriteriaQuery.where(
+                    builder.equal(clientGuardianNotificationSettingRoot.get("clientGuardian"), clientGuardians.get(0)));
+            List<ClientGuardianNotificationSetting> clientGuardianNotificationSettings = session.createQuery(clientGuardianNotificationSettingCriteriaQuery).getResultList();
+            if (clientGuardianNotificationSettings.isEmpty() && predefined.isEnabledAtDefault()) {
+                return true;
+            }
+            for (ClientGuardianNotificationSetting clientGuardianNotificationSetting : clientGuardianNotificationSettings) {
+                if (clientGuardianNotificationSetting.getNotifyType().equals(predefined.getValue())) {
+                    return true;
+                }
             }
         }
         return false;

@@ -141,6 +141,25 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             }
             return stringBuilder.toString();
         }
+
+        public String getInitialsCaption() {
+            StringBuilder stringBuilder = new StringBuilder();
+            if (StringUtils.isNotEmpty(firstName)) {
+                stringBuilder.append(firstName);
+            }
+            if (StringUtils.isNotEmpty(secondName)) {
+                if (0 != stringBuilder.length()) {
+                    stringBuilder.append(' ');
+                }
+                stringBuilder.append(secondName.charAt(0));
+                stringBuilder.append('.');
+            }
+            if (StringUtils.isNotEmpty(surname)) {
+                stringBuilder.append(surname.charAt(0));
+                stringBuilder.append('.');
+            }
+            return stringBuilder.toString();
+        }
     }
 
     public static class Item {
@@ -287,6 +306,15 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             return stringBuilder.toString();
         }
 
+        public String getInitialsCaption() {
+            if (null == idOfClient) {
+                return "";
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(ContractIdFormat.format(contractId)).append(" (").append(contractPerson.getCaption())
+                    .append("): ").append(person.getInitialsCaption());
+            return stringBuilder.toString();
+        }
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
