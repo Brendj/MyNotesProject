@@ -26,7 +26,20 @@
                               headerClass="filter-panel-header" id="goodRequestsNewReportFilterPanelGrid">
                 <h:panelGrid styleClass="borderless-grid" columns="2">
 
-                    <h:outputText styleClass="output-text" escape="true" value="Поставщик"/>
+                    <h:outputText escape="true" value="Поставщик" styleClass="output-text" />
+                    <h:panelGroup styleClass="borderless-div">
+                        <a4j:commandButton value="..." action="#{mainPage.goodRequestsNewReportPage.showContragentSelectPage}"
+                                           render="modalContragentSelectorPanel, orgPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px;" >
+                            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                        </a4j:commandButton>
+                        <h:outputText styleClass="output-text" escape="true"
+                                      value=" {#{mainPage.goodRequestsNewReportPage.defaultSupplier}}"/>
+                    </h:panelGroup>
+
+                    <h:outputText styleClass="output-text" escape="true" value="Производственная конфигурация"/>
                     <h:panelGroup id="contragetFilter">
                         <a4j:commandButton value="..."
                                            action="#{mainPage.goodRequestsNewReportPage.showContragentListSelectPage}"
