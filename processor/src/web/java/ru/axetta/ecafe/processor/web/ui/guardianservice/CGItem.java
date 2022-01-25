@@ -53,7 +53,12 @@ public class CGItem implements Comparable {
         if ((indexThis == -1) && (indexItem > -1)) return -1;
         if ((indexThis > -1) && (indexItem == -1)) return 1;
 
-        return Integer.valueOf(indexThis).compareTo(indexItem);
+        int res = Integer.valueOf(indexThis).compareTo(indexItem);
+        if (res == 0) {
+            return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+        } else {
+            return res;
+        }
     }
 
     @Override
