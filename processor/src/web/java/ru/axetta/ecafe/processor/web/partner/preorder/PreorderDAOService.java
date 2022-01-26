@@ -2629,12 +2629,13 @@ public class PreorderDAOService {
     }
 
     private PreorderMenuDetail createPreorderWtMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md,
-                                                          Date date, Long idOfDish, Integer amount, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
+                                                          Date date, Long idOfDish, Integer amount, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
         WtDish wtDish = null;
         if (md == null) wtDish = getWtDishById(idOfDish);
-        if (wtDish == null) {
+        if (wtDish == null)
             throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
-        }
+        if(wtDish.getDateOfEndMenuIncluding().before(date))
+            throw new InvalidDatePreorderDishException("Блюдо с ид.=" + idOfDish.toString() + " будет исключено из меню до исполнения предзаказа");
         return createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, amount, mobile, mobileGroupOnCreate);
     }
 
