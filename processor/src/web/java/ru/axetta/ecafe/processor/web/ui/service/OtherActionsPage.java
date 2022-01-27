@@ -48,10 +48,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*;
 
@@ -922,13 +919,14 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runDeleteDoubleGuardians() {
         if (CollectionUtils.isEmpty(idOfOrgList)) {
-            printError("не выбраны организации для обработки дублей представителей");
+            printError("Не выбраны организации для обработки дублей представителей");
             return;
         }
+        Collections.sort(idOfOrgList);
         for (long idOfOrg : idOfOrgList) {
             RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
         }
-
+        printMessage("Операция обработки дублей представителей по выбранным организациям выполнена");
     }
 
     public void runUpdateSpbCardUids() throws Exception {

@@ -28,7 +28,7 @@ public class CGItem implements Comparable {
                   Long idOfClientGroup, Long guardianLastUpdate) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
-        this.fio = fio.replaceAll("ё", "е");
+        this.fio = fio.toLowerCase().replaceAll("ё", "е");
         this.mobile = mobile;
         this.cardno = cardno;
         this.state = state;
@@ -66,7 +66,7 @@ public class CGItem implements Comparable {
         if (!(o instanceof CGItem)) {
             return false;
         }
-        if (((CGItem) o).getIdOfClientGuardian().equals(this.getIdOfClientGuardian())) return true;
+        if (((CGItem) o).getIdOfGuardin().equals(this.getIdOfGuardin())) return true;
         return false;
     }
 

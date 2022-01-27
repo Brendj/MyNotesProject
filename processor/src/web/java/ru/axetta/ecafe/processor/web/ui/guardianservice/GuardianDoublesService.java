@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
@@ -30,11 +31,11 @@ public class GuardianDoublesService {
         logger.info("Start process one org. Id=" + idOfOrg);
         processedCG.clear();
         List<CGItem> items = getCGItems(idOfOrg);
-        Map<Long, List<CGItem>> map = getCGItemsMap(items);
+        Map<String, List<CGItem>> map = getCGItemsMap(items);
         for (Map.Entry me : map.entrySet()) {
-            Long idOfClient = (Long)me.getKey();
-            List<CGItem> guardians = (List)me.getValue();
-            processOneClient(idOfClient, guardians);
+            String fio = (String) me.getKey();
+            List<CGItem> children = (List)me.getValue();
+            processOneClient(fio, children);
 
 
             //logger.info(me.getKey().toString() + ": " + ((List)me.getValue()).size());
@@ -56,8 +57,8 @@ public class GuardianDoublesService {
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
                     "left join cf_cards ca on ca.idofclient = g.idofclient and ca.state in (0, 4) and ca.lifestate = 1 and ca.validdate > :card_date " +
-                    "where c.idoforg = :idOfOrg " +
-                    "and g.idofclientgroup >= :group_employees " +
+                    "where c.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " +
+                    "and g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
                     "and g.idofclientgroup not in (:group_leaving, :group_deleted) " +
                     "order by c.idofclient";
             Query query = session.createNativeQuery(query_str);
@@ -96,8 +97,8 @@ public class GuardianDoublesService {
         return result;
     }
 
-    private Map<Long, List<CGItem>> getCGItemsMap(List<CGItem> items) {
-        Map<Long, List<CGItem>> result = new HashMap<>();
+    private Map<String, List<CGItem>> getCGItemsMap(List<CGItem> items) {
+        /*Map<Long, List<CGItem>> result = new HashMap<>();
         for (CGItem item : items) {
             List<CGItem> list = result.get(item.getIdOfClient());
             if (list == null) {
@@ -107,13 +108,24 @@ public class GuardianDoublesService {
             list.add(item);
             result.put(item.getIdOfClient(), list);
         }
+        return result;*/
+        Map<String, List<CGItem>> result = new HashMap<>();
+        for (CGItem item : items) {
+            List<CGItem> list = result.get(item.getFioPlusMobile());
+            if (list == null) {
+                list = new LinkedList<>();
+            }
+
+            list.add(item);
+            result.put(item.getFioPlusMobile(), list);
+        }
         return result;
     }
 
-    private void processOneClient(Long idOfClient, List<CGItem> guardians) {
-        for (CGItem item : guardians) {
+    private void processOneClient(String fio, List<CGItem> children) {
+        for (CGItem item : children) {
             if (processedCG.contains(item.getIdOfClientGuardian())) continue;
-            List<CGItem> processList = getNotProcessedDoubles(item, guardians);
+            List<CGItem> processList = getNotProcessedDoubles(item, children);
             if (processList.size() == 1) continue;
             //Есть дубли, дальше обрабатываем
             processDoubles(processList);
@@ -138,17 +150,6 @@ public class GuardianDoublesService {
         }
     }
 
-    private CGItem getCGItemWithActualCard(List<CGItem> processList, Set<CGCardItem> cardItems) {
-        if (cardItems.size() == 0) {
-            return processList.get(0);
-        }
-        CGCardItem cardItem = cardItems.iterator().next(); //первая карта самая приоритетная
-        for (CGItem item : processList) {
-            if (cardItem.getIdOfCard().equals(item.getCardno())) return item;
-        }
-        return null;
-    }
-
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
         Session session = null;
         Transaction transaction = null;
@@ -164,7 +165,7 @@ public class GuardianDoublesService {
                     item.getIdOfGuardin(), false, HISTORY_LABEL, CardState.BLOCKED);
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
-                deleteGuardian(session, item, version);
+                deleteGuardian(session, aliveGuardian, item, version);
                 logger.info(String.format("Deleted client id = %s", item.getIdOfGuardin()));
             }
             if (priorityCard != null) {
@@ -187,25 +188,65 @@ public class GuardianDoublesService {
         }
     }
 
-    private void deleteGuardian(Session session, CGItem deletedGuardian, Long version) throws Exception {
-        if (deletedGuardian.getBalance() > 0) {
+    private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version) throws Exception {
+        /*if (deletedGuardian.getBalance() > 0) {
             logger.info(String.format("Cannot delete guardian idOfClient = %s, idOfGuardian = %s since balance > 0",
                     deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin()));
             return;
+        }*/
+        ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связка у удаляемого представителя
+
+        if (!clientGuardian.getDeletedState()) {
+            ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, deletedGuardian);
+            if (cg == null) {
+                ClientGuardianHistory clientGuardianHistory2 = new ClientGuardianHistory();
+                clientGuardianHistory2.setUser(MainPage.getSessionInstance().getCurrentUser());
+                clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                clientGuardianHistory2.setReason(HISTORY_LABEL);
+                ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
+                        version, clientGuardian.isDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
+                        clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
+                logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
+            } else if (cg.getDeletedState()) {
+                cg.setDeletedState(false);
+                cg.setNotificationSettings(clientGuardian.getNotificationSettings());
+                logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
+                session.update(cg);
+            }
         }
+
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
         clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
         clientGuardianHistory.setReason(HISTORY_LABEL);
         ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
+        logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
 
         Client client = DAOUtils.findClient(session, deletedGuardian.getIdOfGuardin());
-        ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
-                        .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
-        client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        session.update(client);
+        if (!client.isDeletedOrLeaving()) {
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+            client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            session.update(client);
+        }
         session.flush();
+    }
+
+    private ClientGuardian getClientGuardianByCGItem(Session session, CGItem item) {
+        Query query = session.createQuery("select cg from ClientGuardian cg where cg.idOfClientGuardian = :id");
+        query.setParameter("id", item.getIdOfClientGuardian());
+        return (ClientGuardian) query.getResultList().get(0);
+    }
+
+    private ClientGuardian getGuardianChildlink(Session session, CGItem aliveGuardian, CGItem deletedGuardian) {
+        Query query = session.createQuery("select cg from ClientGuardian cg " +
+                "where cg.idOfGuardian = :idOfGuardian and cg.idOfChildren = :idOfChildren");
+        query.setParameter("idOfGuardian", aliveGuardian.getIdOfGuardin());
+        query.setParameter("idOfChildren", deletedGuardian.getIdOfClient());
+        List<ClientGuardian> list = query.getResultList();
+        if (list.size() == 0) return null;
+        else return list.get(0);
     }
 
     private List<CGItem> getNotProcessedDoubles(CGItem item, List<CGItem> guardians) {
