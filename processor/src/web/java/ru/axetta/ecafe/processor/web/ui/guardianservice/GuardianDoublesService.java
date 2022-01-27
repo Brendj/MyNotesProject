@@ -57,8 +57,8 @@ public class GuardianDoublesService {
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
                     "left join cf_cards ca on ca.idofclient = g.idofclient and ca.state in (0, 4) and ca.lifestate = 1 and ca.validdate > :card_date " +
-                    "where c.idoforg = :idOfOrg " +
-                    "and g.idofclientgroup >= :group_employees " +
+                    "where c.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " +
+                    "and g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
                     "and g.idofclientgroup not in (:group_leaving, :group_deleted) " +
                     "order by c.idofclient";
             Query query = session.createNativeQuery(query_str);
@@ -196,13 +196,6 @@ public class GuardianDoublesService {
         }*/
         ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связка у удаляемого представителя
 
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-        clientGuardianHistory.setReason(HISTORY_LABEL);
-        ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
-        logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
-
         if (!clientGuardian.getDeletedState()) {
             ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, deletedGuardian);
             if (cg == null) {
@@ -222,12 +215,21 @@ public class GuardianDoublesService {
             }
         }
 
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason(HISTORY_LABEL);
+        ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
+        logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
+
         Client client = DAOUtils.findClient(session, deletedGuardian.getIdOfGuardin());
-        ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
-                        .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
-        client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        session.update(client);
+        if (!client.isDeletedOrLeaving()) {
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+            client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            session.update(client);
+        }
         session.flush();
     }
 
