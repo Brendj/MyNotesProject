@@ -49,6 +49,8 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
+        if (this.cardno != null && item.getCardno() == null) return -1;
+        if (this.cardno == null && item.getCardno() != null) return 1;
         int indexThis = GROUPS.indexOf(this.idOfClientGroup);
         int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
         if ((indexThis == -1) && (indexItem == -1)) return 0;
