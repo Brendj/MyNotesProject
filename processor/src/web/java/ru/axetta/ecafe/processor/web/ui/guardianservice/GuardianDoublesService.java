@@ -52,7 +52,8 @@ public class GuardianDoublesService {
             transaction = session.beginTransaction();
             String query_str = "select c.idofclient, cg.idofguardian, pg.surname, pg.firstname, " +
                     "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg as clientOrg, g.idoforg as guardianOrg, " +
-                    "cg.idofclientguardian, ca.lastupdate, g.balance, g.idofclientgroup, g.lastupdate as guardianLU " +
+                    "cg.idofclientguardian, ca.lastupdate, g.balance, g.idofclientgroup, g.lastupdate as guardianLU, " +
+                    "cg.deletedstate " +
                     "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
@@ -83,7 +84,8 @@ public class GuardianDoublesService {
                         HibernateUtils.getDbLong(row[11]),
                         HibernateUtils.getDbLong(row[12]),
                         HibernateUtils.getDbLong(row[13]),
-                        HibernateUtils.getDbLong(row[14]));
+                        HibernateUtils.getDbLong(row[14]),
+                        (Boolean)row[15]);
                 result.add(item);
             }
             transaction.commit();
@@ -151,6 +153,7 @@ public class GuardianDoublesService {
     }
 
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
+        boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -158,7 +161,7 @@ public class GuardianDoublesService {
             transaction = session.beginTransaction();
             Long version = ClientManager.generateNewClientGuardianVersion(session);
             for (CGItem item : deleteGuardianList) {
-                if (item.equals(aliveGuardian)) continue;
+                if (item.equals(aliveGuardian) && !allCGDeleted) continue;
                 if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
@@ -188,6 +191,15 @@ public class GuardianDoublesService {
         }
     }
 
+    private boolean getAllCGDeleted(List<CGItem> list) {
+        for (CGItem item : list) {
+            if (!item.getDeletedState()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version) throws Exception {
         /*if (deletedGuardian.getBalance() > 0) {
             logger.info(String.format("Cannot delete guardian idOfClient = %s, idOfGuardian = %s since balance > 0",
@@ -215,12 +227,15 @@ public class GuardianDoublesService {
             }
         }
 
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-        clientGuardianHistory.setReason(HISTORY_LABEL);
-        ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
-        logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
+        ClientGuardianHistory clientGuardianHistory = null;
+        if (!deletedGuardian.getDeletedState()) {
+            clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(HISTORY_LABEL);
+            ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
+            logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
+        }
 
         Client client = DAOUtils.findClient(session, deletedGuardian.getIdOfGuardin());
         if (!client.isDeletedOrLeaving()) {

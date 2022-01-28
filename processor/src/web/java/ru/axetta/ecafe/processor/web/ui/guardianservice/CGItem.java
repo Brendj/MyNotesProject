@@ -19,13 +19,14 @@ public class CGItem implements Comparable {
     private Long balance;
     private Long idOfClientGroup;
     private Long guardianLastUpdate;
+    private Boolean deletedState;
 
     public static final List<Long> GROUPS = Arrays.asList(1100000000L, 1100000010L, 1100000050L, 1100000020L,
             1100000030L, 1100000100L, 1100000110L);
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
                   boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
-                  Long idOfClientGroup, Long guardianLastUpdate) {
+                  Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio.toLowerCase().replaceAll("ё", "е");
@@ -39,6 +40,7 @@ public class CGItem implements Comparable {
         this.balance = balance;
         this.idOfClientGroup = idOfClientGroup;
         this.guardianLastUpdate = guardianLastUpdate;
+        this.deletedState = deletedState;
     }
 
     @Override
@@ -176,5 +178,13 @@ public class CGItem implements Comparable {
 
     public void setGuardianLastUpdate(Long guardianLastUpdate) {
         this.guardianLastUpdate = guardianLastUpdate;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 }
