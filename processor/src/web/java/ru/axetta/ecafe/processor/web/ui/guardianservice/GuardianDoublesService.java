@@ -27,32 +27,6 @@ public class GuardianDoublesService {
 
     public static final String HISTORY_LABEL = "Удаление дубликата представителя";
 
-    public void test() {
-        List<CGItem> list = new ArrayList<>();
-        CGItem item = new CGItem(1L, 10L, "String fio", "String mobile", null, null,
-        true, 100L, null, 0L,
-                1100000050L, 33L, false);
-        list.add(item);
-        CGItem item2 = new CGItem(2L, 11L, "String fio", "String mobile", null, null,
-                true, 100L, null, 0L,
-                1100000050L, 33L, false);
-        list.add(item2);
-        CGItem item3 = new CGItem(3L, 12L, "String fio", "String mobile", 1000L, 1,
-                true, 100L, 10000L, 0L,
-                1100000000L, 33L, false);
-        list.add(item3);
-        CGItem item4 = new CGItem(4L, 13L, "String fio", "String mobile", 1001L, 1,
-                true, 100L, 999L, 0L,
-                1100000050L, 33L, false);
-        list.add(item4);
-        CGItem item5 = new CGItem(5L, 14L, "String fio", "String mobile", 1002L, 1,
-                true, 100L, 998L, 0L,
-                1100000050L, 34L, false);
-        list.add(item5);
-        Collections.sort(list);
-        logger.info("" + list.size());
-    }
-
     public void processDeleteDoubleGuardiansForOrg(long idOfOrg) {
         logger.info("Start process one org. Id=" + idOfOrg);
         processedCG.clear();
@@ -185,10 +159,15 @@ public class GuardianDoublesService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Long version = ClientManager.generateNewClientGuardianVersion(session);
+            Long version = 123L; //ClientManager.generateNewClientGuardianVersion(session);
+            boolean priorityCardIsAlive = true;
+            if (priorityCard != null && aliveGuardian.getCardno() != null
+                    && !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) {
+                priorityCardIsAlive = false;
+            }
             for (CGItem item : deleteGuardianList) {
                 if (item.equals(aliveGuardian) && !allCGDeleted) continue;
-                if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (item.getCardno() != null && (!item.getCardno().equals(priorityCard.getIdOfCard()) || !priorityCardIsAlive) || allCGDeleted) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
@@ -198,7 +177,7 @@ public class GuardianDoublesService {
                 logger.info(String.format("Deleted client id = %s", item.getIdOfGuardin()));
             }
             if (priorityCard != null) {
-                if (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (aliveGuardian.getCardno() == null) {
                     Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                     RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                             card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
