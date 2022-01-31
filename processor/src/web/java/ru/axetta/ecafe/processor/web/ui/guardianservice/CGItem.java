@@ -49,8 +49,8 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
-        if (this.cardno != null && item.getCardno() == null) return -1;
-        if (this.cardno == null && item.getCardno() != null) return 1;
+        //if (this.cardno != null && item.getCardno() == null) return -1;
+        //if (this.cardno == null && item.getCardno() != null) return 1;
         int indexThis = GROUPS.indexOf(this.idOfClientGroup);
         int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
         if ((indexThis == -1) && (indexItem == -1)) return 0;
@@ -59,6 +59,16 @@ public class CGItem implements Comparable {
 
         int res = Integer.valueOf(indexThis).compareTo(indexItem);
         if (res == 0) {
+            if (this.cardno != null && item.getCardno() == null) return -1;
+            if (this.cardno == null && item.getCardno() != null) return 1;
+            if (this.cardno != null && item.getCardno() != null) {
+                int cardRes = -cardLastUpdate.compareTo(item.getCardLastUpdate());
+                if (cardRes == 0) {
+                    return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                } else {
+                    return cardRes;
+                }
+            }
             return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
         } else {
             return res;

@@ -27,6 +27,32 @@ public class GuardianDoublesService {
 
     public static final String HISTORY_LABEL = "Удаление дубликата представителя";
 
+    public void test() {
+        List<CGItem> list = new ArrayList<>();
+        CGItem item = new CGItem(1L, 10L, "String fio", "String mobile", null, null,
+        true, 100L, null, 0L,
+                1100000050L, 33L, false);
+        list.add(item);
+        CGItem item2 = new CGItem(2L, 11L, "String fio", "String mobile", null, null,
+                true, 100L, null, 0L,
+                1100000050L, 33L, false);
+        list.add(item2);
+        CGItem item3 = new CGItem(3L, 12L, "String fio", "String mobile", 1000L, 1,
+                true, 100L, 10000L, 0L,
+                1100000000L, 33L, false);
+        list.add(item3);
+        CGItem item4 = new CGItem(4L, 13L, "String fio", "String mobile", 1001L, 1,
+                true, 100L, 999L, 0L,
+                1100000050L, 33L, false);
+        list.add(item4);
+        CGItem item5 = new CGItem(5L, 14L, "String fio", "String mobile", 1002L, 1,
+                true, 100L, 998L, 0L,
+                1100000050L, 34L, false);
+        list.add(item5);
+        Collections.sort(list);
+        logger.info("" + list.size());
+    }
+
     public void processDeleteDoubleGuardiansForOrg(long idOfOrg) {
         logger.info("Start process one org. Id=" + idOfOrg);
         processedCG.clear();
