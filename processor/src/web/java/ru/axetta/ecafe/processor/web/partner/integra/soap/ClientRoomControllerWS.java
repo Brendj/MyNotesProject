@@ -199,7 +199,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
     private static final Long RC_REGULAR_WRONG_START_DATE = 713L;
     private static final Long RC_REGULAR_EXISTS = 714L;
-    private static final Long RC_INVALID_DATE_PREORDER_DISH = 715L;
     private static final Long RC_INVALID_CREATOR = 720L;
 
 
@@ -262,7 +261,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
     private static final String RC_INVALID_REGULAR_RANGE_DESC = "Создание повтора питания на один день запрещено";
-    private static final String RC_INVALID_DATE_PREORDER_DISH_DESC = "Блюдо будет исключено из меню до исполнения предзаказа";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -10299,10 +10297,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .savePreorderComplexes(preorderSaveListParam, guardianMobile, externalSystem);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
-        } catch (InvalidDatePreorderDishException e) {
-            result.resultCode = RC_INVALID_DATE_PREORDER_DISH;
-            result.description = RC_INVALID_DATE_PREORDER_DISH_DESC;
-        } catch (MenuDetailNotExistsException e) {
+        }  catch (MenuDetailNotExistsException | InvalidDatePreorderDishException e) {
             result.resultCode = RC_NOT_FOUND_MENUDETAIL;
             result.description = RC_NOT_FOUND_MENUDETAIL_DESC;
         } catch (NotEditedDayException e) {
