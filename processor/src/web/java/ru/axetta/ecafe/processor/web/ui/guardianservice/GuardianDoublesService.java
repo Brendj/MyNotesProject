@@ -159,10 +159,15 @@ public class GuardianDoublesService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Long version = ClientManager.generateNewClientGuardianVersion(session);
+            Long version = 123L; //ClientManager.generateNewClientGuardianVersion(session);
+            boolean priorityCardIsAlive = true;
+            if (priorityCard != null && aliveGuardian.getCardno() != null
+                    && !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) {
+                priorityCardIsAlive = false;
+            }
             for (CGItem item : deleteGuardianList) {
                 if (item.equals(aliveGuardian) && !allCGDeleted) continue;
-                if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (item.getCardno() != null && (!item.getCardno().equals(priorityCard.getIdOfCard()) || !priorityCardIsAlive) || allCGDeleted) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
@@ -172,7 +177,7 @@ public class GuardianDoublesService {
                 logger.info(String.format("Deleted client id = %s", item.getIdOfGuardin()));
             }
             if (priorityCard != null) {
-                if (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (aliveGuardian.getCardno() == null) {
                     Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                     RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                             card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
