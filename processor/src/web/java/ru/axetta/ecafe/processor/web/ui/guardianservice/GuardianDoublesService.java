@@ -159,15 +159,15 @@ public class GuardianDoublesService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Long version = 123L; //ClientManager.generateNewClientGuardianVersion(session);
-            boolean priorityCardIsAlive = true;
+            Long version = ClientManager.generateNewClientGuardianVersion(session);
+            boolean aliveGuardianCardIsAlive = true;
             if (priorityCard != null && aliveGuardian.getCardno() != null
                     && !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) {
-                priorityCardIsAlive = false;
+                aliveGuardianCardIsAlive = false;
             }
             for (CGItem item : deleteGuardianList) {
                 if (item.equals(aliveGuardian) && !allCGDeleted) continue;
-                if (item.getCardno() != null && (!item.getCardno().equals(priorityCard.getIdOfCard()) || !priorityCardIsAlive) || allCGDeleted) {
+                if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
@@ -176,15 +176,19 @@ public class GuardianDoublesService {
                 deleteGuardian(session, aliveGuardian, item, version);
                 logger.info(String.format("Deleted client id = %s", item.getIdOfGuardin()));
             }
-            if (priorityCard != null) {
-                if (aliveGuardian.getCardno() == null) {
-                    Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
-                    RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
-                            card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
-                            card.getLifeState(), HISTORY_LABEL, new Date(), card.getExternalId(), null, card.getOrg().getIdOfOrg(),
-                            "", false);
-                    logger.info(String.format("Card with cardno = %s issue to client id = %s", priorityCard.getIdOfCard(), aliveGuardian.getIdOfGuardin()));
-                }
+            if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
+                Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
+                RuntimeContext.getAppContext().getBean(CardService.class).block(aliveGuardian.getCardno(), g.getOrg().getIdOfOrg(),
+                        aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
+                logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
+            }
+            if (priorityCard != null && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))) {
+                Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
+                RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
+                        card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
+                        card.getLifeState(), HISTORY_LABEL, new Date(), card.getExternalId(), null, card.getOrg().getIdOfOrg(),
+                        "", false);
+                logger.info(String.format("Card with cardno = %s issue to client id = %s", priorityCard.getIdOfCard(), aliveGuardian.getIdOfGuardin()));
             }
             transaction.commit();
             transaction = null;
