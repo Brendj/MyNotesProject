@@ -182,7 +182,7 @@ public class GuardianDoublesService {
                         aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
                 logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
             }
-            if (priorityCard != null) {
+            if (priorityCard != null && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                         card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
