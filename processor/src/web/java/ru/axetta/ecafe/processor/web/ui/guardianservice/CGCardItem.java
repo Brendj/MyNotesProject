@@ -7,12 +7,14 @@ public class CGCardItem implements Comparable {
     private Long idOfClient;
     private Long cardLastUpdate;
     private Long idOfClientGroup;
+    private Long guardianLastUpdate;
 
-    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate, Long idOfClientGroup) {
+    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate, Long idOfClientGroup, Long guardianLastUpdate) {
         this.idOfCard = idOfCard;
         this.idOfClient = idOfClient;
         this.cardLastUpdate = cardLastUpdate;
         this.idOfClientGroup = idOfClientGroup;
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 
     public Long getIdOfCard() {
@@ -47,7 +49,12 @@ public class CGCardItem implements Comparable {
             if ((indexThis == -1) && (indexItem == -1)) return 0;
             if ((indexThis == -1) && (indexItem > -1)) return -1;
             if ((indexThis > -1) && (indexItem == -1)) return 1;
-            return Integer.valueOf(indexThis).compareTo(indexItem);
+            int res2 = Integer.valueOf(indexThis).compareTo(indexItem);
+            if (res2 == 0) {
+                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+            } else {
+                return res2;
+            }
         } else {
             return res;
         }
@@ -83,5 +90,13 @@ public class CGCardItem implements Comparable {
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getGuardianLastUpdate() {
+        return guardianLastUpdate;
+    }
+
+    public void setGuardianLastUpdate(Long guardianLastUpdate) {
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 }

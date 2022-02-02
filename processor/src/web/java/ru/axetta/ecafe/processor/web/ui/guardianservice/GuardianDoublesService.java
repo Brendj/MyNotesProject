@@ -144,7 +144,8 @@ public class GuardianDoublesService {
                     item.getIdOfGuardin(), item.getCardno(), item.getIdOfClientGroup(), item.getBalance(), item.getGuardianLastUpdate(),
                     item.getCardLastUpdate(), item.getDeletedState());
             if (item.getCardno() != null) {
-                cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(), item.getIdOfClientGroup()));
+                cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
+                        item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
             }
         }
         logger.info(log_message);
@@ -153,6 +154,7 @@ public class GuardianDoublesService {
             priorityCard = cardItems.iterator().next();
         }
         Collections.sort(processList);
+        logger.info(String.format("Priority client id: %s, Priority card: %s", processList.get(0).getIdOfGuardin(), priorityCard.getIdOfCard()));
         deleteGuardians(processList.get(0), processList, priorityCard);
         for (CGItem item : processList) {
             processedCG.add(item.getIdOfClientGuardian());
