@@ -45,13 +45,29 @@ public class KafkaService {
         BlockPersonEntranceRequest request = objectMapper.readValue(message, BlockPersonEntranceRequest.class);
         //Проверка на дубли
         //Только 1 раз блокируется и 1 раз разблокируется
-        List<CardActionRequest> unblock = cardActionRequestService.findRequestUnblockByRequestIdFull(request.getId());
-        if ((!cardActionRequestService.findRequestBlockByRequestIdFull(request.getId()).isEmpty() && request.getAction() == ActionType.block)
-                || (!unblock.isEmpty() && request.getAction() == ActionType.unblock && unblock.get(0).getProcessed()))
+        boolean good = true;
+        if (request.getAction() == ActionType.block)
         {
-            log.info(String.format("ДУБЛЬ Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
+            if (!cardActionRequestService.findRequestBlockByRequestIdFull(request.getId()).isEmpty())
+            {
+                good = false;
+                log.info(String.format("ДУБЛЬ block Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
+            }
         }
-        else {
+        else
+        {
+            List<CardActionRequest> unblock = cardActionRequestService.findRequestUnblockByRequestIdFull(request.getId());
+            //Если для данного запроса уже есть успешная операция разблокирования
+            if (!unblock.isEmpty())
+            {
+                if (unblock.get(0).getProcessed()){
+                    good = false;
+                    log.info(String.format("ДУБЛЬ unblock Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
+                }
+            }
+        }
+        if (good)
+        {
             log.info(String.format("Offset %d, Partition_ID %d, Received JSON: %s", offset, partitionId, message));
             commitJson(request);
         }
