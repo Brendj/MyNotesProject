@@ -154,7 +154,8 @@ public class GuardianDoublesService {
             priorityCard = cardItems.iterator().next();
         }
         Collections.sort(processList);
-        logger.info(String.format("Priority client id: %s, Priority card: %s", processList.get(0).getIdOfGuardin(), priorityCard.getIdOfCard()));
+        logger.info(String.format("Priority client id: %s, Priority card: %s", processList.get(0).getIdOfGuardin(),
+                priorityCard == null ? "null" : priorityCard.getIdOfCard()));
         deleteGuardians(processList.get(0), processList, priorityCard);
         for (CGItem item : processList) {
             processedCG.add(item.getIdOfClientGuardian());
