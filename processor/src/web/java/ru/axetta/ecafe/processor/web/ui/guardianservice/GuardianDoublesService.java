@@ -58,7 +58,7 @@ public class GuardianDoublesService {
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
                     "left join cf_cards ca on ca.idofclient = g.idofclient and ca.state in (0, 4) and ca.lifestate = 1 and ca.validdate > :card_date " +
-                    "where c.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " +
+                    "where g.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " +
                     "and g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
                     "and g.idofclientgroup not in (:group_leaving, :group_deleted) " +
                     "order by c.idofclient";
@@ -136,16 +136,25 @@ public class GuardianDoublesService {
 
     private void processDoubles(List<CGItem> processList) {
         Set<CGCardItem> cardItems = new TreeSet<>(); //все карты
+        String log_message = "Processing doubles: ";
         for (CGItem item : processList) {
+            log_message += String.format("\nFIO: %s, idOfClient: %s, idOfGuardian: %s, cardNo: %s, guardianClientGroup: %s, " +
+                    "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s",
+                    item.getFioPlusMobile(), item.getIdOfClient(),
+                    item.getIdOfGuardin(), item.getCardno(), item.getIdOfClientGroup(), item.getBalance(), item.getGuardianLastUpdate(),
+                    item.getCardLastUpdate(), item.getDeletedState());
             if (item.getCardno() != null) {
-                cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate()));
+                cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
+                        item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
             }
         }
+        logger.info(log_message);
         CGCardItem priorityCard = null;
         if (cardItems.size() > 0) {
             priorityCard = cardItems.iterator().next();
         }
         Collections.sort(processList);
+        logger.info(String.format("Priority client id: %s, Priority card: %s", processList.get(0).getIdOfGuardin(), priorityCard.getIdOfCard()));
         deleteGuardians(processList.get(0), processList, priorityCard);
         for (CGItem item : processList) {
             processedCG.add(item.getIdOfClientGuardian());
@@ -174,7 +183,7 @@ public class GuardianDoublesService {
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
                 deleteGuardian(session, aliveGuardian, item, version);
-                logger.info(String.format("Deleted client id = %s", item.getIdOfGuardin()));
+
             }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
                 Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
@@ -215,24 +224,26 @@ public class GuardianDoublesService {
                     deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin()));
             return;
         }*/
-        ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связка у удаляемого представителя
+        List<ClientGuardian> clientGuardians = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
 
-        if (!clientGuardian.getDeletedState()) {
-            ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, deletedGuardian);
-            if (cg == null) {
-                ClientGuardianHistory clientGuardianHistory2 = new ClientGuardianHistory();
-                clientGuardianHistory2.setUser(MainPage.getSessionInstance().getCurrentUser());
-                clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-                clientGuardianHistory2.setReason(HISTORY_LABEL);
-                ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
-                        version, clientGuardian.isDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
-                        clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
-                logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
-            } else if (cg.getDeletedState()) {
-                cg.setDeletedState(false);
-                cg.setNotificationSettings(clientGuardian.getNotificationSettings());
-                logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
-                session.update(cg);
+        for (ClientGuardian clientGuardian : clientGuardians) {
+            if (!clientGuardian.getDeletedState()) {
+                ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, clientGuardian);
+                if (cg == null) {
+                    ClientGuardianHistory clientGuardianHistory2 = new ClientGuardianHistory();
+                    clientGuardianHistory2.setUser(MainPage.getSessionInstance().getCurrentUser());
+                    clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+                    clientGuardianHistory2.setReason(HISTORY_LABEL);
+                    ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
+                            version, clientGuardian.isDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
+                            clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
+                    logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
+                } else if (cg.getDeletedState()) {
+                    cg.setDeletedState(false);
+                    cg.setNotificationSettings(clientGuardian.getNotificationSettings());
+                    logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
+                    session.update(cg);
+                }
             }
         }
 
@@ -253,21 +264,22 @@ public class GuardianDoublesService {
                             .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             session.update(client);
+            logger.info(String.format("Deleted client id = %s", client.getIdOfClient()));
         }
         session.flush();
     }
 
-    private ClientGuardian getClientGuardianByCGItem(Session session, CGItem item) {
+    private List<ClientGuardian> getClientGuardianByCGItem(Session session, CGItem item) {
         Query query = session.createQuery("select cg from ClientGuardian cg where cg.idOfClientGuardian = :id");
         query.setParameter("id", item.getIdOfClientGuardian());
-        return (ClientGuardian) query.getResultList().get(0);
+        return query.getResultList();
     }
 
-    private ClientGuardian getGuardianChildlink(Session session, CGItem aliveGuardian, CGItem deletedGuardian) {
+    private ClientGuardian getGuardianChildlink(Session session, CGItem aliveGuardian, ClientGuardian deletedGuardian) {
         Query query = session.createQuery("select cg from ClientGuardian cg " +
                 "where cg.idOfGuardian = :idOfGuardian and cg.idOfChildren = :idOfChildren");
         query.setParameter("idOfGuardian", aliveGuardian.getIdOfGuardin());
-        query.setParameter("idOfChildren", deletedGuardian.getIdOfClient());
+        query.setParameter("idOfChildren", deletedGuardian.getIdOfChildren());
         List<ClientGuardian> list = query.getResultList();
         if (list.size() == 0) return null;
         else return list.get(0);

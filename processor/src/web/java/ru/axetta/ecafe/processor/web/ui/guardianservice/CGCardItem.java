@@ -6,11 +6,15 @@ public class CGCardItem implements Comparable {
     private Long idOfCard;
     private Long idOfClient;
     private Long cardLastUpdate;
+    private Long idOfClientGroup;
+    private Long guardianLastUpdate;
 
-    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate) {
+    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate, Long idOfClientGroup, Long guardianLastUpdate) {
         this.idOfCard = idOfCard;
         this.idOfClient = idOfClient;
         this.cardLastUpdate = cardLastUpdate;
+        this.idOfClientGroup = idOfClientGroup;
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 
     public Long getIdOfCard() {
@@ -38,7 +42,22 @@ public class CGCardItem implements Comparable {
         if (this.cardLastUpdate == null && item.getCardLastUpdate() == null) return 0;
         if (this.cardLastUpdate != null && item.getCardLastUpdate() == null) return -1;
         if (this.cardLastUpdate == null && item.getCardLastUpdate() != null) return 1;
-        return -cardLastUpdate.compareTo(item.getCardLastUpdate());
+        int res = -cardLastUpdate.compareTo(item.getCardLastUpdate());
+        if (res == 0) {
+            int indexThis = CGItem.GROUPS.indexOf(this.idOfClientGroup);
+            int indexItem = CGItem.GROUPS.indexOf(item.getIdOfClientGroup());
+            if ((indexThis == -1) && (indexItem == -1)) return 0;
+            if ((indexThis == -1) && (indexItem > -1)) return -1;
+            if ((indexThis > -1) && (indexItem == -1)) return 1;
+            int res2 = Integer.valueOf(indexThis).compareTo(indexItem);
+            if (res2 == 0) {
+                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+            } else {
+                return res2;
+            }
+        } else {
+            return res;
+        }
     }
 
     @Override
@@ -63,5 +82,21 @@ public class CGCardItem implements Comparable {
 
     public void setCardLastUpdate(Long cardLastUpdate) {
         this.cardLastUpdate = cardLastUpdate;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getGuardianLastUpdate() {
+        return guardianLastUpdate;
+    }
+
+    public void setGuardianLastUpdate(Long guardianLastUpdate) {
+        this.guardianLastUpdate = guardianLastUpdate;
     }
 }
