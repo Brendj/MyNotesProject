@@ -63,13 +63,7 @@ public class KafkaService {
                 cardProcessorService.processBlockRequest(request);
                 break;
             case unblock:
-                if (cardProcessorService.newReq(request)) {
-                    cardProcessorService.processUnblockRequest(request);
-                }
-                else
-                {
-                    cardProcessorService.processUnblockRequestOLD(request);
-                }
+                cardProcessorService.processUnblockRequest(request);
         }
     }
 }
