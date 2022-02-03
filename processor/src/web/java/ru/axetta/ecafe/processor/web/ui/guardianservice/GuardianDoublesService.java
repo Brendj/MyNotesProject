@@ -248,15 +248,10 @@ public class GuardianDoublesService {
             }
         }
 
-        ClientGuardianHistory clientGuardianHistory = null;
-        if (!deletedGuardian.getDeletedState()) {
-            clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(HISTORY_LABEL);
-            ClientManager.removeGuardianByClient(session, deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin(), version, clientGuardianHistory);
-            logger.info(String.format("Removed guardian id=%d from client id=%d", deletedGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
-        }
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason(HISTORY_LABEL);
 
         Client client = DAOUtils.findClient(session, deletedGuardian.getIdOfGuardin());
         if (!client.isDeletedOrLeaving()) {
