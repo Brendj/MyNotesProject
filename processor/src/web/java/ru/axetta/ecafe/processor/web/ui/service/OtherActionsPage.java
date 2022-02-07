@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import org.hibernate.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -68,6 +70,8 @@ public class OtherActionsPage extends OnlineReportPage {
     private boolean allowGenerateGuardians = true;
     private String orgsforCleaninig;
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
+    private Integer processedMeshGuids;
+    private Boolean showProcessedMeshGuids = false;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -534,6 +538,139 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void loadMeshGuidsForGuardians(FileUploadEvent event) {
+        UploadedFile item = event.getUploadedFile();
+        InputStream inputStream = null;
+        try {
+            byte[] data = item.getData();
+            inputStream = new ByteArrayInputStream(data);
+            logger.info("Start loadMeshGuidsForGuardians");
+            showProcessedMeshGuids = false;
+            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream);
+            showProcessedMeshGuids = true;
+            logger.info("End loadMeshGuidsForGuardians");
+            printMessage("Файл загружен успешно");
+        } catch (Exception e) {
+            getLogger().error("Failed to load guardians mesh guids", e);
+            printMessage("Ошибка при загрузке файла с mesh гуидами представителей : " + e.getMessage());
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    private int loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Query query = session.createNativeQuery("create temp table temp_guids (idOfClient bigint, guid character varying(36)) on commit drop");
+            query.executeUpdate();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            int lineNo = 0;
+            String currLine = reader.readLine();
+            Long idOfClient;
+            String meshGuid;
+            String temp_query_str = "insert into temp_guids(idofclient, guid) values";
+            while (null != currLine) {
+                if (lineNo == 0) {
+                    currLine = reader.readLine();
+                    lineNo++;
+                    continue; //пропускаем заголовок
+                }
+                try {
+                    String[] arr = currLine.split("#");
+                    idOfClient = Long.valueOf(arr[0]);
+                    meshGuid = arr[1];
+                    if (meshGuid.startsWith("\"")) {
+                        meshGuid = meshGuid.substring(1, meshGuid.length()-1);
+                    }
+                } catch (Exception e) {
+                    idOfClient = null;
+                    meshGuid = null;
+                    logger.error("Error in loadMeshGuidsForGuardiansFile. LineNo=" + lineNo, e);
+                }
+                if (idOfClient != null) {
+                    temp_query_str += String.format("(%d, '%s'),", idOfClient, meshGuid);
+                }
+                if (lineNo % 5000 == 0) {
+                    temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                    Query temp_query = session.createNativeQuery(temp_query_str);
+                    temp_query.executeUpdate();
+                    temp_query_str = "insert into temp_guids(idofclient, guid) values";
+                    logger.info(String.format("Processed %s lines", lineNo));
+                }
+                currLine = reader.readLine();
+                lineNo++;
+            }
+            if (temp_query_str.length() > 50) {
+                temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                Query temp_query = session.createNativeQuery(temp_query_str);
+                temp_query.executeUpdate();
+                logger.info(String.format("Processed %s lines", lineNo));
+            }
+            //дубли гуидов по выгрузке
+            Query temp_doubles_query =
+                    session.createNativeQuery("select cast(count(t.idofclient) as bigint) as amount, guid " +
+                            "from temp_guids t join cf_clients c on t.idofclient = c.idofclient " +
+                            "where c.idofclientgroup not in (1100000060, 1100000070) " +
+                            "group by guid having count(t.idofclient) > 1 order by 1 desc");
+            List list = temp_doubles_query.getResultList();
+            String doubleGuidList = "";
+            if (list.size() > 0) {
+                for (Object o : list) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
+                    doubleGuidList += (String)row[1] + ",";
+                }
+                doubleGuidList = doubleGuidList.substring(0, doubleGuidList.length()-1);
+            }
+            Query temp_guids_filter = session.createNativeQuery("create temp table temp_double_guids (guid character varying(36)) on commit drop");
+            temp_guids_filter.executeUpdate();
+            if (doubleGuidList.length() > 0) {
+                temp_guids_filter = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", doubleGuidList));
+                temp_guids_filter.executeUpdate();
+            }
+
+            //отсеиваем существующие в БД гуиды
+            Query exist_guids_query = session.createNativeQuery("select t.idofclient, t.guid " +
+                    "from temp_guids t join cf_clients c on t.guid = c.meshguid");
+            List list2 = exist_guids_query.getResultList();
+            String existingGuids = "";
+            if (list2.size() > 0) {
+                for (Object o : list2) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Existing guids: %s - idofclient = %d", (String) row[1], HibernateUtils.getDbLong(row[0])));
+                    existingGuids += (String) row[1] + ",";
+                }
+                existingGuids = existingGuids.substring(0, existingGuids.length()-1);
+            }
+            if (existingGuids.length() > 0) {
+                exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", existingGuids));
+                exist_guids_query.executeUpdate();
+            }
+
+            Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
+                    "from temp_guids temp where c.idofclient = temp.idofclient and c.idofclientgroup not in (1100000060, 1100000070) " +
+                    "and not exists (select guid from temp_double_guids t where t.guid = temp.guid)");
+            update_query.setParameter("version", nextVersion);
+            int res = update_query.executeUpdate();
+            logger.info(String.format("Updated %s client records", res));
+            transaction.commit();
+            transaction = null;
+            return res;
+        } catch (Exception e) {
+            logger.error("Error in loadMeshGuidsForGuardiansFile: ", e);
+            return 0;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public void specialDatesLoadFileListener(FileUploadEvent event) {
         UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
@@ -878,5 +1015,21 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Integer getProcessedMeshGuids() {
+        return processedMeshGuids;
+    }
+
+    public void setProcessedMeshGuids(Integer processedMeshGuids) {
+        this.processedMeshGuids = processedMeshGuids;
+    }
+
+    public Boolean getShowProcessedMeshGuids() {
+        return showProcessedMeshGuids;
+    }
+
+    public void setShowProcessedMeshGuids(Boolean showProcessedMeshGuids) {
+        this.showProcessedMeshGuids = showProcessedMeshGuids;
     }
 }

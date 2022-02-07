@@ -320,6 +320,28 @@
                                        styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
                 </h:panelGrid>
             </rich:panel>
+            <rich:panel id="loadMeshGuidsForGuardiansPanel">
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
+                                  styleClass="output-text"/><br/>
+                    <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
+                    <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
+                                     addLabel="Добавить..."
+                                     clearAllLabel="Очистить"
+                                     uploadLabel="Загрузить"
+                                     doneLabel="Готово"
+                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
+                                     listHeight="100">
+                        <f:facet name="label">
+                            <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                        </f:facet>
+                        <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
+                        <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
+                    </rich:fileUpload>
+                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
+                                  styleClass="report-error-output-text" rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
 
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
