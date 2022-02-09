@@ -539,6 +539,14 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void loadMeshGuidsForGuardians(FileUploadEvent event) {
+        if (CollectionUtils.isEmpty(idOfOrgList)) {
+            printError("Не выбраны организации для загрузки мэш гуидов представителей");
+            return;
+        }
+        Collections.sort(idOfOrgList);
+        for (long idOfOrg : idOfOrgList) {
+            RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
+        }
         UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
@@ -546,7 +554,7 @@ public class OtherActionsPage extends OnlineReportPage {
             inputStream = new ByteArrayInputStream(data);
             logger.info("Start loadMeshGuidsForGuardians");
             showProcessedMeshGuids = false;
-            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream);
+            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream, idOfOrgList);
             showProcessedMeshGuids = true;
             logger.info("End loadMeshGuidsForGuardians");
             printMessage("Файл загружен успешно");
@@ -558,7 +566,17 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
-    private int loadMeshGuidsForGuardiansFile(InputStream inputStream) throws Exception {
+    private int loadMeshGuidsForGuardiansFileByOrg(Session session, List<Long> idOfOrgList, Long nextVersion) {
+        Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
+                "from temp_guids temp where c.idofclient = temp.idofclient and c.idofclientgroup not in (1100000060, 1100000070) " +
+                "and c.idoforg in (:idOfOrgList)" +
+                "and not exists (select guid from temp_double_guids t where t.guid = temp.guid)");
+        update_query.setParameter("version", nextVersion);
+        update_query.setParameterList("idOfOrgList", idOfOrgList);
+        return update_query.executeUpdate();
+    }
+
+    private int loadMeshGuidsForGuardiansFile(InputStream inputStream, List<Long> idOfOrgList) throws Exception {
         Session session = null;
         Transaction transaction = null;
         long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -653,15 +671,21 @@ public class OtherActionsPage extends OnlineReportPage {
                 exist_guids_query.executeUpdate();
             }
 
-            Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
-                    "from temp_guids temp where c.idofclient = temp.idofclient and c.idofclientgroup not in (1100000060, 1100000070) " +
-                    "and not exists (select guid from temp_double_guids t where t.guid = temp.guid)");
-            update_query.setParameter("version", nextVersion);
-            int res = update_query.executeUpdate();
-            logger.info(String.format("Updated %s client records", res));
+            Set<Long> processedOrgs = new HashSet<>();
+            int result = 0;
+            int res = 0;
+            for (Long idOfOrg : idOfOrgList) {
+                if (processedOrgs.contains(idOfOrg)) continue;
+                List<Long> friendlyOrgs = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+                res = loadMeshGuidsForGuardiansFileByOrg(session, friendlyOrgs, nextVersion);
+                logger.info(String.format("Updated %s client records", res));
+                result += res;
+                processedOrgs.addAll(friendlyOrgs);
+            }
+
             transaction.commit();
             transaction = null;
-            return res;
+            return result;
         } catch (Exception e) {
             logger.error("Error in loadMeshGuidsForGuardiansFile: ", e);
             return 0;
