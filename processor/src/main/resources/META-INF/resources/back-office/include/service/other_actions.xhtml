@@ -324,6 +324,17 @@
                 <h:panelGrid columns="2">
                     <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
                                   styleClass="output-text"/><br/>
+                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                    <h:panelGroup>
+                        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                           render="modalOrgListSelectorPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                        </a4j:commandButton>
+                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.filter}}"/>
+                    </h:panelGroup>
                     <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
                     <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
                                      addLabel="Добавить..."
@@ -331,7 +342,7 @@
                                      uploadLabel="Загрузить"
                                      doneLabel="Готово"
                                      fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
-                                     listHeight="100">
+                                     listHeight="100" >
                         <f:facet name="label">
                             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
                         </f:facet>
