@@ -544,9 +544,6 @@ public class OtherActionsPage extends OnlineReportPage {
             return;
         }
         Collections.sort(idOfOrgList);
-        for (long idOfOrg : idOfOrgList) {
-            RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
-        }
         UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
