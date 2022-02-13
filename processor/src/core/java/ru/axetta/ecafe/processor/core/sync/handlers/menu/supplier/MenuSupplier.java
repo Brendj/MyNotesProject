@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxAvailableItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -28,7 +30,7 @@ public class MenuSupplier implements SectionRequest {
     protected static final String[] CLIENT_SECTION_NAMES = new String[]{
             "OrgGroupsRequest", "CategoryItemsRequest", "TypeProductionsRequest", "AgeGroupItemsRequest",
             "DietTypesRequest", "ComplexGroupItemsRequest", "GroupItemsRequest", "DishesRequest", "MenuGroupsRequest",
-            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest"};
+            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest", "FoodBoxDishRemain", "FoodBoxPreorder"};
 
     public static final String SECTION_NAME = "MenuSupplier";
 
@@ -54,7 +56,7 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtComplex> complexes = new HashSet<>();
     private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
-
+    private FoodBoxDishRemain foodBoxDishRemain;
     private Integer resCode;
     private String errorMessage;
 
@@ -82,13 +84,21 @@ public class MenuSupplier implements SectionRequest {
                 } else {
                     err.append("Attribute Version for node ").append(itemNode.getNodeName()).append(" not found\n");
                 }
+                if (itemNode.getNodeName().equals(FoodBoxDishRemain.SECTION_NAME)) {
+                    //Обработка foodbox
+                    try {
+                        foodBoxDishRemain = new FoodBoxDishRemain(itemNode);
+                    } catch (Exception e) {
+                        err.append(" Error in section foodBoxDishRemain ");
+                    }
+                }
             }
             itemNode = itemNode.getNextSibling();
         }
-        return new MenuSupplier(idOfOrg, err.toString());
+        return new MenuSupplier(idOfOrg, err.toString(), foodBoxDishRemain);
     }
 
-    public MenuSupplier(Long idOfOrg, String errorMessage) {
+    public MenuSupplier(Long idOfOrg, String errorMessage, FoodBoxDishRemain foodBoxDishRemain) {
 
         this.setIdOfOrg(idOfOrg);
         this.setErrorMessage(errorMessage);
@@ -183,6 +193,10 @@ public class MenuSupplier implements SectionRequest {
                 }
                 case "ExcludeDaysRequest": {
                     excludeDays = daoReadonlyService.getExcludeDaysSetFromVersion(entry.getValue(), contragent, org);
+                    break;
+                }
+                case "FoodBoxDishRemain": {
+                    this.foodBoxDishRemain = foodBoxDishRemain;
                     break;
                 }
             }
@@ -344,5 +358,13 @@ public class MenuSupplier implements SectionRequest {
 
     public void setOfflineOrgGroups(Set<WtOrgGroup> offlineOrgGroups) {
         this.offlineOrgGroups = offlineOrgGroups;
+    }
+
+    public FoodBoxDishRemain getFoodBoxDishRemain() {
+        return foodBoxDishRemain;
+    }
+
+    public void setFoodBoxDishRemain(FoodBoxDishRemain foodBoxDishRemain) {
+        this.foodBoxDishRemain = foodBoxDishRemain;
     }
 }

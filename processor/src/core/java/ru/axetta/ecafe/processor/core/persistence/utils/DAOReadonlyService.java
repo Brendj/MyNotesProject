@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
@@ -3270,6 +3272,43 @@ public class DAOReadonlyService {
             q.setParameter("uid", uid);
             return (MeshClass) q.getSingleResult();
         } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public Long getMaxVersionOfFoodBoxPreorderAvailable(Org org){
+        try {
+            Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
+            q.setParameter("org", org);
+            return (Long) q.getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public Set<FoodBoxPreorder> getFoodBoxPreordersFromVersion(Long version, Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.version > :version "
+                    + "AND fb.org = :org");
+            query.setParameter("version", version);
+            query.setParameter("org", org);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return new HashSet<>(foodBoxPreorders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public Set<FoodBoxPreorderDish> getFoodBoxPreordersDishes(FoodBoxPreorder foodBoxPreorder) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbd from FoodBoxPreorderDish fbd "
+                    + "where fbd.foodBoxPreorder > :foodBoxPreorder ");
+            query.setParameter("foodBoxPreorder", foodBoxPreorder);
+            List<FoodBoxPreorderDish> foodBoxPreorderDishes = query.getResultList();
+            return new HashSet<>(foodBoxPreorderDishes);
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

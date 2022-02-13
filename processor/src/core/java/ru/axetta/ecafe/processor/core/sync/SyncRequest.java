@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBu
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
@@ -3142,6 +3143,10 @@ public class SyncRequest {
 
     public TurnstileSettingsRequest getTurnstileSettingsRequest() {
         return this.<TurnstileSettingsRequest>findSection(TurnstileSettingsRequest.class);
+    }
+
+    public FoodBoxDishRemain getFoodBoxRequest() {
+        return this.<FoodBoxDishRemain>findSection(FoodBoxDishRemain.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

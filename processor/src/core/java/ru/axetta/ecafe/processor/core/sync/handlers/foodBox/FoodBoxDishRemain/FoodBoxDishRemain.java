@@ -1,23 +1,23 @@
 /*
- * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2022. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.handlers.foodBox;
+package ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain;
 
 import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class FoodBoxRequest implements SectionRequest {
+public class FoodBoxDishRemain implements SectionRequest {
 
     public static final String SECTION_NAME = "FoodBoxDishRemain";
     private Long maxVersion;
-    private List<FoodBoxAvailableItem> items = new LinkedList<>();
+    private Set<FoodBoxAvailableItem> items = new HashSet<>();
 
-    public FoodBoxRequest(Node sectionElement) throws Exception {
+    public FoodBoxDishRemain(Node sectionElement) {
         this.maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
         Node nodeElement = sectionElement.getFirstChild();
         while (nodeElement != null) {
@@ -44,14 +44,14 @@ public class FoodBoxRequest implements SectionRequest {
         this.maxVersion = maxVersion;
     }
 
-    public List<FoodBoxAvailableItem> getItems() {
+    public Set<FoodBoxAvailableItem> getItems() {
         if (items == null) {
-            items = new LinkedList<>();
+            items = new HashSet<>();
         }
         return items;
     }
 
-    public void setItems(List<FoodBoxAvailableItem> items) {
+    public void setItems(Set<FoodBoxAvailableItem> items) {
         this.items = items;
     }
 }
