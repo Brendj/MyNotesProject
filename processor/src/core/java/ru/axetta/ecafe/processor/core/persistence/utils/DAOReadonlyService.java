@@ -18,6 +18,9 @@ import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItemItem;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
@@ -3311,5 +3314,30 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public FoodBoxPreorder findFoodBoxPreorder(Long idFoodBoxPreorder) {
+        return entityManager.find(FoodBoxPreorder.class, idFoodBoxPreorder);
+    }
+
+    public FoodBoxPreorderNew getFoodBoxPreorders(Long version, Org org)
+    {
+        Set<FoodBoxPreorder> foodBoxPreorders = DAOReadonlyService.getInstance().getFoodBoxPreordersFromVersion(version, org);
+        FoodBoxPreorderNew foodBoxPreorderNew = new FoodBoxPreorderNew();
+        for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
+        {
+            FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getInitialDateTime(),foodBoxPreorder.getVersion());
+            Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+            for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
+            {
+                FoodBoxPreorderNewItemItem foodBoxPreorderNewItemItem = new FoodBoxPreorderNewItemItem();
+                foodBoxPreorderNewItemItem.setIdOfDish(foodBoxPreorderDish.getIdOfDish());
+                foodBoxPreorderNewItemItem.setPrice(foodBoxPreorderDish.getPrice());
+                foodBoxPreorderNewItemItem.setQty(foodBoxPreorderDish.getQty());
+                foodBoxPreorderNewItem.getItems().add(foodBoxPreorderNewItemItem);
+            }
+            foodBoxPreorderNew.getItems().add(foodBoxPreorderNewItem);
+        }
+        return foodBoxPreorderNew;
     }
 }

@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import java.util.Date;
 
 public class FoodBoxPreorder {
-    private Long id;
+    private Long idFoodBoxPreorder;
     private FoodBoxStateTypeEnum state;
     private Client client;
     private Date initialDateTime;
@@ -29,12 +29,12 @@ public class FoodBoxPreorder {
         updateDate = new Date();
     }
 
-    public Long getId() {
-        return id;
+    public Long getIdFoodBoxPreorder() {
+        return idFoodBoxPreorder;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdFoodBoxPreorder(Long idFoodBoxPreorder) {
+        this.idFoodBoxPreorder = idFoodBoxPreorder;
     }
 
     public FoodBoxStateTypeEnum getState() {

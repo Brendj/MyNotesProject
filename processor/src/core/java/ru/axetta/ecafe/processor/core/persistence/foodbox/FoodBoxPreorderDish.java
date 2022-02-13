@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.foodbox;
 import java.util.Date;
 
 public class FoodBoxPreorderDish {
-    private Long id;
+    private Long idFoodBoxPreorderDish;
     private FoodBoxPreorder foodBoxPreorder;
     private Long idOfDish;
     private Integer price;
@@ -20,12 +20,12 @@ public class FoodBoxPreorderDish {
         updateDate = new Date();
     }
 
-    public Long getId() {
-        return id;
+    public Long getIdFoodBoxPreorderDish() {
+        return idFoodBoxPreorderDish;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdFoodBoxPreorderDish(Long idFoodBoxPreorderDish) {
+        this.idFoodBoxPreorderDish = idFoodBoxPreorderDish;
     }
 
     public Long getIdOfDish() {

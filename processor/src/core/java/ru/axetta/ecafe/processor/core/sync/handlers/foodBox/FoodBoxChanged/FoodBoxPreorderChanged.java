@@ -9,20 +9,18 @@ import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FoodBoxPreorderChanged implements SectionRequest {
 
     public static final String SECTION_NAME = "FoodBoxPreorder";
-    private Long maxVersion;
-    private List<FoodBoxPreorderChangedItem> items;
+    private Set<FoodBoxPreorderChangedItem> items = new HashSet<>();
 
     public FoodBoxPreorderChanged() {
     }
 
     public FoodBoxPreorderChanged(Node sectionElement) throws Exception {
-        this.maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
         Node nodeElement = sectionElement.getFirstChild();
         while (nodeElement != null) {
             if (nodeElement.getNodeName().equals("FBP")) {
@@ -47,21 +45,13 @@ public class FoodBoxPreorderChanged implements SectionRequest {
         return SECTION_NAME;
     }
 
-    public List<FoodBoxPreorderChangedItem> getItems() {
+    public Set<FoodBoxPreorderChangedItem> getItems() {
         if (items == null)
-            items = new ArrayList<>();
+            items = new HashSet<>();
         return items;
     }
 
-    public void setItems(List<FoodBoxPreorderChangedItem> items) {
+    public void setItems(Set<FoodBoxPreorderChangedItem> items) {
         this.items = items;
-    }
-
-    public Long getMaxVersion() {
-        return maxVersion;
-    }
-
-    public void setMaxVersion(Long maxVersion) {
-        this.maxVersion = maxVersion;
     }
 }

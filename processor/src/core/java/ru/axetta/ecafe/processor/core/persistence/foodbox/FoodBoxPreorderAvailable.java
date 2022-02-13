@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import java.util.Date;
 
 public class FoodBoxPreorderAvailable {
-    private Long id;
+    private Long idPreorderAvailableFoodbox;
     private Long idOfDish;
     private Integer availableQty;
     private Org org;
@@ -23,12 +23,12 @@ public class FoodBoxPreorderAvailable {
     }
 
 
-    public Long getId() {
-        return id;
+    public Long getIdPreorderAvailableFoodbox() {
+        return idPreorderAvailableFoodbox;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdPreorderAvailableFoodbox(Long idPreorderAvailableFoodbox) {
+        this.idPreorderAvailableFoodbox = idPreorderAvailableFoodbox;
     }
 
     public Long getIdOfDish() {

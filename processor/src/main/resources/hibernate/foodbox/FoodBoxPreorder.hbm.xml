@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder" table="cf_foodbox_preorders">
-        <id name="id" column="id" type="long">
+        <id name="idFoodBoxPreorder" column="id" type="long">
             <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
                 <param name="optimizer">pooled-lo</param>
                 <param name="increment_size">1</param>
