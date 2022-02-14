@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sms.emp.type;
 
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -14,8 +15,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EMPReqestSmsType extends EmpResult{
-    @JsonProperty("token")
-    private String token;
     @JsonProperty("destination")
     private String destination;
     @JsonProperty("message")
@@ -23,19 +22,10 @@ public class EMPReqestSmsType extends EmpResult{
     @JsonProperty("source")
     private String source;
 
-    public EMPReqestSmsType(String token, String destination, String message, String source) {
-        this.token = token;
+    public EMPReqestSmsType(String destination, String message, String source) {
         this.destination = destination;
         this.message = message;
         this.source = source;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getDestination() {

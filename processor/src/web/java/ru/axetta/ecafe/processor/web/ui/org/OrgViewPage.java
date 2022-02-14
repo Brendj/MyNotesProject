@@ -117,6 +117,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean changesDSZN;
 
     private Boolean useWebArm;
+    private Boolean useWebArmAdmin;
 
     private Boolean goodDateCheck;
 
@@ -308,6 +309,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.preorderlp = org.getPreorderlp();
 
         this.useWebArm = org.getUseWebArm();
+        this.useWebArmAdmin = org.getUseWebArmAdmin();
         this.orgIdFromNsi = org.getOrgIdFromNsi();
         this.goodDateCheck = org.getGooddatecheck();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
@@ -838,6 +840,14 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public Boolean getUseWebArmAdmin() {
+        return useWebArmAdmin;
+    }
+
+    public void setUseWebArmAdmin(Boolean useWebArmAdmin) {
+        this.useWebArmAdmin = useWebArmAdmin;
     }
 
     public String getFounder() {

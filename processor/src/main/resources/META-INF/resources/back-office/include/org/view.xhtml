@@ -219,8 +219,10 @@
                       rendered="#{mainPage.orgViewPage.isCurrentOrg(key.idOfOrg)}"/>
         <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
     </a4j:repeat>
-    <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
+    <h:outputText escape="true" value="Использовать Web-АРМ поставщика питания" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useWebArm}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Использовать Web-АРМ Администратора" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useWebArmAdmin}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Функционал проверки даты в заявке на питание" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.goodDateCheck}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
