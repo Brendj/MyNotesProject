@@ -445,6 +445,48 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             long totalBuffetCount = 0, totalBuffetSum = 0;
             long mealCountGroupTotal, mealSumGroupTotal, mealCountSumByCashTotal, mealSumSumByCashTotal, mealCountSumByCardTotal, mealSumSumByCardTotal, mealCountSumByCashAndSumByCardTotal, mealSumSumByCardAndSumByCashTotal;
             long mealCountGroupTotalCash, mealCountGroupTotalCard, mealSumGroupTotalCash, mealSumGroupTotalCard, mealCountGroupMixed, mealSumGroupMixed;
+            Map<String, MealRow> mealRowHashMap = new HashMap<String, MealRow>();
+            Map<String, TotalRow> mealRowMap = new HashMap<String, TotalRow>();
+            int menuOrigin1 = 0;
+            String menuGroup1 = null;
+
+            // Создаем временную таблицу для оптимизации последующих запросов
+            Query tempTableQuery = session.createSQLQuery(
+                    "CREATE TEMP TABLE temp_orders_orderdetails ON COMMIT DROP AS " +
+                            "SELECT" +
+                            "   o.idoforg, " +
+                            "   o.idoforder, " +
+                            "   o.idofclient, " +
+                            "   o.grantsum, " +
+                            "   o.sumbycash, " +
+                            "   o.sumbycard, " +
+                            "   od.idoforderdetail, " +
+                            "   od.qty, " +
+                            "   od.discount, " +
+                            "   od.socdiscount, " +
+                            "   od.RPrice, " +
+                            "   od.MenuDetailName, " +
+                            "   od.MenuGroup, " +
+                            "   od.MenuType, " +
+                            "   od.MenuOrigin " +
+                            "FROM CF_ORDERS o, CF_ORDERDETAILS od " +
+                            "WHERE o.idOfOrg IN (:idOfOrg) " +
+                            "   AND od.idOfOrg IN (:idOfOrg) " +
+                            "   AND o.IdOfOrder=od.IdOfOrder " +
+                            "   AND o.state=0 " +
+                            "   AND od.state=0 " +
+                            "   AND o.CreatedDate BETWEEN (:startTime) AND (:endTime)");
+
+            List<Long> idOrgs = new LinkedList<>();
+            for (OrgShortItem orgItem : orgShortItemList) {
+                idOrgs.add(orgItem.getIdOfOrg());
+            }
+            tempTableQuery.setParameterList("idOfOrg", idOrgs);
+            tempTableQuery.setParameter("startTime", startTime.getTime());
+            tempTableQuery.setParameter("endTime", endTime.getTime());
+
+
+            tempTableQuery.executeUpdate();
 
             // буфет
             String groupByField = "MenuOrigin";
@@ -472,25 +514,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 }
             }
 
-            Map<String, MealRow> mealRowHashMap = new HashMap<String, MealRow>();
-            Map<String, TotalRow> mealRowMap = new HashMap<String, TotalRow>();
-            int menuOrigin1 = 0;
-            String menuGroup1 = null;
-
             Query menuOriginQuery = session
-                    .createSQLQuery(String.format("SELECT DISTINCT od.%s FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                            + " WHERE (o.idOfOrg in (:idOfOrg) AND od.idOfOrg in (:idOfOrg)) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
-                            + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) ", groupByField));
+                    .createSQLQuery(String.format(
+                            "SELECT DISTINCT " +
+                                "t.%s " +
+                            "FROM temp_orders_orderdetails t " +
+                            "WHERE t.MenuType=:typeDish", groupByField));
 
             menuOriginQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
-            menuOriginQuery.setParameter("startTime", startTime.getTime());
-            menuOriginQuery.setParameter("endTime", endTime.getTime());
-
-            List<Long> idOrgs = new LinkedList<>();
-            for (OrgShortItem orgItem : orgShortItemList) {
-                idOrgs.add(orgItem.getIdOfOrg());
-            }
-            menuOriginQuery.setParameterList("idOfOrg", idOrgs);
 
             menuOriginList = menuOriginQuery.list();
 
@@ -519,21 +550,35 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             String orgAdditionalCondition = createOrgAdditionalConditionByOrgList(orgShortItemList);
 
             Query mealsQuery = session.createSQLQuery(String.format(
-                    "SELECT od.%s, od.MenuDetailName, SUM(od.qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), " +
-                            "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                            + "ELSE 'other' END AS flag " +
-                            " FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                            + "WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
-                            + "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice, flag "
-                            + "ORDER BY od.%s, od.MenuDetailName", groupByField, orgAdditionalCondition,
-                    menuGroupsCondition == null ? "" : "AND od.MenuGroup IN (" + menuGroupsCondition + ") ",
+                            "SELECT " +
+                            "   t.%s, " +
+                            "   t.MenuDetailName, " +
+                            "   SUM(t.qty) AS qtySum, " +
+                            "   t.RPrice, " +
+                            "   SUM(t.Qty * t.RPrice), " +
+                            "   CASE " +
+                            "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) THEN 'cash' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) THEN 'card' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) THEN 'mixed' " +
+                            "       ELSE 'other' " +
+                            "   END AS flag " +
+                            "FROM temp_orders_orderdetails t " +
+                            "WHERE " +
+                            "   t.MenuType=:typeDish " +
+                            "   %s " +
+                            "GROUP BY " +
+                            "   t.%s, " +
+                            "   t.MenuDetailName, " +
+                            "   t.RPrice, " +
+                            "   flag " +
+                            "ORDER BY " +
+                            "   t.%s, " +
+                            "   t.MenuDetailName",
+                    groupByField,
+                    menuGroupsCondition == null ? "" : "AND t.MenuGroup IN (" + menuGroupsCondition + ") ",
                     groupByField, groupByField));
 
             mealsQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
-            mealsQuery.setParameter("startTime", startTime.getTime());
-            mealsQuery.setParameter("endTime", endTime.getTime());
 
             mealsList = mealsQuery.list();
 
@@ -627,26 +672,37 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery(
-                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum, " +
-                        "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
-                                + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
-                                + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                                + "ELSE 'other' END AS flag "
-                                + "FROM CF_ORDERS o "
-                                + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder and o.idoforg = od.idoforg "
-                                + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder"
-                                + " WHERE "
-                                + orgAdditionalCondition
-                                + " AND (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND "
-                                + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 AND "
-                                + " pl.idofpreorderlinkod IS NULL "
-                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, flag");
+                                "SELECT " +
+                                "   t.MenuType, " +
+                                "   SUM(t.Qty) AS qtySum, " +
+                                "   t.RPrice, " +
+                                "   SUM(t.Qty*t.RPrice), " +
+                                "   t.menuDetailName, " +
+                                "   t.discount, " +
+                                "   t.socdiscount, " +
+                                "   t.grantsum, " +
+                                "   CASE " +
+                                "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) THEN 'cash' " +
+                                "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) THEN 'card' " +
+                                "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) THEN 'mixed' " +
+                                "       ELSE 'other' " +
+                                "   END AS flag " +
+                                "FROM temp_orders_orderdetails t " +
+                                "   LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = t.idoforder " +
+                                "WHERE (t.MenuType>=:typeComplexMin AND t.MenuType<=:typeComplexMax) " +
+                                "   AND t.rPrice>0 " +
+                                "   AND pl.idofpreorderlinkod IS NULL " +
+                                "GROUP BY " +
+                                "   t.MenuType, " +
+                                "   t.RPrice, " +
+                                "   t.menuDetailName, " +
+                                "   t.discount, " +
+                                "   t.socdiscount, " +
+                                "   t.grantsum, " +
+                                "   flag");
 
                 complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
                 complexQuery_1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                complexQuery_1.setParameter("startTime", startTime.getTime());
-                complexQuery_1.setParameter("endTime", endTime.getTime());
-
                 mealsList = complexQuery_1.list();
 
                 String menuGroupPay = "Платное комплексное питание";
@@ -701,19 +757,26 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
                 //// бесплатное питание по своей ОО
                 Query freeComplexQuery1 = session.createSQLQuery(
-                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
-                                + "FROM CF_ORDERS o,CF_ORDERDETAILS od, cf_clients c "
-                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) "
-                                + "and c.idofclient = o.idofclient "
-                                + "and c.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = o.idoforg)"
-                                + "AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) "
-                                + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
-                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
+                        "SELECT " +
+                                "   t.MenuType, " +
+                                "   SUM(t.Qty) AS qtySum, " +
+                                "   t.RPrice, " +
+                                "   SUM(t.Qty*(t.RPrice+t.socdiscount)), " +
+                                "   t.menuDetailName, " +
+                                "   t.socdiscount " +
+                                "FROM temp_orders_orderdetails t, cf_clients c " +
+                                "WHERE c.idofclient = t.idofclient " +
+                                "   AND c.idoforg IN (SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg = t.idoforg) " +
+                                "   AND (t.MenuType>=:typeComplexMin OR t.MenuType<=:typeComplexMax) " +
+                                "   AND t.RPrice=0 AND t.Discount>0 " +
+                                "GROUP BY " +
+                                "   t.MenuType, " +
+                                "   t.RPrice, " +
+                                "   t.menuDetailName, " +
+                                "   t.socdiscount");
 
                 freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
                 freeComplexQuery1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                freeComplexQuery1.setParameter("startTime", startTime.getTime());
-                freeComplexQuery1.setParameter("endTime", endTime.getTime());
 
                 mealsList = freeComplexQuery1.list();
 
@@ -755,19 +818,27 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 //бесплатное пропитание временно обуччающихся другой ООО
 
                 Query freeComplexQueryTempClients = session.createSQLQuery(
-                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
-                                + "FROM CF_ORDERS o,CF_ORDERDETAILS od, cf_clients c "
-                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) "
-                                + "and c.idofclient = o.idofclient "
-                                + "and c.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = o.idoforg)"
-                                + "AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) "
-                                + "AND (od.RPrice=0 AND od.Discount>0) AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
-                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
+                        "SELECT " +
+                                "   t.MenuType, " +
+                                "   SUM(t.Qty) AS qtySum, " +
+                                "   t.RPrice, " +
+                                "   SUM(t.Qty*(t.RPrice+t.socdiscount)), " +
+                                "   t.menuDetailName, " +
+                                "   t.socdiscount " +
+                                "FROM temp_orders_orderdetails t, cf_clients c " +
+                                "WHERE c.idofclient = t.idofclient " +
+                                "   AND c.idoforg NOT IN (SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg = t.idoforg) " +
+                                "   AND (t.MenuType>=:typeComplexMin OR t.MenuType<=:typeComplexMax) " +
+                                "   AND (t.RPrice=0 " +
+                                "   AND t.Discount>0) " +
+                                "GROUP BY " +
+                                "   t.MenuType, " +
+                                "   t.RPrice, " +
+                                "   t.menuDetailName, " +
+                                "   t.socdiscount");
 
                 freeComplexQueryTempClients.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
                 freeComplexQueryTempClients.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                freeComplexQueryTempClients.setParameter("startTime", startTime.getTime());
-                freeComplexQueryTempClients.setParameter("endTime", endTime.getTime());
 
                 mealsList = freeComplexQueryTempClients.list();
 
@@ -803,32 +874,39 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             // предзаказы
             Query preordersQuery = session.createSQLQuery(
-                    "SELECT od.MenuType, od.Qty, od.RPrice, od.Qty*od.RPrice AS sum, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, "
-                     + "    CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
-                     + "        WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
-                     + "        WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                     + "        ELSE 'other' END AS flag "
-                     + "    , pmd.menudetailname AS preorderMenuDetailName, pmd.menudetailprice, pmd.amount, "
-                     + "    pc.modeofadd, pc.armcomplexid, pmd.itemcode "
-                     + "FROM cf_orders o "
-                     + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND od.idoforg = o.idoforg "
-                     + "INNER JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
-                     + "INNER JOIN cf_preorder_complex pc ON pl.preorderguid = pc.guid "
-                     + "LEFT JOIN "
-                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.usedamount as amount, pmd.itemcode "
-                     + "        FROM cf_preorder_menudetail pmd "
-                     + "        WHERE pmd.amount > 0 "
-                     + "    ) pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex "
-                     + "WHERE "
-                     + orgAdditionalCondition
-                     + "    AND od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax AND od.rPrice > 0 AND "
-                     + "    o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime AND o.state=0 AND od.state=0 "
-                     + "ORDER BY 1, 11, 10");
+                            "SELECT " +
+                            "   t.MenuType, " +
+                            "   t.Qty, " +
+                            "   t.RPrice, " +
+                            "   t.Qty*t.RPrice AS sum, " +
+                            "   t.menuDetailName, " +
+                            "   t.discount, " +
+                            "   t.socdiscount, " +
+                            "   t.grantsum, " +
+                            "   CASE " +
+                            "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) THEN 'cash' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) THEN 'card' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) THEN 'mixed' " +
+                            "       ELSE 'other' " +
+                            "   END AS flag, " +
+                            "   pmd.menudetailname AS preorderMenuDetailName, " +
+                            "   pmd.menudetailprice, " +
+                            "   pmd.amount, " +
+                            "   pc.modeofadd, " +
+                            "   pc.armcomplexid, " +
+                            "   pmd.itemcode " +
+                            "FROM temp_orders_orderdetails t " +
+                            "   INNER JOIN cf_preorder_linkod pl ON pl.idoforder = t.idoforder " +
+                            "   INNER JOIN cf_preorder_complex pc ON pl.preorderguid = pc.guid " +
+                            "   LEFT JOIN " +
+                            "       (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.usedamount AS amount, pmd.itemcode " +
+                            "       FROM cf_preorder_menudetail pmd WHERE pmd.amount > 0 ) pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex " +
+                            "WHERE t.MenuType>=:typeComplexMin AND t.MenuType<=:typeComplexMax " +
+                            "   AND t.rPrice > 0 " +
+                            "ORDER BY 1, 11, 10");
 
             preordersQuery.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             preordersQuery.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-            preordersQuery.setParameter("startTime", startTime.getTime());
-            preordersQuery.setParameter("endTime", endTime.getTime());
 
             mealsList = preordersQuery.list();
 
@@ -976,31 +1054,48 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             List<Object[]> mealsPayTotals;
 
             Query payComplexQueryTotal = session.createSQLQuery(
-                    "SELECT CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount) ELSE 0 END AS amount, "
-                            + "CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty * od.RPrice) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount * pmd.menudetailprice) ELSE 0 END AS price, "
-                            + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NULL THEN 'mixed' "
-                            + "WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcash' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcard' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pmixed' "
-                            + "ELSE 'other' END AS flag FROM CF_ORDERS o "
-                            + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND o.idoforg = od.idoforg "
-                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = od.idoforder and pl.idoforderdetail = od.idoforderdetail "
-                            + "LEFT JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid "
-                            + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex AND pc.amount = 0"
-                            + String.format("WHERE %s AND (o.IdOfOrder = od.IdOfOrder) ", orgAdditionalCondition)
-                            + "AND (od.MenuType >= :typeComplexMin AND od.MenuType <= :typeComplexMax) "
-                            + "AND (od.rPrice > 0) AND (o.CreatedDate >= :startTime AND o.CreatedDate <= :endTime) "
-                            + "AND o.state = 0 AND od.state = 0 "
-                            + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, "
-                            + "o.grantsum, o.sumbycard, o.sumbycash, pl.idofpreorderlinkod, pc.modeofadd, pc.idofpreordercomplex");
+                            "SELECT " +
+                            "   CASE " +
+                            "       WHEN pc.modeofadd = 2 OR pc.idofpreordercomplex IS NULL THEN SUM(t.Qty) " +
+                            "       WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount) " +
+                            "       ELSE 0 " +
+                            "   END AS amount, " +
+                            "   CASE" +
+                            "       WHEN pc.modeofadd = 2 OR pc.idofpreordercomplex IS NULL THEN SUM(t.Qty * t.RPrice) " +
+                            "       WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount * pmd.menudetailprice) " +
+                            "       ELSE 0 " +
+                            "   END AS price, " +
+                            "   CASE " +
+                            "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) AND pl.idofpreorderlinkod IS NULL THEN 'mixed' " +
+                            "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcash' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcard' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pmixed' " +
+                            "       ELSE 'other' " +
+                            "   END AS flag " +
+                            "FROM temp_orders_orderdetails t " +
+                            "        LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = t.idoforder AND pl.idoforderdetail = t.idoforderdetail " +
+                            "        LEFT JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid " +
+                            "        LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex AND pc.amount = 0 " +
+                            "WHERE t.MenuType BETWEEN (:typeComplexMin) AND (:typeComplexMax) " +
+                            "   AND t.rPrice > 0 " +
+                            "GROUP BY " +
+                            "   t.MenuType, " +
+                            "   t.RPrice, " +
+                            "   t.menuDetailName, " +
+                            "   t.menuDetailName, " +
+                            "   t.discount, " +
+                            "   t.socdiscount, " +
+                            "   t.grantsum, " +
+                            "   t.sumbycard, " +
+                            "   t.sumbycash, " +
+                            "   pl.idofpreorderlinkod, " +
+                            "   pc.modeofadd, " +
+                            "   pc.idofpreordercomplex");
+
             payComplexQueryTotal.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             payComplexQueryTotal.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-            payComplexQueryTotal.setParameter("startTime", startTime.getTime());
-            payComplexQueryTotal.setParameter("endTime", endTime.getTime());
 
             mealsPayTotals = payComplexQueryTotal.list();
 
@@ -1093,21 +1188,34 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             TotalMealRow totalMealRow;
 
             Query mealsBuffQuery = session.createSQLQuery(String.format(
-                    "SELECT od.%s, SUM(od.qty) as qtySum, SUM(od.Qty*od.RPrice),"
-                            + " CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
-                            + " WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
-                            + " WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                            + " ELSE 'other' END AS flag "
-                            + " FROM CF_ORDERS o, CF_ORDERDETAILS od "
-                            + " WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
-                            + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice, o.sumbycash, o.sumbycard "
-                            + " ORDER BY od.%s, od.MenuDetailName", groupByField, orgAdditionalCondition,
+                            "SELECT " +
+                            "   t.%s, " +
+                            "   SUM(t.qty) AS qtySum, " +
+                            "   SUM(t.Qty * t.RPrice), " +
+                            "   CASE " +
+                            "       WHEN (t.sumbycash <> 0) AND (t.sumbycard = 0) THEN 'cash' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash = 0) THEN 'card' " +
+                            "       WHEN (t.sumbycard <> 0) AND (t.sumbycash <> 0) THEN 'mixed' " +
+                            "       ELSE 'other' " +
+                            "   END AS flag " +
+                            "FROM temp_orders_orderdetails t " +
+                            "WHERE " +
+                            "   t.MenuType=:typeDish " +
+                            "   %s " +
+                            "GROUP BY " +
+                            "   t.%s, " +
+                            "   t.MenuDetailName, " +
+                            "   t.RPrice, " +
+                            "   t.sumbycash, " +
+                            "   t.sumbycard " +
+                            "ORDER BY " +
+                            "   t.%s, " +
+                            "   t.MenuDetailName",
+                    groupByField,
                     menuGroupsCondition == null ? "" : "AND od.MenuGroup IN (" + menuGroupsCondition + ") ",
                     groupByField, groupByField));
 
             mealsBuffQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
-            mealsBuffQuery.setParameter("startTime", startTime.getTime());
-            mealsBuffQuery.setParameter("endTime", endTime.getTime());
 
             mealBuffetList = mealsBuffQuery.list();
 
