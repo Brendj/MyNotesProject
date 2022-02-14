@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReportRuleListPage extends BasicWorkspacePage {
 
@@ -49,28 +51,20 @@ public class ReportRuleListPage extends BasicWorkspacePage {
             }
             this.documentFormat = reportHandleRule.getDocumentFormat();
             this.subject = reportHandleRule.getSubject();
-            this.routeAddresses = new LinkedList<String>();
-            addAddress(this.routeAddresses, reportHandleRule.getRoute0());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute1());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute2());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute3());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute4());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute5());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute6());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute7());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute8());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute9());
-            this.ruleConditionItems = new LinkedList<RuleConditionItem>();
+            this.routeAddresses = new LinkedList<>();
+
+            this.routeAddresses.addAll(
+                    reportHandleRule.getRoutes()
+                            .stream()
+                            .map(ReportHandleRuleRoute::getRoute)
+                            .collect(Collectors.toList())
+            );
+
+            this.ruleConditionItems = new LinkedList<>();
             for (RuleCondition currRuleCondition : ruleConditions) {
                 if (currRuleCondition.isTypeCondition()) {
                     this.ruleConditionItems.add(new RuleConditionItem(currRuleCondition));
                 }
-            }
-        }
-
-        private static void addAddress(List<String> addresses, String newAddress) {
-            if (StringUtils.isNotEmpty(newAddress)) {
-                addresses.add(newAddress);
             }
         }
 
@@ -157,9 +151,8 @@ public class ReportRuleListPage extends BasicWorkspacePage {
     public void fill(Session session) throws Exception {
         List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
         Criteria reportRulesCriteria = ReportHandleRule.createAllReportRulesCriteria(session);
-        List rules = reportRulesCriteria.list();
-        for (Object currObject : rules) {
-            ReportHandleRule currRule = (ReportHandleRule) currObject;
+        List<ReportHandleRule> rules = reportRulesCriteria.list();
+        for (ReportHandleRule currRule : rules) {
             newRuleItems.add(new RuleItem(session, currRule));
         }
         this.items = newRuleItems;

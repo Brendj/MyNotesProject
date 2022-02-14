@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -17,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -121,22 +119,19 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         this.manualReportRun = reportHandleRule.isAllowManualReportRun();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
-        this.routeAddresses = new LinkedList<String>();
+        this.routeAddresses = new LinkedList<>();
         this.storagePeriod = reportHandleRule.getStoragePeriod();
-        addAddress(this.routeAddresses, reportHandleRule.getRoute0());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute1());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute2());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute3());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute4());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute5());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute6());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute7());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute8());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute9());
-        //this.ruleConditionItems = new LinkedList<RuleConditionItem>();
+
+        this.routeAddresses.addAll(
+                reportHandleRule.getRoutes()
+                        .stream()
+                        .map(ReportHandleRuleRoute::getRoute)
+                        .collect(Collectors.toList())
+        );
+
         this.shortName = ReportRuleConstants.createShortName(reportHandleRule, 64);
 
-        this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
+        this.paramHints = new LinkedList<>();
         ReportRuleConstants.ReportHint defaultRules = ReportRuleConstants.findReportHint(this.reportType);
         for (int i : defaultRules.getParamHints()) {
             ReportRuleConstants.ParamHint hint = ReportRuleConstants.PARAM_HINTS[Math.abs(i)];
@@ -240,12 +235,6 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         }
 
         return "";
-    }
-
-    private static void addAddress(List<String> addresses, String newAddress) {
-        if (StringUtils.isNotEmpty(newAddress)) {
-            addresses.add(newAddress);
-        }
     }
 
     public void setReportTemplateFileName(String reportTemplateFileName) {

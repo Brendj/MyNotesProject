@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -65,6 +62,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     private int documentFormat;
     private String subject;
     private String routeAddresses;
+    private Map<String, ReportHandleRuleRoute> routeMap;
     private String ruleConditionItems;
     private String shortName;
     private boolean enabled;
@@ -248,13 +246,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void updateReportRule(Session session, Long idOfReportHandleRule) throws Exception {
-        FacesContext context = FacesContext.getCurrentInstance();
-        UIViewRoot root = context.getViewRoot();
-        String componentId = "in";
-        UIComponent c = findComponent(root, componentId);
-
         ReportHandleRule reportHandleRule = (ReportHandleRule) session
-                .load(ReportHandleRule.class, idOfReportHandleRule);
+                .get(ReportHandleRule.class, idOfReportHandleRule);
         reportHandleRule.setRuleName(this.ruleName);
         reportHandleRule.setTag(this.tag);
         reportHandleRule.setDocumentFormat(this.documentFormat);
@@ -283,23 +276,28 @@ public class ReportRuleEditPage  extends OnlineReportPage
 
         }
 
-        reportHandleRule.setRoute0(StringUtils.trim(getString(addressList, 0)));
-        reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
-        reportHandleRule.setRoute2(StringUtils.trim(getString(addressList, 2)));
-        reportHandleRule.setRoute3(StringUtils.trim(getString(addressList, 3)));
-        reportHandleRule.setRoute4(StringUtils.trim(getString(addressList, 4)));
-        reportHandleRule.setRoute5(StringUtils.trim(getString(addressList, 5)));
-        reportHandleRule.setRoute6(StringUtils.trim(getString(addressList, 6)));
-        reportHandleRule.setRoute7(StringUtils.trim(getString(addressList, 7)));
-        reportHandleRule.setRoute8(StringUtils.trim(getString(addressList, 8)));
-        reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
+        for(String addr : addressList){
+            String processedAddress = StringUtils.trim(addr);
+            ReportHandleRuleRoute route = this.routeMap.get(processedAddress);
+            if(route == null){
+                route = new ReportHandleRuleRoute(processedAddress, reportHandleRule);
+                reportHandleRule.getRoutes().add(route);
+                session.save(route);
+            }
+            this.routeMap.remove(processedAddress);
+        }
 
-        Set<RuleCondition> newRuleConditions = new HashSet<RuleCondition>();
+        for(ReportHandleRuleRoute deleted : this.routeMap.values()){
+            reportHandleRule.getRoutes().remove(deleted);
+            deleted = (ReportHandleRuleRoute) session.merge(deleted);
+            session.delete(deleted);
+        }
+
+        Set<RuleCondition> newRuleConditions = new HashSet<>();
         newRuleConditions.add(ReportRuleConstants.buildTypeCondition(reportHandleRule, this.reportType));
 
-
         // Собираем строку с условием
-        StringBuilder newCondition = new StringBuilder("");
+        StringBuilder newCondition = new StringBuilder();
         for (Hint hint : hints) {
             //  Проверяем выбранные значения, если пустые, то пропускаем этот параметр
             if (!hint.getHint().isRequired() &&
@@ -377,8 +375,6 @@ public class ReportRuleEditPage  extends OnlineReportPage
                     }
                     newValue.append(idOfOrgList.get(i));
                 }
-            } else if (hint.getType().equals(Hint.CLIENT)) {
-                //  Добавить!
             }
 
             if (hint.getHint().isRequired() && newValue.length() < 1) {
@@ -389,9 +385,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
             if (newCondition.length() > 0) {
                 newCondition.append(";");
             }
-            newCondition.append(hint.getHint().getParamHint().getName()).append("=").append(newValue.toString());
+            newCondition.append(hint.getHint().getParamHint().getName()).append("=").append(newValue);
         }
-
 
         this.ruleConditionItems = newCondition.toString();
         String[] textRuleConditions = this.ruleConditionItems.split(ReportHandleRule.DELIMETER);
@@ -404,7 +399,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
             }
         }
 
-        Set<RuleCondition> superfluousRuleConditions = new HashSet<RuleCondition>();
+        Set<RuleCondition> superfluousRuleConditions = new HashSet<>();
         for (RuleCondition ruleCondition : reportHandleRule.getRuleConditions()) {
             if (!newRuleConditions.contains(ruleCondition)) {
                 superfluousRuleConditions.add(ruleCondition);
@@ -426,14 +421,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
         fill(session, reportHandleRule);
     }
 
-    private static String getString(String[] strings, int i) {
-        if (0 <= i && i < strings.length) {
-            return strings[i];
-        }
-        return null;
-    }
-
     private void fill(Session session, ReportHandleRule reportHandleRule) throws Exception {
+        this.routeMap = new HashMap<>();
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
         this.tag = reportHandleRule.getTag();
@@ -450,16 +439,12 @@ public class ReportRuleEditPage  extends OnlineReportPage
         this.subject = reportHandleRule.getSubject();
 
         StringBuilder routeAddresses = new StringBuilder();
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute0());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute1());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute2());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute3());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute4());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute5());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute6());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute7());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute8());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute9());
+
+        for(ReportHandleRuleRoute r : reportHandleRule.getRoutes()){
+            this.routeMap.put(r.getRoute(), r);
+            appendNotEmpty(routeAddresses, r.getRoute());
+        }
+
         this.routeAddresses = routeAddresses.toString();
 
         StringBuilder ruleConditionItems = new StringBuilder();
@@ -516,9 +501,6 @@ public class ReportRuleEditPage  extends OnlineReportPage
                     continue;
                 } else if (hint.getHint().getParamHint().getName().equals("idOfOrg")) {
                     fillOrgsHint(getActualHintByName("idOfOrg", actualRules));
-                    continue;
-                } else if (hint.getHint().getParamHint().getName().equals("idOfClient")) {
-                    fillClientHint (getActualHintByName ("idOfClient", actualRules));
                     continue;
                 }
                 defRule = new RuleConditionItem (hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
@@ -621,12 +603,6 @@ public class ReportRuleEditPage  extends OnlineReportPage
             completeOrgListSelection(res);
         } catch (Exception e) {
             logger.error("Failed to parse orgs hint " + hint.getConditionConstant(), e);
-        }
-    }
-
-    public void fillClientHint (RuleCondition hint) {
-        if (hint == null) {
-            return;
         }
     }
 
