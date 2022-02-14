@@ -62,7 +62,7 @@ public enum SBMSKPaymentsDesc {
         return null;
     }
 
-    public static SBMSKPaymentsDesc getFromPaymenResultCode(Integer paymentResultCode, String type) {
+    public static SBMSKPaymentsDesc getFromPaymentResultCode(Integer paymentResultCode, String type) {
         if (paymentResultCode.equals(SBMSKPaymentsCodes.TEMPORARY_ERROR.getCode())) {
             return TEMPORARY_ERROR;
         } else if (paymentResultCode.equals(SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR.getCode())) {
