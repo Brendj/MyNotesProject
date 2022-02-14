@@ -1283,5 +1283,11 @@ public class DAOService {
         q.setParameter("oldID", cardSign.getIdOfCardSign());
         q.executeUpdate();
     }
+
+    public void deleteOldFoodBoxAvailable(Org org) {
+        Query query = entityManager.createQuery("delete from FoodBoxPreorderAvailable where org=:org");
+        query.setParameter("org", org);
+        query.executeUpdate();
+    }
 }
 

@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -52,6 +54,8 @@ public class ResMenuSupplier implements AbstractToElement {
     private Set<WtComplex> complexes;
     private Set<WtComplex> offlineComplexes;
     private Set<WtComplexExcludeDays> excludeDays;
+    private FoodBoxPreorderNew foodBoxPreorderNew;
+    private ResFoodBoxChanged resFoodBoxChanged;
 
     private Long idOfOrg;
 
@@ -77,6 +81,7 @@ public class ResMenuSupplier implements AbstractToElement {
         offlineComplexes = new HashSet<>();
         excludeDays = new HashSet<>();
         idOfOrg = null;
+        foodBoxPreorderNew = null;
     }
 
     public ResMenuSupplier(MenuSupplier menuSupplier) {
@@ -96,6 +101,8 @@ public class ResMenuSupplier implements AbstractToElement {
         offlineComplexes = menuSupplier.getOfflineComplexes();
         excludeDays = menuSupplier.getExcludeDays();
         idOfOrg = menuSupplier.getIdOfOrg();
+        foodBoxPreorderNew = menuSupplier.getFoodBoxPreorderNew();
+        resFoodBoxChanged = menuSupplier.getResFoodBoxChanged();
     }
 
     @Override
@@ -197,7 +204,11 @@ public class ResMenuSupplier implements AbstractToElement {
         element.appendChild(menusElem);
         element.appendChild(complexesElem);
         element.appendChild(excludeDaysElem);
-
+        element.appendChild(foodBoxPreorderNew.toElement(document));
+        if (resFoodBoxChanged != null)
+        {
+            element.appendChild(resFoodBoxChanged.toElement(document));
+        }
         return element;
     }
 
@@ -617,5 +628,13 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public FoodBoxPreorderNew getFoodBoxPreorderNew() {
+        return foodBoxPreorderNew;
+    }
+
+    public void setFoodBoxPreorderNew(FoodBoxPreorderNew foodBoxPreorderNew) {
+        this.foodBoxPreorderNew = foodBoxPreorderNew;
     }
 }
