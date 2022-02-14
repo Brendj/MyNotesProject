@@ -33,5 +33,6 @@
         <property name="updateDate" column="updatedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
                      not-null="true" update="false"/>
+        <property name="idFoodBoxExternal" column="idFoodBoxExternal" type="long"/>
     </class>
 </hibernate-mapping>

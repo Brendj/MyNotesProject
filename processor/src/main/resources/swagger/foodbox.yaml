@@ -1,0 +1,1507 @@
+openapi: 3.0.1
+info:
+  title: API по питанию в образовательных учреждениях Москвы
+  description: API по питанию в образовательных учреждениях Москвы
+  version: 1.0.1
+servers:
+  - url: http://mes-api.mos.ru/meals
+  - url: http://mes-api-test.mos.ru/meals
+security:
+  - apiKey: []
+    agent: []
+  - bearerAuth: []
+paths:
+  /clients:
+    get:
+      tags:
+        - Клиент
+      summary: Возвращает данные клиента
+      operationId: getClientData
+      parameters:
+        - $ref: '#/components/parameters/clientId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientData'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /clients/expenseConstraints:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    put:
+      tags:
+        - Клиент
+      summary: Устанавливает ограничение на покупку.
+      operationId: setPersonExpenseConstraints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseConstraints'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /clients/preorderAllowed:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    put:
+      tags:
+        - Клиент
+      summary: Устанавливает согласие представителя на получение услуги предзаказа
+      operationId: setPersonPreorderAllowed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: boolean
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /dictionaries/notifications:
+    get:
+      tags:
+        - Уведомления
+      summary: Возвращает список возможных уведомлений.
+      operationId: getNotificationDictionary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDictionary'
+  /clients/notifications:
+    parameters:
+      - $ref: '#/components/parameters/PersonId'
+    get:
+      tags:
+        - Уведомления
+      summary: Возвращает список уведомлений для персоны.
+      operationId: getPersonNotifications
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationRule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Уведомления
+      summary: Установка списка уведомлений представителя по клиенту.
+      operationId: setPersonNotifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRule'
+      responses:
+        '204':
+          description: Обработано
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /menu/buffet:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Меню
+      summary: Возвращает меню буфета.
+      operationId: getPersonBuffetMenu
+      parameters:
+        - $ref: '#/components/parameters/OnDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonBuffetMenu'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /menu/complexes:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Меню
+      summary: Возвращает меню столовой.
+      operationId: getPersonComplexMenu
+      parameters:
+        - $ref: '#/components/parameters/OnDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonComplexMenu'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /menu/prohibitions:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Ограничения в столовой
+      summary: Возвращает список ограничений.
+      operationId: getPersonProhibitions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prohibitions'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Ограничения в столовой
+      summary: Установка ограничений на категории, подкатегории, блюда для клиента.
+      operationId: setPersonProhibitions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Prohibitions'
+      responses:
+        '204':
+          description: Обработано
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/single:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Разовые заказы
+      summary: Возвращает список заказов.
+      operationId: getPersonSingleOrders
+      parameters: #Нужно ли получение отдельных типов предзаказов
+        - $ref: '#/components/parameters/OnDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SingleOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Разовые заказы
+      summary: Создаёт заказ
+      operationId: addPersonSingleOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleOrder'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                description: Идентификатор заказа
+                type: integer
+                format: int64
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/single/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    delete:
+      tags:
+        - Разовые заказы
+      summary: Удаляет заказ.
+      operationId: deletePersonSingleOrders
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Разовые заказы
+      summary: Обновляет отдельные параметры заказа.
+      operationId: setPersonSingleOrderAmount
+      parameters:
+        - name: amount
+          description: Заказываемое количество комплексов.
+          in: query
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/foodbox:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    post:
+      tags:
+        - Фудбокс-заказ
+      summary: Создаёт заказ
+      operationId: addPersonFoodboxOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodboxOrder'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderErrorInfo'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentFoodboxOrderInfo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Фудбокс-заказ
+      summary: Удаляет заказ.
+      operationId: deletePersonFoodboxOrder
+      parameters:
+        - name: id
+          description: Идентификатор заказа.
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - Фудбокс-заказ
+      summary: Возвращает список всех фудбокс-заказов.
+      operationId: getPersonFoodboxOrderList
+      parameters:
+        - $ref: '#/components/parameters/From'
+        - $ref: '#/components/parameters/To'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/foodboxOrderNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryFoodboxOrderInfo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /foodbox/info:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Доступ к фудбоксу
+      summary: Возвращает список разрешений по Фудбоксу для ОУ и клиента
+      operationId: getFoodboxInfo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFoodboxInfo'
+    put:
+      tags:
+        - Доступ к фудбоксу
+      summary: Устанавливает разрешение по Фудбоксу для клиента
+      operationId: putFoodboxInfo
+      parameters:
+        - name: foodboxAvailability
+          description: Признак доступности использования фудбокса
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/regular:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Регулярные предзаказы
+      summary: Возвращает список заказов.
+      operationId: getPersonRegularOrders
+      parameters:
+        - $ref: '#/components/parameters/OnDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegularOrders'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Регулярные предзаказы
+      summary: Добавляет заказы.
+      operationId: addPersonRegularOrders
+      parameters:
+        - name: replace
+          description: true - заменить список
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegularOrders'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/regular/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/OrderId'
+    delete:
+      tags:
+        - Регулярные предзаказы
+      summary: Удаляет заказы.
+      operationId: deletePersonRegularOrders
+      parameters:
+        - name: id
+          in: query
+          description: Список идентификаторов заказов. При отсутствии списка удаляются все заказы.
+          schema:
+            type: array
+            items:
+              type: integer
+              description: Идентификатор заказа
+              format: int64
+            minimum: 1
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Регулярные предзаказы
+      summary: Обновляет заказ.
+      operationId: updatePersonRegularOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegularOrder'
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/handed:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Выданные заказы
+      summary: Возвращает список выданных заказов.
+      operationId: getPersonHandedOrders
+      parameters:
+        - $ref: '#/components/parameters/From'
+        - $ref: '#/components/parameters/To'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HandedOrders'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /orders/summary:
+    parameters:
+      - $ref: '#/components/parameters/clientId'
+    get:
+      tags:
+        - Информация по заказам
+      summary: Отчёт по предзаказам на 14 дней
+      operationId: getPersonOrdersSummary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    clientId:
+      name: clientId
+      description: Идентификатор персоны из МЭШ.Контингент
+      in: query
+      required: true
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/clientId'
+    PersonId:
+      name: personId
+      description: Идентификатор персоны из МЭШ.Контингент
+      in: query
+      required: true
+      schema:
+        type: string
+        format: UUID
+    OnDate:
+      name: onDate
+      description: Дата, на которую необходимо вернуть данные
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+    From:
+      name: from
+      description: Дата начала выборки.
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+    To:
+      name: to
+      description: Дата конца выборки.
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+    Offset:
+      name: offset
+      description: Смещение.
+      in: query
+      schema:
+        minimum: 1
+        type: integer
+        default: 1
+    Limit:
+      name: limit
+      description: Максимальное количество элементов в выборке.
+      in: query
+      schema:
+        maximum: 1000
+        minimum: 1
+        type: integer
+        default: 10
+    Sort:
+      name: sort
+      description: Сортировка по дате факта.
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+    foodboxOrderNumber:
+      name: foodboxOrderNumber
+      description: Номер фудбокс-заказа
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int64
+    OrderId:
+      name: orderId
+      description: Идентификатор предзаказа.
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    OrderType:
+      name: orderType
+      description: 'Тип заказа: 1 - заказ на комплексное питание; 2 - заказ на дополнительные блюда'
+      in: query
+      schema:
+        type: integer
+        format: int32
+  responses:
+    BadRequest:
+      description: Не хватает обязательных параметров, неправильное значение парметров или другая ошибка, связанная с формулировкой запроса.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Для доступа к запрашиваемому ресурсу требуется аутентификация.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Клиент не уполномочен совершать операции с запрошенным ресурсом.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntity:
+      description: Логическая ошибка, из-за которой невозможно произвести операцию.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Не найден запрашиваемый ресурс.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Внутренняя ошибка сервера, сбой.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      description: Ответ с ошибкой.
+      required:
+        - code
+        - description
+      type: object
+      properties:
+        code:
+          minLength: 1
+          type: string
+          description: Идентификатор ошибки.
+        description:
+          minLength: 1
+          type: string
+          description: Описание ошибки.
+        details:
+          type: object
+          properties: {}
+          description: Детализация ошибки.
+    NotificationRule:
+      type: object
+      description: Список кодов уведомлений представителя по персоне.
+      properties:
+        agent_id:
+          type: string
+          format: UUID
+          description: Идентификатор представителя из МЭШ.Контингент
+        person_id:
+          type: string
+          format: UUID
+          description: Идентификатор представителя из МЭШ.Контингент
+        items:
+          type: array
+          description: Список кодов уведомлений
+          items:
+            type: string
+    NotificationDictionary:
+      description: Справочник уведомлений.
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationDictionaryItem'
+    NotificationDictionaryItem:
+      description: Элемент справочника уведомлений.
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          title: Код настройки
+          type: integer
+          format: int64
+          example: 1000000000
+        name:
+          title: Название настройки
+          type: string
+          example: Оповещение о пополнениях
+    Prohibitions:
+      description: Список ограничений на категории, подкатегории, блюда
+      type: array
+      items:
+        $ref: '#/components/schemas/Prohibition'
+    Prohibition:
+      description: Ограничение на категорию, подкатегорию, блюдо. Должен быть задан только один из параметров
+      type: object
+      properties:
+        dishId:
+          type: integer
+          description: Идентификатор блюда.
+          format: int64
+          nullable: true
+          example: 10001
+        categoryId:
+          type: integer
+          description: Идентификатор категории.
+          format: int64
+          nullable: true
+          example: 110002
+        subcategoryId:
+          type: integer
+          description: Идентификатор подкатегории.
+          format: int64
+          nullable: true
+          example: 220003
+    PersonBuffetMenu:
+      type: object
+      description: Персональное меню
+      properties:
+        buffetCategoriesItem:
+          type: object
+          description: Список категорий меню
+          required:
+            - id
+            - name
+            - buffetSubcategoriesItem
+          properties:
+            id:
+              type: integer
+              description: Идентификатор категории.
+              format: int64
+            name:
+              type: string
+              description: Название категории.
+            buffetSubcategoriesItem:
+              type: object
+              description: Список подкатегорий меню
+              required:
+                - id
+                - name
+                - menuDishesItem
+              properties:
+                id:
+                  type: integer
+                  description: Идентификатор подкатегории.
+                  format: int64
+                name:
+                  type: string
+                  description: Название подкатегории.
+                menuDishesItem:
+                  type: array
+                  description: Список блюд меню.
+                  items:
+                    $ref: '#/components/schemas/Dish'
+        dishesAmount:
+          type: integer
+          description: Количество блюд
+          format: int64
+        buffetIsOpen:
+          type: boolean
+          description: Признак работы буфета, открыт или закрыт
+        buffetOpenTime:
+          type: string
+          description: Дата начала работы буфета
+          format: datetime
+        buffetCloseTime:
+          type: string
+          description: Дата завершения работы буфета
+          format: datetime
+    Dish:
+      description: Блюдо.
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - price
+      properties:
+        id:
+          type: integer
+          description: Идентификатор блюда.
+          format: int64
+        code:
+          type: string
+          description: Код блюда.
+        name:
+          type: string
+          description: Название блюда.
+        price:
+          type: integer
+          description: Цена блюда в копейках.
+          format: int64
+        ingredients:
+          type: string
+          description: Состав блюда.
+        calories:
+          type: integer
+          description: Калорийность блюда.
+        weight:
+          type: string
+          description: Масса блюда в граммах.
+        protein:
+          type: integer
+          description: Белки.
+        fat:
+          type: integer
+          description: Жиры.
+        carbohydrates:
+          type: integer
+          description: Углеводы.
+    Complex:
+      description: Комплекс.
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - kind
+      properties:
+        id:
+          type: integer
+          description: Идентификатор комплекса
+          format: int64
+        name:
+          type: string
+          description: Название комплекса
+        price:
+          type: integer
+          description: Цена комплекса в копейках
+          format: int64
+        kind:
+          type: integer
+          description: "Вид рациона комплекса: 0 – не указан (не выводить), 1 – завтрак, 2 – обед, 3 – полдник, 4 - ужин"
+          format: int32
+        paymentType:
+          description: "Условия предоставления комплекса: 1 - льготно, 2 - платно, 3 - льготно и платно"
+          type: integer
+        preorderAllowed:
+          type: boolean
+          description: Доступен для предзаказа
+        allowSelectItems:
+          type: boolean
+          description: Признак возможности выбора отдельных блюд составного комплекса
+        items:
+          type: array
+          description: Список блюд составного комплекса
+          items:
+            $ref: '#/components/schemas/Dish'
+    RegularOrders:
+      type: array
+      description: Список регулярных предзаказов
+      items:
+        $ref: '#/components/schemas/RegularOrder'
+    PersonComplexMenu:
+      description: Персонализированное меню комплексного питания
+      type: object
+      properties:
+        items:
+          description: Доступные комплексы
+          type: array
+          items:
+            $ref: '#/components/schemas/Complex'
+    WeekSchedule:
+      description: Расписание на неделю.
+      required:
+        - monday
+        - tuesday
+        - wednesday
+        - thursday
+        - friday
+        - saturday
+      type: object
+      properties:
+        monday:
+          type: boolean
+          description: Флаг заказа на понедельник.
+        tuesday:
+          type: boolean
+          description: Флаг заказа на вторник.
+        wednesday:
+          type: boolean
+          description: Флаг заказа на среду.
+        thursday:
+          type: boolean
+          description: Флаг заказа на четверг.
+        friday:
+          type: boolean
+          description: Флаг заказа на пятницу.
+        saturday:
+          type: boolean
+          description: Флаг заказа на субботу.
+    RegularOrder:
+      description: Регулярный предзаказ.
+      required:
+        - id
+        - contractId
+        - type
+        - from
+        - to
+        - amount
+        - days
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор предзаказа.
+          format: int64
+        contractId:
+          type: integer
+          description: Номер лицевого счета клиента
+          format: int64
+          example: 13177
+        from:
+          type: string
+          description: Дата начала действия регуляра.
+          format: date
+        to:
+          type: string
+          description: Дата окончания действия регуляра.
+          format: date
+        complexId:
+          type: integer
+          format: int64
+          description: Идентификатор комплекса.
+        dishId:
+          type: integer
+          format: int64
+          description: Идентификатор блюда.
+        amount:
+          type: integer
+          format: int32
+          description: Заказываемое количество комплексов.
+        days:
+          $ref: '#/components/schemas/WeekSchedule'
+    SingleOrder:
+      description: Разовый заказ.
+      type: object
+      required:
+        - id
+        - onDate
+        - complexId
+        - amount
+        - deliveryWay
+      properties:
+        id:
+          type: integer
+          description: Идентификатор предзаказа. Игнорируется при создании
+          format: int64
+          default: 0
+        onDate:
+          type: string
+          description: Дата, на которую сделан предзаказа.
+          format: date
+        complexId:
+          type: integer
+          description: Идентификатор комплекса.
+          format: int64
+        amount:
+          type: integer
+          description: Заказываемое количество комплексов.
+        deliveryWay:
+          type: integer
+          format: int32
+          description: 'Способ выдачи: 1 - Стандартный; 2 - Фудбокс'
+        dishes:
+          description: Список блюд в заказе.
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDish'
+    OrderDish:
+      description: Блюдо в заказе.
+      required:
+        - id
+        - dishId
+        - amount
+        - price
+        - buffetCategoriesId
+        - buffetCategoriesName
+      type: object
+      properties:
+        dishId:
+          type: integer
+          description: Идентификатор блюда.
+          format: int64
+        amount:
+          type: integer
+          description: Заказываемое количество блюда.
+        name:
+          type: string
+          description: Название блюда.
+        price:
+          type: integer
+          description: Цена блюда в копейках.
+          format: int64
+        buffetCategoriesId:
+          type: integer
+          description: Идентификатор категории.
+          format: int64
+        buffetCategoriesName:
+          type: string
+          description: Название категории.
+    FoodboxOrder:
+      description: Cоздание фудбокс-заказа.
+      type: object
+      required:
+        - id
+        - createdAt
+        - foodboxAllowed
+      properties:
+        id:
+          type: integer
+          description: Идентификатор заказа.
+          format: int64
+        createdAt:
+          type: string
+          description: Дата и время совершения заказа.
+          format: date-time
+        dishes:
+          description: Список блюд в заказе.
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDish'
+        orderPrice:
+          type: integer
+          description: Общая стоимость заказа в копейках
+          format: int64
+    FoodboxOrderInfo:
+      description: Передача данных о заказе (в контексте списка).
+      type: object
+      required:
+        - id
+        - status
+        - dishes
+      properties:
+        id:
+          type: integer
+          description: Идентификатор заказа.
+          format: int64
+        status:
+          type: string
+          description: Статус заказа в системе. При запросе списка заказов передавать статусы всех заказов, в т.ч. и текущих
+        expiresAt:
+          type: string
+          description: Дата и время, до которого клиент может забрать заказ
+          format: date-time
+        timeOrder:
+          type: string
+          description: Дата и время создания заказа
+          format: date-time
+        issueTime:
+          type: string
+          description: Дата и время получения заказа. Параметр обязателен для выданных заказов
+          format: date-time
+        foodboxOrderNumber:
+          type: integer
+          description: Номер фудбокс-заказа
+          format: int64
+        dishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDish'
+        orderPrice:
+          type: integer
+          description: Общая стоимость заказа в копейках
+          format: int64
+    HistoryFoodboxOrderInfo:
+      description: История заказов или получение данных по конкретному заказу фудбокса
+      type: object
+      properties:
+        foodboxAvailabilityForEO:
+          type: boolean
+          description: Признак доступности использования фудбокса для образовательной организации
+        foodboxAvailability:
+          type: boolean
+          description: Признак доступности использования фудбокса
+        ordersInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodboxOrderInfo'
+        ordersAmount:
+          type: integer
+          description: Количество заказов в списке
+          format: int64
+    GetFoodboxInfo:
+      description: Возвращает список разрешений по Фудбоксу для ОУ и клиента
+      type: object
+      properties:
+        foodboxAvailabilityForEO:
+          type: boolean
+          description: Признак доступности использования фудбокса для образовательной организации
+        foodboxAvailability:
+          type: boolean
+          description: Признак доступности использования фудбокса
+    CurrentFoodboxOrderInfo:
+      description: Передача данных о текущем заказе
+      type: object
+      required:
+        - id
+        - foodboxOrderNumber
+        - status
+        - dishes
+        - expiresAt
+        - timeOrder
+        - orderPrice
+      properties:
+        id:
+          type: integer
+          description: Идентификатор заказа.
+          format: int64
+        foodboxOrderNumber:
+          type: integer
+          description: Номер фудбокс-заказа
+          format: int64
+        status:
+          type: string
+          description: Статус заказа в системе
+        dishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDish'
+        expiresAt:
+          type: string
+          description: Дата и время, до которого клиент может забрать заказ
+          format: date-time
+        timeOrder:
+          type: string
+          description: Дата и время создания заказа
+          format: date-time
+        orderPrice:
+          type: integer
+          description: Общая стоимость заказа в копейках
+          format: int64
+    OrderErrorInfo:
+      description: Информация о балансе ЛС клиента
+      type: object
+      required:
+        - code
+        - information
+      properties:
+        code:
+          type: integer
+          format: int64
+          description: Код ошибки, возвращаемый в ответе
+          example: 10
+        information:
+          type: string
+          description: Информация возвращаемая в ответе
+          example: Заказ не попадает в рамки времени работы буфета
+        currentBalanceLimit:
+          type: integer
+          format: int64
+          description: Лимит дневных трат. Атрибут передаётся в случае ошибки, связанной с превышением дневного лимита
+        currentBalance:
+          type: integer
+          format: int64
+          description: Остаток денежных средств. Атрибут передаётся в случае ошибки, связанной с нехваткой средств на балансе при попытке заказа
+    HandedOrder:
+      description: Выданный заказ.
+      type: object
+      required:
+        - id
+        - occuredAt
+        - orderType
+        - sum
+        - cancel
+      properties:
+        id: # Идентификатор заказа или события выдачи заказа?
+          type: integer
+          format: int64
+          description: Идентификатор заказа
+          example: 704602893596893184
+        occuredAt:
+          type: string
+          description: Дата и время пробития заказа.
+          format: datetime
+        orderType:
+          type: integer
+          format: int32
+          description: 'Тип заказа: 1 - заказ на комплексное питание; 2 - заказ на дополнительные блюда'
+        deliveryWay:
+          type: integer
+          format: int32
+          description: 'Способ выдачи: 1 - Стандартный; 2 - Фудбокс'
+        sum:
+          type: integer
+          description: Сумма покупки в копейках
+          format: int64
+          example: 11075
+        cancel:
+          type: boolean
+          description: Признак сторнирования.
+        items:
+          description: Блюда в заказе.
+          type: array
+          items:
+            $ref: '#/components/schemas/HandedOrderItem'
+    HandedOrderItem:
+      description: Позиция в заказе.
+      type: object
+      required:
+        - amount
+      properties:
+        dish:
+          $ref: '#/components/schemas/Dish'
+        complex:
+          $ref: '#/components/schemas/Complex'
+        amount:
+          type: integer
+          description: Количество.
+    HandedOrders:
+      description: Выданные заказы.
+      type: array
+      items:
+        $ref: '#/components/schemas/HandedOrder'
+    Organization:
+      description: Организация.
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          description: Название организации.
+          example: ГБОУ СОШ № 1367 (13)
+        type:
+          type: string
+          description: Тип организации.
+          example: Общеобразовательное ОУ
+        address:
+          type: string
+          description: Адрес организации.
+          example: Москва, Волжский бульвар, дом 16, корпус 2
+    clientId:
+      description: Идентификатор персоны.
+      type: object
+      properties:
+        contractId:
+          type: integer
+          description: Номер лицевого счета.
+          format: int64
+        staffId:
+          description: Идентификатор сотрудника из реестра кадров.
+          type: integer
+          format: int64
+        personId:
+          description: Идентификатор персоны из МЭШ.Контингента.
+          type: string
+          format: uuid
+    ClientData:
+      description: Персона.
+      type: object
+      required:
+        - balance
+      properties:
+        clientId:
+          $ref: '#/components/schemas/clientId'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        preorderAllowed:
+          type: boolean
+          description: Признак согласия представителя на получение услуги предзаказа.
+        balance:
+          type: integer
+          description: Баланс в копейках.
+          format: int64
+    ExpenseConstraints:
+      type: object
+      properties:
+        expenseDayLimit:
+          type: integer
+          format: int64
+          description: "Ограничение на покупку в рублях"
+        balanceThreshold:
+          type: integer
+          format: int64
+          description: "Пороговое значение снижения баланса лицевого счета в рублях"
+      description: "Настройки клиента"
+      additionalProperties:
+        type: integer
+    OrdersSummary:
+      description: Информация по предварительным заказам на 14 дней
+      required:
+        - code
+        - description
+        - orderSum14Days
+        - orderSum3Days
+      type: object
+      properties:
+        forbiddenDays:
+          description: Количество дней запрещенных для редактирования
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 3
+        orderSum14Days:
+          description: Сумма заказа в копейках на 14 дней вперед, включая текущий
+          type: integer
+          format: int64
+        orderSum3Days:
+          description: Сумма заказа в копейках на 3 дня вперед, включая текущий
+          type: integer
+          format: int64
+        schedule:
+          description: Список рабочих/нерабочих дней на 14 дней вперёд в школе, где зарегистрирован клиент
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDaySummary'
+    OrderDaySummary:
+      type: object
+      description: Информация по одному дню периода отчёта
+      properties:
+        onDate:
+          description: Дата в периоде
+          type: string
+          format: date
+        orderAllowed:
+          type: boolean
+          description: День доступен для заказа питания
+        orderCount:
+          type: integer
+          format: int32
+          description: Количество заказов на день
+          minimum: 0
+        organization:
+          $ref: '#/components/schemas/Organization'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-Api-Key
+      in: header
+      description: Выполнение операций на основе clientId
+    agent:
+      type: apiKey
+      name: agent
+      in: header
+      description: Информация по агенту, от имени которого выполняется операция { "stf":12, "ctg":"07c6782a-edf6-461f-a8b0-0dfc3df789d1"}
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Вызовы на основе токена АУПД (personId и staffId)

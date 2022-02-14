@@ -3289,6 +3289,18 @@ public class DAOReadonlyService {
         }
     }
 
+    public Long getMaxVersionOfFoodBoxPreorder(){
+        try {
+            Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorder AS c");
+            Long maxV = (Long) q.getSingleResult();
+            if (maxV == null)
+                maxV = 0L;
+            return maxV;
+        } catch (NoResultException e){
+            return 0L;
+        }
+    }
+
     public Set<FoodBoxPreorder> getFoodBoxPreordersFromVersion(Long version, Org org) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
@@ -3303,10 +3315,23 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public FoodBoxPreorder getFoodBoxPreorderByExternalId(Long externalId) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.idFoodBoxExternal = :idFoodBoxExternal ");
+            query.setParameter("idFoodBoxExternal", externalId);
+            return (FoodBoxPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Set<FoodBoxPreorderDish> getFoodBoxPreordersDishes(FoodBoxPreorder foodBoxPreorder) {
         try {
             Query query = entityManager.createQuery("SELECT fbd from FoodBoxPreorderDish fbd "
-                    + "where fbd.foodBoxPreorder > :foodBoxPreorder ");
+                    + "where fbd.foodBoxPreorder = :foodBoxPreorder ");
             query.setParameter("foodBoxPreorder", foodBoxPreorder);
             List<FoodBoxPreorderDish> foodBoxPreorderDishes = query.getResultList();
             return new HashSet<>(foodBoxPreorderDishes);
