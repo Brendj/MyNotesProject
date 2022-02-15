@@ -70,7 +70,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
     private String reportTemplateFileName;
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
-    private List<Hint> hints = new ArrayList <Hint> ();
+    private List<Hint> hints = new ArrayList <> ();
     private boolean manualReportRun = false;
     private long storagePeriod;
 
@@ -114,14 +114,6 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
         //contragentFilter.completeContragentSelection(session, idOfContragent);
     }
-
-    //public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-    //    if (classTypes.equals(Contragent.PAY_AGENT+"")) {
-    //        contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
-    //    } else {
-    //        contragentFilter.completeContragentSelection(session, idOfContragent);
-    //    }
-    //}
 
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
@@ -537,7 +529,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void fillContragentHint (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return;
         }
         try {
@@ -550,7 +542,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void fillContragentPayAgentHint (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return;
         }
         try {
@@ -563,7 +555,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void fillContragentReceiverHint (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return;
         }
         try {
@@ -576,7 +568,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void fillContractHint (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return;
         }
         try {
@@ -589,12 +581,12 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public void fillOrgsHint (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return;
         }
         try {
-            String ids [] = hint.getConditionConstant().split(",");
-            Map <Long, String> res = new HashMap <Long, String> ();
+            String[] ids = hint.getConditionConstant().split(",");
+            Map <Long, String> res = new HashMap<>();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
                 Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
@@ -616,7 +608,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
     
     public List<SelectItem> getStoragePeriods() {
-        List<SelectItem> items = new ArrayList<SelectItem>();
+        List<SelectItem> items = new LinkedList<>();
         for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
             items.add(new SelectItem(per.getMilliseconds(), per.getName()));
         }
@@ -633,19 +625,5 @@ public class ReportRuleEditPage  extends OnlineReportPage
 
     public String getMailListNames() {
         return ReportHandleRule.getMailListNames();
-    }
-
-    private UIComponent findComponent(UIComponent c, String id) {
-        if (id.equals(c.getId())) {
-            return c;
-        }
-        Iterator<UIComponent> kids = c.getFacetsAndChildren();
-        while (kids.hasNext()) {
-            UIComponent found = findComponent(kids.next(), id);
-            if (found != null) {
-                return found;
-            }
-        }
-        return null;
     }
 }

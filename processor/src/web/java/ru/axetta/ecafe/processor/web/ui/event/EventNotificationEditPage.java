@@ -35,7 +35,7 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
 
         public EventParamHint(EventConstants.EventHint reportHint) {
             this.typeName = reportHint.getTypeName();
-            this.paramHints = new LinkedList<EventConstants.ParamHint>();
+            this.paramHints = new LinkedList<>();
             for (int i : reportHint.getParamHints()) {
                 this.paramHints.add(EventConstants.PARAM_HINTS[i]);
             }
@@ -69,7 +69,7 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
     }
 
     public EventNotificationEditPage() {
-        this.eventParamHints = new LinkedList<EventParamHint>();
+        this.eventParamHints = new LinkedList<>();
         for (EventConstants.EventHint reportHint : EventConstants.EVENT_HINTS) {
             this.eventParamHints.add(new EventParamHint(reportHint));
         }

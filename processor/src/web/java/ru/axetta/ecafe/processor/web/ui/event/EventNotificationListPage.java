@@ -141,7 +141,7 @@ public class EventNotificationListPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
+        List<RuleItem> newRuleItems = new LinkedList<>();
         Criteria notificationRulesCriteria = ReportHandleRule.createAllEventNotificationsCriteria(session);
         List<ReportHandleRule> rules = notificationRulesCriteria.list();
         for (ReportHandleRule currRule : rules) {

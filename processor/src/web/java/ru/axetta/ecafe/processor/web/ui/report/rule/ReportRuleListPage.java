@@ -149,7 +149,7 @@ public class ReportRuleListPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
+        List<RuleItem> newRuleItems = new LinkedList<>();
         Criteria reportRulesCriteria = ReportHandleRule.createAllReportRulesCriteria(session);
         List<ReportHandleRule> rules = reportRulesCriteria.list();
         for (ReportHandleRule currRule : rules) {

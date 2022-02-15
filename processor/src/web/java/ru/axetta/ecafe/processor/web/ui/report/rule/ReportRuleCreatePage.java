@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import org.apache.commons.collections4.CollectionUtils;
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
@@ -278,7 +279,6 @@ public class ReportRuleCreatePage  extends OnlineReportPage
             }
             hint.getHint().getParamHint().setValue(defRule.getConditionOperationText() + " " + defRule.getConditionConstant());
 
-            RuleCondition actRule = null;
             hint.fill (defRule, null);
         }
     }
@@ -304,8 +304,8 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
             //  Проверяем выбранные значения, если пустые, то пропускаем этот параметр
             if (!hint.getHint().isRequired() &&
-                (hint.getValueItems() == null || hint.getValueItems().size() < 1) &&
-                (hint.getValue() == null || hint.getValue().length() < 1) &&
+                CollectionUtils.isEmpty(hint.getValueItems()) &&
+                StringUtils.isEmpty(hint.getValue()) &&
                 !hint.isSuperType ()) {
                 continue;
             }
@@ -435,7 +435,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     }
 
     public List<SelectItem> getStoragePeriods() {
-        List<SelectItem> items = new ArrayList<SelectItem>();
+        List<SelectItem> items = new LinkedList<>();
         for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
             items.add(new SelectItem(per.getMilliseconds(), per.getName()));
         }
