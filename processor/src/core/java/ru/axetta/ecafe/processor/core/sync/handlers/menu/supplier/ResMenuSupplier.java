@@ -204,9 +204,10 @@ public class ResMenuSupplier implements AbstractToElement {
         element.appendChild(menusElem);
         element.appendChild(complexesElem);
         element.appendChild(excludeDaysElem);
-        element.appendChild(foodBoxPreorderNew.toElement(document));
-        if (resFoodBoxChanged != null)
-        {
+        if (foodBoxPreorderNew != null) {
+            element.appendChild(foodBoxPreorderNew.toElement(document));
+        }
+        if (resFoodBoxChanged != null) {
             element.appendChild(resFoodBoxChanged.toElement(document));
         }
         return element;
