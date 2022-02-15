@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.event;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ReportConditionItem;
@@ -35,7 +36,7 @@ public class EventNotificationCreatePage extends BasicWorkspacePage {
 
         public EventParamHint(EventConstants.EventHint reportHint) {
             this.typeName = reportHint.getTypeName();
-            this.paramHints = new LinkedList<EventConstants.ParamHint>();
+            this.paramHints = new LinkedList<>();
             for (int i : reportHint.getParamHints()) {
                 this.paramHints.add(EventConstants.PARAM_HINTS[i]);
             }
@@ -66,7 +67,7 @@ public class EventNotificationCreatePage extends BasicWorkspacePage {
     }
 
     public EventNotificationCreatePage() {
-        this.eventParamHints = new LinkedList<EventParamHint>();
+        this.eventParamHints = new LinkedList<>();
         for (EventConstants.EventHint eventHint : EventConstants.EVENT_HINTS) {
             this.eventParamHints.add(new EventParamHint(eventHint));
         }
@@ -153,19 +154,16 @@ public class EventNotificationCreatePage extends BasicWorkspacePage {
     public void createEventNotification(Session session) throws Exception {
         String[] addressList = this.routeAddresses.split(DELIMETER);
 
-        ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject, addressList[0],
+        ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject,
                 this.enabled);
         reportHandleRule.setRuleName(this.notificationName);
 
-        reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
-        reportHandleRule.setRoute2(StringUtils.trim(getString(addressList, 2)));
-        reportHandleRule.setRoute3(StringUtils.trim(getString(addressList, 3)));
-        reportHandleRule.setRoute4(StringUtils.trim(getString(addressList, 4)));
-        reportHandleRule.setRoute5(StringUtils.trim(getString(addressList, 5)));
-        reportHandleRule.setRoute6(StringUtils.trim(getString(addressList, 6)));
-        reportHandleRule.setRoute7(StringUtils.trim(getString(addressList, 7)));
-        reportHandleRule.setRoute8(StringUtils.trim(getString(addressList, 8)));
-        reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
+        for(String addr : addressList){
+            String processedAddress = StringUtils.trim(addr);
+
+            ReportHandleRuleRoute route = new ReportHandleRuleRoute(processedAddress, reportHandleRule);
+            reportHandleRule.getRoutes().add(route);
+        }
 
         reportHandleRule.addRuleCondition(EventConstants.buildTypeCondition(reportHandleRule, this.eventType));
         String[] textRuleConditions = this.ruleConditionItems.split(DELIMETER);
@@ -179,12 +177,5 @@ public class EventNotificationCreatePage extends BasicWorkspacePage {
             }
         }
         session.save(reportHandleRule);
-    }
-
-    private static String getString(String[] strings, int i) {
-        if (0 <= i && i < strings.length) {
-            return strings[i];
-        }
-        return null;
     }
 }

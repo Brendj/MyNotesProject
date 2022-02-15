@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import org.apache.commons.collections4.CollectionUtils;
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
@@ -28,6 +30,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +42,6 @@ import java.util.List;
  */
 public class ReportRuleCreatePage  extends OnlineReportPage
         implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
-    Logger logger = LoggerFactory.getLogger(ReportRuleCreatePage.class);
 
     private String ruleName;
     private boolean enabled;
@@ -57,7 +59,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     private boolean manualReportRun = false;
     private long storagePeriod;
 
-    private List<Hint> hints = new ArrayList<Hint>();
+    private List<Hint> hints = new LinkedList<>();
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
     private final CCAccountFilter contragentPayAgentFilter = new CCAccountFilter();
@@ -204,9 +206,15 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         switch (receiverSelection){
-            case 0: contragentFilter.completeContragentSelection(session, idOfContragent); break;
-            case 1: contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);break;
-            case 2: contragentReceiverFilter.completeContragentSelection(session, idOfContragent);break;
+            case 0:
+                contragentFilter.completeContragentSelection(session, idOfContragent);
+                break;
+            case 1:
+                contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
+                break;
+            case 2:
+                contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+                break;
         }
         //contragentFilter.completeContragentSelection(session, idOfContragent);
     }
@@ -244,7 +252,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
     public void parseExecParams () {
         //  Если заходят на страницу в первый раз, то делаем выбранным первое правило
-        if (reportType == null || reportType.length() < 1) {
+        if (StringUtils.isEmpty(reportType)) {
             reportType = reportTypeMenu.getItems() [0].getValue().toString();
         }
 
@@ -271,41 +279,37 @@ public class ReportRuleCreatePage  extends OnlineReportPage
             }
             hint.getHint().getParamHint().setValue(defRule.getConditionOperationText() + " " + defRule.getConditionConstant());
 
-            RuleCondition actRule = null;
             hint.fill (defRule, null);
         }
     }
 
-
-
     public void createReportRule(Session session) throws Exception {
         String[] addressList = this.routeAddresses.split(ReportHandleRule.DELIMETER);
 
-        ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject, addressList[0],
-                this.enabled);
+        ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject, this.enabled);
         reportHandleRule.setRuleName(this.ruleName);
 
-        reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
-        reportHandleRule.setRoute2(StringUtils.trim(getString(addressList, 2)));
-        reportHandleRule.setRoute3(StringUtils.trim(getString(addressList, 3)));
-        reportHandleRule.setRoute4(StringUtils.trim(getString(addressList, 4)));
-        reportHandleRule.setRoute5(StringUtils.trim(getString(addressList, 5)));
-        reportHandleRule.setRoute6(StringUtils.trim(getString(addressList, 6)));
-        reportHandleRule.setRoute7(StringUtils.trim(getString(addressList, 7)));
-        reportHandleRule.setRoute8(StringUtils.trim(getString(addressList, 8)));
-        reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
+        for(String addr : addressList){
+            String processedAddress = StringUtils.trim(addr);
+
+            ReportHandleRuleRoute route = new ReportHandleRuleRoute(processedAddress, reportHandleRule);
+            reportHandleRule.getRoutes().add(route);
+        }
+
         reportHandleRule.setTag(tag);
 
         // Собираем строку с условием
         StringBuilder newCondition = new StringBuilder("");
         for (Hint hint : hints) {
+
             //  Проверяем выбранные значения, если пустые, то пропускаем этот параметр
             if (!hint.getHint().isRequired() &&
-                (hint.getValueItems() == null || hint.getValueItems().size() < 1) &&
-                (hint.getValue() == null || hint.getValue().length() < 1) &&
+                CollectionUtils.isEmpty(hint.getValueItems()) &&
+                StringUtils.isEmpty(hint.getValue()) &&
                 !hint.isSuperType ()) {
                 continue;
             }
+
             //  Проверка контрагента
             if (!hint.getHint().isRequired() &&
                 hint.getType().equals(Hint.CONTRAGENT) &&
@@ -313,6 +317,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                 contragentFilter.getContragent().getIdOfContragent() == null)) {
                 continue;
             }
+
             //  Проверка контрагента "Агент по приему платежей"
             if (!hint.getHint().isRequired() &&
                     hint.getType().equals(Hint.CONTRAGENT_PAYAGENT) &&
@@ -320,6 +325,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                             contragentPayAgentFilter.getContragent().getIdOfContragent() == null)) {
                 continue;
             }
+
             //  Проверка контрагента "ТСП"
             if (!hint.getHint().isRequired() &&
                     hint.getType().equals(Hint.CONTRAGENT_RECEIVER) &&
@@ -335,15 +341,15 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                 contractFilter.getContract().getIdOfContract() == null)) {
                 continue;
             }
+
             //  Проверка орга
             if (!hint.getHint().isRequired() &&
                 hint.getType().equals(Hint.ORG) &&
                 (idOfOrgList == null || idOfOrgList.size() < 1)) {
                 continue;
             }
+
             //  Проверка клиента
-
-
             StringBuilder newValue = new StringBuilder();
             if (hint.getValueItems() != null && hint.getValueItems().size() > 0) {
                 List <String> items = hint.getValueItems();
@@ -374,8 +380,8 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                     }
                     newValue.append(idOfOrgList.get(i));
                 }
-                if(newValue.length()> RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD-100 ){
-                    newValue.delete(RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD -100, newValue.length() );
+                if(newValue.length()> RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD - 100){
+                    newValue.delete(RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD - 100, newValue.length() );
                     int i = newValue.lastIndexOf(",");
                     if(i >  0){
                         newValue.delete(i, newValue.length());
@@ -416,13 +422,6 @@ public class ReportRuleCreatePage  extends OnlineReportPage
         session.save(reportHandleRule);
     }
 
-    private static String getString(String[] strings, int i) {
-        if (0 <= i && i < strings.length) {
-            return strings[i];
-        }
-        return null;
-    }
-
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -436,7 +435,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     }
 
     public List<SelectItem> getStoragePeriods() {
-        List<SelectItem> items = new ArrayList<SelectItem>();
+        List<SelectItem> items = new LinkedList<>();
         for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
             items.add(new SelectItem(per.getMilliseconds(), per.getName()));
         }

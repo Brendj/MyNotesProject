@@ -18,16 +18,6 @@
         <property name="templateFileName" column="TemplateFileName" type="string" length="256" not-null="true"/>
         <property name="documentFormat" column="DocumentFormat" type="int" not-null="true"/>
         <property name="subject" column="Subject" type="string" length="128" not-null="true"/>
-        <property name="route0" column="Route0" type="string" length="128" not-null="true"/>
-        <property name="route1" column="Route1" type="string" length="128"/>
-        <property name="route2" column="Route2" type="string" length="128"/>
-        <property name="route3" column="Route3" type="string" length="128"/>
-        <property name="route4" column="Route4" type="string" length="128"/>
-        <property name="route5" column="Route5" type="string" length="128"/>
-        <property name="route6" column="Route6" type="string" length="128"/>
-        <property name="route7" column="Route7" type="string" length="128"/>
-        <property name="route8" column="Route8" type="string" length="128"/>
-        <property name="route9" column="Route9" type="string" length="128"/>
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="storagePeriod" column="StoragePeriod" type="long"/>
         <property name="allowManualReportRun" column="AllowManualReportRun" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
@@ -39,6 +29,10 @@
         <set name="ruleConditionsInternal" inverse="true" cascade="all">
             <key column="IdOfReportHandleRule"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.RuleCondition"/>
+        </set>
+        <set name="routes" cascade="all-delete-orphan" inverse="true">
+            <key column="IdOfReportHandleRule" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute"/>
         </set>
     </class>
 </hibernate-mapping>

@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.event.EventDocumentBuilder;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -33,6 +30,7 @@ import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -835,18 +833,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             this.tag = reportHandleRule.getTag();
             this.documentFormat = reportHandleRule.getDocumentFormat();
             this.subject = reportHandleRule.getSubject();
-            this.routeAdresses = new LinkedList<String>();
-            this.routeAdresses.add(reportHandleRule.getRoute0());
-            this.routeAdresses.add(reportHandleRule.getRoute1());
-            this.routeAdresses.add(reportHandleRule.getRoute2());
-            this.routeAdresses.add(reportHandleRule.getRoute3());
-            this.routeAdresses.add(reportHandleRule.getRoute4());
-            this.routeAdresses.add(reportHandleRule.getRoute5());
-            this.routeAdresses.add(reportHandleRule.getRoute6());
-            this.routeAdresses.add(reportHandleRule.getRoute7());
-            this.routeAdresses.add(reportHandleRule.getRoute8());
-            this.routeAdresses.add(reportHandleRule.getRoute9());
-            this.boolExpressions = new LinkedList<BasicBoolExpression>();
+            this.routeAdresses = new LinkedList<>();
+            this.routeAdresses.addAll(
+                    reportHandleRule.getRoutes()
+                            .stream()
+                            .map(ReportHandleRuleRoute::getRoute)
+                            .collect(Collectors.toList())
+                    );
+            this.boolExpressions = new LinkedList<>();
             for (RuleCondition currRuleCondition : reportHandleRule.getRuleConditions()) {
                 this.boolExpressions.add(createExpression(currRuleCondition));
             }

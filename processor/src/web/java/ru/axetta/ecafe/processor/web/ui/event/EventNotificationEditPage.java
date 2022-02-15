@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.event;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -34,7 +35,7 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
 
         public EventParamHint(EventConstants.EventHint reportHint) {
             this.typeName = reportHint.getTypeName();
-            this.paramHints = new LinkedList<EventConstants.ParamHint>();
+            this.paramHints = new LinkedList<>();
             for (int i : reportHint.getParamHints()) {
                 this.paramHints.add(EventConstants.PARAM_HINTS[i]);
             }
@@ -61,13 +62,14 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
     private final EventTypeMenu eventTypeMenu = new EventTypeMenu();
     private final ReportFormatMenu reportFormatMenu = new ReportFormatMenu();
     private List<EventParamHint> eventParamHints = Collections.emptyList();
+    private Map<String, ReportHandleRuleRoute> routeMap = new HashMap<>();
 
     public String getPageFilename() {
         return "event_notification/edit";
     }
 
     public EventNotificationEditPage() {
-        this.eventParamHints = new LinkedList<EventParamHint>();
+        this.eventParamHints = new LinkedList<>();
         for (EventConstants.EventHint reportHint : EventConstants.EVENT_HINTS) {
             this.eventParamHints.add(new EventParamHint(reportHint));
         }
@@ -169,25 +171,31 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
 
     public void updateEventNotification(Session session, Long idOfReportHandleRule) throws Exception {
         ReportHandleRule reportHandleRule = (ReportHandleRule) session
-                .load(ReportHandleRule.class, idOfReportHandleRule);
+                .get(ReportHandleRule.class, idOfReportHandleRule);
         reportHandleRule.setRuleName(this.notificationName);
         reportHandleRule.setDocumentFormat(this.documentFormat);
         reportHandleRule.setSubject(this.subject);
         reportHandleRule.setEnabled(this.enabled);
 
         String[] addressList = this.routeAddresses.split(DELIMETER);
-        reportHandleRule.setRoute0(StringUtils.trim(getString(addressList, 0)));
-        reportHandleRule.setRoute1(StringUtils.trim(getString(addressList, 1)));
-        reportHandleRule.setRoute2(StringUtils.trim(getString(addressList, 2)));
-        reportHandleRule.setRoute3(StringUtils.trim(getString(addressList, 3)));
-        reportHandleRule.setRoute4(StringUtils.trim(getString(addressList, 4)));
-        reportHandleRule.setRoute5(StringUtils.trim(getString(addressList, 5)));
-        reportHandleRule.setRoute6(StringUtils.trim(getString(addressList, 6)));
-        reportHandleRule.setRoute7(StringUtils.trim(getString(addressList, 7)));
-        reportHandleRule.setRoute8(StringUtils.trim(getString(addressList, 8)));
-        reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
+        for(String addr : addressList){
+            String processedAddress = StringUtils.trim(addr);
+            ReportHandleRuleRoute route = this.routeMap.get(processedAddress);
+            if(route == null){
+                route = new ReportHandleRuleRoute(processedAddress, reportHandleRule);
+                reportHandleRule.getRoutes().add(route);
+                session.save(route);
+            }
+            this.routeMap.remove(processedAddress);
+        }
 
-        Set<RuleCondition> newRuleConditions = new HashSet<RuleCondition>();
+        for(ReportHandleRuleRoute deleted : this.routeMap.values()){
+            reportHandleRule.getRoutes().remove(deleted);
+            deleted = (ReportHandleRuleRoute) session.merge(deleted);
+            session.delete(deleted);
+        }
+
+        Set<RuleCondition> newRuleConditions = new HashSet<>();
         newRuleConditions.add(EventConstants.buildTypeCondition(reportHandleRule, this.eventType));
 
         String[] textRuleConditions = this.ruleConditionItems.split(DELIMETER);
@@ -200,7 +208,7 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
             }
         }
 
-        Set<RuleCondition> superfluousRuleConditions = new HashSet<RuleCondition>();
+        Set<RuleCondition> superfluousRuleConditions = new HashSet<>();
         for (RuleCondition ruleCondition : reportHandleRule.getRuleConditions()) {
             if (!newRuleConditions.contains(ruleCondition)) {
                 superfluousRuleConditions.add(ruleCondition);
@@ -226,6 +234,11 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.notificationName = reportHandleRule.getRuleName();
 
+        this.routeMap = new HashMap<>();
+        for(ReportHandleRuleRoute r : reportHandleRule.getRoutes()){
+            routeMap.put(r.getRoute(), r);
+        }
+
         Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
         this.eventType = reportHandleRule.findType(session);
         if (null == this.eventType) {
@@ -235,16 +248,9 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
         this.subject = reportHandleRule.getSubject();
 
         StringBuilder routeAddresses = new StringBuilder();
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute0());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute1());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute2());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute3());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute4());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute5());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute6());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute7());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute8());
-        appendNotEmpty(routeAddresses, reportHandleRule.getRoute9());
+        for(ReportHandleRuleRoute r : reportHandleRule.getRoutes()) {
+            appendNotEmpty(routeAddresses, r.getRoute());
+        }
         this.routeAddresses = routeAddresses.toString();
 
         StringBuilder ruleConditionItems = new StringBuilder();
@@ -265,13 +271,5 @@ public class EventNotificationEditPage extends BasicWorkspacePage {
             }
             stringBuilder.append(value);
         }
-    }
-
-
-    private static String getString(String[] strings, int i) {
-        if (0 <= i && i < strings.length) {
-            return strings[i];
-        }
-        return null;
     }
 }

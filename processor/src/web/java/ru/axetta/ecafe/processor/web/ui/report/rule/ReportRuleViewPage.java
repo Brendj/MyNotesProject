@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -17,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +33,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     private int documentFormat;
     private String subject;
     private List<String> routeAddresses = Collections.emptyList();
-    private List<RuleConditionItem> ruleConditionItems = Collections.emptyList();
+    private final List<RuleConditionItem> ruleConditionItems = Collections.emptyList();
     private String shortName;
     private List<ReportRuleConstants.ParamHint> paramHints = Collections.emptyList();
     private String reportTemplateFileName;
@@ -109,35 +107,37 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
         this.tag = reportHandleRule.getTag();
-        Set<RuleCondition> actualRules = reportHandleRule.getRuleConditions();
-        this.reportType = reportHandleRule.findType(session);
+
         if (null == this.reportType) {
             this.reportType = ReportRuleConstants.UNKNOWN_REPORT_TYPE;
         }
+
         this.reportTemplateFileName = reportHandleRule.getTemplateFileName();
-        if (null == this.reportTemplateFileName)
+        if (null == this.reportTemplateFileName) {
             this.reportTemplateFileName = ReportRuleConstants.DEFAULT_REPORT_TEMPLATE;
+        }
+
         this.enabled = reportHandleRule.isEnabled();
         this.manualReportRun = reportHandleRule.isAllowManualReportRun();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
-        this.routeAddresses = new LinkedList<String>();
+        this.routeAddresses = new LinkedList<>();
         this.storagePeriod = reportHandleRule.getStoragePeriod();
-        addAddress(this.routeAddresses, reportHandleRule.getRoute0());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute1());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute2());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute3());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute4());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute5());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute6());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute7());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute8());
-        addAddress(this.routeAddresses, reportHandleRule.getRoute9());
-        //this.ruleConditionItems = new LinkedList<RuleConditionItem>();
+
+        this.routeAddresses.addAll(
+                reportHandleRule.getRoutes()
+                        .stream()
+                        .map(ReportHandleRuleRoute::getRoute)
+                        .collect(Collectors.toList())
+        );
+
         this.shortName = ReportRuleConstants.createShortName(reportHandleRule, 64);
 
-        this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
+        this.paramHints = new LinkedList<>();
         ReportRuleConstants.ReportHint defaultRules = ReportRuleConstants.findReportHint(this.reportType);
+
+        Set<RuleCondition> actualRules = reportHandleRule.getRuleConditions();
+        this.reportType = reportHandleRule.findType(session);
         for (int i : defaultRules.getParamHints()) {
             ReportRuleConstants.ParamHint hint = ReportRuleConstants.PARAM_HINTS[Math.abs(i)];
             String argument  = "";  // к чему применяется
@@ -152,14 +152,19 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
                     constant  = conditionItem.getConditionConstant();  // значение
 
                     //  Дополнительные действия для тех значений, которые необходимо грузить из БД
-                    if (hint.getName().equals("idOfContragent")) {
-                        constant = getContragentHintValue (getActualHintByName ("idOfContragent", actualRules));
-                    } else if (hint.getName().equals("idOfContract")) {
-                        constant = getContractHintValue (getActualHintByName ("idOfContract", actualRules));
-                    } else if (hint.getName().equals("idOfOrg")) {
-                        constant = getOrgsHintValue(getActualHintByName("idOfOrg", actualRules));
-                    } else if (hint.getName().equals("idOfClient")) {
-                        constant = getClientHintValue (getActualHintByName ("idOfClient", actualRules));
+                    switch (hint.getName()) {
+                        case "idOfContragent":
+                            constant = getContragentHintValue(getActualHintByName("idOfContragent", actualRules));
+                            break;
+                        case "idOfContract":
+                            constant = getContractHintValue(getActualHintByName("idOfContract", actualRules));
+                            break;
+                        case "idOfOrg":
+                            constant = getOrgsHintValue(getActualHintByName("idOfOrg", actualRules));
+                            break;
+                        case "idOfClient":
+                            constant = getClientHintValue(getActualHintByName("idOfClient", actualRules));
+                            break;
                     }
                 }
             }
@@ -175,9 +180,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     }
 
     public RuleCondition getActualHintByName (String name, Set<RuleCondition> actualRules) {
-        Iterator<RuleCondition> hints = actualRules.iterator();
-        while (hints.hasNext()) {
-            RuleCondition hint = hints.next();
+        for (RuleCondition hint : actualRules) {
             if (hint.getConditionArgument().equals(name)) {
                 return hint;
             }
@@ -186,7 +189,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     }
 
     public String getContragentHintValue (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return "";
         }
         try {
@@ -200,7 +203,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     }
 
     public String getContractHintValue (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return "";
         }
         try {
@@ -213,21 +216,21 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     }
 
     public String getOrgsHintValue (RuleCondition hint) {
-        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+        if (hint == null || StringUtils.isEmpty(hint.getConditionConstant())) {
             return "";
         }
         try {
-            String ids [] = hint.getConditionConstant().split(",");
-            String res = "";
+            String[] ids = hint.getConditionConstant().split(",");
+            StringBuilder sb = new StringBuilder();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
                 Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
-                if (res.length() > 0) {
-                    res = res + ", ";
+                if (sb.length() > 0) {
+                    sb.append(", ");
                 }
-                res = res + org.getOfficialName();
+                sb.append(org.getOfficialName());
             }
-            return res;
+            return sb.toString();
         } catch (Exception e) {
             //logger.error("Failed to parse orgs hint " + hint.getConditionConstant(), e);
         }
@@ -240,12 +243,6 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         }
 
         return "";
-    }
-
-    private static void addAddress(List<String> addresses, String newAddress) {
-        if (StringUtils.isNotEmpty(newAddress)) {
-            addresses.add(newAddress);
-        }
     }
 
     public void setReportTemplateFileName(String reportTemplateFileName) {
