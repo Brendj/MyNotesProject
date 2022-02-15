@@ -292,10 +292,10 @@ public class ImageUtils {
         } catch (NullPointerException | IOException ignore) {
             try {
                 if (file.getParentFile().mkdirs())
-                    logger.info("Директория для " + "\"" + path + "\"" + " успешно создана");
+                    logger.info(String.format("Директория для \"%s\" успешно создана", path));
                 ImageIO.write(image, "jpg", file);
             } catch (NullPointerException er) {
-                logger.error("Ошибка при создании директории для " + "\"" + path + "\"", er);
+                logger.error(String.format("Ошибка при создании директории для \"%s\"", path), er);
             }
         }
     }
