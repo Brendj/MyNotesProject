@@ -611,6 +611,8 @@ public class DTSZNDiscountsReviseService {
             if (deltaDate == null) {
                 deltaDate = CalendarUtils.addHours(new Date(), -24);
             }
+            deltaDate = CalendarUtils.addSeconds(deltaDate,1);
+
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class)
                     .getDiscountsUpdatedSinceDate(deltaDate);
         } else {
@@ -830,13 +832,7 @@ public class DTSZNDiscountsReviseService {
                     Set<CategoryDiscount> oldDiscounts = client.getCategories();
                     Integer oldDiscountMode = client.getDiscountMode();
 
-                    for (Iterator<CategoryDiscount> iterator = discounts.iterator(); iterator.hasNext(); ) {
-                        CategoryDiscount s = iterator.next();
-                        if (s.getIdOfCategoryDiscount() == isppCode) {
-                            iterator.remove();
-                        }
-                    }
-                    //String newDiscounts = StringUtils.join(discounts, ",");
+                    discounts.removeIf(s -> s.getIdOfCategoryDiscount() == isppCode);
                     Integer newDiscountMode =
                             discounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 

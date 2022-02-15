@@ -4,15 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Session;
+import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -21,8 +18,6 @@ import java.util.Set;
 
 @Service
 public class ClientDiscountHistoryService {
-    private Logger log = LoggerFactory.getLogger(ClientDiscountHistoryService.class);
-
     public void saveClientDiscountHistoryByOldScheme(Session session, Client client,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment){
         List<ClientDiscountHistory> histories = new LinkedList<>();
@@ -34,7 +29,6 @@ public class ClientDiscountHistoryService {
                         .getType(oldDiscounts, newDiscounts, uncommon);
 
                 histories.add(ClientDiscountHistory.build(client, comment, uncommon, type));
-
             }
         } else {
             Date begin = CalendarUtils.startOfDay(new Date());
@@ -48,7 +42,9 @@ public class ClientDiscountHistoryService {
                 }
             }
         }
-        for(ClientDiscountHistory h :histories) {
+        histories.sort(ClientDiscountHistory::compareTo);
+
+        for(ClientDiscountHistory h : histories) {
             session.save(h);
         }
     }
