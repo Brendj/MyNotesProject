@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import org.apache.commons.lang.StringUtils;
@@ -153,7 +154,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
     throws Exception {
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
-        SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymenResultCode(error.getCode(), action);
+        SBMSKPaymentsDesc sbmskPaymentsDesc = SBMSKPaymentsDesc.getFromPaymentResultCode(error.getCode(), action);
         if (sbmskPaymentsDesc != null) {
             int resultCode = sbmskPaymentsDesc.getCode();
             stringBuilder.append(String.format("<CODE>%d</CODE>", resultCode));
@@ -199,6 +200,11 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             contractId = Long.parseLong(account);
         } catch (Exception e) {
             throw new InvalidContractIdFormatException("Invalid contractId format");
+        }
+        Client client = DAOReadonlyService.getInstance().findClientByContractId(contractId);
+        if (client == null)
+        {
+            throw new InvalidClientException("Client not found");
         }
         String amount = parseResult.getParam("AMOUNT");
         if(!amount.matches("\\d+\\.\\d{2}")){
