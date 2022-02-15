@@ -41,8 +41,7 @@ public class ImageUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageUtils.class);
 
-    private static final String IMAGE_DIRECTORY = RuntimeContext.getInstance().getConfigProperties()
-            .getProperty(RuntimeContext.IMAGE_DIRECTORY, "/image");
+    private static final String IMAGE_DIRECTORY = RuntimeContext.getInstance().getConfigProperties().getProperty(RuntimeContext.IMAGE_DIRECTORY, "/image");
     private static final String AB = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
     private static final String DELIMITER = "/";
@@ -51,17 +50,16 @@ public class ImageUtils {
     private static final String NOT_FOUND = "not_found";
     private static final String ISNEW = "n/";
 
-    public static String getImagePathByURL(String URL){
+    public static String getImagePathByURL(String URL) {
         return IMAGE_DIRECTORY + DELIMITER + URL + JPG;
     }
 
-    public static String getNotFoundImagePath(){
+    public static String getNotFoundImagePath() {
         return IMAGE_DIRECTORY + DELIMITER + NOT_FOUND + JPG;
     }
 
     public static String formImagePath(Long contractId, Long idOfClient, boolean isNew, String hashFileName, ImageSize size) {
-        return IMAGE_DIRECTORY + DELIMITER + size.getDescription() + DELIMITER +
-                generateFileName(contractId, idOfClient, isNew, hashFileName) + JPG;
+        return IMAGE_DIRECTORY + DELIMITER + size.getDescription() + DELIMITER + generateFileName(contractId, idOfClient, isNew, hashFileName) + JPG;
     }
 
     public static String defaultImagePath() {
@@ -69,17 +67,17 @@ public class ImageUtils {
     }
 
     public static String getPhotoURL(Client client, ClientPhoto photo, int size, boolean isNew) throws NoPhotoException, NoNewPhotoException, NoSuchImageSizeException {
-        if(photo == null || (!photo.getIsApproved() && !isNew)){
+        if (photo == null || (!photo.getIsApproved() && !isNew)) {
             throw new NoPhotoException("У клиента нет фото.");
         }
-        if(!photo.getIsNew() && isNew){
+        if (!photo.getIsNew() && isNew) {
             throw new NoNewPhotoException();
         }
-        int layer = (int)(client.getIdOfClient() / 3000) + 1;
+        int layer = (int) (client.getIdOfClient() / 3000) + 1;
         StringBuilder tmp = new StringBuilder();
         tmp.append(ImageSize.fromInteger(size));
         tmp.append(DELIMITER);
-        if(isNew){
+        if (isNew) {
             tmp.append(ISNEW);
         }
         tmp.append(layer);
@@ -90,24 +88,23 @@ public class ImageUtils {
     }
 
     public static int getPhotoStatus(ClientPhoto photo) {
-        if(photo.getIsNew()){
+        if (photo.getIsNew()) {
             return PhotoStatus.NEW.getValue();
         }
-        if(photo.getIsCanceled()){
+        if (photo.getIsCanceled()) {
             return PhotoStatus.WAS_CANCELED.getValue();
         }
         return PhotoStatus.CONFIRMED.getValue();
     }
 
-    public static String getDefaultImageURL(){
+    public static String getDefaultImageURL() {
         return DEFAULT;
     }
 
     public static PhotoContent getPhotoContent(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
-                    ImageSize.fromIntegerToEnum(size));
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(), ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
         }
@@ -118,8 +115,7 @@ public class ImageUtils {
     public static String getPhotoString(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
-                    ImageSize.fromIntegerToEnum(size));
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(), ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
         }
@@ -130,8 +126,7 @@ public class ImageUtils {
     public static int getPhotoHash(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
-                    ImageSize.fromIntegerToEnum(size));
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(), ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
         }
@@ -149,7 +144,7 @@ public class ImageUtils {
             file = new File(defaultImagePath());
             fileInputStreamReader = new FileInputStream(file);
         }
-        byte[] bytes = new byte[(int)file.length()];
+        byte[] bytes = new byte[(int) file.length()];
         fileInputStreamReader.read(bytes);
         int hash = Arrays.hashCode(bytes);
         BASE64Encoder encoder = new BASE64Encoder();
@@ -169,7 +164,7 @@ public class ImageUtils {
             file = new File(defaultImagePath());
             fileInputStreamReader = new FileInputStream(file);
         }
-        byte[] bytes = new byte[(int)file.length()];
+        byte[] bytes = new byte[(int) file.length()];
         fileInputStreamReader.read(bytes);
         BASE64Encoder encoder = new BASE64Encoder();
         String encoded = encoder.encode(bytes);
@@ -188,7 +183,7 @@ public class ImageUtils {
             file = new File(defaultImagePath());
             fileInputStreamReader = new FileInputStream(file);
         }
-        byte[] bytes = new byte[(int)file.length()];
+        byte[] bytes = new byte[(int) file.length()];
         fileInputStreamReader.read(bytes);
         int hash = Arrays.hashCode(bytes);
         fileInputStreamReader.close();
@@ -206,15 +201,15 @@ public class ImageUtils {
         return image;
     }
 
-    public static ClientPhoto findClientPhoto(Session session, Long idOfClient){
+    public static ClientPhoto findClientPhoto(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientPhoto.class);
         criteria.add(Restrictions.eq("idOfClient", idOfClient));
         return (ClientPhoto) criteria.uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
-    public static List<ClientPhoto> findClientPhotos(Session session, List<Long> clientIds){
-        if(clientIds == null || clientIds.isEmpty()) {
+    public static List<ClientPhoto> findClientPhotos(Session session, List<Long> clientIds) {
+        if (clientIds == null || clientIds.isEmpty()) {
             return new ArrayList<ClientPhoto>();
         }
         Criteria criteria = session.createCriteria(ClientPhoto.class);
@@ -223,18 +218,18 @@ public class ImageUtils {
         return result != null ? result : new ArrayList<ClientPhoto>();
     }
 
-    public static String generateHashFileName(int length){
+    public static String generateHashFileName(int length) {
         StringBuilder sb = new StringBuilder(length);
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             sb.append(AB.charAt(rnd.nextInt(AB.length())));
         }
         return sb.toString();
     }
 
-    public static String generateFileName(Long contractId, Long idOfClient, boolean isNew, String hashFileName){
-        int layer = (int)(idOfClient / 3000) + 1;
+    public static String generateFileName(Long contractId, Long idOfClient, boolean isNew, String hashFileName) {
+        int layer = (int) (idOfClient / 3000) + 1;
         StringBuilder tmp = new StringBuilder();
-        if(isNew){
+        if (isNew) {
             tmp.append(ISNEW);
         }
         tmp.append(layer);
@@ -244,8 +239,8 @@ public class ImageUtils {
         return tmp.toString();
     }
 
-    private static BufferedImage toBufferedImage(Image image){
-        BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB );
+    private static BufferedImage toBufferedImage(Image image) {
+        BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
 
         Graphics2D bGr = bimage.createGraphics();
         bGr.drawImage(image, 0, 0, null);
@@ -256,8 +251,7 @@ public class ImageUtils {
 
     private static BufferedImage resizeImage(BufferedImage image, int targetWidth, int targetHeight) {
         Object hint = RenderingHints.VALUE_INTERPOLATION_BILINEAR;
-        int type = (image.getTransparency() == Transparency.OPAQUE)
-                        ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        int type = (image.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         int width = image.getWidth();
         int height = image.getHeight();
         BufferedImage result = image;
@@ -288,20 +282,21 @@ public class ImageUtils {
     }
 
     public static BufferedImage resizeImage(BufferedImage image) {
-        return resizeImage(image, (int) (image.getWidth() * ClientPhotoConfig.COMPRESSION),
-                (int) (image.getHeight() * ClientPhotoConfig.COMPRESSION));
+        return resizeImage(image, (int) (image.getWidth() * ClientPhotoConfig.COMPRESSION), (int) (image.getHeight() * ClientPhotoConfig.COMPRESSION));
     }
 
     public static void saveImage(String path, BufferedImage image) throws IOException {
         File file = new File(path);
         try {
             ImageIO.write(image, "jpg", file);
-        } catch (NullPointerException e) {
-            file.getParentFile().mkdir();
-            ImageIO.write(image, "jpg", file);
-        } catch (IOException e){
-            file.getParentFile().mkdir();
-            ImageIO.write(image, "jpg", file);
+        } catch (NullPointerException | IOException ignore) {
+            try {
+                if (file.getParentFile().mkdirs())
+                    logger.info("Директория для " + "\"" + path + "\"" + " успешно создана");
+                ImageIO.write(image, "jpg", file);
+            } catch (NullPointerException er) {
+                logger.error("Ошибка при создании директории для " + "\"" + path + "\"", er);
+            }
         }
     }
 
@@ -341,10 +336,8 @@ public class ImageUtils {
     }
 
     public static void moveImage(Client client, ClientPhoto photo) throws IOException {
-        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.MEDIUM),
-                formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.MEDIUM));
-        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.SMALL),
-                formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.SMALL));
+        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.MEDIUM), formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.MEDIUM));
+        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.SMALL), formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.SMALL));
     }
 
     private static void moveImage(String src, String target) throws IOException {
@@ -364,7 +357,7 @@ public class ImageUtils {
 
     public static boolean deleteImage(Long contractId, Long idOfClient, String hashFileName, boolean isNew) {
         boolean result = deleteImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.MEDIUM));
-        if(result) {
+        if (result) {
             deleteImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.SMALL));
         }
         return result;
@@ -382,7 +375,7 @@ public class ImageUtils {
     public static boolean checkImageExists(Long contractId, Long idOfClient, String hashFileName, boolean isNew) throws SmallPhotoNotFoundException {
         boolean medium = checkImageExists(contractId, idOfClient, hashFileName, isNew, ImageSize.MEDIUM);
         boolean small = checkImageExists(contractId, idOfClient, hashFileName, isNew, ImageSize.SMALL);
-        if(medium && !small){
+        if (medium && !small) {
             throw new SmallPhotoNotFoundException("Image with small size not found while medium exists!");
         }
         return medium;
@@ -406,39 +399,37 @@ public class ImageUtils {
         BufferedImage oldImage = null;
         try {
             oldImage = ImageIO.read(new FileInputStream(formImagePath(contractId, idOfClient, true, hashFileName, ImageSize.MEDIUM)));
-        } catch (FileNotFoundException ignore){}
+        } catch (FileNotFoundException ignore) {
+        }
         try {
             oldImage = ImageIO.read(new FileInputStream(formImagePath(contractId, idOfClient, false, hashFileName, ImageSize.MEDIUM)));
-        } catch (FileNotFoundException ignore){}
-        if(oldImage != null) {
-            if(compareImage(image, oldImage)){
+        } catch (FileNotFoundException ignore) {
+        }
+        if (oldImage != null) {
+            if (compareImage(image, oldImage)) {
                 throw new PhotoIsNotNewException("Фото совпадает с уже имеющимся фото клиента.");
             }
         }
     }
 
     private static void validateSize(BufferedImage image) throws IOException, ImageUtilsException {
-        if(image.getHeight() > ClientPhotoConfig.MAX_HEIGHT || image.getWidth() > ClientPhotoConfig.MAX_WIDTH){
-            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Максимальный размер %s х %s пикселей.",
-                    ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
+        if (image.getHeight() > ClientPhotoConfig.MAX_HEIGHT || image.getWidth() > ClientPhotoConfig.MAX_WIDTH) {
+            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Максимальный размер %s х %s пикселей.", ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
         }
-        if(image.getHeight() < ClientPhotoConfig.MIN_HEIGHT || image.getWidth() < ClientPhotoConfig.MIN_WIDTH){
-            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Минимальный размер %s х %s пикселей.",
-                    ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
+        if (image.getHeight() < ClientPhotoConfig.MIN_HEIGHT || image.getWidth() < ClientPhotoConfig.MIN_WIDTH) {
+            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Минимальный размер %s х %s пикселей.", ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
         }
         double whratio = ((double) image.getHeight()) / ((double) image.getWidth());
-        if(whratio > ClientPhotoConfig.MAX_H_W_RATIO || whratio < ClientPhotoConfig.MIN_H_W_RATIO){
-            throw new IllegalPhotoSizeException(String.format("Недопустимое соотношение сторон изображения. Допустимые значения от %s до %s.",
-                    ClientPhotoConfig.MIN_H_W_RATIO, ClientPhotoConfig.MAX_H_W_RATIO));
+        if (whratio > ClientPhotoConfig.MAX_H_W_RATIO || whratio < ClientPhotoConfig.MIN_H_W_RATIO) {
+            throw new IllegalPhotoSizeException(String.format("Недопустимое соотношение сторон изображения. Допустимые значения от %s до %s.", ClientPhotoConfig.MIN_H_W_RATIO, ClientPhotoConfig.MAX_H_W_RATIO));
         }
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", tmp);
         tmp.close();
         int contentLength = tmp.size();
         int maxContentLength = ClientPhotoConfig.MAX_SIZE * 1024 * 8;
-        if(contentLength > maxContentLength){
-            throw new IllegalPhotoSizeException(String.format("Недопустимый размер файла. Максимальный размер %s Кб.",
-                    ClientPhotoConfig.MAX_SIZE));
+        if (contentLength > maxContentLength) {
+            throw new IllegalPhotoSizeException(String.format("Недопустимый размер файла. Максимальный размер %s Кб.", ClientPhotoConfig.MAX_SIZE));
         }
     }
 
@@ -448,20 +439,19 @@ public class ImageUtils {
         DataBuffer dbB = biB.getData().getDataBuffer();
         int sizeB = dbB.getSize();
 
-        if(sizeA == sizeB) {
-            for(int i = 0; i < sizeA; i++) {
-                if(dbA.getElem(i) != dbB.getElem(i)) {
+        if (sizeA == sizeB) {
+            for (int i = 0; i < sizeA; i++) {
+                if (dbA.getElem(i) != dbB.getElem(i)) {
                     return false;
                 }
             }
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public static List<ClientPhoto> getNewClientPhotos(Session session, List<Org> orgs){
+    public static List<ClientPhoto> getNewClientPhotos(Session session, List<Org> orgs) {
         DetachedCriteria subCriteria = DetachedCriteria.forClass(Client.class);
         subCriteria.createAlias("org", "org");
         subCriteria.add(Restrictions.in("org", orgs));
@@ -481,10 +471,10 @@ public class ImageUtils {
         private static final double COMPRESSION;
         private static final double MAX_H_W_RATIO;
         private static final double MIN_H_W_RATIO;
+
         //private static final boolean CHECK_UNIQUE;
         static {
-            String[] config = RuntimeContext.getInstance().getConfigProperties()
-                    .getProperty(RuntimeContext.IMAGE_VALIDATION, "640,480,320,240,200,0.375,1.4,1.2,1").split(",");
+            String[] config = RuntimeContext.getInstance().getConfigProperties().getProperty(RuntimeContext.IMAGE_VALIDATION, "640,480,320,240,200,0.375,1.4,1.2,1").split(",");
             MAX_HEIGHT = Integer.parseInt(config[0]);
             MAX_WIDTH = Integer.parseInt(config[1]);
             MIN_HEIGHT = Integer.parseInt(config[2]);
@@ -496,6 +486,7 @@ public class ImageUtils {
             //CHECK_UNIQUE = (Integer.parseInt(config[8]) != 0);
         }
     }
+
     public static class PhotoContent {
         private String base64;
         private byte[] bytes;
@@ -534,9 +525,7 @@ public class ImageUtils {
 
     public enum PhotoStatus {
 
-        CONFIRMED(0, "Подтверждено"),
-        NEW(1, "Расхождение"),
-        WAS_CANCELED(2, "Расхождение было отклонено");
+        CONFIRMED(0, "Подтверждено"), NEW(1, "Расхождение"), WAS_CANCELED(2, "Расхождение было отклонено");
 
         private final int value;
         private final String description;
@@ -558,12 +547,12 @@ public class ImageUtils {
 
     public enum ImageSize {
 
-        SMALL(0, "small"),
-        MEDIUM(1, "medium");
+        SMALL(0, "small"), MEDIUM(1, "medium");
 
         private final int value;
         private final String description;
         private static final Map<Integer, String> map;
+
         static {
             map = new HashMap<Integer, String>();
             for (ImageSize imageSize : ImageSize.values()) {
@@ -590,7 +579,7 @@ public class ImageUtils {
 
         public static String getFormatsString() {
             StringBuilder sb = new StringBuilder();
-            for(ImageSize imageSize : ImageSize.values()) {
+            for (ImageSize imageSize : ImageSize.values()) {
                 sb.append(String.format("%d - %s, ", imageSize.getValue(), imageSize.getDescription()));
             }
             return sb.toString().substring(0, sb.length() - 2);
@@ -598,13 +587,13 @@ public class ImageUtils {
 
         public static ImageSize fromIntegerToEnum(int value) throws NoSuchImageSizeException {
             ImageSize result = null;
-            for(ImageSize i : ImageSize.values()){
-                if(i.getValue() == value){
+            for (ImageSize i : ImageSize.values()) {
+                if (i.getValue() == value) {
                     result = i;
                     break;
                 }
             }
-            if(result == null){
+            if (result == null) {
                 throw new NoSuchImageSizeException("Допустимые значения: " + getFormatsString() + ".");
             }
             return result;
@@ -612,7 +601,7 @@ public class ImageUtils {
 
         public static String fromInteger(int value) throws NoSuchImageSizeException {
             String result = map.get(value);
-            if(result == null){
+            if (result == null) {
                 throw new NoSuchImageSizeException("Допустимые значения: " + getFormatsString() + ".");
             }
             return result;
