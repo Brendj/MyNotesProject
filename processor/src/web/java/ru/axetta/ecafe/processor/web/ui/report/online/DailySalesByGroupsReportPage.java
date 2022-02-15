@@ -192,9 +192,10 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     public void buildReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Transaction persistenceTransaction = null;
+        Session persistenceSession = null;
         try {
             // Открываем не readonly сессию, так как далее будет создаваться временная таблица для оптимизации запросов
-            Session persistenceSession = (Session) RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             List<BasicReportJob.OrgShortItem> orgShortItemList;
 
             if (idOfOrgList == null || idOfOrgList.isEmpty()) {
@@ -224,6 +225,10 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             getLogger().error("Failed to build sales report", e);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
     }
 
