@@ -177,6 +177,7 @@ public class Org implements Serializable {
     private Boolean gooddatecheck;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
+    private Boolean usedFoodbox;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -256,6 +257,7 @@ public class Org implements Serializable {
         this.useWebArm = false;
         this.governmentContract = false;
         this.useLongCardNo = false;
+        this.usedFoodbox = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1410,5 +1412,13 @@ public class Org implements Serializable {
 
     public void setFoodApplicationSyncParam(Boolean foodApplicationSyncParam) {
         this.foodApplicationSyncParam = foodApplicationSyncParam;
+    }
+
+    public Boolean getUsedFoodbox() {
+        return usedFoodbox;
+    }
+
+    public void setUsedFoodbox(Boolean usedFoodbox) {
+        this.usedFoodbox = usedFoodbox;
     }
 }

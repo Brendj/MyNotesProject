@@ -146,6 +146,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean multiCardModeEnabled;
     private Boolean participantOP;
     private Boolean preorderlp;
+    private Boolean usedfoodbox;
 
     private Boolean useWebArm;
     private Boolean goodDateCheck;
@@ -451,6 +452,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
+        org.setUsedFoodbox(usedfoodbox);
 
         manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
                 lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
@@ -618,6 +620,7 @@ public class OrgEditPage extends BasicWorkspacePage
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.useMealSchedule = mealSchedule != null && mealSchedule;
+        this.usedfoodbox = org.getUsedFoodbox();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1298,6 +1301,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setGoodDateCheck(Boolean goodDateCheck) {
         this.goodDateCheck = goodDateCheck;
+    }
+
+    public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
     }
 
     public static class ContragentItem {
