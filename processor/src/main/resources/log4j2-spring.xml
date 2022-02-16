@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
+    <Properties>
+        <property name="logging.filesize">${bundle:application-${sys:spring.profiles.active}:logging.filesize}</property>
+    </Properties>
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT" follow="true">
             <PatternLayout
@@ -15,7 +18,7 @@
             </PatternLayout>
             <Policies>
                 <SizeBasedTriggeringPolicy
-                        size="${sys:LOG_FILE_SIZE:-${env:LOG_FILE_SIZE:-${bundle:application:logging.filesize:-30MB}}}" />
+                        size="${logging.filesize}" />
             </Policies>
         </RollingFile>
         <Async name="ALL" includeLocation = "true">
