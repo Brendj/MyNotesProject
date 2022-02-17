@@ -183,6 +183,7 @@ public class GuardianDoublesService {
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
+                //Set<ClientGuardianNotificationSetting> notificationSettings
                 deleteGuardian(session, aliveGuardian, item, version);
 
             }
@@ -225,9 +226,9 @@ public class GuardianDoublesService {
                     deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin()));
             return;
         }*/
-        List<ClientGuardian> clientGuardians = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
+        ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
 
-        for (ClientGuardian clientGuardian : clientGuardians) {
+        if (clientGuardian != null) {
             if (!clientGuardian.getDeletedState()) {
                 ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, clientGuardian);
                 if (cg == null) {
@@ -236,14 +237,18 @@ public class GuardianDoublesService {
                     clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                     clientGuardianHistory2.setReason(HISTORY_LABEL);
                     ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
-                            version, clientGuardian.isDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
+                            version, false, clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
                             clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
                     logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
-                } else if (cg.getDeletedState()) {
-                    cg.setDeletedState(false);
-                    cg.setNotificationSettings(clientGuardian.getNotificationSettings());
-                    logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
-                    session.update(cg);
+                } else {
+                    addNotificationSettingsAndOptions(session, cg, clientGuardian);
+                    if (cg.getDeletedState()) {
+                        cg.setDeletedState(false);
+                        cg.setDisabled(false);
+                        cg.setNotificationSettings(clientGuardian.getNotificationSettings());
+                        logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
+                        session.update(cg);
+                    }
                 }
             }
         }
@@ -265,10 +270,33 @@ public class GuardianDoublesService {
         session.flush();
     }
 
-    private List<ClientGuardian> getClientGuardianByCGItem(Session session, CGItem item) {
+    private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG, ClientGuardian deletedCG) {
+        boolean changed = false;
+        for (ClientGuardianNotificationSetting settingDeleted : deletedCG.getNotificationSettings()) {
+            boolean found = false;
+            for (ClientGuardianNotificationSetting settingAlive : aliveCG.getNotificationSettings()) {
+                if (settingDeleted.equals(settingAlive)) break;
+            }
+            if (!found) {
+                changed = true;
+                aliveCG.getNotificationSettings().add(settingDeleted);
+                logger.info(String.format("Added notification flag = %s to guardian id = %s",
+                        settingDeleted.getNotifyType(), aliveCG.getIdOfGuardian()));
+            }
+        }
+        if (aliveCG.isDisabled()) {
+            aliveCG.setDisabled(false);
+            changed = true;
+        }
+        if (changed) session.update(aliveCG);
+    }
+
+    private ClientGuardian getClientGuardianByCGItem(Session session, CGItem item) {
         Query query = session.createQuery("select cg from ClientGuardian cg where cg.idOfClientGuardian = :id");
         query.setParameter("id", item.getIdOfClientGuardian());
-        return query.getResultList();
+        List<ClientGuardian> list = query.getResultList();
+        if (list.size() == 0) return null;
+        else return list.get(0);
     }
 
     private ClientGuardian getGuardianChildlink(Session session, CGItem aliveGuardian, ClientGuardian deletedGuardian) {
