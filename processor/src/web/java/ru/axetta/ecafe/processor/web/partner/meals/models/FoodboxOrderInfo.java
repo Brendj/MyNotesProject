@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Передача данных о заказе (в контексте списка).
  */
-public class FoodboxOrderInfo {
+public class FoodboxOrderInfo implements Comparable{
     private Long id = null;
     private String status = null;
     private Date expiresAt = null;
@@ -211,4 +211,8 @@ public class FoodboxOrderInfo {
         return o.toString().replace("\n", "\n    ");
     }
 
+    @Override
+    public int compareTo(Object o) {
+        return getTimeOrder().compareTo(((FoodboxOrderInfo)o).getTimeOrder());
+    }
 }

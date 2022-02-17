@@ -3328,6 +3328,22 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<FoodBoxPreorder> getFoodBoxPreorderByForClient(Client client, Date from, Date to) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.createDate between :from and :to");
+            query.setParameter("client", client);
+            query.setParameter("from", from);
+            query.setParameter("to", to);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Set<FoodBoxPreorderDish> getFoodBoxPreordersDishes(FoodBoxPreorder foodBoxPreorder) {
         try {
             Query query = entityManager.createQuery("SELECT fbd from FoodBoxPreorderDish fbd "

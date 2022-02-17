@@ -19,6 +19,9 @@
         <property name="idOfDish" column="idofdish" type="long"/>
         <property name="price" column="price" type="int"/>
         <property name="qty" column="qty" type="int"/>
+        <property name="name" column="name" type="string"/>
+        <property name="buffetCategoriesId" column="buffetCategoriesId" type="long"/>
+        <property name="buffetCategoriesName" column="buffetCategoriesName" type="string"/>
         <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="updateDate" column="updatedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>

@@ -4,14 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.persistence.foodbox;
 
-import generated.etp.CitizenshipType;
-
 public enum FoodBoxStateTypeEnum {
-    NEW(0, "Новый"),
-    ASSEMBLED(1, "Собран"),
-    LOADED(2, "Загружен в ячейку"),
-    EXECUTED(3, "Исполнен"),
-    CANCELED(4, "Аннулирован");
+    NEW(0, "new"), //новый заказ
+    ASSEMBLED(1, "collected"), //заказ собран
+    LOADED(2, "loaded"), //заказ загружен
+    EXECUTED(3, "received"), //заказ получен
+    CANCELED(4, "canceled"); //заказ аннулирован
 
     private final int value;
     private final String description;

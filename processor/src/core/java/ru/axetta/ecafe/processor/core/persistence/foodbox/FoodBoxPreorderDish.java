@@ -12,6 +12,9 @@ public class FoodBoxPreorderDish {
     private Long idOfDish;
     private Integer price;
     private Integer qty;
+    private String name;
+    private Long buffetCategoriesId;
+    private String buffetCategoriesName;
     private Date createDate;
     private Date updateDate;
 
@@ -74,5 +77,29 @@ public class FoodBoxPreorderDish {
 
     public void setFoodBoxPreorder(FoodBoxPreorder foodBoxPreorder) {
         this.foodBoxPreorder = foodBoxPreorder;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getBuffetCategoriesId() {
+        return buffetCategoriesId;
+    }
+
+    public void setBuffetCategoriesId(Long buffetCategoriesId) {
+        this.buffetCategoriesId = buffetCategoriesId;
+    }
+
+    public String getBuffetCategoriesName() {
+        return buffetCategoriesName;
+    }
+
+    public void setBuffetCategoriesName(String buffetCategoriesName) {
+        this.buffetCategoriesName = buffetCategoriesName;
     }
 }

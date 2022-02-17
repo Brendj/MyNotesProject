@@ -1415,6 +1415,8 @@ public class Org implements Serializable {
     }
 
     public Boolean getUsedFoodbox() {
+        if (usedFoodbox == null)
+            return false;
         return usedFoodbox;
     }
 
