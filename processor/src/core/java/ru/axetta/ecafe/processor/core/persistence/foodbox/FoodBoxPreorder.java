@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import java.util.Date;
 
-public class FoodBoxPreorder {
+public class FoodBoxPreorder  {
     private Long idFoodBoxPreorder;
     private Long idFoodBoxExternal;
     private FoodBoxStateTypeEnum state;
@@ -24,6 +24,7 @@ public class FoodBoxPreorder {
     private Date createDate;
     private Date updateDate;
     private Org org;
+    private Long orderPrice;
 
     public FoodBoxPreorder()
     {
@@ -140,5 +141,13 @@ public class FoodBoxPreorder {
 
     public void setIdFoodBoxExternal(Long idFoodBoxExternal) {
         this.idFoodBoxExternal = idFoodBoxExternal;
+    }
+
+    public Long getOrderPrice() {
+        return orderPrice;
+    }
+
+    public void setOrderPrice(Long orderPrice) {
+        this.orderPrice = orderPrice;
     }
 }

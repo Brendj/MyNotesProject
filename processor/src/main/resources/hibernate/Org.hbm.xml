@@ -293,7 +293,8 @@
         <property name="gooddatecheck" column="gooddatecheck" type="boolean"/>
         <property name="governmentContract" column="governmentContract" type="boolean"/>
         <property name="useLongCardNo" column="useLongCardNo" type="boolean"/>
-        <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
+	    <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
+        <property name="usedFoodbox" column="usedFoodbox" type="boolean"/>
     </class>
 </hibernate-mapping>
 

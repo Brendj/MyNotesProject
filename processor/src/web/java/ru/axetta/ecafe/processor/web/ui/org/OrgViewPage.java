@@ -108,6 +108,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean participantOP;
     private Boolean preorderlp;
     private Boolean useLongCardNo;
+    private Boolean usedfoodbox;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -314,6 +315,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.goodDateCheck = org.getGooddatecheck();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
         this.useLongCardNo = org.getUseLongCardNo();
+        this.usedfoodbox = org.getUsedFoodbox();
 
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
@@ -900,5 +902,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUseMealSchedule(Boolean useMealSchedule) {
         this.useMealSchedule = useMealSchedule;
+    }
+
+    public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
     }
 }
