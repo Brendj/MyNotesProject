@@ -148,6 +148,7 @@ public class Client {
     private SmartWatchVendor vendor;
     private String iacRegId;
     private Boolean multiCardMode;
+    private Boolean foodboxAvailability;
 
     private String parallel;
 
@@ -1291,5 +1292,15 @@ public class Client {
 
     public void setClearedSsoid(Boolean clearedSsoid) {
         this.clearedSsoid = clearedSsoid;
+    }
+
+    public Boolean getFoodboxAvailability() {
+        if (foodboxAvailability == null)
+            foodboxAvailability = true;
+        return foodboxAvailability;
+    }
+
+    public void setFoodboxAvailability(Boolean foodboxAvailability) {
+        this.foodboxAvailability = foodboxAvailability;
     }
 }

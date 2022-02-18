@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -1314,6 +1315,29 @@ public class DAOReadonlyService {
         return entityManager.createQuery("select menu.orgs from WtMenu menu where menu = :menu")
                 .setParameter("menu", wtMenu)
                 .getResultList();
+    }
+
+    public List<WtDish> getWtDishesByOrgandDate(Org org, Date date) {
+        Query query = entityManager.createNativeQuery("SELECT distinct d.idofdish, m.begindate, m.enddate FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and mgr.deletestate = 0 and d.idofdish is not null ");
+        query.setParameter("idOfOrg", org.getIdOfOrg());
+        List list = query.getResultList();
+        List<WtDish> dishes = new ArrayList<>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            Long startDate = ((Timestamp) row[1]).getTime();
+            Long endDate = ((Timestamp) row[2]).getTime();
+            if (date.getTime() >= startDate && date.getTime() <= endDate)
+                dishes.add(entityManager.find(WtDish.class, ((BigInteger)row[0]).longValue()));
+        }
+        return dishes;
     }
 
     public List<WtMenu> getMenuByWtMenuGroup(WtMenuGroup wtMenuGroup) {
