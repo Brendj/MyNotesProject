@@ -20,8 +20,8 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.library.ResponseCodes;
-import ru.axetta.ecafe.processor.web.partner.library.Result;
+import ru.axetta.ecafe.processor.web.partner.meals.ResponseCodes;
+import ru.axetta.ecafe.processor.web.partner.meals.Result;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -269,6 +269,13 @@ public class MealsController extends Application {
         try {
             if (typeWork == 1) {
                 FoodBoxPreorder foodBoxPreorder = daoReadonlyService.getFoodBoxPreorderByExternalId(foodboxOrderNumber);
+                if (foodBoxPreorder == null)
+                {
+                    logger.error(String.format("Не найден заказ с externalid %s", foodboxOrderNumber));
+                    result.setErrorCode(ResponseCodes.RC_NOT_FOUND_FOODBOX.getCode().toString());
+                    result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_FOODBOX.toString());
+                    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+                }
                 FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
                 historyFoodboxOrderInfo.getOrdersInfo().add(foodboxOrderInfo);
                 historyFoodboxOrderInfo.setOrdersAmount(foodboxOrderInfo.getOrderPrice());
@@ -416,7 +423,7 @@ public class MealsController extends Application {
                 dish.setPrice(wtDish.getPrice().longValue());
                 dish.setIngredients(wtDish.getComponentsOfDish());
                 dish.setCalories(wtDish.getCalories());
-                dish.setWeight("0");
+                dish.setWeight(wtDish.getQty());
                 dish.setProtein(wtDish.getProtein());
                 dish.setFat(wtDish.getFat());
                 dish.setCarbohydrates(wtDish.getCarbohydrates());
@@ -633,7 +640,9 @@ public class MealsController extends Application {
         FoodboxOrderInfo foodboxOrderInfo = new FoodboxOrderInfo();
         foodboxOrderInfo.setExpiresAt(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000));
         foodboxOrderInfo.setFoodboxOrderNumber(foodBoxPreorder.getIdOfFoodBox());
-        foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
+        if(foodBoxPreorder.getState() != null) {
+            foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
+        }
         foodboxOrderInfo.setTimeOrder(foodBoxPreorder.getCreateDate());
         foodboxOrderInfo.setId(foodBoxPreorder.getIdFoodBoxExternal());
         Long sum = 0L;
