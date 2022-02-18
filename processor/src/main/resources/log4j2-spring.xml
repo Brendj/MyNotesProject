@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Properties>
-        <property name="logging.filesize">${bundle:application-${sys:spring.profiles.active}:logging.filesize}</property>
+        <property name="logging.filesize">${bundle:application:logging.filesize}</property>
     </Properties>
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT" follow="true">
