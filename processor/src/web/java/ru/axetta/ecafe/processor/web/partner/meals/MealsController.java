@@ -47,6 +47,7 @@ public class MealsController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
+    @Transactional
     public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, FoodboxOrder foodboxOrder) {
         Result result = new Result();
         String contractIdStr = "";
@@ -165,6 +166,7 @@ public class MealsController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
+    @Transactional
     public Response getInfoFoodBoxPreorder(@Context HttpServletRequest request) {
         Result result = new Result();
         String foodboxOrderNumberStr = "";
@@ -502,6 +504,7 @@ public class MealsController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "foodbox/info")
+    @Transactional
     public Response setFoodboxAvailability(@Context HttpServletRequest request) {
         Result result = new Result();
         String contractIdStr = "";
