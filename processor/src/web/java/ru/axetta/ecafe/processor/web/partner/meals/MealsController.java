@@ -21,8 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.meals.ResponseCodes;
-import ru.axetta.ecafe.processor.web.partner.meals.Result;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -397,6 +395,22 @@ public class MealsController extends Application {
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+        Boolean errorOrg = false;
+        try {
+            if (!client.getOrg().getUsedFoodbox())
+            {
+                errorOrg = true;
+            }
+        } catch (Exception e) {
+            errorOrg = true;
+        }
+        if (errorOrg)
+        {
+            logger.error("У организации не включен функционал фудбокса");
+            result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), onDate);
         //Тут будет фильтр по остаткам
@@ -534,22 +548,22 @@ public class MealsController extends Application {
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
-//        Boolean errorOrg = false;
-//        try {
-//            if (!client.getOrg().getUsedFoodbox())
-//            {
-//                errorOrg = true;
-//            }
-//        } catch (Exception e) {
-//            errorOrg = true;
-//        }
-//        if (errorOrg)
-//        {
-//            logger.error("У организации не включен функционал фудбокса");
-//            result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
-//            result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-//            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-//        }
+        Boolean errorOrg = false;
+        try {
+            if (!client.getOrg().getUsedFoodbox())
+            {
+                errorOrg = true;
+            }
+        } catch (Exception e) {
+            errorOrg = true;
+        }
+        if (errorOrg)
+        {
+            logger.error("У организации не включен функционал фудбокса");
+            result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         Boolean foodBoxAvailable = true;
         try {
             foodBoxAvailable = Boolean.parseBoolean(foodBoxAvailableStr);
@@ -635,6 +649,22 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+        Boolean errorOrg = false;
+        try {
+            if (!client.getOrg().getUsedFoodbox())
+            {
+                errorOrg = true;
+            }
+        } catch (Exception e) {
+            errorOrg = true;
+        }
+        if (errorOrg)
+        {
+            logger.error("У организации не включен функционал фудбокса");
+            result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
         GetFoodboxInfo getFoodboxInfo = new GetFoodboxInfo();
