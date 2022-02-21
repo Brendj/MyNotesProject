@@ -223,11 +223,6 @@ public class GuardianDoublesService {
     }
 
     private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version) throws Exception {
-        /*if (deletedGuardian.getBalance() > 0) {
-            logger.info(String.format("Cannot delete guardian idOfClient = %s, idOfGuardian = %s since balance > 0",
-                    deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin()));
-            return;
-        }*/
         ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
 
         if (clientGuardian != null) {
@@ -247,7 +242,6 @@ public class GuardianDoublesService {
                     if (cg.getDeletedState()) {
                         cg.setDeletedState(false);
                         cg.setDisabled(false);
-                        cg.setNotificationSettings(clientGuardian.getNotificationSettings());
                         logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
                         session.update(cg);
                     }
@@ -274,10 +268,9 @@ public class GuardianDoublesService {
 
     private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG, ClientGuardian deletedCG) {
         boolean changed = false;
-        Set<ClientGuardianNotificationSetting> settings = aliveCG.getNotificationSettings();
         for (ClientGuardianNotificationSetting settingDeleted : deletedCG.getNotificationSettings()) {
             boolean found = false;
-            for (ClientGuardianNotificationSetting settingAlive : settings) {
+            for (ClientGuardianNotificationSetting settingAlive : aliveCG.getNotificationSettings()) {
                 if (settingDeleted.getNotifyType().equals(settingAlive.getNotifyType())) {
                     found = true;
                     break;
@@ -285,7 +278,7 @@ public class GuardianDoublesService {
             }
             if (!found) {
                 changed = true;
-                settings.add(new ClientGuardianNotificationSetting(aliveCG, settingDeleted.getNotifyType()));
+                aliveCG.getNotificationSettings().add(new ClientGuardianNotificationSetting(aliveCG, settingDeleted.getNotifyType()));
                 logger.info(String.format("Added notification flag = %s to guardian id = %s",
                         settingDeleted.getNotifyType(), aliveCG.getIdOfGuardian()));
             }
@@ -317,7 +310,7 @@ public class GuardianDoublesService {
             session.saveOrUpdate(preorderFlagAliveCG);
         }
         if (changed) {
-            aliveCG.setNotificationSettings(settings);
+            //aliveCG.setNotificationSettings(settings);
             session.save(aliveCG);
         }
         session.flush();
