@@ -232,19 +232,19 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
 
-            try {
-                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
-                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
-                    logger.error(message);
-                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            } catch (Exception e) {
-                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
-                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+//            try {
+//                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
+//                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
+//                    logger.error(message);
+//                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+//                    return;
+//                }
+//            } catch (Exception e) {
+//                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
+//                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
+//                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+//                return;
+//            }
 
 
             //  Daily logging for sync request
