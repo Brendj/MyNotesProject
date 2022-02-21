@@ -15,7 +15,8 @@ public enum ResponseCodes {
     RC_WRONG_DATE(210L, "Неверная дата и время операции"),
     RC_NOT_FOUND_CLIENT(150L, "Клиент не найден"),
     RC_NOT_FOUND_ORG(160L, "У организации не включен функционал"),
-    RC_NOT_FOUND_FOODBOX(170L, "Заявка не найдена");
+    RC_NOT_FOUND_FOODBOX(170L, "Заявка не найдена"),
+    RC_FOUND_FOODBOX(180L, "Заявка с данных идентификатором уже зарегистрирована");
 
     private final Long code;
     private final String description;

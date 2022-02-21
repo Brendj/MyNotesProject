@@ -117,6 +117,14 @@ public class MealsController extends Application {
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+        FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(foodboxOrder.getId());
+        if (foodBoxPreorderDB != null)
+        {
+            logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", foodboxOrder.getId()));
+            result.setErrorCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_FOUND_FOODBOX.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
