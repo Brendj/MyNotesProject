@@ -19,10 +19,14 @@ import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodB
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodBoxPreorderChangedItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxAvailableItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChangedItem;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,30 +49,31 @@ public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
     @Override
     public ResMenuSupplier process() throws Exception {
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
-        //Apply change from ARM
+        //Получение количества доступной продукции
         FoodBoxDishRemain foodBoxDishRemain = menuSupplier.getFoodBoxDishRemain();
         Org org = daoReadonlyService.findOrg(menuSupplier.getIdOfOrg());
         if (foodBoxDishRemain != null) {
-            Long maxVersionFromARM = foodBoxDishRemain.getMaxVersion();
-            Long currentMaxVersion = daoReadonlyService.getMaxVersionOfFoodBoxPreorderAvailable(org);
-            if (currentMaxVersion == null || maxVersionFromARM > currentMaxVersion) {
+//            Long maxVersionFromARM = foodBoxDishRemain.getMaxVersion();
+//            Long currentMaxVersion = daoReadonlyService.getMaxVersionOfFoodBoxPreorderAvailable(org);
+//            if (currentMaxVersion == null || maxVersionFromARM > currentMaxVersion) {
                 DAOService.getInstance().deleteOldFoodBoxAvailable(org);
                 for (FoodBoxAvailableItem foodBoxAvailableItem : foodBoxDishRemain.getItems()) {
                     FoodBoxPreorderAvailable foodBoxPreorderAvailable = new FoodBoxPreorderAvailable();
                     foodBoxPreorderAvailable.setCreateDate(new Date());
                     foodBoxPreorderAvailable.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
                     foodBoxPreorderAvailable.setIdOfDish(foodBoxAvailableItem.getIdOfDish());
-                    foodBoxPreorderAvailable.setVersion(maxVersionFromARM);
+                    foodBoxPreorderAvailable.setVersion(0L);
                     foodBoxPreorderAvailable.setOrg(org);
                     session.persist(foodBoxPreorderAvailable);
-                }
+                //}
             }
         }
+        //Получение измений по заказам
         FoodBoxPreorderChanged foodBoxPreorderChanged = menuSupplier.getFoodBoxPreorderChanged();
         if (foodBoxPreorderChanged != null) {
             ResFoodBoxChanged resFoodBoxChanged = new ResFoodBoxChanged();
             for (FoodBoxPreorderChangedItem foodBoxPreorderChangedItem : foodBoxPreorderChanged.getItems()) {
-                Long version = daoReadonlyService.getMaxVersionOfFoodBoxPreorderAvailable(org);
+                Long version = daoReadonlyService.getMaxVersionOfFoodBoxPreorder();
                 FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorder(foodBoxPreorderChangedItem.getId());
                 foodBoxPreorder.setError(foodBoxPreorderChangedItem.getError());
                 foodBoxPreorder.setIdOfFoodBox(foodBoxPreorderChangedItem.getIdOfFoodBox());
@@ -76,15 +81,16 @@ public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
                 foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
                 foodBoxPreorder.setIdOfOrder(foodBoxPreorderChangedItem.getIdOfOrder());
                 foodBoxPreorder.setCancelReason(foodBoxPreorderChangedItem.getCancelReason());
-                foodBoxPreorder.setVersion(version);
+                foodBoxPreorder.setVersion(version+1);
                 session.merge(foodBoxPreorder);
                 ResFoodBoxChangedItem resFoodBoxChangedItem = new ResFoodBoxChangedItem();
                 resFoodBoxChangedItem.setError("");
                 resFoodBoxChangedItem.setId(foodBoxPreorder.getIdFoodBoxPreorder());
                 resFoodBoxChangedItem.setRes(0);
-                resFoodBoxChangedItem.setVersion(version);
+                resFoodBoxChangedItem.setVersion(version+1);
                 resFoodBoxChanged.getItems().add(resFoodBoxChangedItem);
             }
+            //Подтверждение получения новых заказов
             menuSupplier.setResFoodBoxChanged(resFoodBoxChanged);
         }
         return new ResMenuSupplier(menuSupplier);

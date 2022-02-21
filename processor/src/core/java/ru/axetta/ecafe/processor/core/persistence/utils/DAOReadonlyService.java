@@ -1326,7 +1326,9 @@ public class DAOReadonlyService {
                 + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
                 + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
                 + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
-                + "and mgr.deletestate = 0 and d.idofdish is not null ");
+                + "and mgr.deletestate = 0 and d.idofdish is not null " +
+                "  and d.idofdish in (select cfa.idofdish from cf_foodbox_available cfa where " +
+                " cfa.availableqty > 0 and cfa.idoforg = :idOfOrg)");
         query.setParameter("idOfOrg", org.getIdOfOrg());
         List list = query.getResultList();
         List<WtDish> dishes = new ArrayList<>();

@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
@@ -142,6 +143,7 @@ public class MealsController extends Application {
                 foodBoxPreorderDish.setBuffetCategoriesName(orderDish.getBuffetCategoriesName());
                 foodBoxPreorderDish.setCreateDate(new Date());
                 persistenceSession.persist(foodBoxPreorderDish);
+                DAOService.getInstance().updateFoodBoxAvailable(orderDish.getDishId(), client.getOrg());
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -503,6 +505,13 @@ public class MealsController extends Application {
         }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
+            result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
+
+        if (foodBoxAvailableStr.isEmpty()) {
+            logger.error("Отсутствует foodBoxAvailable");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();

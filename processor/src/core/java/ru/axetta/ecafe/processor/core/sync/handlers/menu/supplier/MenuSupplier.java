@@ -32,7 +32,7 @@ public class MenuSupplier implements SectionRequest {
     protected static final String[] CLIENT_SECTION_NAMES = new String[]{
             "OrgGroupsRequest", "CategoryItemsRequest", "TypeProductionsRequest", "AgeGroupItemsRequest",
             "DietTypesRequest", "ComplexGroupItemsRequest", "GroupItemsRequest", "DishesRequest", "MenuGroupsRequest",
-            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest", "FoodBoxDishRemain", "FoodBoxPreorder", "FoodBoxPreorderRequest"};
+            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest", "FoodBoxDishRemain", "FoodBoxPreorder"};
 
     public static final String SECTION_NAME = "MenuSupplier";
 
@@ -214,13 +214,14 @@ public class MenuSupplier implements SectionRequest {
                 }
                 case "FoodBoxPreorder": {
                     this.foodBoxPreorderChanged = foodBoxPreorderChanged;
-                    break;
-                }
-                case "FoodBoxPreorderRequest": {
-                    //Отправляем новые заказы по фудбоксу
                     this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(),org);
                     break;
                 }
+//                case "FoodBoxPreorderRequest": {
+//                    //Отправляем новые заказы по фудбоксу
+//                    this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(),org);
+//                    break;
+//                }
             }
         }
     }

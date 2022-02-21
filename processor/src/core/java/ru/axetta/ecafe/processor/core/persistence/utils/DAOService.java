@@ -1289,5 +1289,14 @@ public class DAOService {
         query.setParameter("org", org);
         query.executeUpdate();
     }
+
+    public void updateFoodBoxAvailable(Long idOfDish, Org org) {
+        Query query = entityManager.createQuery(
+                "update FoodBoxPreorderAvailable set availableQty=availableQty-1, version=:version where org=:org and idOfDish=:idOfDish");
+        query.setParameter("org", org);
+        query.setParameter("idOfDish", idOfDish);
+        query.setParameter("version", DAOReadonlyService.getInstance().getMaxVersionOfFoodBoxPreorderAvailable(org) + 1);
+        query.executeUpdate();
+    }
 }
 
