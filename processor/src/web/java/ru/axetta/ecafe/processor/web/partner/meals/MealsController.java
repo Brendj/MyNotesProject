@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
@@ -136,7 +137,7 @@ public class MealsController extends Application {
             foodBoxPreorder.setClient(client);
             foodBoxPreorder.setState(FoodBoxStateTypeEnum.NEW);
             foodBoxPreorder.setOrg(client.getOrg());
-            foodBoxPreorder.setInitialDateTime(foodboxOrder.getCreatedAt());
+            foodBoxPreorder.setInitialDateTime(CalendarUtils.convertdateInUTC(foodboxOrder.getCreatedAt()));
             foodBoxPreorder.setCreateDate(new Date());
             foodBoxPreorder.setIdFoodBoxExternal(foodboxOrder.getId());
             foodBoxPreorder.setOrderPrice(foodboxOrder.getOrderPrice());
