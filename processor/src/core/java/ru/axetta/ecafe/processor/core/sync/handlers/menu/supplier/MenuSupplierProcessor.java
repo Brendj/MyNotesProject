@@ -51,8 +51,8 @@ public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         //Получение количества доступной продукции
         FoodBoxDishRemain foodBoxDishRemain = menuSupplier.getFoodBoxDishRemain();
-        Org org = daoReadonlyService.findOrg(menuSupplier.getIdOfOrg());
         if (foodBoxDishRemain != null) {
+              Org org = daoReadonlyService.findOrg(menuSupplier.getIdOfOrg());
 //            Long maxVersionFromARM = foodBoxDishRemain.getMaxVersion();
 //            Long currentMaxVersion = daoReadonlyService.getMaxVersionOfFoodBoxPreorderAvailable(org);
 //            if (currentMaxVersion == null || maxVersionFromARM > currentMaxVersion) {

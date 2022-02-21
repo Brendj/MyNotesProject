@@ -209,12 +209,16 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "FoodBoxDishRemain": {
-                    this.foodBoxDishRemain = foodBoxDishRemain;
+                    if (org.getUsedFoodbox()) {
+                        this.foodBoxDishRemain = foodBoxDishRemain;
+                    }
                     break;
                 }
                 case "FoodBoxPreorder": {
-                    this.foodBoxPreorderChanged = foodBoxPreorderChanged;
-                    this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(),org);
+                    if (org.getUsedFoodbox()) {
+                        this.foodBoxPreorderChanged = foodBoxPreorderChanged;
+                        this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(), org);
+                    }
                     break;
                 }
 //                case "FoodBoxPreorderRequest": {
