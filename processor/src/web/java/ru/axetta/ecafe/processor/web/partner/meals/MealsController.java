@@ -53,8 +53,10 @@ public class MealsController extends Application {
         String securityKey = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
-            if (currParam.getKey().equals("contractId"))
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
+                break;
+            }
         }
         Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
@@ -177,22 +179,30 @@ public class MealsController extends Application {
         Boolean sortDesc = true;
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
-            if (currParam.getKey().equals("from")) {
+            if (currParam.getKey().toLowerCase().equals("from")) {
                 fromStr = currParam.getValue();
                 fromStr = fromStr.replace("%3A", ":");
                 fromStr = fromStr.replace("%20", " ");
+                continue;
             }
-            if (currParam.getKey().equals("to")) {
+            if (currParam.getKey().toLowerCase().equals("to")) {
                 toStr = currParam.getValue();
                 toStr = toStr.replace("%3A", ":");
                 toStr = toStr.replace("%20", " ");
+                continue;
             }
-            if (currParam.getKey().equals("sort"))
+            if (currParam.getKey().toLowerCase().equals("sort")) {
                 sortStr = currParam.getValue();
-            if (currParam.getKey().equals("foodboxOrderNumber"))
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("foodboxordernumber")) {
                 foodboxOrderNumberStr = currParam.getValue();
-            if (currParam.getKey().equals("contractId"))
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
+                continue;
+            }
         }
         Enumeration<String> headerNames = request.getHeaderNames();
         String securityKey = "";
@@ -334,12 +344,17 @@ public class MealsController extends Application {
         Date onDate = null;
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
-            if (currParam.getKey().equals("contractId"))
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
-            if (currParam.getKey().equals("onDate")) {
-                onDateStr = currParam.getValue();
-                onDateStr = onDateStr.replace("%3A", ":");
-                onDateStr = onDateStr.replace("%20", " ");
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("ondate")) {
+                {
+                    onDateStr = currParam.getValue();
+                    onDateStr = onDateStr.replace("%3A", ":");
+                    onDateStr = onDateStr.replace("%20", " ");
+                    continue;
+                }
             }
         }
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -499,14 +514,17 @@ public class MealsController extends Application {
                 if (header.toLowerCase().equals("x-api-key"))
                 {
                     securityKey = request.getHeader(header);
+                    continue;
                 }
                 if (header.toLowerCase().equals("contractid"))
                 {
                     contractIdStr = request.getHeader(header);
+                    continue;
                 }
                 if (header.toLowerCase().equals("foodboxavailability"))
                 {
                     foodBoxAvailableStr = request.getHeader(header);
+                    continue;
                 }
             }
         }
@@ -613,10 +631,12 @@ public class MealsController extends Application {
                 if (header.toLowerCase().equals("x-api-key"))
                 {
                     securityKey = request.getHeader(header);
+                    continue;
                 }
                 if (header.toLowerCase().equals("contractid"))
                 {
                     contractIdStr = request.getHeader(header);
+                    continue;
                 }
             }
         }
