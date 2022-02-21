@@ -1332,12 +1332,21 @@ public class DAOReadonlyService {
         query.setParameter("idOfOrg", org.getIdOfOrg());
         List list = query.getResultList();
         List<WtDish> dishes = new ArrayList<>();
-        for (Object o : list) {
-            Object[] row = (Object[]) o;
-            Long startDate = ((Timestamp) row[1]).getTime();
-            Long endDate = ((Timestamp) row[2]).getTime();
-            if (date.getTime() >= startDate && date.getTime() <= endDate)
-                dishes.add(entityManager.find(WtDish.class, ((BigInteger)row[0]).longValue()));
+        if (date != null) {
+            for (Object o : list) {
+                Object[] row = (Object[]) o;
+                Long startDate = ((Timestamp) row[1]).getTime();
+                Long endDate = ((Timestamp) row[2]).getTime();
+                if (date.getTime() >= startDate && date.getTime() <= endDate)
+                    dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+            }
+        }
+        else
+        {
+            for (Object o : list) {
+                Object[] row = (Object[]) o;
+                dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+            }
         }
         return dishes;
     }
