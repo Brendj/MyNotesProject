@@ -6,16 +6,12 @@ package ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class FoodBoxPreorderNewItem {
     private Long id;
@@ -43,20 +39,12 @@ public class FoodBoxPreorderNewItem {
         XMLUtils.setAttributeIfNotNull(element, "State", state.getValue());
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
         if (this.initialDateTime != null)
-            XMLUtils.setAttributeIfNotNull(element, "InitialDateTime", getTimeFormat().format(this.initialDateTime));
+            XMLUtils.setAttributeIfNotNull(element, "InitialDateTime", initialDateTime);
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         for (FoodBoxPreorderNewItemItem item : this.getItems()) {
             element.appendChild(item.toElement(document,"FBPD"));
         }
         return element;
-    }
-
-    private DateFormat getTimeFormat()
-    {
-        TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
-        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        timeFormat.setTimeZone(localTimeZone);
-        return timeFormat;
     }
 
     public List<FoodBoxPreorderNewItemItem> getItems() {
