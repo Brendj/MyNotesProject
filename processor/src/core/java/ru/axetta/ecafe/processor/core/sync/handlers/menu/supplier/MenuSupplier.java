@@ -92,6 +92,12 @@ public class MenuSupplier implements SectionRequest {
                 if (itemNode.getNodeName().equals(FoodBoxDishRemain.SECTION_NAME)) {
                     //Обработка остатков foodbox
                     try {
+                        try {
+                            versions.put(itemNode.getNodeName(), 0L);
+                        } catch (NumberFormatException e) {
+                            err.append("NumberFormatException Version for node ").append(itemNode.getNodeName())
+                                    .append(" not found\n");
+                        }
                         foodBoxDishRemain = new FoodBoxDishRemain(itemNode);
                     } catch (Exception e) {
                         err.append(" Error in section foodBoxDishRemain ");
