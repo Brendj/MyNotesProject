@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class FoodBoxPreorderNewItem {
         XMLUtils.setAttributeIfNotNull(element, "State", state.getValue());
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
         if (this.initialDateTime != null)
-            XMLUtils.setAttributeIfNotNull(element, "InitialDateTime", initialDateTime);
+            XMLUtils.setAttributeIfNotNull(element, "InitialDateTime", CalendarUtils.dateTimeToString(initialDateTime));
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         for (FoodBoxPreorderNewItemItem item : this.getItems()) {
             element.appendChild(item.toElement(document,"FBPD"));
