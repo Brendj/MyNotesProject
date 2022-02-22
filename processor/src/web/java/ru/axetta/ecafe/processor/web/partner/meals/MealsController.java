@@ -31,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -78,6 +79,21 @@ public class MealsController extends Application {
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+        Date curDate = CalendarUtils.convertdateInUTC(foodboxOrder.getCreatedAt());
+        Long createTime = curDate.getTime() - CalendarUtils.startOfDay(curDate).getTime();
+        DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
+        try {
+            if (!(createTime > (format.parse(getBuffetOpenTime()).getTime()) &&
+                    createTime < (format.parse(getBuffetCloseTime()).getTime()))) {
+                logger.error("Заказ пришел на время закрытия буфета");
+                result.setErrorCode(ResponseCodes.RC_BUFFET_CLOSE.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_BUFFET_CLOSE.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            }
+        } catch (Exception e)
+        {};
+
+
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
@@ -118,6 +134,7 @@ public class MealsController extends Application {
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+
         FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(foodboxOrder.getId());
         if (foodBoxPreorderDB != null)
         {
@@ -137,7 +154,7 @@ public class MealsController extends Application {
             foodBoxPreorder.setClient(client);
             foodBoxPreorder.setState(FoodBoxStateTypeEnum.NEW);
             foodBoxPreorder.setOrg(client.getOrg());
-            foodBoxPreorder.setInitialDateTime(CalendarUtils.convertdateInUTC(foodboxOrder.getCreatedAt()));
+            foodBoxPreorder.setInitialDateTime(curDate);
             foodBoxPreorder.setCreateDate(new Date());
             foodBoxPreorder.setIdFoodBoxExternal(foodboxOrder.getId());
             foodBoxPreorder.setOrderPrice(foodboxOrder.getOrderPrice());
