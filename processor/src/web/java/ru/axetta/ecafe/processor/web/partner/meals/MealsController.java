@@ -234,7 +234,7 @@ public class MealsController extends Application {
                 continue;
             }
         }
-        Enumeration<String> headerNames = request.getHeaderNames();
+        /*Enumeration<String> headerNames = request.getHeaderNames();
         String securityKey = "";
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
@@ -252,7 +252,7 @@ public class MealsController extends Application {
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }
+        }*/
         try {
             if (!foodboxOrderNumberStr.isEmpty()) {
                 foodboxOrderNumber = Long.parseLong(foodboxOrderNumberStr);
