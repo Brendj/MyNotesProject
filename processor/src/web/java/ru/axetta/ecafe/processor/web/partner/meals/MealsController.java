@@ -45,6 +45,8 @@ public class MealsController extends Application {
     public static final String BUFFET_OPEN_TIME = "ecafe.processor.meals.buffetOpenTime";
     public static final String BUFFET_CLOSE_TIME = "ecafe.processor.meals.buffetCloseTime";
 
+    public static final Integer MAX_COUNT = 20;//Максимальное количество блюд для возвращения в методе
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -466,10 +468,62 @@ public class MealsController extends Application {
         personBuffetMenu.buffetCloseTime(getBuffetCloseTime());
         if (!wtDishes.isEmpty())
             personBuffetMenu.setDishesAmount((long) wtDishes.size());
+        Integer corCount = 0;
         for (WtDish wtDish: wtDishes)
         {
             //Находим все подкатегории
             List<WtCategoryItem> wtCategoryItemList =  daoReadonlyService.getCategoryItemsByWtDish(wtDish.getIdOfDish());
+            if (wtCategoryItemList.isEmpty())
+            {
+                WtCategory wtCategory = wtDish.getWtCategory();
+                Dish dish = new Dish();
+                ///
+                dish.setId(wtDish.getIdOfDish());
+                dish.setCode(wtDish.getBarcode());
+                dish.setName(wtDish.getDishName());
+                dish.setPrice(wtDish.getPrice().longValue());
+                dish.setIngredients(wtDish.getComponentsOfDish());
+                dish.setCalories(wtDish.getCalories());
+                dish.setWeight(wtDish.getQty());
+                dish.setProtein(wtDish.getProtein());
+                dish.setFat(wtDish.getFat());
+                dish.setCarbohydrates(wtDish.getCarbohydrates());
+                ///
+                PersonBuffetMenuBuffetCategoriesItem buffetMenuBuffetCategoriesItem = null;
+                for (PersonBuffetMenuBuffetCategoriesItem p : personBuffetMenu.getBuffetCategoriesItem())
+                {
+                    if (p.getId().equals(wtCategory.getIdOfCategory()))
+                    {
+                        buffetMenuBuffetCategoriesItem = p;
+                        break;
+                    }
+                }
+                if (buffetMenuBuffetCategoriesItem == null)
+                {
+                    buffetMenuBuffetCategoriesItem = new PersonBuffetMenuBuffetCategoriesItem();
+                    buffetMenuBuffetCategoriesItem.setId(wtCategory.getIdOfCategory());
+                    buffetMenuBuffetCategoriesItem.setName(wtCategory.getDescription());
+                    personBuffetMenu.getBuffetCategoriesItem().add(buffetMenuBuffetCategoriesItem);
+                }
+                ////
+//                PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem buffetSubcategoriesItem = null;
+//                for (PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem g : buffetMenuBuffetCategoriesItem.getBuffetSubcategoriesItem())
+//                {
+//                    if (g.getId().equals(wtCategoryItem.getIdOfCategoryItem()))
+//                    {
+//                        buffetSubcategoriesItem = g;
+//                        break;
+//                    }
+//                }
+//                if (buffetSubcategoriesItem == null)
+//                {
+//                    buffetSubcategoriesItem = new PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem();
+//                    buffetSubcategoriesItem.setId(wtCategoryItem.getIdOfCategoryItem());
+//                    buffetSubcategoriesItem.setName(wtCategoryItem.getDescription());
+//                    buffetMenuBuffetCategoriesItem.getBuffetSubcategoriesItem().add(buffetSubcategoriesItem);
+//                }
+                buffetMenuBuffetCategoriesItem.getMenuDishesItem().add(dish);
+            }
             for (WtCategoryItem wtCategoryItem: wtCategoryItemList)
             {
                 WtCategory wtCategory = wtCategoryItem.getWtCategory();
@@ -522,6 +576,10 @@ public class MealsController extends Application {
                 }
                 buffetSubcategoriesItem.getMenuDishesItem().add(dish);
             }
+            //Тупая обрезка всего, что больше порога (меня заставили)
+            corCount++;
+            if (corCount == MAX_COUNT)
+                break;
         }
         return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenu).build();
     }
