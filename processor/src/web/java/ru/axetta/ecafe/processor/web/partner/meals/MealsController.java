@@ -73,6 +73,7 @@ public class MealsController extends Application {
         }
         Date curDate = CalendarUtils.convertdateInUTC(foodboxOrder.getCreatedAt());
         Long createTime = curDate.getTime() - CalendarUtils.startOfDay(curDate).getTime();
+        createTime = CalendarUtils.convertdateInUTC(new Date(createTime)).getTime();
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         try {
             if (!(createTime > (format.parse(getBuffetOpenTime()).getTime()) &&
