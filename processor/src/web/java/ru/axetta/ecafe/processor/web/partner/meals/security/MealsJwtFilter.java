@@ -42,7 +42,7 @@ public class MealsJwtFilter extends OncePerRequestFilter {
         } catch (MealsInvalidToken e) {
             SecurityContextHolder.clearContext();
             servletResponse.setContentType("application/json;charset=UTF-8");
-            servletResponse.setStatus(HttpServletResponse.SC_OK);
+            servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             Result result = new Result();
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());

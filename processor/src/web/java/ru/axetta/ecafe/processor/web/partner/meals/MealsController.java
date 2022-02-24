@@ -69,7 +69,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         Date curDate = CalendarUtils.convertdateInUTC(foodboxOrder.getCreatedAt());
         Long createTime = curDate.getTime() - CalendarUtils.startOfDay(curDate).getTime();
@@ -90,7 +90,7 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -100,7 +100,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -108,7 +108,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -124,7 +124,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
 
         FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(foodboxOrder.getId());
@@ -133,7 +133,7 @@ public class MealsController extends Application {
             logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", foodboxOrder.getId()));
             result.setErrorCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_FOUND_FOODBOX.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -192,7 +192,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String foodboxOrderNumberStr = "";
         Long foodboxOrderNumber = null;
@@ -262,7 +262,7 @@ public class MealsController extends Application {
             typeWork = 1;
         else
         {
-            if (from == null || to == null || contract != null)
+            if (from != null && to != null && contract != null)
                 typeWork = 2;
         }
         if (typeWork == 0)
@@ -270,7 +270,7 @@ public class MealsController extends Application {
             logger.error("Не определен тип запроса ввиду отсутсвия корректных параметров");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = null;
@@ -280,7 +280,7 @@ public class MealsController extends Application {
                 logger.error("Клиент не найден");
                 result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
                 result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-                return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
             }
         }
         HistoryFoodboxOrderInfo historyFoodboxOrderInfo = new HistoryFoodboxOrderInfo();
@@ -292,7 +292,7 @@ public class MealsController extends Application {
                     logger.error(String.format("Не найден заказ с externalid %s", foodboxOrderNumber));
                     result.setErrorCode(ResponseCodes.RC_NOT_FOUND_FOODBOX.getCode().toString());
                     result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_FOODBOX.toString());
-                    return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+                    return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
                 }
                 FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
                 historyFoodboxOrderInfo.getOrdersInfo().add(foodboxOrderInfo);
@@ -352,7 +352,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         String onDateStr = "";
@@ -380,13 +380,13 @@ public class MealsController extends Application {
             logger.error("Неверный формат onDate");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -396,7 +396,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -404,7 +404,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -420,7 +420,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), onDate);
@@ -545,7 +545,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         String foodBoxAvailableStr = "true";
@@ -580,14 +580,14 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
 
         if (foodBoxAvailableStr.isEmpty()) {
             logger.error("Отсутствует foodBoxAvailable");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -597,7 +597,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -605,7 +605,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -621,7 +621,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean foodBoxAvailable = true;
         try {
@@ -630,7 +630,7 @@ public class MealsController extends Application {
             logger.error("Неверный формат foodBoxAvailable");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -646,7 +646,7 @@ public class MealsController extends Application {
             logger.error("Ошибка при сохранении флага для клиента", e);
             result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -668,7 +668,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         Map<String, String> params = parseParams(request);
@@ -693,7 +693,7 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -703,7 +703,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_REQUST.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -711,7 +711,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -727,7 +727,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setErrorCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         GetFoodboxInfo getFoodboxInfo = new GetFoodboxInfo();
         getFoodboxInfo.setFoodboxAvailability(client.getFoodboxAvailability());
