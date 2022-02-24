@@ -1045,8 +1045,7 @@ public class DAOService {
     public void changeOrgSecurityLevel(Long idOfOrg, OrganizationSecurityLevel securityLevel) {
         Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
         org.setSecurityLevel(securityLevel);
-        entityManager.persist(org);
-        entityManager.flush();
+        entityManager.merge(org);
     }
 
     public void setFullSyncByOrg(Long idOfOrg, boolean value) throws Exception {
