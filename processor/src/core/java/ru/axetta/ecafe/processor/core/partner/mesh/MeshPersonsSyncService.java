@@ -72,21 +72,24 @@ public class MeshPersonsSyncService {
     }
     protected void processMeshResponse(List<ResponsePersons> meshResponses) {
         Session session = null;
+        Transaction transaction = null;
+        Map<Integer, MeshTrainingForm> trainingForms = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            session.setFlushMode(FlushMode.COMMIT);
-            Map<Integer, MeshTrainingForm> trainingForms = getTrainingForms(session);
-            for (ResponsePersons person : meshResponses) {
-                processPerson(session, person, trainingForms);
-            }
-            RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
+            transaction = session.beginTransaction();
+            trainingForms = getTrainingForms(session);
+            transaction.commit();
+            transaction = null;
         } catch (Exception e) {
-            logger.error("Error in load persons from Mesh", e);
+            logger.error("Error in load MeshTrainingForm", e);
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        for (ResponsePersons person : meshResponses) {
+            processPerson(null, person, trainingForms);
+        }
     }
-
 
     public void loadPersons(long idOfOrg, String meshId, String lastName, String firstName, String patronymic) throws
             Exception {
@@ -99,6 +102,7 @@ public class MeshPersonsSyncService {
         CollectionType collectionType = typeFactory.constructCollectionType(
                 List.class, ResponsePersons.class);
         List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+        RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
         logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
         processMeshResponse(meshResponses);
         logger.info("End load persons from MESH");
@@ -134,9 +138,11 @@ public class MeshPersonsSyncService {
         return trainingForm.getEducation_form().contains(OUT_ORG_GROUP_PREFIX);
     }
 
-    protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) throws Exception {
+    protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms){
         Transaction transaction = null;
         try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
             transaction = session.beginTransaction();
             String personguid = "";
             try {
@@ -226,8 +232,11 @@ public class MeshPersonsSyncService {
             }
             transaction.commit();
             transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in load persons from Mesh", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
