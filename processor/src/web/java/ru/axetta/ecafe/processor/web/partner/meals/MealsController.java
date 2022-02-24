@@ -8,6 +8,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -55,7 +57,6 @@ public class MealsController extends Application {
     public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, FoodboxOrder foodboxOrder) {
         Result result = new Result();
         String contractIdStr = "";
-        String securityKey = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
@@ -63,20 +64,9 @@ public class MealsController extends Application {
                 break;
             }
         }
-        Enumeration<String> headerNames = request.getHeaderNames();
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("x-api-key"))
-                {
-                    securityKey = request.getHeader(header);
-                    break;
-                }
-            }
-        }
         //Контроль безопасности
-        if (!validateAccess(securityKey)) {
-            logger.error("Неверный ключ доступа");
+        if (!validateAccess()) {
+            logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
@@ -197,6 +187,13 @@ public class MealsController extends Application {
     @Transactional
     public Response getInfoFoodBoxPreorder(@Context HttpServletRequest request) {
         Result result = new Result();
+        //Контроль безопасности
+        if (!validateAccess()) {
+            logger.error("Не удалось авторизовать пользователя");
+            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         String foodboxOrderNumberStr = "";
         Long foodboxOrderNumber = null;
         String contractIdStr = "";
@@ -234,25 +231,6 @@ public class MealsController extends Application {
                 continue;
             }
         }
-        /*Enumeration<String> headerNames = request.getHeaderNames();
-        String securityKey = "";
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("x-api-key"))
-                {
-                    securityKey = request.getHeader(header);
-                    break;
-                }
-            }
-        }
-        //Контроль безопасности
-        if (!validateAccess(securityKey)) {
-            logger.error("Неверный ключ доступа");
-            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-        }*/
         try {
             if (!foodboxOrderNumberStr.isEmpty()) {
                 foodboxOrderNumber = Long.parseLong(foodboxOrderNumberStr);
@@ -369,6 +347,13 @@ public class MealsController extends Application {
     @Transactional
     public Response getInfoFoodBoxMenu(@Context HttpServletRequest request) {
         Result result = new Result();
+        //Контроль безопасности
+        if (!validateAccess()) {
+            logger.error("Не удалось авторизовать пользователя");
+            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        }
         String contractIdStr = "";
         String onDateStr = "";
         Date onDate = null;
@@ -386,25 +371,6 @@ public class MealsController extends Application {
                     continue;
                 }
             }
-        }
-        Enumeration<String> headerNames = request.getHeaderNames();
-        String securityKey = "";
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("x-api-key"))
-                {
-                    securityKey = request.getHeader(header);
-                    break;
-                }
-            }
-        }
-        //Контроль безопасности
-        if (!validateAccess(securityKey)) {
-            logger.error("Неверный ключ доступа");
-            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
         try {
             if (!onDateStr.isEmpty()) {
@@ -505,23 +471,6 @@ public class MealsController extends Application {
                     buffetMenuBuffetCategoriesItem.setName(wtCategory.getDescription());
                     personBuffetMenu.getBuffetCategoriesItem().add(buffetMenuBuffetCategoriesItem);
                 }
-                ////
-//                PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem buffetSubcategoriesItem = null;
-//                for (PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem g : buffetMenuBuffetCategoriesItem.getBuffetSubcategoriesItem())
-//                {
-//                    if (g.getId().equals(wtCategoryItem.getIdOfCategoryItem()))
-//                    {
-//                        buffetSubcategoriesItem = g;
-//                        break;
-//                    }
-//                }
-//                if (buffetSubcategoriesItem == null)
-//                {
-//                    buffetSubcategoriesItem = new PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem();
-//                    buffetSubcategoriesItem.setId(wtCategoryItem.getIdOfCategoryItem());
-//                    buffetSubcategoriesItem.setName(wtCategoryItem.getDescription());
-//                    buffetMenuBuffetCategoriesItem.getBuffetSubcategoriesItem().add(buffetSubcategoriesItem);
-//                }
                 buffetMenuBuffetCategoriesItem.getMenuDishesItem().add(dish);
             }
             for (WtCategoryItem wtCategoryItem: wtCategoryItemList)
@@ -591,37 +540,42 @@ public class MealsController extends Application {
     @Transactional
     public Response setFoodboxAvailability(@Context HttpServletRequest request) {
         Result result = new Result();
-        String contractIdStr = "";
-        String securityKey = "";
-        String foodBoxAvailableStr = "true";
-        Enumeration<String> headerNames = request.getHeaderNames();
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("x-api-key"))
-                {
-                    securityKey = request.getHeader(header);
-                    continue;
-                }
-                if (header.toLowerCase().equals("contractid"))
-                {
-                    contractIdStr = request.getHeader(header);
-                    continue;
-                }
-                if (header.toLowerCase().equals("foodboxavailability"))
-                {
-                    foodBoxAvailableStr = request.getHeader(header);
-                    continue;
-                }
-            }
-        }
         //Контроль безопасности
-        if (!validateAccess(securityKey)) {
-            logger.error("Неверный ключ доступа");
+        if (!validateAccess()) {
+            logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+        String contractIdStr = "";
+        String foodBoxAvailableStr = "true";
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("foodboxavailability")) {
+                foodBoxAvailableStr = currParam.getValue();
+                continue;
+            }
+        }
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        if (headerNames != null) {
+//            while (headerNames.hasMoreElements()) {
+//                String header = headerNames.nextElement();
+//                if (header.toLowerCase().equals("contractid"))
+//                {
+//                    contractIdStr = request.getHeader(header);
+//                    continue;
+//                }
+//                if (header.toLowerCase().equals("foodboxavailability"))
+//                {
+//                    foodBoxAvailableStr = request.getHeader(header);
+//                    continue;
+//                }
+//            }
+//        }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
@@ -709,31 +663,32 @@ public class MealsController extends Application {
     @Transactional
     public Response getFoodboxAvailability(@Context HttpServletRequest request) {
         Result result = new Result();
-        String contractIdStr = "";
-        String securityKey = "";
-        Enumeration<String> headerNames = request.getHeaderNames();
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (header.toLowerCase().equals("x-api-key"))
-                {
-                    securityKey = request.getHeader(header);
-                    continue;
-                }
-                if (header.toLowerCase().equals("contractid"))
-                {
-                    contractIdStr = request.getHeader(header);
-                    continue;
-                }
-            }
-        }
         //Контроль безопасности
-        if (!validateAccess(securityKey)) {
-            logger.error("Неверный ключ доступа");
+        if (!validateAccess()) {
+            logger.error("Не удалось авторизовать пользователя");
             result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         }
+        String contractIdStr = "";
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+        }
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        if (headerNames != null) {
+//            while (headerNames.hasMoreElements()) {
+//                String header = headerNames.nextElement();
+//                if (header.toLowerCase().equals("contractid"))
+//                {
+//                    contractIdStr = request.getHeader(header);
+//                    continue;
+//                }
+//            }
+//        }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setErrorCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
@@ -830,9 +785,9 @@ public class MealsController extends Application {
         return closeTime;
     }
 
-    private boolean validateAccess(String key) {
-        String keyinternal = RuntimeContext.getInstance().getConfigProperties().getProperty(KEY_FOR_MEALS, "");
-        if (!key.isEmpty() && key.equals(keyinternal))
+    private boolean validateAccess() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null)
             return true;
         return false;
     }
