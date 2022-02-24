@@ -97,6 +97,10 @@
             <column name="idOfContragent"/>
         </many-to-one>
 
+        <many-to-one name="wtCategory" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory">
+            <column name="idofcategory"/>
+        </many-to-one>
+
         <property name="barcode">
             <column name="barcode" sql-type="varchar(16)" length="16"/>
         </property>

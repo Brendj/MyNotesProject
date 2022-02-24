@@ -1,5 +1,10 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,10 +12,14 @@ import java.util.Objects;
 /**
  * Список категорий меню
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PersonBuffetMenuBuffetCategoriesItem")
 public class PersonBuffetMenuBuffetCategoriesItem {
     private Long id = null;
     private String name = null;
     private List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> buffetSubcategoriesItem = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Dish> menuDishesItem = null;
     public PersonBuffetMenuBuffetCategoriesItem id(Long id) {
         this.id = id;
         return this;
@@ -104,5 +113,14 @@ public class PersonBuffetMenuBuffetCategoriesItem {
         return o.toString().replace("\n", "\n    ");
     }
 
+    public List<Dish> getMenuDishesItem() {
+        if (menuDishesItem == null)
+            menuDishesItem = new ArrayList<>();
+        return menuDishesItem;
+    }
+
+    public void setMenuDishesItem(List<Dish> menuDishesItem) {
+        this.menuDishesItem = menuDishesItem;
+    }
 }
 
