@@ -68,18 +68,22 @@ public class MeshPersonsSyncService {
 
     protected void processMeshResponse(List<ResponsePersons> meshResponses){
         Session session = null;
+        Transaction transaction = null;
+        Map<Integer, MeshTrainingForm> trainingForms = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            session.setFlushMode(FlushMode.COMMIT);
-            Map<Integer, MeshTrainingForm> trainingForms = getTrainingForms(session);
-            for (ResponsePersons person : meshResponses) {
-                processPerson(null, person, trainingForms);
-            }
-            RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
+            transaction = session.beginTransaction();
+            trainingForms = getTrainingForms(session);
+            transaction.commit();
+            transaction = null;
         } catch (Exception e) {
             logger.error("Error in load MeshTrainingForm", e);
         } finally {
+            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+        for (ResponsePersons person : meshResponses) {
+            processPerson(null, person, trainingForms);
         }
     }
 
@@ -94,6 +98,7 @@ public class MeshPersonsSyncService {
         CollectionType collectionType = typeFactory.constructCollectionType(
                 List.class, ResponsePersons.class);
         List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+        RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
         logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
         processMeshResponse(meshResponses);
         logger.info("End load persons from MESH");
