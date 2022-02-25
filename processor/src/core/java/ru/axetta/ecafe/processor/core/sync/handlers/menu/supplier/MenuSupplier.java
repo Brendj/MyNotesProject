@@ -10,10 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodBoxPreorderChanged;
-import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
-import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
-import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -32,7 +28,7 @@ public class MenuSupplier implements SectionRequest {
     protected static final String[] CLIENT_SECTION_NAMES = new String[]{
             "OrgGroupsRequest", "CategoryItemsRequest", "TypeProductionsRequest", "AgeGroupItemsRequest",
             "DietTypesRequest", "ComplexGroupItemsRequest", "GroupItemsRequest", "DishesRequest", "MenuGroupsRequest",
-            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest", "FoodBoxDishRemain", "FoodBoxPreorder"};
+            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest"};
 
     public static final String SECTION_NAME = "MenuSupplier";
 
@@ -58,10 +54,10 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtComplex> complexes = new HashSet<>();
     private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
-    private FoodBoxDishRemain foodBoxDishRemain;
-    private FoodBoxPreorderChanged foodBoxPreorderChanged;
-    private FoodBoxPreorderNew foodBoxPreorderNew;
-    private ResFoodBoxChanged resFoodBoxChanged;
+//    private FoodBoxDishRemain foodBoxDishRemain;
+//    private FoodBoxPreorderChanged foodBoxPreorderChanged;
+//    private FoodBoxPreorderNew foodBoxPreorderNew;
+//    private ResFoodBoxChanged resFoodBoxChanged;
     private Integer resCode;
     private String errorMessage;
 
@@ -89,35 +85,13 @@ public class MenuSupplier implements SectionRequest {
                 } else {
                     err.append("Attribute Version for node ").append(itemNode.getNodeName()).append(" not found\n");
                 }
-                if (itemNode.getNodeName().equals(FoodBoxDishRemain.SECTION_NAME)) {
-                    //Обработка остатков foodbox
-                    try {
-                        try {
-                            versions.put(itemNode.getNodeName(), 0L);
-                        } catch (NumberFormatException e) {
-                            err.append("NumberFormatException Version for node ").append(itemNode.getNodeName())
-                                    .append(" not found\n");
-                        }
-                        foodBoxDishRemain = new FoodBoxDishRemain(itemNode);
-                    } catch (Exception e) {
-                        err.append(" Error in section foodBoxDishRemain ");
-                    }
-                }
-                if (itemNode.getNodeName().equals(FoodBoxPreorderChanged.SECTION_NAME)) {
-                    //Обработка изменений foodbox
-                    try {
-                        foodBoxPreorderChanged = new FoodBoxPreorderChanged(itemNode);
-                    } catch (Exception e) {
-                        err.append(" Error in section foodBoxPreorderChanged ");
-                    }
-                }
             }
             itemNode = itemNode.getNextSibling();
         }
-        return new MenuSupplier(idOfOrg, err.toString(), foodBoxDishRemain, foodBoxPreorderChanged);
+        return new MenuSupplier(idOfOrg, err.toString());
     }
 
-    public MenuSupplier(Long idOfOrg, String errorMessage, FoodBoxDishRemain foodBoxDishRemain, FoodBoxPreorderChanged foodBoxPreorderChanged) {
+    public MenuSupplier(Long idOfOrg, String errorMessage) {
 
         this.setIdOfOrg(idOfOrg);
         this.setErrorMessage(errorMessage);
@@ -214,24 +188,6 @@ public class MenuSupplier implements SectionRequest {
                     excludeDays = daoReadonlyService.getExcludeDaysSetFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
-                case "FoodBoxDishRemain": {
-                    if (org.getUsedFoodbox()) {
-                        this.foodBoxDishRemain = foodBoxDishRemain;
-                    }
-                    break;
-                }
-                case "FoodBoxPreorder": {
-                    if (org.getUsedFoodbox()) {
-                        this.foodBoxPreorderChanged = foodBoxPreorderChanged;
-                        this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(), org);
-                    }
-                    break;
-                }
-//                case "FoodBoxPreorderRequest": {
-//                    //Отправляем новые заказы по фудбоксу
-//                    this.foodBoxPreorderNew = daoReadonlyService.getFoodBoxPreorders(entry.getValue(),org);
-//                    break;
-//                }
             }
         }
     }
@@ -391,37 +347,5 @@ public class MenuSupplier implements SectionRequest {
 
     public void setOfflineOrgGroups(Set<WtOrgGroup> offlineOrgGroups) {
         this.offlineOrgGroups = offlineOrgGroups;
-    }
-
-    public FoodBoxDishRemain getFoodBoxDishRemain() {
-        return foodBoxDishRemain;
-    }
-
-    public void setFoodBoxDishRemain(FoodBoxDishRemain foodBoxDishRemain) {
-        this.foodBoxDishRemain = foodBoxDishRemain;
-    }
-
-    public FoodBoxPreorderChanged getFoodBoxPreorderChanged() {
-        return foodBoxPreorderChanged;
-    }
-
-    public void setFoodBoxPreorderChanged(FoodBoxPreorderChanged foodBoxPreorderChanged) {
-        this.foodBoxPreorderChanged = foodBoxPreorderChanged;
-    }
-
-    public FoodBoxPreorderNew getFoodBoxPreorderNew() {
-        return foodBoxPreorderNew;
-    }
-
-    public void setFoodBoxPreorderNew(FoodBoxPreorderNew foodBoxPreorderNew) {
-        this.foodBoxPreorderNew = foodBoxPreorderNew;
-    }
-
-    public ResFoodBoxChanged getResFoodBoxChanged() {
-        return resFoodBoxChanged;
-    }
-
-    public void setResFoodBoxChanged(ResFoodBoxChanged resFoodBoxChanged) {
-        this.resFoodBoxChanged = resFoodBoxChanged;
     }
 }
