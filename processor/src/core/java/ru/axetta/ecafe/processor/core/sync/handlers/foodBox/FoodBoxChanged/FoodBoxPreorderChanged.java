@@ -16,11 +16,12 @@ public class FoodBoxPreorderChanged implements SectionRequest {
 
     public static final String SECTION_NAME = "FoodBoxPreorder";
     private Set<FoodBoxPreorderChangedItem> items = new HashSet<>();
-
+    private Long maxVersion;
     public FoodBoxPreorderChanged() {
     }
 
     public FoodBoxPreorderChanged(Node sectionElement) throws Exception {
+        this.maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
         Node nodeElement = sectionElement.getFirstChild();
         while (nodeElement != null) {
             if (nodeElement.getNodeName().equals("FBP")) {
@@ -53,5 +54,13 @@ public class FoodBoxPreorderChanged implements SectionRequest {
 
     public void setItems(Set<FoodBoxPreorderChangedItem> items) {
         this.items = items;
+    }
+
+    public Long getMaxVersion() {
+        return maxVersion;
+    }
+
+    public void setMaxVersion(Long maxVersion) {
+        this.maxVersion = maxVersion;
     }
 }

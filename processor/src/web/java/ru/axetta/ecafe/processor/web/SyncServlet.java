@@ -10,11 +10,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import ru.axetta.ecafe.processor.config.LimitFilterParams;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -232,19 +230,19 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
 
-//            try {
-//                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
-//                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
-//                    logger.error(message);
-//                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-//                    return;
-//                }
-//            } catch (Exception e) {
-//                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-//                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
-//                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-//                return;
-//            }
+            try {
+                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
+                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
+                    logger.error(message);
+                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+            } catch (Exception e) {
+                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
+                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
 
 
             //  Daily logging for sync request
