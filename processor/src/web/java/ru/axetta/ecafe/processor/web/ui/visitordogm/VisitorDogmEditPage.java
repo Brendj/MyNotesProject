@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class VisitorDogmEditPage extends BasicWorkspacePage{
+public class VisitorDogmEditPage extends BasicWorkspacePage {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(VisitorDogmEditPage.class);
 
@@ -45,18 +46,25 @@ public class VisitorDogmEditPage extends BasicWorkspacePage{
         visitorDogm.addCard(cardItems);
     }
 
-    public Object save(){
+    public Object clear() {
+        visitorDogm = serviceBean.findVisitorsDogmByIdOfVisitor(visitorDogm.getIdOfVisitor());
+        visitorDogmGroupPage.setCurrentVisitorDogm(visitorDogm);
+        super.show();
+        return null;
+    }
+
+    public Object save() {
         try {
             Long id = serviceBean.saveVisitorDogm(visitorDogm);
             printMessage("Данные успешно сохранены");
         } catch (Exception e) {
-            printError("Ошибка при сохранении: "+e.getMessage());
-            LOGGER.error("Error by update visitorDogm info:",e);
+            printError("Ошибка при сохранении: " + e.getMessage());
+            LOGGER.error("Error by update visitorDogm info:", e);
         }
         return null;
     }
 
-    public Object addCard(){
+    public Object addCard() {
         return null;
     }
 
