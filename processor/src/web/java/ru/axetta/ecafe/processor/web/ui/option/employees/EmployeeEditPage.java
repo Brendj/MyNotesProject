@@ -53,6 +53,13 @@ public class EmployeeEditPage extends BasicWorkspacePage{
         return null;
     }
 
+    public Object clear() {
+        employee = serviceBean.findEmployeesByIdOfVisitor(employee.getIdOfVisitor());
+        employeeGroupPage.setCurrentEmployee(employee);
+        super.show();
+        return null;
+    }
+
     public Object addCard(){
         return null;
     }
