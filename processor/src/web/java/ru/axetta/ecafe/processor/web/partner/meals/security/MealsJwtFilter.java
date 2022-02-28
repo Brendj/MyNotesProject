@@ -44,8 +44,8 @@ public class MealsJwtFilter extends OncePerRequestFilter {
             servletResponse.setContentType("application/json;charset=UTF-8");
             servletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             Result result = new Result();
-            result.setErrorCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
-            result.setErrorMessage(ResponseCodes.RC_WRONG_KEY.toString());
+            result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
+            result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(servletResponse.getOutputStream(), result);
         }

@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class FoodBoxPreorder  {
     private Long idFoodBoxPreorder;
-    private Long idFoodBoxExternal;
+    private String idFoodBoxExternal;
     private FoodBoxStateTypeEnum state;
     private Client client;
     private Date initialDateTime;
@@ -135,11 +135,11 @@ public class FoodBoxPreorder  {
         this.org = org;
     }
 
-    public Long getIdFoodBoxExternal() {
+    public String getIdFoodBoxExternal() {
         return idFoodBoxExternal;
     }
 
-    public void setIdFoodBoxExternal(Long idFoodBoxExternal) {
+    public void setIdFoodBoxExternal(String idFoodBoxExternal) {
         this.idFoodBoxExternal = idFoodBoxExternal;
     }
 
