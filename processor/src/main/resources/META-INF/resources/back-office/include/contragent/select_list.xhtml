@@ -11,7 +11,7 @@
     <rich:popupPanel modal="true" id="modalContragentListSelectorPanel" autosized="true" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalContragentListSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
-            <h:outputText escape="true" value="Выбор контрагента"/>
+            <h:outputText escape="true" value="Выбор контрагентов"/>
         </f:facet>
         <h:form id="modalContragentListSelectorForm"
                   styleClass="borderless-form" eventsQueue="modalContragentListSelectorFormEventsQueue">
@@ -27,12 +27,10 @@
                             <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
                             <h:inputText value="#{mainPage.contragentListSelectPage.filter}" size="48" maxlength="128"
                                          styleClass="input-text" />
+                            <a4j:ajax event="keyup" listener="#{mainPage.showContragentListSelectPage}"
+                                      render="modalContragentListSelectorTable"/>
                             <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
-                                            reRender="modalContragentListSelectorForm" styleClass="command-link">
-                                <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                            </a4j:commandLink>
-                            <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
-                                             reRender="modalContragentListSelectorForm" styleClass="command-link">
+                                             render="modalContragentListSelectorForm" styleClass="command-link">
                                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                                 <f:setPropertyActionListener value="" target="#{mainPage.contragentListSelectPage.filter}" />
                             </a4j:commandLink>

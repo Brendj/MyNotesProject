@@ -26,10 +26,8 @@
                 <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
                 <h:inputText value="#{mainPage.contragentSelectPage.filter}" size="52" maxlength="128"
                              styleClass="input-text" />
-                <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
-                                 render="modalContragentSelectorForm" styleClass="command-link">
-                    <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                </a4j:commandLink>
+                <a4j:ajax event="keyup" listener="#{mainPage.showContragentSelectPage}"
+                          render="modalContragentSelectorTable"/>
                 <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
                                  render="modalContragentSelectorForm" styleClass="command-link">
                     <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
