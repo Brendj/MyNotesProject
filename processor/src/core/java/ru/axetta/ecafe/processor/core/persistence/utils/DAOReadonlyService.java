@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
@@ -3351,12 +3352,28 @@ public class DAOReadonlyService {
         }
     }
 
-    public FoodBoxPreorder getFoodBoxPreorderByExternalId(Long externalId) {
+    public FoodBoxPreorder getFoodBoxPreorderByExternalId(String externalId) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
                     + "where fb.idFoodBoxExternal = :idFoodBoxExternal ");
             query.setParameter("idFoodBoxExternal", externalId);
             return (FoodBoxPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<FoodBoxPreorder> getActiveFoodBoxPreorderForClient(Client client) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.state between :new and :loaded");
+            query.setParameter("client", client);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.EXECUTED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -3402,7 +3419,7 @@ public class DAOReadonlyService {
         FoodBoxPreorderNew foodBoxPreorderNew = new FoodBoxPreorderNew();
         for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
         {
-            FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getInitialDateTime(),foodBoxPreorder.getVersion());
+            FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getCreateDate(),foodBoxPreorder.getVersion());
             Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
             for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
             {
@@ -3415,5 +3432,9 @@ public class DAOReadonlyService {
             foodBoxPreorderNew.getItems().add(foodBoxPreorderNewItem);
         }
         return foodBoxPreorderNew;
+    }
+
+    public FoodBoxPreorder findFoodBoxPreorderById(long idOfFoodBoxPreorder) {
+        return entityManager.find(FoodBoxPreorder.class, idOfFoodBoxPreorder);
     }
 }

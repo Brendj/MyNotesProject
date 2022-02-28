@@ -11,7 +11,7 @@ import java.util.List;
 public class HistoryFoodboxOrderInfo {
     private Boolean foodboxAvailabilityForEO = null;
     private Boolean foodboxAvailability = null;
-    private List<FoodboxOrderInfo> ordersInfo = null;
+    private List<FoodboxOrderInfo> ordersInfo = new ArrayList<FoodboxOrderInfo>();
     private Long ordersAmount = null;
     public HistoryFoodboxOrderInfo foodboxAvailabilityForEO(Boolean foodboxAvailabilityForEO) {
         this.foodboxAvailabilityForEO = foodboxAvailabilityForEO;
@@ -53,9 +53,6 @@ public class HistoryFoodboxOrderInfo {
     }
 
     public HistoryFoodboxOrderInfo addOrdersInfoItem(FoodboxOrderInfo ordersInfoItem) {
-        if (this.ordersInfo == null) {
-            this.ordersInfo = new ArrayList<FoodboxOrderInfo>();
-        }
         this.ordersInfo.add(ordersInfoItem);
         return this;
     }
@@ -65,8 +62,6 @@ public class HistoryFoodboxOrderInfo {
      * @return ordersInfo
      **/
     public List<FoodboxOrderInfo> getOrdersInfo() {
-        if (ordersInfo == null)
-            ordersInfo = new ArrayList<>();
         return ordersInfo;
     }
     public void setOrdersInfo(List<FoodboxOrderInfo> ordersInfo) {

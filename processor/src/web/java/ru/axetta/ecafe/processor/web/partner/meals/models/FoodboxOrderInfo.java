@@ -1,5 +1,8 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
+import ru.axetta.ecafe.processor.web.partner.meals.MealsController;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -9,32 +12,26 @@ import java.util.List;
 /**
  * Передача данных о заказе (в контексте списка).
  */
-public class FoodboxOrderInfo implements Comparable{
-    private Long id = null;
+public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
+    private Long isppIdFoodbox = null;
     private String status = null;
-    private Date expiresAt = null;
-    private Date timeOrder = null;
-    private Date issueTime = null;
-    private Long foodboxOrderNumber = null;
+    private String expiresAt = null;
+    private String timeOrder = null;
     private List<OrderDish> dishes = new ArrayList<OrderDish>();
     private Long orderPrice = null;
-    public FoodboxOrderInfo id(Long id) {
-        this.id = id;
-        return this;
-    }
-
-
 
     /**
      * Идентификатор заказа.
      * @return id
      **/
-    public Long getId() {
-        return id;
+    public Long getIsppIdFoodbox() {
+        return isppIdFoodbox;
     }
-    public void setId(Long id) {
-        this.id = id;
+
+    public void setIsppIdFoodbox(Long isppIdFoodbox) {
+        this.isppIdFoodbox = isppIdFoodbox;
     }
+
     public FoodboxOrderInfo status(String status) {
         this.status = status;
         return this;
@@ -52,7 +49,7 @@ public class FoodboxOrderInfo implements Comparable{
     public void setStatus(String status) {
         this.status = status;
     }
-    public FoodboxOrderInfo expiresAt(Date expiresAt) {
+    public FoodboxOrderInfo expiresAt(String expiresAt) {
         this.expiresAt = expiresAt;
         return this;
     }
@@ -63,13 +60,13 @@ public class FoodboxOrderInfo implements Comparable{
      * Дата и время, до которого клиент может забрать заказ
      * @return expiresAt
      **/
-    public Date getExpiresAt() {
+    public String getExpiresAt() {
         return expiresAt;
     }
-    public void setExpiresAt(Date expiresAt) {
+    public void setExpiresAt(String expiresAt) {
         this.expiresAt = expiresAt;
     }
-    public FoodboxOrderInfo timeOrder(Date timeOrder) {
+    public FoodboxOrderInfo timeOrder(String timeOrder) {
         this.timeOrder = timeOrder;
         return this;
     }
@@ -80,45 +77,11 @@ public class FoodboxOrderInfo implements Comparable{
      * Дата и время создания заказа
      * @return timeOrder
      **/
-    public Date getTimeOrder() {
+    public String getTimeOrder() {
         return timeOrder;
     }
-    public void setTimeOrder(Date timeOrder) {
+    public void setTimeOrder(String timeOrder) {
         this.timeOrder = timeOrder;
-    }
-    public FoodboxOrderInfo issueTime(Date issueTime) {
-        this.issueTime = issueTime;
-        return this;
-    }
-
-
-
-    /**
-     * Дата и время получения заказа. Параметр обязателен для выданных заказов
-     * @return issueTime
-     **/
-    public Date getIssueTime() {
-        return issueTime;
-    }
-    public void setIssueTime(Date issueTime) {
-        this.issueTime = issueTime;
-    }
-    public FoodboxOrderInfo foodboxOrderNumber(Long foodboxOrderNumber) {
-        this.foodboxOrderNumber = foodboxOrderNumber;
-        return this;
-    }
-
-
-
-    /**
-     * Номер фудбокс-заказа
-     * @return foodboxOrderNumber
-     **/
-    public Long getFoodboxOrderNumber() {
-        return foodboxOrderNumber;
-    }
-    public void setFoodboxOrderNumber(Long foodboxOrderNumber) {
-        this.foodboxOrderNumber = foodboxOrderNumber;
     }
     public FoodboxOrderInfo dishes(List<OrderDish> dishes) {
         this.dishes = dishes;
@@ -135,8 +98,6 @@ public class FoodboxOrderInfo implements Comparable{
      * @return dishes
      **/
     public List<OrderDish> getDishes() {
-        if (dishes == null)
-            dishes = new ArrayList<>();
         return dishes;
     }
     public void setDishes(List<OrderDish> dishes) {
@@ -168,19 +129,17 @@ public class FoodboxOrderInfo implements Comparable{
             return false;
         }
         FoodboxOrderInfo foodboxOrderInfo = (FoodboxOrderInfo) o;
-        return Objects.equals(this.id, foodboxOrderInfo.id) &&
+        return Objects.equals(this.isppIdFoodbox, foodboxOrderInfo.isppIdFoodbox) &&
                 Objects.equals(this.status, foodboxOrderInfo.status) &&
                 Objects.equals(this.expiresAt, foodboxOrderInfo.expiresAt) &&
                 Objects.equals(this.timeOrder, foodboxOrderInfo.timeOrder) &&
-                Objects.equals(this.issueTime, foodboxOrderInfo.issueTime) &&
-                Objects.equals(this.foodboxOrderNumber, foodboxOrderInfo.foodboxOrderNumber) &&
                 Objects.equals(this.dishes, foodboxOrderInfo.dishes) &&
                 Objects.equals(this.orderPrice, foodboxOrderInfo.orderPrice);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, status, expiresAt, timeOrder, issueTime, foodboxOrderNumber, dishes, orderPrice);
+        return java.util.Objects.hash(isppIdFoodbox, status, expiresAt, timeOrder, dishes, orderPrice);
     }
 
     @Override
@@ -188,12 +147,10 @@ public class FoodboxOrderInfo implements Comparable{
         StringBuilder sb = new StringBuilder();
         sb.append("class FoodboxOrderInfo {\n");
 
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    id: ").append(toIndentedString(isppIdFoodbox)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
         sb.append("    timeOrder: ").append(toIndentedString(timeOrder)).append("\n");
-        sb.append("    issueTime: ").append(toIndentedString(issueTime)).append("\n");
-        sb.append("    foodboxOrderNumber: ").append(toIndentedString(foodboxOrderNumber)).append("\n");
         sb.append("    dishes: ").append(toIndentedString(dishes)).append("\n");
         sb.append("    orderPrice: ").append(toIndentedString(orderPrice)).append("\n");
         sb.append("}");
@@ -211,8 +168,17 @@ public class FoodboxOrderInfo implements Comparable{
         return o.toString().replace("\n", "\n    ");
     }
 
+
     @Override
-    public int compareTo(Object o) {
-        return getTimeOrder().compareTo(((FoodboxOrderInfo)o).getTimeOrder());
+    public int compareTo(FoodboxOrderInfo o) {
+        try {
+            if (MealsController.simpleDateFormat.parse(this.getTimeOrder()).after(MealsController.simpleDateFormat.parse(o.getTimeOrder())))
+                return -1;
+            else
+                return 1;
+        } catch (Exception e)
+        {
+            return 0;
+        }
     }
 }
