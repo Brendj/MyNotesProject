@@ -35,6 +35,6 @@
                      not-null="true" update="false"/>
         <property name="idFoodBoxExternal" column="idFoodBoxExternal" type="string"/>
         <property name="orderPrice" column="orderprice" type="long"/>
-        <property name="located" column="located" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="located" column="located" type="boolean"/>
     </class>
 </hibernate-mapping>
