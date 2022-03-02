@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.core.sync.handlers.foodBox;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodBoxPreorderChanged;
@@ -33,7 +36,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
         ResFoodBoxChanged resFoodBoxChanged = new ResFoodBoxChanged();
         for (FoodBoxPreorderChangedItem foodBoxPreorderChangedItem : foodBoxPreorderChanged.getItems()) {
             Long version = daoReadonlyService.getMaxVersionOfFoodBoxPreorder();
-            FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorder(foodBoxPreorderChangedItem.getId());
+            FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(foodBoxPreorderChangedItem.getId());
             if (foodBoxPreorder == null) {
                 logger.error(String.format("Не найден предзаказ фудбокса с Id == %s",
                         foodBoxPreorderChangedItem.getId()));
@@ -42,7 +45,25 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             foodBoxPreorder.setError(foodBoxPreorderChangedItem.getError());
             foodBoxPreorder.setIdOfFoodBox(foodBoxPreorderChangedItem.getIdOfFoodBox());
             foodBoxPreorder.setCellNumber(foodBoxPreorderChangedItem.getCellNumber());
+            if (foodBoxPreorder.getIdOfFoodBox() != null) {
+                foodBoxPreorder.setLocated(true);
+                if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW)) {
+                    Org org = (Org) session.load(Org.class, idOfOrg);
+                    //Забираем ячейку
+                    FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorder.getIdOfFoodBox());
+                    foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
+                    session.merge(foodBoxCells);
+                }
+            }
             foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
+            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))
+            {
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                //Освобождаем ячейку
+                FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorder.getIdOfFoodBox());
+                foodBoxCells.setBusycells(foodBoxCells.getBusycells()-1);
+                session.merge(foodBoxCells);
+            }
             foodBoxPreorder.setIdOfOrder(foodBoxPreorderChangedItem.getIdOfOrder());
             foodBoxPreorder.setCancelReason(foodBoxPreorderChangedItem.getCancelReason());
             foodBoxPreorder.setVersion(version+1);

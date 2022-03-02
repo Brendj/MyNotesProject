@@ -42,6 +42,8 @@ public class FoodboxOrder {
      * @return dishes
      **/
     public List<OrderDish> getDishes() {
+        if (dishes == null)
+            dishes = new ArrayList<>();
         return dishes;
     }
     public void setDishes(List<OrderDish> dishes) {
