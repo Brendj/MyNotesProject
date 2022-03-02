@@ -3356,7 +3356,7 @@ public class DAOReadonlyService {
     public Integer getFoodBoxPreordersUnallocated(Org org) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
-                    + "where fb.org = :org and (fb.located is null or fb.located is false)");
+                    + "where fb.org = :org and (fb.located is null or fb.located = false)");
             query.setParameter("org", org);
             List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
             return foodBoxPreorders.size();
@@ -3372,6 +3372,8 @@ public class DAOReadonlyService {
                     + "where fb.idFoodBoxExternal = :idFoodBoxExternal ");
             query.setParameter("idFoodBoxExternal", externalId);
             return (FoodBoxPreorder)query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
