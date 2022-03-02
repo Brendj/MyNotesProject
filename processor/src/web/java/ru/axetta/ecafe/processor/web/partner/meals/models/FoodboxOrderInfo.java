@@ -1,9 +1,6 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
-
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.web.partner.meals.MealsController;
 
-import java.util.Date;
 import java.util.Objects;
 
 import java.util.ArrayList;

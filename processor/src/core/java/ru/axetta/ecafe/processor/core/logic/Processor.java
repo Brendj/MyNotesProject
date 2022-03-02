@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderAvailable;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -61,6 +62,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxCells.FoodBoxCellsItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxCells.FoodBoxCellsSync;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodBoxPreorderChanged;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxAvailableItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
@@ -4066,6 +4069,16 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            FoodBoxCellsSync foodBoxCellsSync = request.getFoodBoxCells();
+            if (foodBoxCellsSync != null) {
+                processFoodBoxCells(foodBoxCellsSync, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxCells: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         updateOrgSyncDate(request.getIdOfOrg());
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
@@ -5245,7 +5258,8 @@ public class Processor implements SyncProcessor {
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) || payment.getOrderType()
                             .equals(OrderTypeEnumType.DEFAULT) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.VENDING)) {
+                            .equals(OrderTypeEnumType.VENDING) || payment.getOrderType()
+                            .equals(OrderTypeEnumType.FOODBOX)) {
                         values = EventNotificationService.attachToValues("isBarOrder", "true", values);
                     } else if (payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) || payment.getOrderType()
                             .equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
@@ -8135,7 +8149,7 @@ public class Processor implements SyncProcessor {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e){
-            logger.error("Error in process FoodBoxPreorderChanged: ", e);
+            logger.error("Error in process processFoodBoxPreorderChanged: ", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -8155,7 +8169,7 @@ public class Processor implements SyncProcessor {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e){
-            logger.error("Error in process FoodBoxPreorderNew: ", e);
+            logger.error("Error in process processFoodBoxPreorderNew: ", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -8166,7 +8180,6 @@ public class Processor implements SyncProcessor {
     private void processFoodBoxPreorderDishRemain(FoodBoxDishRemain foodBoxDishRemain, Long idOfOrg) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        FoodBoxPreorderNew foodBoxPreorderNew = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -8184,7 +8197,56 @@ public class Processor implements SyncProcessor {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e){
-            logger.error("Error in process FoodBoxPreorderDishRemain: ", e);
+            logger.error("Error in process processFoodBoxPreorderDishRemain: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void processFoodBoxCells(FoodBoxCellsSync foodBoxCellsSync, Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            Org org = daoReadonlyService.findOrg(idOfOrg);
+            Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(org);
+            for (FoodBoxCellsItem foodBoxCellsItem: foodBoxCellsSync.getItems())
+            {
+                Long id = foodBoxCellsItem.getIdFoodBox();
+                Long count = foodBoxCellsItem.getTotalCellsCount();
+                boolean findInTable = false;
+                for (FoodBoxCells foodBoxCells1 : foodBoxCells)
+                {
+                    if (foodBoxCells1.getFbId().equals(id.intValue()))
+                    {
+                        foodBoxCells1.setTotalcellscount(count.intValue());
+                        if (foodBoxCells1.getBusycells() > foodBoxCells1.getTotalcellscount())
+                            foodBoxCells1.setBusycells(foodBoxCells1.getTotalcellscount());
+                        foodBoxCells1.setUpdateDate(new Date());
+                        persistenceSession.merge(foodBoxCells1);
+                        findInTable = true;
+                    }
+                }
+                if (!findInTable)
+                {
+                    FoodBoxCells foodBoxCells1 = new FoodBoxCells();
+                    foodBoxCells1.setBusycells(0);
+                    foodBoxCells1.setTotalcellscount(count.intValue());
+                    foodBoxCells1.setCreateDate(new Date());
+                    foodBoxCells1.setUpdateDate(new Date());
+                    foodBoxCells1.setFbId(id.intValue());
+                    foodBoxCells1.setOrg(org);
+                    persistenceSession.persist(foodBoxCells1);
+                }
+
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e){
+            logger.error("Error in process processFoodBoxCells: ", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

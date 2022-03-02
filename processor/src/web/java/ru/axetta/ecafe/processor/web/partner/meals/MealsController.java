@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
@@ -75,12 +76,12 @@ public class MealsController extends Application {
         Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         try {
-            if (!(createTime > (format.parse(getBuffetOpenTime()).getTime()) &&
-                    createTime < (format.parse(getBuffetCloseTime()).getTime()))) {
+            if (!(createTime > (CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime())).getTime()) &&
+                    createTime < (CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime())).getTime()))) {
                 logger.error("Заказ пришел на время закрытия буфета");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.name());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
                 orderErrorInfo.setBuffetOpenTime(getBuffetOpenTime());
                 orderErrorInfo.setBuffetCloseTime(getBuffetCloseTime());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
@@ -144,8 +145,26 @@ public class MealsController extends Application {
             logger.error("У клиента имеются необработанные заказы");
             OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_HAVE_PREORDER.getCode());
-            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.name());
+            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.toString());
             orderErrorInfo.setOrderNumber(foodBoxPreorders.get(0).getIdOfOrder());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+        }
+
+        Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
+        Integer countunlocketed = daoReadonlyService.getFoodBoxPreordersUnallocated(client.getOrg());
+        Integer countFree = 0;
+        for (FoodBoxCells foodBoxCells1: foodBoxCells)
+        {
+            //Считаем количество свободных ячеек в фудбоксах
+            countFree += (foodBoxCells1.getTotalcellscount() - foodBoxCells1.getBusycells());
+        }
+        //Есди количество свободных ячеек не позволяет создавать новый заказ
+        if(countFree <= countunlocketed)
+        {
+            logger.error(String.format("У организации с id = %s нет свободных ячеек фудбокса", client.getOrg().getIdOfOrg()));
+            OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+            orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_CELL.getCode());
+            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_CELL.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
         }
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = new CurrentFoodboxOrderInfo();
@@ -160,13 +179,13 @@ public class MealsController extends Application {
             foodBoxPreorder.setClient(client);
             foodBoxPreorder.setState(FoodBoxStateTypeEnum.NEW);
             foodBoxPreorder.setOrg(client.getOrg());
-            //foodBoxPreorder.setInitialDateTime(curDate);
             foodBoxPreorder.setCreateDate(new Date());
             foodBoxPreorder.setIdFoodBoxExternal(foodboxOrder.getMeshIdFoodbox());
+            foodBoxPreorder.setLocated(false);
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setIsppIdFoodbox(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
-            currentFoodboxOrderInfo.setExpiresAt(simpleDateFormat.format(new Date(new Date().getTime() + 7200000))+"Z");
+            currentFoodboxOrderInfo.setExpiresAt(simpleDateFormat.format(new Date(new Date().getTime() + 3600000))+"Z");
             currentFoodboxOrderInfo.setTimeOrder(simpleDateFormat.format(new Date())+"Z");
             currentFoodboxOrderInfo.setCurrentBalance(client.getBalance());
             currentFoodboxOrderInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
@@ -190,11 +209,11 @@ public class MealsController extends Application {
             foodBoxPreorder.setOrderPrice(priceAll);
             persistenceSession.merge(foodBoxPreorder);
             currentFoodboxOrderInfo.setOrderPrice(priceAll);
-            if (priceAll > client.getBalance()) {
+            if (client.getBalance() != 0 && priceAll > client.getBalance()) {
                 logger.error("Сумма заказа превышает баланс клиента");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.name());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
                 orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
             }
@@ -202,7 +221,7 @@ public class MealsController extends Application {
                 logger.error("Сумма заказа превышает дневной лимит трат");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.name());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
                 orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
             }
@@ -361,7 +380,8 @@ public class MealsController extends Application {
                 }
                 FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
                 historyFoodboxOrderInfo.getOrdersInfo().add(foodboxOrderInfo);
-                historyFoodboxOrderInfo.setOrdersAmount(foodboxOrderInfo.getOrderPrice());
+                //historyFoodboxOrderInfo.setOrdersAmount(foodboxOrderInfo.getOrderPrice());
+                historyFoodboxOrderInfo.setOrdersAmount(1L);
                 historyFoodboxOrderInfo.setFoodboxAvailability(true);
                 try {
                     historyFoodboxOrderInfo.setFoodboxAvailabilityForEO(foodBoxPreorder.getClient().getOrg().getUsedFoodbox());
@@ -378,7 +398,8 @@ public class MealsController extends Application {
                 for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
                 {
                     FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
-                    sum += foodboxOrderInfo.getOrderPrice();
+                    //sum += foodboxOrderInfo.getOrderPrice();
+                    sum += 1L;
                     foodboxOrderInfos.add(foodboxOrderInfo);
                 }
                 if (sortDesc)
@@ -808,7 +829,7 @@ public class MealsController extends Application {
         if(foodBoxPreorder.getState() != null) {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
-        foodboxOrderInfo.setTimeOrder(simpleDateFormat.format(foodBoxPreorder.getCreateDate()));
+        foodboxOrderInfo.setTimeOrder(simpleDateFormat.format(foodBoxPreorder.getCreateDate()) + "Z");
         foodboxOrderInfo.setIsppIdFoodbox(foodBoxPreorder.getIdFoodBoxPreorder());
         Long sum = 0L;
         for (FoodBoxPreorderDish foodBoxPreorderDish : DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder)) {

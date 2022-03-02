@@ -25,6 +25,7 @@ public class FoodBoxPreorder  {
     private Date updateDate;
     private Org org;
     private Long orderPrice;
+    private Boolean located;
 
     public FoodBoxPreorder()
     {
@@ -149,5 +150,13 @@ public class FoodBoxPreorder  {
 
     public void setOrderPrice(Long orderPrice) {
         this.orderPrice = orderPrice;
+    }
+
+    public Boolean getLocated() {
+        return located;
+    }
+
+    public void setLocated(Boolean located) {
+        this.located = located;
     }
 }

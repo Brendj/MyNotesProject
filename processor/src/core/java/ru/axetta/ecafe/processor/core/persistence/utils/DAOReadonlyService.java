@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
@@ -3352,6 +3353,19 @@ public class DAOReadonlyService {
         }
     }
 
+    public Integer getFoodBoxPreordersUnallocated(Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.org = :org and (fb.located is null or fb.located is false)");
+            query.setParameter("org", org);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public FoodBoxPreorder getFoodBoxPreorderByExternalId(String externalId) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
@@ -3371,7 +3385,7 @@ public class DAOReadonlyService {
                     + "and fb.state between :new and :loaded");
             query.setParameter("client", client);
             query.setParameter("new", FoodBoxStateTypeEnum.NEW);
-            query.setParameter("loaded", FoodBoxStateTypeEnum.EXECUTED);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
             List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
             return foodBoxPreorders;
         } catch (Exception e) {
@@ -3409,10 +3423,6 @@ public class DAOReadonlyService {
         }
     }
 
-    public FoodBoxPreorder findFoodBoxPreorder(Long idFoodBoxPreorder) {
-        return entityManager.find(FoodBoxPreorder.class, idFoodBoxPreorder);
-    }
-
     public FoodBoxPreorderNew getFoodBoxPreorders(Long version, Org org)
     {
         Set<FoodBoxPreorder> foodBoxPreorders = DAOReadonlyService.getInstance().getFoodBoxPreordersFromVersion(version, org);
@@ -3436,5 +3446,31 @@ public class DAOReadonlyService {
 
     public FoodBoxPreorder findFoodBoxPreorderById(long idOfFoodBoxPreorder) {
         return entityManager.find(FoodBoxPreorder.class, idOfFoodBoxPreorder);
+    }
+
+    public Set<FoodBoxCells> getFoodBoxCellsByOrg(Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbc from FoodBoxCells fbc "
+                    + "where fbc.org = :org ");
+            query.setParameter("org", org);
+            List<FoodBoxCells> foodBoxCells = query.getResultList();
+            return new HashSet<>(foodBoxCells);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public FoodBoxCells getFoodBoxCellsByOrgAndFoodBoxId(Org org, Long foodBoxId) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbc from FoodBoxCells fbc "
+                    + "where fbc.org = :org and fbc.fbId = :foodBoxId");
+            query.setParameter("org", org);
+            query.setParameter("foodBoxId", foodBoxId);
+            FoodBoxCells foodBoxCells = (FoodBoxCells)query.getSingleResult();
+            return foodBoxCells;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

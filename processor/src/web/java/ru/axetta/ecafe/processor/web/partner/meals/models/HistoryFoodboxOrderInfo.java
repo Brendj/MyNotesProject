@@ -62,6 +62,8 @@ public class HistoryFoodboxOrderInfo {
      * @return ordersInfo
      **/
     public List<FoodboxOrderInfo> getOrdersInfo() {
+        if (ordersInfo == null)
+            ordersInfo = new ArrayList<>();
         return ordersInfo;
     }
     public void setOrdersInfo(List<FoodboxOrderInfo> ordersInfo) {
