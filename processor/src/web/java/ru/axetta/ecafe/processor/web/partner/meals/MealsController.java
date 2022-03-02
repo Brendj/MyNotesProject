@@ -76,8 +76,8 @@ public class MealsController extends Application {
         Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         try {
-            if (!(createTime > (CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime())).getTime()) &&
-                    createTime < (CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime())).getTime()))) {
+            if (createTime > (CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime())).getTime()) &&
+                    createTime < (CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime())).getTime())) {
                 logger.error("Заказ пришел на время закрытия буфета");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
@@ -634,7 +634,7 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
-        String foodBoxAvailableStr = "true";
+        String foodBoxAvailableStr = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
