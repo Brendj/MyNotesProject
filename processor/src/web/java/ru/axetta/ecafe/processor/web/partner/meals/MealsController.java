@@ -209,21 +209,26 @@ public class MealsController extends Application {
             foodBoxPreorder.setOrderPrice(priceAll);
             persistenceSession.merge(foodBoxPreorder);
             currentFoodboxOrderInfo.setOrderPrice(priceAll);
-            if (client.getBalance() != 0 && priceAll > client.getBalance()) {
-                logger.error("Сумма заказа превышает баланс клиента");
-                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
-                orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
-                return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+            if (client.getBalance() != null && client.getBalance() != 0) {
+                if (priceAll > client.getBalance())
+                {
+                    logger.error("Сумма заказа превышает баланс клиента");
+                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
+                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
+                    orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
+                    return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                }
             }
-            if (priceAll > client.getExpenditureLimit()) {
-                logger.error("Сумма заказа превышает дневной лимит трат");
-                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
-                orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
-                return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+            if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
+                if (priceAll > client.getExpenditureLimit()) {
+                    logger.error("Сумма заказа превышает дневной лимит трат");
+                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
+                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
+                    orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
+                    return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                }
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
