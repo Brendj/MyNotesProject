@@ -294,6 +294,7 @@
         <property name="governmentContract" column="governmentContract" type="boolean"/>
         <property name="useLongCardNo" column="useLongCardNo" type="boolean"/>
         <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
+        <property name="newСashierMode" column="newСashierMode" type="boolean"/>
     </class>
 </hibernate-mapping>
 

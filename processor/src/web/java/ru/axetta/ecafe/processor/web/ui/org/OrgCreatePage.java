@@ -99,6 +99,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long orgIdFromNsi = null;
     private Boolean governmentContract = false;
     private Boolean useLongCardId = false;
+    private Boolean newСashierMode;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -345,6 +346,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setSubordination(String subordination) {
         this.subordination = subordination;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 
     public static class ContragentItem {
@@ -705,6 +714,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
+        org.setNewСashierMode(newСashierMode);
         session.save(org);
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);

@@ -178,6 +178,7 @@ public class Org implements Serializable {
     private Boolean gooddatecheck;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
+    private Boolean newСashierMode;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -1420,5 +1421,13 @@ public class Org implements Serializable {
 
     public void setFoodApplicationSyncParam(Boolean foodApplicationSyncParam) {
         this.foodApplicationSyncParam = foodApplicationSyncParam;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 }

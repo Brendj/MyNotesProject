@@ -74,6 +74,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allIsWorkInSummerTime = true;
     private Boolean allUseGovernmentContract = true;
     private Boolean allUseMealSchedule = true;
+    private Boolean allNewСashierMode = true;
 
     private void resetSelectedColumns() {
         allUseWebArmAdmin = true;
@@ -114,6 +115,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             allIsWorkInSummerTime &= item.getIsWorkInSummerTime();
             allUseGovernmentContract &= item.getGovernmentContract();
             allUseMealSchedule &= item.getUseMealSchedule();
+            allNewСashierMode &= item.getNewСashierMode();
         }
     }
 
@@ -220,6 +222,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     break;
                 case 14:
                     item.setUseWebArmAdmin(allUseWebArmAdmin);
+                    break;
+                case 15:
+                    item.setNewСashierMode(allNewСashierMode);
                     break;
             }
             item.change();
@@ -393,6 +398,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setOrgStructureVersion(nextOrgVersion);
                     org.setOrgSettingsSyncParam(Boolean.TRUE);
                     org.setGovernmentContract(item.getGovernmentContract());
+                    org.setNewСashierMode(item.getNewСashierMode());
                     session.update(org);
 
                     logger.info("Success");
@@ -626,5 +632,13 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllUseMealSchedule(Boolean allUseMealSchedule) {
         this.allUseMealSchedule = allUseMealSchedule;
+    }
+
+    public Boolean getAllNewСashierMode() {
+        return allNewСashierMode;
+    }
+
+    public void setAllNewСashierMode(Boolean allNewСashierMode) {
+        this.allNewСashierMode = allNewСashierMode;
     }
 }
