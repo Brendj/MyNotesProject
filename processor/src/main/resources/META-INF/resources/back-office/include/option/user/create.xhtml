@@ -43,6 +43,11 @@
             <h:outputText escape="true" value="Электронная почта" styleClass="output-text"/>
             <h:inputText value="#{mainPage.userCreatePage.email}" maxlength="128" styleClass="input-text"/>
 
+            <h:outputText styleClass="output-text" escape="true" value="Дата блокировки учетной записи"
+                          rendered="#{mainPage.userCreatePage.isSfk}"/>
+            <rich:calendar value="#{mainPage.userCreatePage.deleteDate}" rendered="#{mainPage.userCreatePage.isSfk}"
+                           datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+
             <h:outputText escape="true" value="Роль" styleClass="output-text"/>
             <h:selectOneMenu value="#{mainPage.userCreatePage.idOfRole}" styleClass="input-text">
                 <a4j:ajax event="change" render="userCreateGrid" ajaxSingle="true"/>
@@ -78,8 +83,10 @@
             </h:panelGroup>
 
             <h:outputText escape="true" value="Организация" styleClass="output-text"
-                          rendered="#{!mainPage.userCreatePage.isSecurityAdmin &amp;&amp; !mainPage.userCreatePage.isDirector}"/>
-            <h:panelGroup rendered="#{!mainPage.userCreatePage.isSecurityAdmin &amp;&amp; !mainPage.userCreatePage.isDirector}">
+                          rendered="#{!mainPage.userCreatePage.isSecurityAdmin &amp;&amp;
+                          !mainPage.userCreatePage.isDirector &amp;&amp; !mainPage.userCreatePage.isSfk}"/>
+            <h:panelGroup rendered="#{!mainPage.userCreatePage.isSecurityAdmin &amp;&amp;
+            !mainPage.userCreatePage.isDirector &amp;&amp; !mainPage.userCreatePage.isSfk}">
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
                                    disabled="#{mainPage.userCreatePage.isWebArmUser}"
                                    render="modalOrgSelectorPanel"
@@ -88,6 +95,19 @@
                 <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.userOrgName}}"/>
             </h:panelGroup>
 
+            <h:outputText escape="true" value="Организации" styleClass="output-text"
+                          rendered="#{mainPage.userCreatePage.isSfk}"/>
+            <h:panelGroup rendered="#{mainPage.userCreatePage.isSfk}">
+                <a4j:commandButton value="..." action="#{mainPage.userCreatePage.showSelectOrgListPage}"
+                                   render="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="2" target="#{mainPage.userCreatePage.selectOrgType}"/>
+                    <f:setPropertyActionListener value="#{mainPage.userCreatePage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.orgItemsForUserFilter}}"/>
+            </h:panelGroup>
 
             <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text"
                           rendered="#{mainPage.userCreatePage.renderContragent}"/>

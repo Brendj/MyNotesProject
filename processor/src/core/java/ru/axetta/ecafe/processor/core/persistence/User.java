@@ -249,8 +249,8 @@ public class User {
         INFORMATION_SYSTEM_OPERATOR(9,"Оператор ИС"),
         CLASSROOM_TEACHER(10,"Классный руководитель"),
         CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
-        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)");
-
+        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)"),
+        SFK(13, "Служба финансового контроля");
 
         private Integer identification;
         private String description;

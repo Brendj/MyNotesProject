@@ -31,6 +31,7 @@ import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,12 +60,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     protected String contragentIds;
     protected String orgIds;
     protected String orgIdsCanceled;
+    protected String orgIdsForUser;
     protected Long organizationId;
     protected Boolean blocked;
     protected SelectItem[] regions;
     protected String region;
     protected String orgFilter = "Не выбрано";
     protected String orgFilterCanceled = "Не выбрано";
+    protected String orgItemsForUserFilter = "Не выбрано";
     protected Boolean needChangePassword;
     protected Date blockedUntilDate;
     protected String organizationsFilter = "Не выбрано";
@@ -76,12 +79,15 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     protected String userOrgName = "Не выбрано";
     protected Long userIdOfClient;
     protected String userClientName = "Не выбрано";
+    protected Date deleteDate;
 
     protected UserNotificationType selectOrgType;
 
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
     protected List<OrgItem> organizationItems = new ArrayList<OrgItem>(0);
+    protected List<OrgItem> orgItemsForUser = new ArrayList<>(0);
+
 
     private final static Logger logger = LoggerFactory.getLogger(UserEditPage.class);
 
@@ -115,6 +121,21 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                             stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
                         }
                         orgFilterCanceled = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
+                }
+            } break;
+            case ORG_SELECTED_FOR_USER: {
+                if (orgMap != null) {
+                    orgItemsForUser = new ArrayList<OrgItem>();
+                    if (orgMap.isEmpty()) {
+                        orgItemsForUserFilter = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItemsForUser.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgItemsForUserFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
                     }
                 }
             } break;
@@ -204,6 +225,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setClient(null);
             user.setPhone(phone);
             user.setEmail(email);
+            user.setDeleteDate(deleteDate);
             user.setUpdateTime(new Date());
             if (user.isBlocked() && !blocked) {
                 //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
@@ -310,6 +332,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             for (OrgItem orgItem : orgItemsCanceled) {
                 Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
                 UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+                session.save(userOrgs);
+            }
+
+            for (OrgItem orgItem : orgItemsForUser) {
+                Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+                UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORG_SELECTED_FOR_USER);
                 session.save(userOrgs);
             }
 
@@ -482,6 +510,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
         orgFilterCanceled = "Не выбрано";
         orgItemsCanceled.clear();
+
+        orgItemsForUserFilter = "Не выбрано";
+        orgItemsForUser.clear();
     }
 
     public Object showOrgListSelectPage(){
@@ -492,6 +523,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public Object showOrgListSelectCancelPage(){
         selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showSelectOrgListPage(){
+        selectOrgType = UserNotificationType.ORG_SELECTED_FOR_USER;
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
     }
@@ -546,6 +583,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DIRECTOR);
+    }
+
+    public Boolean getIsSfk() {
+        if(idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.SFK);
     }
 
     @Override
@@ -636,6 +679,26 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         }
     }
 
+    private void setOrgFilterForUserInfo(List<OrgItem> orgItemsForUser) {
+        orgItemsForUser.sort(Comparator.comparing((OrgItem o) -> o.idOfOrg));
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (orgItemsForUser.isEmpty()) {
+            orgItemsForUserFilter = "Не выбрано";
+        } else {
+            for (OrgItem ot : orgItemsForUser) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(ot.getShortName());
+                ids.append(ot.getIdOfOrg());
+            }
+            orgItemsForUserFilter = str.toString();
+        }
+        orgIdsForUser = ids.toString();
+    }
+
     /*public Object showContragentListSelectPageOwn() {
         BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
@@ -690,6 +753,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.contragentItems.clear();
         this.orgItems.clear();
         this.orgItemsCanceled.clear();
+        this.orgItemsForUser.clear();
         this.idOfUser = user.getIdOfUser();
         this.userName = user.getUserName();
         this.phone = user.getPhone();
@@ -716,11 +780,15 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 case ORDER_STATE_CHANGE_NOTIFY: {
                     this.orgItemsCanceled.add(new OrgItem(o.getOrg()));
                 }break;
+                case ORG_SELECTED_FOR_USER: {
+                    this.orgItemsForUser.add(new OrgItem(o.getOrg()));
+                }break;
             }
         }
         setContragentFilterInfo(contragentItems);
         setOrgFilterInfo(orgItems);
         setOrgFilterCanceledInfo(orgItemsCanceled);
+        setOrgFilterForUserInfo(orgItemsForUser);
 
         this.organizationItems.clear();
         String sqlQuery =
@@ -749,6 +817,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         } else {
             this.idOfRole = UserRoleEnumTypeMenu.OFFSET.intValue() + user.getIdOfGroup().intValue();
         }
+        this.deleteDate = user.getDeleteDate();
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
         this.blockedUntilDate = user.getBlockedUntilDate();
@@ -764,6 +833,15 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             this.userOrgName = userOrg.getShortName();
         }
         initRegions(session);
+    }
+
+    public String getGetStringIdOfOrgList() {
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: return orgItems.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORDER_STATE_CHANGE_NOTIFY: return orgItemsCanceled.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_SELECTED_FOR_USER: return orgItemsForUser.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+        }
+        return "";
     }
 
     public Boolean getNeedChangePassword() {
@@ -934,6 +1012,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return email;
     }
 
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -1012,6 +1098,22 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getOrgIdsForUser() {
+        return orgIdsForUser;
+    }
+
+    public void setOrgIdsForUser(String orgIdsForUser) {
+        this.orgIdsForUser = orgIdsForUser;
+    }
+
+    public String getOrgItemsForUserFilter() {
+        return orgItemsForUserFilter;
+    }
+
+    public void setOrgItemsForUserFilter(String orgItemsForUserFilter) {
+        this.orgItemsForUserFilter = orgItemsForUserFilter;
     }
 
     @Override
