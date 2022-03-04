@@ -3431,17 +3431,18 @@ public class DAOReadonlyService {
         FoodBoxPreorderNew foodBoxPreorderNew = new FoodBoxPreorderNew();
         for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
         {
-            FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getCreateDate(),foodBoxPreorder.getVersion());
-            Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
-            for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
-            {
-                FoodBoxPreorderNewItemItem foodBoxPreorderNewItemItem = new FoodBoxPreorderNewItemItem();
-                foodBoxPreorderNewItemItem.setIdOfDish(foodBoxPreorderDish.getIdOfDish());
-                foodBoxPreorderNewItemItem.setPrice(foodBoxPreorderDish.getPrice());
-                foodBoxPreorderNewItemItem.setQty(foodBoxPreorderDish.getQty());
-                foodBoxPreorderNewItem.getItems().add(foodBoxPreorderNewItemItem);
+            if (!(foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))) {
+                FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getCreateDate(), foodBoxPreorder.getVersion());
+                Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+                for (FoodBoxPreorderDish foodBoxPreorderDish : foodBoxPreorderDishes) {
+                    FoodBoxPreorderNewItemItem foodBoxPreorderNewItemItem = new FoodBoxPreorderNewItemItem();
+                    foodBoxPreorderNewItemItem.setIdOfDish(foodBoxPreorderDish.getIdOfDish());
+                    foodBoxPreorderNewItemItem.setPrice(foodBoxPreorderDish.getPrice());
+                    foodBoxPreorderNewItemItem.setQty(foodBoxPreorderDish.getQty());
+                    foodBoxPreorderNewItem.getItems().add(foodBoxPreorderNewItemItem);
+                }
+                foodBoxPreorderNew.getItems().add(foodBoxPreorderNewItem);
             }
-            foodBoxPreorderNew.getItems().add(foodBoxPreorderNewItem);
         }
         return foodBoxPreorderNew;
     }
