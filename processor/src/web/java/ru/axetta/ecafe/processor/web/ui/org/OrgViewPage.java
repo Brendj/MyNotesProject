@@ -128,6 +128,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private Boolean useMealSchedule;
+    private Boolean newСashierMode;
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
@@ -319,6 +320,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
+        this.newСashierMode = org.getNewСashierMode();
     }
 
     public String getFilterOrgs() {
@@ -910,5 +912,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUsedfoodbox(Boolean usedfoodbox) {
         this.usedfoodbox = usedfoodbox;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 }

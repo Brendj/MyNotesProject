@@ -152,6 +152,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
     private Boolean useMealSchedule;
+    private Boolean newСashierMode;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -455,6 +456,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
         org.setUsedFoodbox(usedfoodbox);
+        org.setNewСashierMode(newСashierMode);
 
         manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
                 lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
@@ -624,6 +626,7 @@ public class OrgEditPage extends BasicWorkspacePage
         Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.useMealSchedule = mealSchedule != null && mealSchedule;
         this.usedfoodbox = org.getUsedFoodbox();
+        this.newСashierMode = org.getNewСashierMode();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1320,6 +1323,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setUsedfoodbox(Boolean usedfoodbox) {
         this.usedfoodbox = usedfoodbox;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 
     public static class ContragentItem {

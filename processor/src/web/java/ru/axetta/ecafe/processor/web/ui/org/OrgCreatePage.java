@@ -100,6 +100,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean governmentContract = false;
     private Boolean useLongCardId = false;
     private Boolean usedfoodbox = false;
+    private Boolean newСashierMode;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -354,6 +355,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setUsedfoodbox(Boolean usedfoodbox) {
         this.usedfoodbox = usedfoodbox;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 
     public static class ContragentItem {
@@ -715,6 +724,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
         org.setUsedFoodbox(usedfoodbox);
+        org.setNewСashierMode(newСashierMode);
         session.save(org);
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);

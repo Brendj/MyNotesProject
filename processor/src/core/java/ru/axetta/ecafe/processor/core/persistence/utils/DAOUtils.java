@@ -3935,6 +3935,14 @@ public class DAOUtils {
         return query.list();
     }
 
+    public static PreorderComplex getPreorderComplexByGuid(Session session, String guid) {
+        Query query = session.createQuery("select pc from PreorderComplex pc where pc.guid = :guid");
+        query.setParameter("guid", guid);
+        List<PreorderComplex> list = query.getResultList();
+        if (list.size() > 0) return list.get(0);
+        return null;
+    }
+
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,
             PreorderComplex complex) throws Exception {
         Criteria criteria = session.createCriteria(PreorderMenuDetail.class);

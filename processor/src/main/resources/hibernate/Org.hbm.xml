@@ -295,6 +295,7 @@
         <property name="useLongCardNo" column="useLongCardNo" type="boolean"/>
 	    <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
         <property name="usedFoodbox" column="usedFoodbox" type="boolean"/>
+        <property name="newСashierMode" column="newСashierMode" type="boolean"/>
     </class>
 </hibernate-mapping>
 
