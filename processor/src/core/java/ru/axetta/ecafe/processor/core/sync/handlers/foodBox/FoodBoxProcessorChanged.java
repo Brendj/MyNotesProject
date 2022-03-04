@@ -50,7 +50,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW)) {
                     Org org = (Org) session.load(Org.class, idOfOrg);
                     //Забираем ячейку
-                    FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorder.getIdOfFoodBox());
+                    FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
                     foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
                     session.merge(foodBoxCells);
                 }
@@ -60,7 +60,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
-                FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorder.getIdOfFoodBox());
+                FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
                 foodBoxCells.setBusycells(foodBoxCells.getBusycells()-1);
                 session.merge(foodBoxCells);
             }
