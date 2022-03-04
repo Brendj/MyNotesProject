@@ -43,6 +43,7 @@
         <property name="idOfGoodsRequestPosition" column="idofgoodsrequestposition" type="long" />
         <property name="idOfOrgOnCreate" column="idoforgoncreate" type="long" />
         <property name="mobile" column="mobile" type="string" length="32" />
+        <property name="toPay" column="toPay" type="integer"/>
         <property name="mobileGroupOnCreate" column="mobileGroupOnCreate">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>

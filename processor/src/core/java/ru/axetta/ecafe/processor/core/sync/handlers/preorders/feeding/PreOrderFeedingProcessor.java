@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import org.hibernate.Session;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding> {
@@ -22,9 +23,23 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
         this.preOrdersFeedingRequest = preOrdersFeedingRequest;
     }
 
-    //todo тут доработки
+    private void processToPayList() {
+        Long version = DAOUtils.nextVersionByPreorderComplex(session);
+        for (PreOrdersFeedingToPayItem item : preOrdersFeedingRequest.getItems()) {
+            PreorderComplex preorderComplex = DAOUtils.getPreorderComplexByGuid(session, item.getGuid());
+            if (preorderComplex != null) {
+                preorderComplex.setToPay(item.getToPay());
+                preorderComplex.setVersion(version);
+                preorderComplex.setLastUpdate(new Date());
+                session.merge(preorderComplex);
+            }
+        }
+        session.flush();
+    }
+
     @Override
     public PreOrdersFeeding process() throws Exception {
+        processToPayList();
         PreOrdersFeeding result = new PreOrdersFeeding();
         List<PreOrdersFeedingItem> items = new ArrayList<PreOrdersFeedingItem>();
 
