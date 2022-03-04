@@ -782,8 +782,8 @@ public class DAOService {
 
         for (Long orgItem: orgItemsForUser) {
             Org org = (Org) session.load(Org.class, orgItem);
-            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORG_SELECTED_FOR_USER);
-            session.save(userOrgs);
+            SfcUserOrgs sfcUserOrgs = new SfcUserOrgs(user, org);
+            session.save(sfcUserOrgs);
         }
     }
 

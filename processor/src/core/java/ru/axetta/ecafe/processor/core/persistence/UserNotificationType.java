@@ -12,8 +12,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 public enum UserNotificationType {
 
     /*0*/ GOOD_REQUEST_CHANGE_NOTIFY("Уведомление об изменении заказа"),
-    /*1*/ ORDER_STATE_CHANGE_NOTIFY("Уведомление об отмене заказа"),
-    /*2*/ ORG_SELECTED_FOR_USER("Организации выбранные для пользоваетля");
+    /*1*/ ORDER_STATE_CHANGE_NOTIFY("Уведомление об отмене заказа");
 
     private final String description;
 

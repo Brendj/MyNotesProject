@@ -58,6 +58,10 @@
             <key column="IdOfUser"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.UserOrgs"/>
         </set>
+        <set name="sfcUserOrgs" inverse="true">
+            <key column="IdOfUser"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SfcUserOrgs"/>
+        </set>
     </class>
 </hibernate-mapping>
 

@@ -250,7 +250,7 @@ public class User {
         CLASSROOM_TEACHER(10,"Классный руководитель"),
         CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
         WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)"),
-        SFK(13, "Служба финансового контроля");
+        SFC(13, "Служба финансового контроля");
 
         private Integer identification;
         private String description;
@@ -316,6 +316,7 @@ public class User {
     private Boolean isGroup;
     private Org org;
     private Client client;
+    private Set<SfcUserOrgs> sfcUserOrgs = new HashSet<>();
 
     public String getRoleName() {
         return roleName;
@@ -567,6 +568,14 @@ public class User {
     public Client getClient(){ return client; }
 
     public void setClient(Client client) { this.client = client; }
+
+    public Set<SfcUserOrgs> getSfcUserOrgs() {
+        return sfcUserOrgs;
+    }
+
+    public void setSfcUserOrgs(Set<SfcUserOrgs> sfcUserOrgs) {
+        this.sfcUserOrgs = sfcUserOrgs;
+    }
 
     /*
     * Если прошел срок, в течение которого было запрещено создавать пользователя с ранее существующим аккаунтом, то

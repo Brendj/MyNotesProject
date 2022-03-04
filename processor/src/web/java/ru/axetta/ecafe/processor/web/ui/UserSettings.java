@@ -95,9 +95,6 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         Map<Long, String> orgListCanceled = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
         completeOrgListSelection(orgListCanceled);
 
-        selectOrgType = UserNotificationType.ORG_SELECTED_FOR_USER;
-        Map<Long, String> orgListForUser = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
-        completeOrgListSelection(orgListForUser);
     }
 
     public User getCurrentUser() throws Exception {
@@ -291,21 +288,6 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
                     }
                 }
             } break;
-            case ORG_SELECTED_FOR_USER: {
-                if (orgMap != null) {
-                    orgItemsForUser = new ArrayList<Long>();
-                    if (orgMap.isEmpty()) {
-                        orgItemsForUserFilter = "Не выбрано";
-                    } else {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (Long idOfOrg : orgMap.keySet()) {
-                            orgItemsForUser.add(idOfOrg);
-                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
-                        }
-                        orgItemsForUserFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
-                    }
-                }
-            } break;
         }
     }
 
@@ -321,17 +303,10 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         return null;
     }
 
-    public Object showSelectOrgListPage(){
-        selectOrgType = UserNotificationType.ORG_SELECTED_FOR_USER;
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
-
     public String getGetStringIdOfOrgList() {
         switch (selectOrgType){
             case GOOD_REQUEST_CHANGE_NOTIFY: return orgItems.toString().replaceAll("[^0-9,]","");
             case ORDER_STATE_CHANGE_NOTIFY: return orgItemsCanceled.toString().replaceAll("[^0-9,]","");
-            case ORG_SELECTED_FOR_USER: return orgItemsForUser.toString().replaceAll("[^0-9,]","");
         }
         return "";
     }
