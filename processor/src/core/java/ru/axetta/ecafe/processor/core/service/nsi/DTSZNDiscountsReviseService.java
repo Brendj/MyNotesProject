@@ -649,7 +649,7 @@ public class DTSZNDiscountsReviseService {
                 }
                 logger.info(String.format("Processing record %s from %s. IdOfClient=%s", counter, discountItemList.getItems().size(),
                         client == null ? "null" : client.getIdOfClient()));
-                if (null == client || !isStudent(client)) {
+                if (!isStudent(client)) {
                     //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                     if (0 == counter++ % maxRecords) {
                         transaction.commit();
