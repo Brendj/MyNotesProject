@@ -2634,7 +2634,7 @@ public class PreorderDAOService {
         if (md == null) wtDish = getWtDishById(idOfDish);
         if (wtDish == null)
             throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
-        if(wtDish.getDateOfEndMenuIncluding().before(date))
+        if(wtDish.getDateOfEndMenuIncluding() != null && wtDish.getDateOfEndMenuIncluding().before(date))
             throw new InvalidDatePreorderDishException("Блюдо с ид.=" + idOfDish.toString() + " будет исключено из меню до исполнения предзаказа");
         return createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, amount, mobile, mobileGroupOnCreate);
     }
