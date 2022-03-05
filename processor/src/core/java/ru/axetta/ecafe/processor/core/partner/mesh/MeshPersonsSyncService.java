@@ -85,6 +85,7 @@ public class MeshPersonsSyncService {
         for (ResponsePersons person : meshResponses) {
             processPerson(null, person, trainingForms);
         }
+        RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
     }
 
     public void loadPersons(long idOfOrg, String meshId, String lastName, String firstName, String patronymic) throws
@@ -98,7 +99,6 @@ public class MeshPersonsSyncService {
         CollectionType collectionType = typeFactory.constructCollectionType(
                 List.class, ResponsePersons.class);
         List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
-        RuntimeContext.getAppContext().getBean(MeshPersonsSearchService.class).getMeshResponses().set(meshResponses);
         logger.info(String.format("Found %s persons in MESH", meshResponses.size()));
         processMeshResponse(meshResponses);
         logger.info("End load persons from MESH");
