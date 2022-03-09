@@ -94,16 +94,22 @@ public class ClientDiscountHistoryService {
     }
 
     public void saveChangeHistoryByDiscountInfo(Session session, ClientDtisznDiscountInfo discountInfo, String comment) {
-          if(discountInfo == null){
-              return;
-          }
-          CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
-                  .getCategoryDiscountDSZNByDSZNCode(session, discountInfo.getDtisznCode());
-          CategoryDiscount discount = categoryDiscountDSZN.getCategoryDiscount();
+        if (discountInfo == null) {
+            return;
+        }
+        CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                .getCategoryDiscountDSZNByDSZNCode(session, discountInfo.getDtisznCode());
+        CategoryDiscount discount = categoryDiscountDSZN.getCategoryDiscount();
 
-         ClientDiscountHistory history = ClientDiscountHistory.build(discountInfo.getClient(),
-                 comment, discount, ClientDiscountHistoryOperationTypeEnum.CHANGE);
+        Client c = discountInfo.getClient();
 
-         session.save(history);
+        if (c.getCategories() == null || !c.getCategories().contains(discount)) {
+            return;
+        }
+
+        ClientDiscountHistory history = ClientDiscountHistory.build(discountInfo.getClient(),
+                comment, discount, ClientDiscountHistoryOperationTypeEnum.CHANGE);
+
+        session.save(history);
     }
 }
