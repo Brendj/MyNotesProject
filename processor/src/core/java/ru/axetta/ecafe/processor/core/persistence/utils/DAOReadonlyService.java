@@ -3468,7 +3468,7 @@ public class DAOReadonlyService {
             Query query = entityManager.createQuery("SELECT fbc from FoodBoxCells fbc "
                     + "where fbc.org = :org and fbc.fbId = :foodBoxId");
             query.setParameter("org", org);
-            query.setParameter("foodBoxId", foodBoxId);
+            query.setParameter("foodBoxId", foodBoxId.intValue());
             FoodBoxCells foodBoxCells = (FoodBoxCells)query.getSingleResult();
             return foodBoxCells;
         } catch (Exception e) {
