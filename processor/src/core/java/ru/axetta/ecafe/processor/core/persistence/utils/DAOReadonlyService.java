@@ -14,10 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
@@ -3321,6 +3318,17 @@ public class DAOReadonlyService {
             Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
             q.setParameter("org", org);
             return (Long) q.getSingleResult();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public FoodBoxPreorderAvailable getFoodBoxPreorderAvailable(Org org, Long idOfDish){
+        try {
+            Query q = entityManager.createQuery("SELECT c FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org and c.idOfDish= :idOfDish");
+            q.setParameter("org", org);
+            q.setParameter("idOfDish", idOfDish);
+            return (FoodBoxPreorderAvailable) q.getSingleResult();
         } catch (NoResultException e){
             return null;
         }

@@ -50,6 +50,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW)) {
                     Org org = (Org) session.load(Org.class, idOfOrg);
                     //Забираем ячейку
+                    logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
                     FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
                     foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
                     session.merge(foodBoxCells);
@@ -63,6 +64,12 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
                 foodBoxCells.setBusycells(foodBoxCells.getBusycells()-1);
                 session.merge(foodBoxCells);
+                logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId()), idOfOrg.toString());
+                //Для отладки
+                if (foodBoxCells.getBusycells() < 0)
+                {
+                    logger.error(String.format("Произошла ошибка с заказом: %s", foodBoxPreorderChangedItem.getId()));
+                }
             }
             foodBoxPreorder.setIdOfOrder(foodBoxPreorderChangedItem.getIdOfOrder());
             foodBoxPreorder.setCancelReason(foodBoxPreorderChangedItem.getCancelReason());
