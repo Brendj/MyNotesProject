@@ -14,10 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
@@ -169,6 +166,8 @@ public class MealsController extends Application {
         }
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = new CurrentFoodboxOrderInfo();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        //Собираем данные для орг
+        List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), new Date());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -191,6 +190,31 @@ public class MealsController extends Application {
             currentFoodboxOrderInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
             for (OrderDish orderDish : foodboxOrder.getDishes()) {
+                FoodBoxPreorderAvailable foodBoxPreorderAvailable = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg(), orderDish.getDishId());
+                try {
+                    if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId())))
+                    {
+                        logger.error(String.format("Блюдо из заказа не доступно idOfDish: %s", orderDish.getDishId()));
+                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
+                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
+                        return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                    }
+                    if (foodBoxPreorderAvailable == null || foodBoxPreorderAvailable.getAvailableQty() <= 0)
+                    {
+                        logger.error(String.format("Количество блюд из заказа не доступно idOfDish: %s", orderDish.getDishId()));
+                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
+                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
+                        return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                    }
+                } catch (Exception e)
+                {
+                    logger.error("Ошибка при сохранении заказа для Фудбокса", e);
+                    result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+                    result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
+                    return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
+                }
                 FoodBoxPreorderDish foodBoxPreorderDish = new FoodBoxPreorderDish();
                 foodBoxPreorderDish.setFoodBoxPreorder(foodBoxPreorder);
                 foodBoxPreorderDish.setIdOfDish(orderDish.getDishId());
