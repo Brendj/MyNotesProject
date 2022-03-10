@@ -294,6 +294,19 @@ public class FunctionSelector {
         return cardOperatorFunctions;
     }
 
+    public Set<Function> getSfcFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List<Function> allFunctions = allFunctionsCriteria.list();
+        Set<Function> sfcFunctions = new HashSet<Function>();
+        for (Function function : allFunctions) {
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_VIEW)
+                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
+                sfcFunctions.add(function);
+            }
+        }
+        return sfcFunctions;
+    }
+
     public void fill(Session session) throws Exception {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions

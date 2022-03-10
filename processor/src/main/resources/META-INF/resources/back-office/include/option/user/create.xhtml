@@ -45,7 +45,7 @@
 
             <h:outputText styleClass="output-text" escape="true" value="Дата блокировки учетной записи"
                           rendered="#{mainPage.userCreatePage.isSfc}"/>
-            <rich:calendar value="#{mainPage.userCreatePage.deleteDate}" rendered="#{mainPage.userCreatePage.isSfc}"
+            <rich:calendar value="#{mainPage.userCreatePage.deleteDateForBlock}" rendered="#{mainPage.userCreatePage.isSfc}"
                            datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
 
             <h:outputText escape="true" value="Роль" styleClass="output-text"/>
@@ -326,7 +326,8 @@
                 </rich:column>
             </rich:dataTable>
             <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text"
-                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}"/>
+                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier ||
+                          mainPage.userCreatePage.isSupplierReport}"/>
             <rich:dataTable
                     value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierReport)}"
                     var="onlineReportItems"

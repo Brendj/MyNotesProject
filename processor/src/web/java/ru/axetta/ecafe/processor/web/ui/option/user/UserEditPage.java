@@ -79,7 +79,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     protected String userOrgName = "Не выбрано";
     protected Long userIdOfClient;
     protected String userClientName = "Не выбрано";
-    protected Date deleteDate;
+    protected Date deleteDateForBlock;
 
     protected UserNotificationType selectOrgType;
 
@@ -225,15 +225,17 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setClient(null);
             user.setPhone(phone);
             user.setEmail(email);
-            user.setDeleteDate(deleteDate);
             user.setUpdateTime(new Date());
             if (user.isBlocked() && !blocked) {
                 //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
                 user.setLastEntryTime(new Date());
             }
             //Если мы разблокируем пользователя, то нужно отправить sms
-            if (user.isBlocked() && !blocked)
+            if (user.isBlocked() && !blocked) {
                 user.setSmsCodeGenerateDate(null);
+                deleteDateForBlock = null;
+            }
+            user.setDeleteDateForBlock(deleteDateForBlock);
             user.setBlocked(blocked);
             user.setBlockedUntilDate(blockedUntilDate);
             User.DefaultRole role = null;
@@ -275,6 +277,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                     throw new RuntimeException("Org field is null");
                 }
             }
+
+            if (role != null && role.equals(User.DefaultRole.SFC)) {
+                user.setFunctions(functionSelector.getSfcFunctions(session));
+                user.setRoleName(role.toString());
+            }
+
             user.getContragents().clear();
             for (ContragentItem it : this.contragentItems) {
                 Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
@@ -821,7 +829,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         } else {
             this.idOfRole = UserRoleEnumTypeMenu.OFFSET.intValue() + user.getIdOfGroup().intValue();
         }
-        this.deleteDate = user.getDeleteDate();
+        this.deleteDateForBlock = user.getDeleteDateForBlock();
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
         this.blockedUntilDate = user.getBlockedUntilDate();
@@ -1018,12 +1026,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return email;
     }
 
-    public Date getDeleteDate() {
-        return deleteDate;
+    public Date getDeleteDateForBlock() {
+        return deleteDateForBlock;
     }
 
-    public void setDeleteDate(Date deleteDate) {
-        this.deleteDate = deleteDate;
+    public void setDeleteDateForBlock(Date deleteDateForBlock) {
+        this.deleteDateForBlock = deleteDateForBlock;
     }
 
     public void setEmail(String email) {
