@@ -84,7 +84,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                     FoodBoxCells foodBoxCell = foodBoxCellsList.get(ind);
                     foodBoxCell.setBusycells(foodBoxCell.getBusycells() - 1);
                 }
-                logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId()), idOfOrg.toString());
+                logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
                 //Для отладки
                 if (foodBoxCells.getBusycells() < 0)
                 {
