@@ -18,6 +18,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodB
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChangedItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged> {
 
     private final FoodBoxPreorderChanged foodBoxPreorderChanged;
@@ -34,6 +37,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
     public ResFoodBoxChanged process() throws Exception {
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         ResFoodBoxChanged resFoodBoxChanged = new ResFoodBoxChanged();
+        List<FoodBoxCells> foodBoxCellsList = new ArrayList<>();
         for (FoodBoxPreorderChangedItem foodBoxPreorderChangedItem : foodBoxPreorderChanged.getItems()) {
             Long version = daoReadonlyService.getMaxVersionOfFoodBoxPreorder();
             FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(foodBoxPreorderChangedItem.getId());
@@ -52,8 +56,16 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                     //Забираем ячейку
                     logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
                     FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
-                    foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
-                    session.merge(foodBoxCells);
+                    int ind = foodBoxCellsList.indexOf(foodBoxCells);
+                    if (ind == -1) {
+                        foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
+                        foodBoxCellsList.add(foodBoxCells);
+                    }
+                    else
+                    {
+                        FoodBoxCells foodBoxCell = foodBoxCellsList.get(ind);
+                        foodBoxCell.setBusycells(foodBoxCell.getBusycells() + 1);
+                    }
                 }
             }
             foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
@@ -62,8 +74,16 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
                 FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
-                foodBoxCells.setBusycells(foodBoxCells.getBusycells()-1);
-                session.merge(foodBoxCells);
+                int ind = foodBoxCellsList.indexOf(foodBoxCells);
+                if (ind == -1) {
+                    foodBoxCells.setBusycells(foodBoxCells.getBusycells() - 1);
+                    foodBoxCellsList.add(foodBoxCells);
+                }
+                else
+                {
+                    FoodBoxCells foodBoxCell = foodBoxCellsList.get(ind);
+                    foodBoxCell.setBusycells(foodBoxCell.getBusycells() - 1);
+                }
                 logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId()), idOfOrg.toString());
                 //Для отладки
                 if (foodBoxCells.getBusycells() < 0)
@@ -81,6 +101,9 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             resFoodBoxChangedItem.setRes(0);
             resFoodBoxChangedItem.setVersion(version+1);
             resFoodBoxChanged.getItems().add(resFoodBoxChangedItem);
+        }
+        for (FoodBoxCells foodBoxCells: foodBoxCellsList){
+            session.merge(foodBoxCells);
         }
         return resFoodBoxChanged;
     }
