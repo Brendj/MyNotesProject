@@ -56,7 +56,14 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                     //Забираем ячейку
                     logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
                     FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
-                    int ind = foodBoxCellsList.indexOf(foodBoxCells);
+                    int ind = -1;
+                    int num = -1;
+                    for (FoodBoxCells foodBoxCells1: foodBoxCellsList)
+                    {
+                        num++;
+                        if (foodBoxCells1.getFoodboxesid().equals(foodBoxCells.getFoodboxesid()))
+                            ind = num;
+                    }
                     if (ind == -1) {
                         foodBoxCells.setBusycells(foodBoxCells.getBusycells() + 1);
                         foodBoxCellsList.add(foodBoxCells);
@@ -74,7 +81,14 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
                 FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(org, foodBoxPreorderChangedItem.getIdOfFoodBox());
-                int ind = foodBoxCellsList.indexOf(foodBoxCells);
+                int ind = -1;
+                int num = -1;
+                for (FoodBoxCells foodBoxCells1: foodBoxCellsList)
+                {
+                    num ++;
+                    if (foodBoxCells1.getFoodboxesid().equals(foodBoxCells.getFoodboxesid()))
+                        ind = num;
+                }
                 if (ind == -1) {
                     foodBoxCells.setBusycells(foodBoxCells.getBusycells() - 1);
                     foodBoxCellsList.add(foodBoxCells);
@@ -85,11 +99,6 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                     foodBoxCell.setBusycells(foodBoxCell.getBusycells() - 1);
                 }
                 logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
-                //Для отладки
-                if (foodBoxCells.getBusycells() < 0)
-                {
-                    logger.error(String.format("Произошла ошибка с заказом: %s", foodBoxPreorderChangedItem.getId()));
-                }
             }
             foodBoxPreorder.setIdOfOrder(foodBoxPreorderChangedItem.getIdOfOrder());
             foodBoxPreorder.setCancelReason(foodBoxPreorderChangedItem.getCancelReason());
