@@ -55,7 +55,7 @@ public class GuardianDoublesService {
             String query_str = "select c.idofclient, cg.idofguardian, pg.surname, pg.firstname, " +
                     "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg as clientOrg, g.idoforg as guardianOrg, " +
                     "cg.idofclientguardian, ca.lastupdate, g.balance, g.idofclientgroup, g.lastupdate as guardianLU, " +
-                    "cg.deletedstate " +
+                    "cg.deletedstate, cg.disabled " +
                     "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
@@ -87,7 +87,8 @@ public class GuardianDoublesService {
                         HibernateUtils.getDbLong(row[12]),
                         HibernateUtils.getDbLong(row[13]),
                         HibernateUtils.getDbLong(row[14]),
-                        (Boolean)row[15]);
+                        (Boolean)row[15],
+                        HibernateUtils.getDbInt(row[16]));
                 result.add(item);
             }
             transaction.commit();
@@ -141,10 +142,11 @@ public class GuardianDoublesService {
         String log_message = "Processing doubles: ";
         for (CGItem item : processList) {
             log_message += String.format("\nFIO: %s, idOfClient: %s, idOfGuardian: %s, cardNo: %s, guardianClientGroup: %s, " +
-                    "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s",
+                    "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s, " +
+                    "clientGuardianDisabled: %s",
                     item.getFioPlusMobile(), item.getIdOfClient(),
                     item.getIdOfGuardin(), item.getCardno(), item.getIdOfClientGroup(), item.getBalance(), item.getGuardianLastUpdate(),
-                    item.getCardLastUpdate(), item.getDeletedState());
+                    item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled());
             if (item.getCardno() != null) {
                 cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
                         item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
@@ -166,6 +168,7 @@ public class GuardianDoublesService {
 
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
         boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
+        boolean allCGDisabled = getAllCGDisabled(deleteGuardianList);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -186,7 +189,7 @@ public class GuardianDoublesService {
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
                 //Set<ClientGuardianNotificationSetting> notificationSettings
-                deleteGuardian(session, aliveGuardian, item, version);
+                deleteGuardian(session, aliveGuardian, item, version, allCGDisabled);
 
             }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
@@ -222,7 +225,17 @@ public class GuardianDoublesService {
         return true;
     }
 
-    private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version) throws Exception {
+    private boolean getAllCGDisabled(List<CGItem> list) {
+        for (CGItem item : list) {
+            if (!item.getDisabled()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version,
+                                boolean allCGDisabled) throws Exception {
         ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
 
         if (clientGuardian != null) {
@@ -238,10 +251,12 @@ public class GuardianDoublesService {
                             clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
                     logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
                 } else {
-                    addNotificationSettingsAndOptions(session, cg, clientGuardian);
+                    addNotificationSettingsAndOptions(session, cg, clientGuardian, allCGDisabled);
                     if (cg.getDeletedState()) {
                         cg.setDeletedState(false);
-                        cg.setDisabled(false);
+                        if (!allCGDisabled) {
+                            cg.setDisabled(false);
+                        }
                         logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
                         session.update(cg);
                     }
@@ -266,7 +281,8 @@ public class GuardianDoublesService {
         session.flush();
     }
 
-    private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG, ClientGuardian deletedCG) {
+    private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG,
+                                                   ClientGuardian deletedCG, boolean allCGDisabled) {
         boolean changed = false;
         for (ClientGuardianNotificationSetting settingDeleted : deletedCG.getNotificationSettings()) {
             boolean found = false;
@@ -283,7 +299,7 @@ public class GuardianDoublesService {
                         settingDeleted.getNotifyType(), aliveCG.getIdOfGuardian()));
             }
         }
-        if (aliveCG.isDisabled()) {
+        if (aliveCG.isDisabled() && !allCGDisabled) {
             aliveCG.setDisabled(false);
             changed = true;
             logger.info(String.format("Client id = %s, Guardian id=%s set disabled false", aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian()));
