@@ -1290,6 +1290,12 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void deleteFoodBox(Long foodboxesid) {
+        Query query = entityManager.createQuery("delete from FoodBoxCells where foodboxesid=:foodboxesid");
+        query.setParameter("foodboxesid", foodboxesid);
+        query.executeUpdate();
+    }
+
     public void updateFoodBoxAvailable(Long idOfDish, Org org, Integer count) {
         Query query = entityManager.createQuery(
                 "update FoodBoxPreorderAvailable set availableQty=availableQty-:count, version=:version where org=:org and idOfDish=:idOfDish");
