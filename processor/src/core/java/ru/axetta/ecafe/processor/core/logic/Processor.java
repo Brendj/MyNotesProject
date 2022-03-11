@@ -8218,16 +8218,19 @@ public class Processor implements SyncProcessor {
                 Long id = foodBoxCellsItem.getIdFoodBox();
                 Long count = foodBoxCellsItem.getTotalCellsCount();
                 boolean findInTable = false;
-                for (FoodBoxCells foodBoxCells1 : foodBoxCells)
-                {
-                    if (foodBoxCells1.getFbId().equals(id.intValue()))
+
+                for (Iterator<FoodBoxCells> iterator = foodBoxCells.iterator(); iterator.hasNext();) {
+                    FoodBoxCells item = iterator.next();
+                    if (item.getFbId().equals(id.intValue()))
                     {
-                        foodBoxCells1.setTotalcellscount(count.intValue());
-                        if (foodBoxCells1.getBusycells() > foodBoxCells1.getTotalcellscount())
-                            foodBoxCells1.setBusycells(foodBoxCells1.getTotalcellscount());
-                        foodBoxCells1.setUpdateDate(new Date());
-                        persistenceSession.merge(foodBoxCells1);
+                        item.setTotalcellscount(count.intValue());
+                        if (item.getBusycells() > item.getTotalcellscount())
+                            item.setBusycells(item.getTotalcellscount());
+                        item.setUpdateDate(new Date());
+                        persistenceSession.merge(item);
                         findInTable = true;
+                        iterator.remove();
+                        break;
                     }
                 }
                 if (!findInTable)
@@ -8241,7 +8244,11 @@ public class Processor implements SyncProcessor {
                     foodBoxCells1.setOrg(org);
                     persistenceSession.persist(foodBoxCells1);
                 }
-
+            }
+            //Удаляем все фудбоксы, которые не пришли
+            DAOService daoService = DAOService.getInstance();
+            for (FoodBoxCells foodBoxCells1: foodBoxCells) {
+                daoService.deleteFoodBox(foodBoxCells1.getFoodboxesid());
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
