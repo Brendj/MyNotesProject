@@ -13,3 +13,7 @@ COMMENT ON TABLE cf_SfcUserOrgs IS 'Таблица связки сфк поль�
 COMMENT ON COLUMN cf_SfcUserOrgs.idOfSfcUserOrg IS 'Идентификатор записи';
 COMMENT ON COLUMN cf_SfcUserOrgs.idOfUser IS 'Идентификатор пользователя, ссылка на таблицу cf_users';
 COMMENT ON COLUMN cf_SfcUserOrgs.idOfOrg IS 'Идентификатор организации, ссылка на таблицу cf_orgs';
+
+ALTER TABLE cf_users ADD COLUMN deleteDateForBlock bigint;
+
+COMMENT ON COLUMN cf_users.deleteDateForBlock IS 'Дата блокировки учетной записи';

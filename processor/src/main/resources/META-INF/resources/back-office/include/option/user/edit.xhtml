@@ -57,7 +57,7 @@
 
             <h:outputText styleClass="output-text" escape="true" value="Дата блокировки учетной записи"
                           rendered="#{mainPage.userEditPage.isSfc}"/>
-            <rich:calendar value="#{mainPage.userEditPage.deleteDate}"
+            <rich:calendar value="#{mainPage.userEditPage.deleteDateForBlock}"
                            rendered="#{mainPage.userEditPage.isSfc}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
 
@@ -66,8 +66,10 @@
                                      valueChangeListener="#{mainPage.userEditPage.blockedToChange}">
                 <a4j:ajax event="change" render="blockedUntilId"/>
             </h:selectBooleanCheckbox>
-            <h:outputText escape="true" value="Дата окончания блокировки" styleClass="output-text"/>
+            <h:outputText escape="true" value="Дата окончания блокировки" styleClass="output-text"
+                          rendered="#{!mainPage.userEditPage.isSfc}"/>
             <rich:calendar id="blockedUntilId" value="#{mainPage.userEditPage.blockedUntilDate}"
+                           rendered="#{!mainPage.userEditPage.isSfc}"
                            datePattern="dd.MM.yyyy"
                            converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false"
@@ -348,7 +350,8 @@
                 </rich:column>
             </rich:dataTable>
             <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text"
-                          rendered="#{mainPage.userEditPage.isDefault || mainPage.userEditPage.isSupplier || mainPage.userEditPage.isSupplierReport}"/>
+                          rendered="#{mainPage.userEditPage.isDefault || mainPage.userEditPage.isSupplier ||
+                          mainPage.userEditPage.isSupplierReport}"/>
             <rich:dataTable
                     value="#{mainPage.userEditPage.functionSelector.onlineReportItemsAll(mainPage.userEditPage.isSupplierReport)}"
                     var="onlineReportItems"

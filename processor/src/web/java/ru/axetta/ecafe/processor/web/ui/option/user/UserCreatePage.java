@@ -73,7 +73,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     protected String userOrgName = "Не выбрано";
     protected Long userIdOfClient;
     protected String userClientName = "Не выбрано";
-    protected Date deleteDate;
+    protected Date deleteDateForBlock;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -259,7 +259,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             }
             User user = new User(userName, plainPassword, phone, new Date());
             user.setEmail(email);
-            user.setDeleteDate(deleteDate);
+            user.setDeleteDateForBlock(deleteDateForBlock);
             User.DefaultRole role = null;
             if (idOfRole < UserRoleEnumTypeMenu.OFFSET) {
                 role = User.DefaultRole.parse(idOfRole);
@@ -324,6 +324,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                     this.printError("Выберите организацию.");
                     throw new RuntimeException("Org field is null");
                 }
+            }
+
+            if (role != null && role.equals(User.DefaultRole.SFC)) {
+                user.setFunctions(functionSelector.getSfcFunctions(session));
+                user.setRoleName(role.toString());
             }
 
             User u = DAOUtils.findUser(session, userName);
@@ -757,12 +762,12 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
 
     public void setUserClientName(String userClientName) { this.userClientName = userClientName; }
 
-    public Date getDeleteDate() {
-        return deleteDate;
+    public Date getDeleteDateForBlock() {
+        return deleteDateForBlock;
     }
 
-    public void setDeleteDate(Date deleteDate) {
-        this.deleteDate = deleteDate;
+    public void setDeleteDateForBlock(Date deleteDateForBlock) {
+        this.deleteDateForBlock = deleteDateForBlock;
     }
 
     @Override
