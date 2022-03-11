@@ -10,8 +10,8 @@ public class OrderDish {
     private Integer amount = null;
     private String name = null;
     private Long price = null;
-    private Long buffetCategoriesId = null;
-    private String buffetCategoriesName = null;
+    private Long buffetCategoryId = null;
+    private String buffetCategoryName = null;
     public OrderDish dishId(Long dishId) {
         this.dishId = dishId;
         return this;
@@ -81,7 +81,7 @@ public class OrderDish {
         this.price = price;
     }
     public OrderDish buffetCategoriesId(Long buffetCategoriesId) {
-        this.buffetCategoriesId = buffetCategoriesId;
+        this.buffetCategoryId = buffetCategoriesId;
         return this;
     }
 
@@ -91,14 +91,14 @@ public class OrderDish {
      * Идентификатор категории.
      * @return buffetCategoriesId
      **/
-    public Long getBuffetCategoriesId() {
-        return buffetCategoriesId;
+    public Long getBuffetCategoryId() {
+        return buffetCategoryId;
     }
-    public void setBuffetCategoriesId(Long buffetCategoriesId) {
-        this.buffetCategoriesId = buffetCategoriesId;
+    public void setBuffetCategoryId(Long buffetCategoryId) {
+        this.buffetCategoryId = buffetCategoryId;
     }
     public OrderDish buffetCategoriesName(String buffetCategoriesName) {
-        this.buffetCategoriesName = buffetCategoriesName;
+        this.buffetCategoryName = buffetCategoriesName;
         return this;
     }
 
@@ -108,11 +108,11 @@ public class OrderDish {
      * Название категории.
      * @return buffetCategoriesName
      **/
-    public String getBuffetCategoriesName() {
-        return buffetCategoriesName;
+    public String getBuffetCategoryName() {
+        return buffetCategoryName;
     }
-    public void setBuffetCategoriesName(String buffetCategoriesName) {
-        this.buffetCategoriesName = buffetCategoriesName;
+    public void setBuffetCategoryName(String buffetCategoryName) {
+        this.buffetCategoryName = buffetCategoryName;
     }
     @Override
     public boolean equals(Object o) {
@@ -127,13 +127,13 @@ public class OrderDish {
                 Objects.equals(this.amount, orderDish.amount) &&
                 Objects.equals(this.name, orderDish.name) &&
                 Objects.equals(this.price, orderDish.price) &&
-                Objects.equals(this.buffetCategoriesId, orderDish.buffetCategoriesId) &&
-                Objects.equals(this.buffetCategoriesName, orderDish.buffetCategoriesName);
+                Objects.equals(this.buffetCategoryId, orderDish.buffetCategoryId) &&
+                Objects.equals(this.buffetCategoryName, orderDish.buffetCategoryName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dishId, amount, name, price, buffetCategoriesId, buffetCategoriesName);
+        return Objects.hash(dishId, amount, name, price, buffetCategoryId, buffetCategoryName);
     }
 
     @Override
@@ -145,8 +145,8 @@ public class OrderDish {
         sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    price: ").append(toIndentedString(price)).append("\n");
-        sb.append("    buffetCategoriesId: ").append(toIndentedString(buffetCategoriesId)).append("\n");
-        sb.append("    buffetCategoriesName: ").append(toIndentedString(buffetCategoriesName)).append("\n");
+        sb.append("    buffetCategoriesId: ").append(toIndentedString(buffetCategoryId)).append("\n");
+        sb.append("    buffetCategoriesName: ").append(toIndentedString(buffetCategoryName)).append("\n");
         sb.append("}");
         return sb.toString();
     }

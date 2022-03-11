@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,16 +8,16 @@ import java.util.Objects;
  * Передача данных о текущем заказе
  */
 public class CurrentFoodboxOrderInfo {
-    private Long isppIdFoodbox = null;
+    private Long foodboxOrderId = null;
     private String status = null;
     private List<OrderDish> dishes = new ArrayList<OrderDish>();
     private String expiresAt = null;
-    private String timeOrder = null;
-    private Long orderPrice = null;
-    private Long currentBalanceLimit = null;
-    private Long currentBalance = null;
+    private String createdAt = null;
+    private Long totalPrice = null;
+    private Long balanceLimit = null;
+    private Long balance = null;
     public CurrentFoodboxOrderInfo isppIdFoodbox(Long isppIdFoodbox) {
-        this.isppIdFoodbox = isppIdFoodbox;
+        this.foodboxOrderId = isppIdFoodbox;
         return this;
     }
 
@@ -28,11 +27,11 @@ public class CurrentFoodboxOrderInfo {
      * Идентификатор заказа, передаваемый от ИС ПП.
      * @return isppIdFoodbox
      **/
-    public Long getIsppIdFoodbox() {
-        return isppIdFoodbox;
+    public Long getFoodboxOrderId() {
+        return foodboxOrderId;
     }
-    public void setIsppIdFoodbox(Long isppIdFoodbox) {
-        this.isppIdFoodbox = isppIdFoodbox;
+    public void setFoodboxOrderId(Long foodboxOrderId) {
+        this.foodboxOrderId = foodboxOrderId;
     }
     public CurrentFoodboxOrderInfo status(String status) {
         this.status = status;
@@ -91,7 +90,7 @@ public class CurrentFoodboxOrderInfo {
         this.expiresAt = expiresAt;
     }
     public CurrentFoodboxOrderInfo timeOrder(String timeOrder) {
-        this.timeOrder = timeOrder;
+        this.createdAt = timeOrder;
         return this;
     }
 
@@ -101,14 +100,14 @@ public class CurrentFoodboxOrderInfo {
      * Дата и время создания заказа
      * @return timeOrder
      **/
-    public String getTimeOrder() {
-        return timeOrder;
+    public String getCreatedAt() {
+        return createdAt;
     }
-    public void setTimeOrder(String timeOrder) {
-        this.timeOrder = timeOrder;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
     public CurrentFoodboxOrderInfo orderPrice(Long orderPrice) {
-        this.orderPrice = orderPrice;
+        this.totalPrice = orderPrice;
         return this;
     }
 
@@ -118,14 +117,14 @@ public class CurrentFoodboxOrderInfo {
      * Общая стоимость заказа в копейках
      * @return orderPrice
      **/
-    public Long getOrderPrice() {
-        return orderPrice;
+    public Long getTotalPrice() {
+        return totalPrice;
     }
-    public void setOrderPrice(Long orderPrice) {
-        this.orderPrice = orderPrice;
+    public void setTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
     }
     public CurrentFoodboxOrderInfo currentBalanceLimit(Long currentBalanceLimit) {
-        this.currentBalanceLimit = currentBalanceLimit;
+        this.balanceLimit = currentBalanceLimit;
         return this;
     }
 
@@ -135,14 +134,14 @@ public class CurrentFoodboxOrderInfo {
      * Лимит дневных трат
      * @return currentBalanceLimit
      **/
-    public Long getCurrentBalanceLimit() {
-        return currentBalanceLimit;
+    public Long getBalanceLimit() {
+        return balanceLimit;
     }
-    public void setCurrentBalanceLimit(Long currentBalanceLimit) {
-        this.currentBalanceLimit = currentBalanceLimit;
+    public void setBalanceLimit(Long balanceLimit) {
+        this.balanceLimit = balanceLimit;
     }
     public CurrentFoodboxOrderInfo currentBalance(Long currentBalance) {
-        this.currentBalance = currentBalance;
+        this.balance = currentBalance;
         return this;
     }
 
@@ -152,11 +151,11 @@ public class CurrentFoodboxOrderInfo {
      * Остаток денежных средств
      * @return currentBalance
      **/
-    public Long getCurrentBalance() {
-        return currentBalance;
+    public Long getBalance() {
+        return balance;
     }
-    public void setCurrentBalance(Long currentBalance) {
-        this.currentBalance = currentBalance;
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -167,19 +166,19 @@ public class CurrentFoodboxOrderInfo {
             return false;
         }
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = (CurrentFoodboxOrderInfo) o;
-        return Objects.equals(this.isppIdFoodbox, currentFoodboxOrderInfo.isppIdFoodbox) &&
+        return Objects.equals(this.foodboxOrderId, currentFoodboxOrderInfo.foodboxOrderId) &&
                 Objects.equals(this.status, currentFoodboxOrderInfo.status) &&
                 Objects.equals(this.dishes, currentFoodboxOrderInfo.dishes) &&
                 Objects.equals(this.expiresAt, currentFoodboxOrderInfo.expiresAt) &&
-                Objects.equals(this.timeOrder, currentFoodboxOrderInfo.timeOrder) &&
-                Objects.equals(this.orderPrice, currentFoodboxOrderInfo.orderPrice) &&
-                Objects.equals(this.currentBalanceLimit, currentFoodboxOrderInfo.currentBalanceLimit) &&
-                Objects.equals(this.currentBalance, currentFoodboxOrderInfo.currentBalance);
+                Objects.equals(this.createdAt, currentFoodboxOrderInfo.createdAt) &&
+                Objects.equals(this.totalPrice, currentFoodboxOrderInfo.totalPrice) &&
+                Objects.equals(this.balanceLimit, currentFoodboxOrderInfo.balanceLimit) &&
+                Objects.equals(this.balance, currentFoodboxOrderInfo.balance);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(isppIdFoodbox, status, dishes, expiresAt, timeOrder, orderPrice, currentBalanceLimit, currentBalance);
+        return java.util.Objects.hash(foodboxOrderId, status, dishes, expiresAt, createdAt, totalPrice, balanceLimit, balance);
     }
 
     @Override
@@ -187,14 +186,14 @@ public class CurrentFoodboxOrderInfo {
         StringBuilder sb = new StringBuilder();
         sb.append("class CurrentFoodboxOrderInfo {\n");
 
-        sb.append("    isppIdFoodbox: ").append(toIndentedString(isppIdFoodbox)).append("\n");
+        sb.append("    isppIdFoodbox: ").append(toIndentedString(foodboxOrderId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    dishes: ").append(toIndentedString(dishes)).append("\n");
         sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
-        sb.append("    timeOrder: ").append(toIndentedString(timeOrder)).append("\n");
-        sb.append("    orderPrice: ").append(toIndentedString(orderPrice)).append("\n");
-        sb.append("    currentBalanceLimit: ").append(toIndentedString(currentBalanceLimit)).append("\n");
-        sb.append("    currentBalance: ").append(toIndentedString(currentBalance)).append("\n");
+        sb.append("    timeOrder: ").append(toIndentedString(createdAt)).append("\n");
+        sb.append("    orderPrice: ").append(toIndentedString(totalPrice)).append("\n");
+        sb.append("    currentBalanceLimit: ").append(toIndentedString(balanceLimit)).append("\n");
+        sb.append("    currentBalance: ").append(toIndentedString(balance)).append("\n");
         sb.append("}");
         return sb.toString();
     }
