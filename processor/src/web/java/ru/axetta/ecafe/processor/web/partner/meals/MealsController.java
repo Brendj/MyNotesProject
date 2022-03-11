@@ -43,6 +43,8 @@ public class MealsController extends Application {
     private Logger logger = LoggerFactory.getLogger(MealsController.class);
     public static final String BUFFET_OPEN_TIME = "ecafe.processor.meals.buffetOpenTime";
     public static final String BUFFET_CLOSE_TIME = "ecafe.processor.meals.buffetCloseTime";
+    public static final Integer MAX_COUNT_DISH = 5;
+    public static final int HTTP_UNPROCESSABLE_ENTITY = 422;
 
     public static final Integer MAX_COUNT = 20;//Максимальное количество блюд для возвращения в методе
     protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -79,9 +81,9 @@ public class MealsController extends Application {
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-                orderErrorInfo.setBuffetOpenTime(getBuffetOpenTime());
-                orderErrorInfo.setBuffetCloseTime(getBuffetCloseTime());
-                return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                orderErrorInfo.setBuffetOpenAt(getBuffetOpenTime());
+                orderErrorInfo.setBuffetCloseAt(getBuffetCloseTime());
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         } catch (Exception e)
         {};
@@ -102,6 +104,18 @@ public class MealsController extends Application {
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
+        }
+        String xrequestStr = "";
+        Enumeration<String> headerNames = request.getHeaderNames();
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String header = headerNames.nextElement();
+                if (header.toLowerCase().equals("x-request-id"))
+                {
+                    xrequestStr = request.getHeader(header);
+                    break;
+                }
+            }
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -128,10 +142,10 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
 
-        FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(foodboxOrder.getMeshIdFoodbox());
+        FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(xrequestStr);
         if (foodBoxPreorderDB != null)
         {
-            logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", foodboxOrder.getMeshIdFoodbox()));
+            logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", xrequestStr));
             result.setCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
             result.setDescription(ResponseCodes.RC_FOUND_FOODBOX.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
@@ -143,8 +157,8 @@ public class MealsController extends Application {
             OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_HAVE_PREORDER.getCode());
             orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.toString());
-            orderErrorInfo.setOrderNumber(foodBoxPreorders.get(0).getIdOfOrder());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+            orderErrorInfo.setFoodboxOrderId(foodBoxPreorders.get(0).getIdOfOrder());
+            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
 
         Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
@@ -162,7 +176,7 @@ public class MealsController extends Application {
             OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_CELL.getCode());
             orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_CELL.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = new CurrentFoodboxOrderInfo();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -179,34 +193,46 @@ public class MealsController extends Application {
             foodBoxPreorder.setState(FoodBoxStateTypeEnum.NEW);
             foodBoxPreorder.setOrg(client.getOrg());
             foodBoxPreorder.setCreateDate(new Date());
-            foodBoxPreorder.setIdFoodBoxExternal(foodboxOrder.getMeshIdFoodbox());
+            foodBoxPreorder.setIdFoodBoxExternal(xrequestStr);
             foodBoxPreorder.setLocated(false);
             persistenceSession.persist(foodBoxPreorder);
-            currentFoodboxOrderInfo.setIsppIdFoodbox(foodBoxPreorder.getIdFoodBoxPreorder());
+            currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
             currentFoodboxOrderInfo.setExpiresAt(simpleDateFormat.format(new Date(new Date().getTime() + 3600000))+"Z");
-            currentFoodboxOrderInfo.setTimeOrder(simpleDateFormat.format(new Date())+"Z");
-            currentFoodboxOrderInfo.setCurrentBalance(client.getBalance());
-            currentFoodboxOrderInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
+            currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(new Date())+"Z");
+            currentFoodboxOrderInfo.setBalance(client.getBalance());
+            currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
+            boolean havegoodDish = false;
             for (OrderDish orderDish : foodboxOrder.getDishes()) {
+                if (orderDish.getAmount() > MAX_COUNT_DISH)
+                {
+                    logger.error(String.format("Блюд заказано больше допустимого idOfDish: %s", orderDish.getDishId()));
+                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
+                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+                }
+                //Получаем количество доступных блюд
                 FoodBoxPreorderAvailable foodBoxPreorderAvailable = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg(), orderDish.getDishId());
                 try {
                     if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId())))
                     {
-                        logger.error(String.format("Блюдо из заказа не доступно idOfDish: %s", orderDish.getDishId()));
-                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
-                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
-                        return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+//                        logger.error(String.format("Блюдо из заказа не доступно idOfDish: %s", orderDish.getDishId()));
+//                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+//                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
+//                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
+//                        return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+                        continue;
                     }
                     if (foodBoxPreorderAvailable == null || foodBoxPreorderAvailable.getAvailableQty() <= 0)
                     {
-                        logger.error(String.format("Количество блюд из заказа не доступно idOfDish: %s", orderDish.getDishId()));
-                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
-                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
-                        return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+//                        logger.error(String.format("Количество блюд из заказа не доступно idOfDish: %s", orderDish.getDishId()));
+//                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+//                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
+//                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
+//                        return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+                        continue;
                     }
                 } catch (Exception e)
                 {
@@ -215,24 +241,37 @@ public class MealsController extends Application {
                     result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
                     return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
                 }
+                havegoodDish = true;
                 FoodBoxPreorderDish foodBoxPreorderDish = new FoodBoxPreorderDish();
                 foodBoxPreorderDish.setFoodBoxPreorder(foodBoxPreorder);
                 foodBoxPreorderDish.setIdOfDish(orderDish.getDishId());
                 foodBoxPreorderDish.setPrice(orderDish.getPrice().intValue());
                 if (orderDish.getPrice() != null)
                     priceAll += orderDish.getPrice();
-                foodBoxPreorderDish.setQty(orderDish.getAmount());
+                //Если заказали больше, чем осталось
+                if (foodBoxPreorderAvailable.getAvailableQty() < orderDish.getAmount())
+                    foodBoxPreorderDish.setQty(foodBoxPreorderAvailable.getAvailableQty());
+                else
+                    foodBoxPreorderDish.setQty(orderDish.getAmount());
                 foodBoxPreorderDish.setName(orderDish.getName());
-                foodBoxPreorderDish.setBuffetCategoriesId(orderDish.getBuffetCategoriesId());
-                foodBoxPreorderDish.setBuffetCategoriesName(orderDish.getBuffetCategoriesName());
+                foodBoxPreorderDish.setBuffetCategoriesId(orderDish.getBuffetCategoryId());
+                foodBoxPreorderDish.setBuffetCategoriesName(orderDish.getBuffetCategoryName());
                 foodBoxPreorderDish.setCreateDate(new Date());
                 persistenceSession.persist(foodBoxPreorderDish);
-                DAOService.getInstance().updateFoodBoxAvailable(orderDish.getDishId(), client.getOrg());
+                DAOService.getInstance().updateFoodBoxAvailable(orderDish.getDishId(), client.getOrg(), foodBoxPreorderDish.getQty());
                 currentFoodboxOrderInfo.getDishes().add(orderDish);
+            }
+            if (!havegoodDish)
+            {
+                logger.error(String.format("Все блюда из заказа не доступны foodBoxid: %s", xrequestStr));
+                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NO_DISH.getCode());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NO_DISH.toString());
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             foodBoxPreorder.setOrderPrice(priceAll);
             persistenceSession.merge(foodBoxPreorder);
-            currentFoodboxOrderInfo.setOrderPrice(priceAll);
+            currentFoodboxOrderInfo.setTotalPrice(priceAll);
             if (client.getBalance() != null && client.getBalance() != 0) {
                 if (priceAll > client.getBalance())
                 {
@@ -240,8 +279,8 @@ public class MealsController extends Application {
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
-                    orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
-                    return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                    orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
             if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
@@ -250,8 +289,8 @@ public class MealsController extends Application {
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
-                    orderErrorInfo.setCurrentBalanceLimit(client.getExpenditureLimit());
-                    return Response.status(HttpURLConnection.HTTP_OK).entity(orderErrorInfo).build();
+                    orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
             persistenceTransaction.commit();
@@ -867,8 +906,8 @@ public class MealsController extends Application {
             orderDish.setDishId(foodBoxPreorderDish.getIdOfDish());
             orderDish.setPrice(foodBoxPreorderDish.getPrice().longValue());
             orderDish.setName(foodBoxPreorderDish.getName());
-            orderDish.setBuffetCategoriesId(foodBoxPreorderDish.getBuffetCategoriesId());
-            orderDish.setBuffetCategoriesName(foodBoxPreorderDish.getBuffetCategoriesName());
+            orderDish.setBuffetCategoryId(foodBoxPreorderDish.getBuffetCategoriesId());
+            orderDish.setBuffetCategoryName(foodBoxPreorderDish.getBuffetCategoriesName());
             sum += foodBoxPreorderDish.getPrice();
             foodboxOrderInfo.getDishes().add(orderDish);
         }

@@ -16,15 +16,15 @@ public class OrderErrorInfo {
     private Long code = null;
     private String information = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long currentBalanceLimit = null;
+    private Long balanceLimit = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long currentBalance = null;
+    private Long balance = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String buffetOpenTime = null;
+    private String buffetOpenAt = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String buffetCloseTime = null;
+    private String buffetCloseAt = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long orderNumber = null;
+    private Long foodboxOrderId = null;
     public OrderErrorInfo code(Long code) {
         this.code = code;
         return this;
@@ -60,7 +60,7 @@ public class OrderErrorInfo {
         this.information = information;
     }
     public OrderErrorInfo currentBalanceLimit(Long currentBalanceLimit) {
-        this.currentBalanceLimit = currentBalanceLimit;
+        this.balanceLimit = currentBalanceLimit;
         return this;
     }
 
@@ -70,14 +70,14 @@ public class OrderErrorInfo {
      * Лимит дневных трат. Атрибут передаётся в случае ошибки, связанной с превышением дневного лимита
      * @return currentBalanceLimit
      **/
-    public Long getCurrentBalanceLimit() {
-        return currentBalanceLimit;
+    public Long getBalanceLimit() {
+        return balanceLimit;
     }
-    public void setCurrentBalanceLimit(Long currentBalanceLimit) {
-        this.currentBalanceLimit = currentBalanceLimit;
+    public void setBalanceLimit(Long balanceLimit) {
+        this.balanceLimit = balanceLimit;
     }
     public OrderErrorInfo currentBalance(Long currentBalance) {
-        this.currentBalance = currentBalance;
+        this.balance = currentBalance;
         return this;
     }
 
@@ -87,11 +87,11 @@ public class OrderErrorInfo {
      * Остаток денежных средств. Атрибут передаётся в случае ошибки, связанной с нехваткой средств на балансе при попытке заказа
      * @return currentBalance
      **/
-    public Long getCurrentBalance() {
-        return currentBalance;
+    public Long getBalance() {
+        return balance;
     }
-    public void setCurrentBalance(Long currentBalance) {
-        this.currentBalance = currentBalance;
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -104,13 +104,13 @@ public class OrderErrorInfo {
         OrderErrorInfo orderErrorInfo = (OrderErrorInfo) o;
         return Objects.equals(this.code, orderErrorInfo.code) &&
                 Objects.equals(this.information, orderErrorInfo.information) &&
-                Objects.equals(this.currentBalanceLimit, orderErrorInfo.currentBalanceLimit) &&
-                Objects.equals(this.currentBalance, orderErrorInfo.currentBalance);
+                Objects.equals(this.balanceLimit, orderErrorInfo.balanceLimit) &&
+                Objects.equals(this.balance, orderErrorInfo.balance);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(code, information, currentBalanceLimit, currentBalance);
+        return java.util.Objects.hash(code, information, balanceLimit, balance);
     }
 
     @Override
@@ -120,8 +120,8 @@ public class OrderErrorInfo {
 
         sb.append("    code: ").append(toIndentedString(code)).append("\n");
         sb.append("    information: ").append(toIndentedString(information)).append("\n");
-        sb.append("    currentBalanceLimit: ").append(toIndentedString(currentBalanceLimit)).append("\n");
-        sb.append("    currentBalance: ").append(toIndentedString(currentBalance)).append("\n");
+        sb.append("    currentBalanceLimit: ").append(toIndentedString(balanceLimit)).append("\n");
+        sb.append("    currentBalance: ").append(toIndentedString(balance)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -137,27 +137,27 @@ public class OrderErrorInfo {
         return o.toString().replace("\n", "\n    ");
     }
 
-    public String getBuffetOpenTime() {
-        return buffetOpenTime;
+    public String getBuffetOpenAt() {
+        return buffetOpenAt;
     }
 
-    public void setBuffetOpenTime(String buffetOpenTime) {
-        this.buffetOpenTime = buffetOpenTime;
+    public void setBuffetOpenAt(String buffetOpenAt) {
+        this.buffetOpenAt = buffetOpenAt;
     }
 
-    public String getBuffetCloseTime() {
-        return buffetCloseTime;
+    public String getBuffetCloseAt() {
+        return buffetCloseAt;
     }
 
-    public void setBuffetCloseTime(String buffetCloseTime) {
-        this.buffetCloseTime = buffetCloseTime;
+    public void setBuffetCloseAt(String buffetCloseAt) {
+        this.buffetCloseAt = buffetCloseAt;
     }
 
-    public Long getOrderNumber() {
-        return orderNumber;
+    public Long getFoodboxOrderId() {
+        return foodboxOrderId;
     }
 
-    public void setOrderNumber(Long orderNumber) {
-        this.orderNumber = orderNumber;
+    public void setFoodboxOrderId(Long foodboxOrderId) {
+        this.foodboxOrderId = foodboxOrderId;
     }
 }
