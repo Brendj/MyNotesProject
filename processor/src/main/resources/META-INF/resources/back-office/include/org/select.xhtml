@@ -8,7 +8,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="false" width="780" height="800"
+    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="true" minWidth="800" minHeight="800"
                      headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
