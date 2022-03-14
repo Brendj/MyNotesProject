@@ -4,12 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import org.hibernate.criterion.Order;
+import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -23,7 +22,10 @@ import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -76,11 +78,15 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
             Long idOfContragent, Long idOfContract, boolean onlySupplier, Long ekisId, Long orgIdFromNsi,
             Boolean webARM) throws Exception {
+        Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
+        List<Long> ids = new LinkedList<>();
+        User user = (User) session.load(User.class, idOfUser);
         Criteria orgCriteria = session.createCriteria(Org.class);
+
         if (webARM != null) {
             orgCriteria.add(Restrictions.eq("useWebArm", webARM));
         }
-        Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
+
         if (idOfUser == null) {
             throw new Exception("Не удалось получить ID пользователя");
         }
@@ -95,18 +101,24 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             orgCriteria.add(Restrictions.or(shortNameInfoServiceIlike, shortNameOrOfficalNameIlike));
         }
 
+        if (user.getIdOfRole().equals(User.DefaultRole.SFC.getIdentification())) {
+            if(!user.getSfcUserOrgs().isEmpty())
+                ids.addAll(user.getSfcUserOrgs().stream().map(SfcUserOrgs::getIdOfSfcUserOrg).collect(Collectors.toList()));
+        }
+
         if (StringUtils.isNotBlank(idFilter)) {
             String[] stringIds = idFilter.split("\\s*,\\s*");
-            List<Long> ids = new LinkedList<>();
+
             for(String stringId : stringIds) {
                 try {
                     ids.add(Long.valueOf(stringId));
                 } catch (Exception ignored) {
                 }
             }
-            if(CollectionUtils.isNotEmpty(ids)) {
-                orgCriteria.add(Restrictions.in("id", ids));
-            }
+        }
+
+        if(CollectionUtils.isNotEmpty(ids)) {
+            orgCriteria.add(Restrictions.in("id", ids));
         }
 
         if(ekisId != null && ekisId.compareTo(Long.parseLong("-1")) > 0){
