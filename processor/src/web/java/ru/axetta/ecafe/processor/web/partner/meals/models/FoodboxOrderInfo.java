@@ -12,10 +12,10 @@ import java.util.List;
 public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
     private Long isppIdFoodbox = null;
     private String status = null;
-    private String expiresAt = null;
-    private String timeOrder = null;
+    private String expiredAt = null;
+    private String createdAt = null;
     private List<OrderDish> dishes = new ArrayList<OrderDish>();
-    private Long orderPrice = null;
+    private Long totalPrice = null;
 
     /**
      * Идентификатор заказа.
@@ -47,7 +47,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
         this.status = status;
     }
     public FoodboxOrderInfo expiresAt(String expiresAt) {
-        this.expiresAt = expiresAt;
+        this.expiredAt = expiresAt;
         return this;
     }
 
@@ -57,14 +57,14 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
      * Дата и время, до которого клиент может забрать заказ
      * @return expiresAt
      **/
-    public String getExpiresAt() {
-        return expiresAt;
+    public String getExpiredAt() {
+        return expiredAt;
     }
-    public void setExpiresAt(String expiresAt) {
-        this.expiresAt = expiresAt;
+    public void setExpiredAt(String expiredAt) {
+        this.expiredAt = expiredAt;
     }
     public FoodboxOrderInfo timeOrder(String timeOrder) {
-        this.timeOrder = timeOrder;
+        this.createdAt = timeOrder;
         return this;
     }
 
@@ -74,11 +74,11 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
      * Дата и время создания заказа
      * @return timeOrder
      **/
-    public String getTimeOrder() {
-        return timeOrder;
+    public String getCreatedAt() {
+        return createdAt;
     }
-    public void setTimeOrder(String timeOrder) {
-        this.timeOrder = timeOrder;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
     public FoodboxOrderInfo dishes(List<OrderDish> dishes) {
         this.dishes = dishes;
@@ -101,7 +101,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
         this.dishes = dishes;
     }
     public FoodboxOrderInfo orderPrice(Long orderPrice) {
-        this.orderPrice = orderPrice;
+        this.totalPrice = orderPrice;
         return this;
     }
 
@@ -111,11 +111,11 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
      * Общая стоимость заказа в копейках
      * @return orderPrice
      **/
-    public Long getOrderPrice() {
-        return orderPrice;
+    public Long getTotalPrice() {
+        return totalPrice;
     }
-    public void setOrderPrice(Long orderPrice) {
-        this.orderPrice = orderPrice;
+    public void setTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -128,15 +128,15 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
         FoodboxOrderInfo foodboxOrderInfo = (FoodboxOrderInfo) o;
         return Objects.equals(this.isppIdFoodbox, foodboxOrderInfo.isppIdFoodbox) &&
                 Objects.equals(this.status, foodboxOrderInfo.status) &&
-                Objects.equals(this.expiresAt, foodboxOrderInfo.expiresAt) &&
-                Objects.equals(this.timeOrder, foodboxOrderInfo.timeOrder) &&
+                Objects.equals(this.expiredAt, foodboxOrderInfo.expiredAt) &&
+                Objects.equals(this.createdAt, foodboxOrderInfo.createdAt) &&
                 Objects.equals(this.dishes, foodboxOrderInfo.dishes) &&
-                Objects.equals(this.orderPrice, foodboxOrderInfo.orderPrice);
+                Objects.equals(this.totalPrice, foodboxOrderInfo.totalPrice);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(isppIdFoodbox, status, expiresAt, timeOrder, dishes, orderPrice);
+        return java.util.Objects.hash(isppIdFoodbox, status, expiredAt, createdAt, dishes, totalPrice);
     }
 
     @Override
@@ -146,10 +146,10 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
 
         sb.append("    id: ").append(toIndentedString(isppIdFoodbox)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
-        sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
-        sb.append("    timeOrder: ").append(toIndentedString(timeOrder)).append("\n");
+        sb.append("    expiresAt: ").append(toIndentedString(expiredAt)).append("\n");
+        sb.append("    timeOrder: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    dishes: ").append(toIndentedString(dishes)).append("\n");
-        sb.append("    orderPrice: ").append(toIndentedString(orderPrice)).append("\n");
+        sb.append("    orderPrice: ").append(toIndentedString(totalPrice)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -169,7 +169,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
     @Override
     public int compareTo(FoodboxOrderInfo o) {
         try {
-            if (MealsController.simpleDateFormat.parse(this.getTimeOrder()).after(MealsController.simpleDateFormat.parse(o.getTimeOrder())))
+            if (MealsController.simpleDateFormat.parse(this.getCreatedAt()).after(MealsController.simpleDateFormat.parse(o.getCreatedAt())))
                 return -1;
             else
                 return 1;

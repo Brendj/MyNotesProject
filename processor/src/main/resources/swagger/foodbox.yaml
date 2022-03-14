@@ -18,7 +18,7 @@ paths:
       summary: Возвращает данные клиента
       operationId: getClientData
       parameters:
-        - $ref: '#/components/parameters/clientId'
+        - $ref: '#/components/parameters/ClientId'
       responses:
         '200':
           description: OK
@@ -41,7 +41,7 @@ paths:
 
   /clients/expenseConstraints:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     put:
       tags:
         - Клиент
@@ -67,7 +67,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /clients/preorderAllowed:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     put:
       tags:
         - Клиент
@@ -91,57 +91,24 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /dictionaries/notifications:
-    get:
-      tags:
-        - Уведомления
-      summary: Возвращает список возможных уведомлений.
-      operationId: getNotificationDictionary
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationDictionary'
-  /clients/notifications:
+  /clients/foodboxAllowed:
     parameters:
-      - $ref: '#/components/parameters/PersonId'
-    get:
-      tags:
-        - Уведомления
-      summary: Возвращает список уведомлений для персоны.
-      operationId: getPersonNotifications
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationRule'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+      - $ref: '#/components/parameters/ClientId'
     put:
       tags:
-        - Уведомления
-      summary: Установка списка уведомлений представителя по клиенту.
-      operationId: setPersonNotifications
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationRule'
+        - Клиент
+      summary: Устанавливает разрешение по Фудбоксу для клиента
+      operationId: setPersonFoodboxAllowed
+      parameters:
+        - name: foodboxAllowed
+          description: Признак разрешения на использование фудбокса
+          in: query
+          required: true
+          schema:
+            type: boolean
       responses:
         '204':
-          description: Обработано
+          description: No Content
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -154,7 +121,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /menu/buffet:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Меню
@@ -181,7 +148,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /menu/complexes:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Меню
@@ -208,7 +175,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /menu/prohibitions:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Ограничения в столовой
@@ -256,7 +223,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/single:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Разовые заказы
@@ -361,7 +328,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/foodbox:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
+      - $ref: '#/components/parameters/RequestId'
     post:
       tags:
         - Фудбокс-заказ
@@ -374,12 +342,6 @@ paths:
               $ref: '#/components/schemas/FoodboxOrder'
         required: true
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderErrorInfo'
         '201':
           description: Created
           content:
@@ -394,43 +356,19 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Фудбокс-заказ
-      summary: Удаляет заказ.
-      operationId: deletePersonFoodboxOrder
-      parameters:
-        - name: id
-          description: Идентификатор заказа.
-          in: query
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: No Content
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
         '500':
           $ref: '#/components/responses/InternalServerError'
     get:
       tags:
         - Фудбокс-заказ
       summary: Возвращает список всех фудбокс-заказов.
-      operationId: getPersonFoodboxOrderList
+      operationId: getPersonFoodboxOrders
       parameters:
         - $ref: '#/components/parameters/From'
         - $ref: '#/components/parameters/To'
         - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/foodboxOrderNumber'
       responses:
         '200':
           description: OK
@@ -448,35 +386,41 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /foodbox/info:
+  /orders/foodbox/{foodboxOrderId}:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/FoodboxOrderId'
+    delete:
+      tags:
+        - Фудбокс-заказ
+      summary: Удаляет заказ по идентификатору заказа.
+      operationId: deletePersonFoodboxOrder
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     get:
       tags:
-        - Доступ к фудбоксу
-      summary: Возвращает список разрешений по Фудбоксу для ОУ и клиента
-      operationId: getFoodboxInfo
+        - Фудбокс-заказ
+      summary: Возвращает заказ по идентификатору заказа.
+      operationId: getPersonFoodboxOrder
+      parameters:
+        - $ref: '#/components/parameters/FoodboxOrderId'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetFoodboxInfo'
-    put:
-      tags:
-        - Доступ к фудбоксу
-      summary: Устанавливает разрешение по Фудбоксу для клиента
-      operationId: putFoodboxInfo
-      parameters:
-        - name: foodboxAvailability
-          description: Признак доступности использования фудбокса
-          in: query
-          schema:
-            type: boolean
-      responses:
-        '200':
-          description: OK
+                $ref: '#/components/schemas/HistoryFoodboxOrderInfo'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -489,7 +433,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/regular:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Регулярные предзаказы
@@ -553,7 +497,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/regular/{orderId}:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
       - $ref: '#/components/parameters/OrderId'
     delete:
       tags:
@@ -610,7 +554,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/handed:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Выданные заказы
@@ -641,7 +585,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /orders/summary:
     parameters:
-      - $ref: '#/components/parameters/clientId'
+      - $ref: '#/components/parameters/ClientId'
     get:
       tags:
         - Информация по заказам
@@ -667,7 +611,7 @@ paths:
 
 components:
   parameters:
-    clientId:
+    ClientId:
       name: clientId
       description: Идентификатор персоны из МЭШ.Контингент
       in: query
@@ -675,7 +619,15 @@ components:
       style: form
       explode: true
       schema:
-        $ref: '#/components/schemas/clientId'
+        $ref: '#/components/schemas/ClientId'
+    RequestId:
+      name: X-Request-ID
+      description: Идентификатор запроса
+      in: header
+      required: false
+      schema:
+        type: string
+        format: UUID
     PersonId:
       name: personId
       description: Идентификатор персоны из МЭШ.Контингент
@@ -688,7 +640,7 @@ components:
       name: onDate
       description: Дата, на которую необходимо вернуть данные
       in: query
-      required: true
+      required: false
       schema:
         type: string
         format: date
@@ -733,10 +685,10 @@ components:
         type: string
         enum: [asc, desc]
         default: desc
-    foodboxOrderNumber:
-      name: foodboxOrderNumber
-      description: Номер фудбокс-заказа
-      in: query
+    FoodboxOrderId:
+      name: foodboxOrderId
+      description: Идентификатор Фудбокс-заказа, передаваемый от ИС ПП
+      in: path
       required: true
       schema:
         type: integer
@@ -775,14 +727,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    UnprocessableEntity:
-      description: Логическая ошибка, из-за которой невозможно произвести операцию.
+    NotFound:
+      description: Не найден запрашиваемый ресурс.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Не найден запрашиваемый ресурс.
+    UnprocessableEntity:
+      description: Логическая ошибка, из-за которой невозможно произвести операцию.
       content:
         application/json:
           schema:
@@ -813,44 +765,6 @@ components:
           type: object
           properties: {}
           description: Детализация ошибки.
-    NotificationRule:
-      type: object
-      description: Список кодов уведомлений представителя по персоне.
-      properties:
-        agent_id:
-          type: string
-          format: UUID
-          description: Идентификатор представителя из МЭШ.Контингент
-        person_id:
-          type: string
-          format: UUID
-          description: Идентификатор представителя из МЭШ.Контингент
-        items:
-          type: array
-          description: Список кодов уведомлений
-          items:
-            type: string
-    NotificationDictionary:
-      description: Справочник уведомлений.
-      type: array
-      items:
-        $ref: '#/components/schemas/NotificationDictionaryItem'
-    NotificationDictionaryItem:
-      description: Элемент справочника уведомлений.
-      type: object
-      required:
-        - code
-        - name
-      properties:
-        code:
-          title: Код настройки
-          type: integer
-          format: int64
-          example: 1000000000
-        name:
-          title: Название настройки
-          type: string
-          example: Оповещение о пополнениях
     Prohibitions:
       description: Список ограничений на категории, подкатегории, блюда
       type: array
@@ -881,57 +795,73 @@ components:
     PersonBuffetMenu:
       type: object
       description: Персональное меню
+      required:
+        - categories
+        - buffetIsOpen
+        - buffetOpenAt
+        - buffetCloseAt
       properties:
-        buffetCategoriesItem:
-          type: object
+        categories:
+          type: array
           description: Список категорий меню
-          required:
-            - id
-            - name
-            - buffetSubcategoriesItem
-          properties:
-            id:
-              type: integer
-              description: Идентификатор категории.
-              format: int64
-            name:
-              type: string
-              description: Название категории.
-            buffetSubcategoriesItem:
-              type: object
-              description: Список подкатегорий меню
-              required:
-                - id
-                - name
-                - menuDishesItem
-              properties:
-                id:
-                  type: integer
-                  description: Идентификатор подкатегории.
-                  format: int64
-                name:
-                  type: string
-                  description: Название подкатегории.
-                menuDishesItem:
-                  type: array
-                  description: Список блюд меню.
-                  items:
-                    $ref: '#/components/schemas/Dish'
-        dishesAmount:
-          type: integer
-          description: Количество блюд
-          format: int64
+          items:
+            $ref: '#/components/schemas/BuffetCategory'
         buffetIsOpen:
           type: boolean
           description: Признак работы буфета, открыт или закрыт
-        buffetOpenTime:
+        buffetOpenAt:
           type: string
           description: Дата начала работы буфета
           format: datetime
-        buffetCloseTime:
+        buffetCloseAt:
           type: string
           description: Дата завершения работы буфета
           format: datetime
+    BuffetCategory:
+      type: object
+      description: Категория блюд
+      required:
+        - id
+        - name
+        - dishes
+      properties:
+        id:
+          type: integer
+          description: Идентификатор категории
+          format: int64
+        name:
+          type: string
+          description: Название категории
+        subcategories:
+          type: array
+          description: Список подкатегорий меню
+          items:
+            $ref: '#/components/schemas/BuffetSubcategory'
+        dishes:
+          type: array
+          description: Блюда в категории
+          items:
+            $ref: '#/components/schemas/Dish'
+    BuffetSubcategory:
+      type: object
+      description: Подкатегория блюд
+      required:
+        - id
+        - name
+        - dishes
+      properties:
+        id:
+          type: integer
+          description: Идентификатор подкатегории
+          format: int64
+        name:
+          type: string
+          description: Название подкатегории
+        dishes:
+          type: array
+          description: Блюда в подкатегории
+          items:
+            $ref: '#/components/schemas/Dish'
     Dish:
       description: Блюдо.
       type: object
@@ -940,6 +870,12 @@ components:
         - code
         - name
         - price
+        - ingredients
+        - calories
+        - weight
+        - protein
+        - fat
+        - carbohydrates
       properties:
         id:
           type: integer
@@ -1139,8 +1075,9 @@ components:
         - dishId
         - amount
         - price
-        - buffetCategoriesId
-        - buffetCategoriesName
+        - name
+        - buffetCategoryId
+        - buffetCategoryName
       type: object
       properties:
         dishId:
@@ -1157,124 +1094,87 @@ components:
           type: integer
           description: Цена блюда в копейках.
           format: int64
-        buffetCategoriesId:
+        buffetCategoryId:
           type: integer
           description: Идентификатор категории.
           format: int64
-        buffetCategoriesName:
+        buffetCategoryName:
           type: string
           description: Название категории.
     FoodboxOrder:
       description: Cоздание фудбокс-заказа.
       type: object
       required:
-        - id
-        - createdAt
-        - foodboxAllowed
+        - dishes
       properties:
-        id:
-          type: integer
-          description: Идентификатор заказа.
-          format: int64
-        createdAt:
-          type: string
-          description: Дата и время совершения заказа.
-          format: date-time
         dishes:
           description: Список блюд в заказе.
           type: array
           items:
             $ref: '#/components/schemas/OrderDish'
-        orderPrice:
-          type: integer
-          description: Общая стоимость заказа в копейках
-          format: int64
     FoodboxOrderInfo:
       description: Передача данных о заказе (в контексте списка).
       type: object
       required:
-        - id
+        - foodboxOrderId
         - status
         - dishes
+        - expiredAt
+        - createdAt
+        - totalPrice
       properties:
-        id:
+        foodboxOrderId:
           type: integer
-          description: Идентификатор заказа.
+          description: Идентификатор Фудбокс-заказа, передаваемый от ИС ПП
           format: int64
         status:
           type: string
           description: Статус заказа в системе. При запросе списка заказов передавать статусы всех заказов, в т.ч. и текущих
-        expiresAt:
+        expiredAt:
           type: string
           description: Дата и время, до которого клиент может забрать заказ
           format: date-time
-        timeOrder:
+        createdAt:
           type: string
           description: Дата и время создания заказа
           format: date-time
-        issueTime:
-          type: string
-          description: Дата и время получения заказа. Параметр обязателен для выданных заказов
-          format: date-time
-        foodboxOrderNumber:
-          type: integer
-          description: Номер фудбокс-заказа
-          format: int64
         dishes:
           type: array
           items:
             $ref: '#/components/schemas/OrderDish'
-        orderPrice:
+        totalPrice:
           type: integer
           description: Общая стоимость заказа в копейках
           format: int64
     HistoryFoodboxOrderInfo:
       description: История заказов или получение данных по конкретному заказу фудбокса
       type: object
+      required:
+        - info
+        - orders
       properties:
-        foodboxAvailabilityForEO:
-          type: boolean
-          description: Признак доступности использования фудбокса для образовательной организации
-        foodboxAvailability:
-          type: boolean
-          description: Признак доступности использования фудбокса
-        ordersInfo:
-          type: array
-          items:
-            $ref: '#/components/schemas/FoodboxOrderInfo'
-        ordersAmount:
+        info:
+          $ref: '#/components/schemas/FoodboxOrderInfo'
+        orders:
           type: integer
           description: Количество заказов в списке
           format: int64
-    GetFoodboxInfo:
-      description: Возвращает список разрешений по Фудбоксу для ОУ и клиента
-      type: object
-      properties:
-        foodboxAvailabilityForEO:
-          type: boolean
-          description: Признак доступности использования фудбокса для образовательной организации
-        foodboxAvailability:
-          type: boolean
-          description: Признак доступности использования фудбокса
     CurrentFoodboxOrderInfo:
       description: Передача данных о текущем заказе
       type: object
       required:
-        - id
-        - foodboxOrderNumber
+        - foodboxOrderId
         - status
         - dishes
-        - expiresAt
-        - timeOrder
-        - orderPrice
+        - expiredAt
+        - createdAt
+        - totalPrice
+        - balanceLimit
+        - balance
       properties:
-        id:
+        foodboxOrderId:
           type: integer
-          description: Идентификатор заказа.
-          format: int64
-        foodboxOrderNumber:
-          type: integer
-          description: Номер фудбокс-заказа
+          description: Идентификатор Фудбокс-заказа, передаваемый от ИС ПП
           format: int64
         status:
           type: string
@@ -1283,42 +1183,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderDish'
-        expiresAt:
+        expiredAt:
           type: string
           description: Дата и время, до которого клиент может забрать заказ
           format: date-time
-        timeOrder:
+        createdAt:
           type: string
           description: Дата и время создания заказа
           format: date-time
-        orderPrice:
+        totalPrice:
           type: integer
           description: Общая стоимость заказа в копейках
           format: int64
-    OrderErrorInfo:
-      description: Информация о балансе ЛС клиента
-      type: object
-      required:
-        - code
-        - information
-      properties:
-        code:
+        balanceLimit:
           type: integer
+          description: Лимит дневных трат
           format: int64
-          description: Код ошибки, возвращаемый в ответе
-          example: 10
-        information:
-          type: string
-          description: Информация возвращаемая в ответе
-          example: Заказ не попадает в рамки времени работы буфета
-        currentBalanceLimit:
+        balance:
           type: integer
+          description: Остаток денежных средств
           format: int64
-          description: Лимит дневных трат. Атрибут передаётся в случае ошибки, связанной с превышением дневного лимита
-        currentBalance:
-          type: integer
-          format: int64
-          description: Остаток денежных средств. Атрибут передаётся в случае ошибки, связанной с нехваткой средств на балансе при попытке заказа
     HandedOrder:
       description: Выданный заказ.
       type: object
@@ -1329,7 +1213,7 @@ components:
         - sum
         - cancel
       properties:
-        id: # Идентификатор заказа или события выдачи заказа?
+        id:
           type: integer
           format: int64
           description: Идентификатор заказа
@@ -1396,9 +1280,11 @@ components:
           type: string
           description: Адрес организации.
           example: Москва, Волжский бульвар, дом 16, корпус 2
-    clientId:
+    ClientId:
       description: Идентификатор персоны.
       type: object
+      required:
+        - contractId
       properties:
         contractId:
           type: integer
@@ -1418,8 +1304,8 @@ components:
       required:
         - balance
       properties:
-        clientId:
-          $ref: '#/components/schemas/clientId'
+        ClientId:
+          $ref: '#/components/schemas/ClientId'
         organization:
           $ref: '#/components/schemas/Organization'
         preorderAllowed:
@@ -1429,6 +1315,12 @@ components:
           type: integer
           description: Баланс в копейках.
           format: int64
+        foodboxAllowed:
+          type: boolean
+          description: Признак разрешения представителем на использование фудбокса ребёнком
+        foodboxAvailablе:
+          type: boolean
+          description: Признак доступности использования фудбокса для образовательной организации
     ExpenseConstraints:
       type: object
       properties:
@@ -1494,7 +1386,7 @@ components:
       type: apiKey
       name: X-Api-Key
       in: header
-      description: Выполнение операций на основе clientId
+      description: Выполнение операций на основе ClientId
     agent:
       type: apiKey
       name: agent

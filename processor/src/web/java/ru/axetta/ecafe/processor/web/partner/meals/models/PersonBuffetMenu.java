@@ -8,40 +8,24 @@ import java.util.Objects;
  * Персональное меню
  */
 public class PersonBuffetMenu {
-    private List<PersonBuffetMenuBuffetCategoriesItem> buffetCategoriesItem = null;
-    private Long dishesAmount = null;
+    private List<PersonBuffetMenuBuffetCategoriesItem> categories = null;
     private Boolean buffetIsOpen = null;
-    private String buffetOpenTime = null;
-    private String buffetCloseTime = null;
+    private String buffetOpenAt = null;
+    private String buffetCloseAt = null;
 
 
     /**
      * Get buffetCategoriesItem
      * @return buffetCategoriesItem
      **/
-    public List<PersonBuffetMenuBuffetCategoriesItem> getBuffetCategoriesItem() {
-        if (buffetCategoriesItem == null)
-            buffetCategoriesItem = new ArrayList<>();
-        return buffetCategoriesItem;
+    public List<PersonBuffetMenuBuffetCategoriesItem> getCategories() {
+        if (categories == null)
+            categories = new ArrayList<>();
+        return categories;
     }
 
-    public void setBuffetCategoriesItem(List<PersonBuffetMenuBuffetCategoriesItem> buffetCategoriesItem) {
-        this.buffetCategoriesItem = buffetCategoriesItem;
-    }
-
-    /**
-     * Количество блюд
-     * @return dishesAmount
-     **/
-    public Long getDishesAmount() {
-        return dishesAmount;
-    }
-    public void setDishesAmount(Long dishesAmount) {
-        this.dishesAmount = dishesAmount;
-    }
-    public PersonBuffetMenu buffetIsOpen(Boolean buffetIsOpen) {
-        this.buffetIsOpen = buffetIsOpen;
-        return this;
+    public void setCategories(List<PersonBuffetMenuBuffetCategoriesItem> categories) {
+        this.categories = categories;
     }
 
 
@@ -57,7 +41,7 @@ public class PersonBuffetMenu {
         this.buffetIsOpen = buffetIsOpen;
     }
     public PersonBuffetMenu buffetOpenTime(String buffetOpenTime) {
-        this.buffetOpenTime = buffetOpenTime;
+        this.buffetOpenAt = buffetOpenTime;
         return this;
     }
 
@@ -67,14 +51,14 @@ public class PersonBuffetMenu {
      * Дата начала работы буфета
      * @return buffetOpenTime
      **/
-    public String getBuffetOpenTime() {
-        return buffetOpenTime;
+    public String getBuffetOpenAt() {
+        return buffetOpenAt;
     }
-    public void setBuffetOpenTime(String buffetOpenTime) {
-        this.buffetOpenTime = buffetOpenTime;
+    public void setBuffetOpenAt(String buffetOpenAt) {
+        this.buffetOpenAt = buffetOpenAt;
     }
     public PersonBuffetMenu buffetCloseTime(String buffetCloseTime) {
-        this.buffetCloseTime = buffetCloseTime;
+        this.buffetCloseAt = buffetCloseTime;
         return this;
     }
 
@@ -84,11 +68,11 @@ public class PersonBuffetMenu {
      * Дата завершения работы буфета
      * @return buffetCloseTime
      **/
-    public String getBuffetCloseTime() {
-        return buffetCloseTime;
+    public String getBuffetCloseAt() {
+        return buffetCloseAt;
     }
-    public void setBuffetCloseTime(String buffetCloseTime) {
-        this.buffetCloseTime = buffetCloseTime;
+    public void setBuffetCloseAt(String buffetCloseAt) {
+        this.buffetCloseAt = buffetCloseAt;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -99,16 +83,15 @@ public class PersonBuffetMenu {
             return false;
         }
         PersonBuffetMenu personBuffetMenu = (PersonBuffetMenu) o;
-        return Objects.equals(this.buffetCategoriesItem, personBuffetMenu.buffetCategoriesItem) &&
-                Objects.equals(this.dishesAmount, personBuffetMenu.dishesAmount) &&
+        return Objects.equals(this.categories, personBuffetMenu.categories) &&
                 Objects.equals(this.buffetIsOpen, personBuffetMenu.buffetIsOpen) &&
-                Objects.equals(this.buffetOpenTime, personBuffetMenu.buffetOpenTime) &&
-                Objects.equals(this.buffetCloseTime, personBuffetMenu.buffetCloseTime);
+                Objects.equals(this.buffetOpenAt, personBuffetMenu.buffetOpenAt) &&
+                Objects.equals(this.buffetCloseAt, personBuffetMenu.buffetCloseAt);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(buffetCategoriesItem, dishesAmount, buffetIsOpen, buffetOpenTime, buffetCloseTime);
+        return java.util.Objects.hash(categories, buffetIsOpen, buffetOpenAt, buffetCloseAt);
     }
 
     @Override
@@ -116,11 +99,10 @@ public class PersonBuffetMenu {
         StringBuilder sb = new StringBuilder();
         sb.append("class PersonBuffetMenu {\n");
 
-        sb.append("    buffetCategoriesItem: ").append(toIndentedString(buffetCategoriesItem)).append("\n");
-        sb.append("    dishesAmount: ").append(toIndentedString(dishesAmount)).append("\n");
+        sb.append("    buffetCategoriesItem: ").append(toIndentedString(categories)).append("\n");
         sb.append("    buffetIsOpen: ").append(toIndentedString(buffetIsOpen)).append("\n");
-        sb.append("    buffetOpenTime: ").append(toIndentedString(buffetOpenTime)).append("\n");
-        sb.append("    buffetCloseTime: ").append(toIndentedString(buffetCloseTime)).append("\n");
+        sb.append("    buffetOpenTime: ").append(toIndentedString(buffetOpenAt)).append("\n");
+        sb.append("    buffetCloseTime: ").append(toIndentedString(buffetCloseAt)).append("\n");
         sb.append("}");
         return sb.toString();
     }

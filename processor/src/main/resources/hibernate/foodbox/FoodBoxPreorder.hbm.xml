@@ -36,5 +36,6 @@
         <property name="idFoodBoxExternal" column="idFoodBoxExternal" type="string"/>
         <property name="orderPrice" column="orderprice" type="long"/>
         <property name="located" column="located" type="boolean"/>
+        <property name="posted" column="posted" type="int"/>
     </class>
 </hibernate-mapping>

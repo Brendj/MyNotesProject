@@ -6,10 +6,10 @@ import java.util.Objects;
  * Возвращает список разрешений по Фудбоксу для ОУ и клиента
  */
 public class GetFoodboxInfo {
-    private Boolean foodboxAvailabilityForEO = null;
-    private Boolean foodboxAvailability = null;
+    private Boolean foodboxAvailable = null;
+    private Boolean foodboxAllowed = null;
     public GetFoodboxInfo foodboxAvailabilityForEO(Boolean foodboxAvailabilityForEO) {
-        this.foodboxAvailabilityForEO = foodboxAvailabilityForEO;
+        this.foodboxAvailable = foodboxAvailabilityForEO;
         return this;
     }
 
@@ -18,13 +18,13 @@ public class GetFoodboxInfo {
      * @return foodboxAvailabilityForEO
      **/
     public Boolean isFoodboxAvailabilityForEO() {
-        return foodboxAvailabilityForEO;
+        return foodboxAvailable;
     }
-    public void setFoodboxAvailabilityForEO(Boolean foodboxAvailabilityForEO) {
-        this.foodboxAvailabilityForEO = foodboxAvailabilityForEO;
+    public void setFoodboxAvailable(Boolean foodboxAvailable) {
+        this.foodboxAvailable = foodboxAvailable;
     }
     public GetFoodboxInfo foodboxAvailability(Boolean foodboxAvailability) {
-        this.foodboxAvailability = foodboxAvailability;
+        this.foodboxAllowed = foodboxAvailability;
         return this;
     }
 
@@ -35,10 +35,10 @@ public class GetFoodboxInfo {
      * @return foodboxAvailability
      **/
     public Boolean isFoodboxAvailability() {
-        return foodboxAvailability;
+        return foodboxAllowed;
     }
-    public void setFoodboxAvailability(Boolean foodboxAvailability) {
-        this.foodboxAvailability = foodboxAvailability;
+    public void setFoodboxAllowed(Boolean foodboxAllowed) {
+        this.foodboxAllowed = foodboxAllowed;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -49,13 +49,13 @@ public class GetFoodboxInfo {
             return false;
         }
         GetFoodboxInfo getFoodboxInfo = (GetFoodboxInfo) o;
-        return Objects.equals(this.foodboxAvailabilityForEO, getFoodboxInfo.foodboxAvailabilityForEO) &&
-                Objects.equals(this.foodboxAvailability, getFoodboxInfo.foodboxAvailability);
+        return Objects.equals(this.foodboxAvailable, getFoodboxInfo.foodboxAvailable) &&
+                Objects.equals(this.foodboxAllowed, getFoodboxInfo.foodboxAllowed);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(foodboxAvailabilityForEO, foodboxAvailability);
+        return java.util.Objects.hash(foodboxAvailable, foodboxAllowed);
     }
 
     @Override
@@ -63,8 +63,8 @@ public class GetFoodboxInfo {
         StringBuilder sb = new StringBuilder();
         sb.append("class GetFoodboxInfo {\n");
 
-        sb.append("    foodboxAvailabilityForEO: ").append(toIndentedString(foodboxAvailabilityForEO)).append("\n");
-        sb.append("    foodboxAvailability: ").append(toIndentedString(foodboxAvailability)).append("\n");
+        sb.append("    foodboxAvailabilityForEO: ").append(toIndentedString(foodboxAvailable)).append("\n");
+        sb.append("    foodboxAvailability: ").append(toIndentedString(foodboxAllowed)).append("\n");
         sb.append("}");
         return sb.toString();
     }

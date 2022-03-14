@@ -10,7 +10,7 @@ import java.util.Objects;
 public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
     private Long id = null;
     private String name = null;
-    private List<Dish> menuDishesItem = null;
+    private List<Dish> dishes = null;
     public PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem id(Long id) {
         this.id = id;
         return this;
@@ -46,15 +46,15 @@ public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
         this.name = name;
     }
     public PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem menuDishesItem(List<Dish> menuDishesItem) {
-        this.menuDishesItem = menuDishesItem;
+        this.dishes = menuDishesItem;
         return this;
     }
 
     public PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem addMenuDishesItemItem(Dish menuDishesItemItem) {
-        if (this.menuDishesItem == null) {
-            this.menuDishesItem = new ArrayList<Dish>();
+        if (this.dishes == null) {
+            this.dishes = new ArrayList<Dish>();
         }
-        this.menuDishesItem.add(menuDishesItemItem);
+        this.dishes.add(menuDishesItemItem);
         return this;
     }
 
@@ -62,13 +62,13 @@ public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
      * Список блюд меню.
      * @return menuDishesItem
      **/
-    public List<Dish> getMenuDishesItem() {
-        if (menuDishesItem == null)
-            menuDishesItem = new ArrayList<>();
-        return menuDishesItem;
+    public List<Dish> getDishes() {
+        if (dishes == null)
+            dishes = new ArrayList<>();
+        return dishes;
     }
-    public void setMenuDishesItem(List<Dish> menuDishesItem) {
-        this.menuDishesItem = menuDishesItem;
+    public void setDishes(List<Dish> dishes) {
+        this.dishes = dishes;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -81,12 +81,12 @@ public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
         PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem personBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem = (PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem) o;
         return Objects.equals(this.id, personBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem.id) &&
                 Objects.equals(this.name, personBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem.name) &&
-                Objects.equals(this.menuDishesItem, personBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem.menuDishesItem);
+                Objects.equals(this.dishes, personBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem.dishes);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, menuDishesItem);
+        return java.util.Objects.hash(id, name, dishes);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
 
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    menuDishesItem: ").append(toIndentedString(menuDishesItem)).append("\n");
+        sb.append("    menuDishesItem: ").append(toIndentedString(dishes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

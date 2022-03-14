@@ -17,9 +17,9 @@ import java.util.Objects;
 public class PersonBuffetMenuBuffetCategoriesItem {
     private Long id = null;
     private String name = null;
-    private List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> buffetSubcategoriesItem = null;
+    private List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> subcategories = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<Dish> menuDishesItem = null;
+    private List<Dish> dishes = null;
     public PersonBuffetMenuBuffetCategoriesItem id(Long id) {
         this.id = id;
         return this;
@@ -61,14 +61,14 @@ public class PersonBuffetMenuBuffetCategoriesItem {
      * Get buffetSubcategoriesItem
      * @return buffetSubcategoriesItem
      **/
-    public List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> getBuffetSubcategoriesItem() {
-        if (buffetSubcategoriesItem == null)
-            buffetSubcategoriesItem = new ArrayList<>();
-        return buffetSubcategoriesItem;
+    public List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> getSubcategories() {
+        if (subcategories == null)
+            subcategories = new ArrayList<>();
+        return subcategories;
     }
 
-    public void setBuffetSubcategoriesItem(List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> buffetSubcategoriesItem) {
-        this.buffetSubcategoriesItem = buffetSubcategoriesItem;
+    public void setSubcategories(List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> subcategories) {
+        this.subcategories = subcategories;
     }
 
     @Override
@@ -82,12 +82,12 @@ public class PersonBuffetMenuBuffetCategoriesItem {
         PersonBuffetMenuBuffetCategoriesItem personBuffetMenuBuffetCategoriesItem = (PersonBuffetMenuBuffetCategoriesItem) o;
         return Objects.equals(this.id, personBuffetMenuBuffetCategoriesItem.id) &&
                 Objects.equals(this.name, personBuffetMenuBuffetCategoriesItem.name) &&
-                Objects.equals(this.buffetSubcategoriesItem, personBuffetMenuBuffetCategoriesItem.buffetSubcategoriesItem);
+                Objects.equals(this.subcategories, personBuffetMenuBuffetCategoriesItem.subcategories);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, buffetSubcategoriesItem);
+        return java.util.Objects.hash(id, name, subcategories);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class PersonBuffetMenuBuffetCategoriesItem {
 
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    buffetSubcategoriesItem: ").append(toIndentedString(buffetSubcategoriesItem)).append("\n");
+        sb.append("    buffetSubcategoriesItem: ").append(toIndentedString(subcategories)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -113,14 +113,14 @@ public class PersonBuffetMenuBuffetCategoriesItem {
         return o.toString().replace("\n", "\n    ");
     }
 
-    public List<Dish> getMenuDishesItem() {
-        if (menuDishesItem == null)
-            menuDishesItem = new ArrayList<>();
-        return menuDishesItem;
+    public List<Dish> getDishes() {
+        if (dishes == null)
+            dishes = new ArrayList<>();
+        return dishes;
     }
 
-    public void setMenuDishesItem(List<Dish> menuDishesItem) {
-        this.menuDishesItem = menuDishesItem;
+    public void setDishes(List<Dish> dishes) {
+        this.dishes = dishes;
     }
 }
 
