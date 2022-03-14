@@ -51,7 +51,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             foodBoxPreorder.setCellNumber(foodBoxPreorderChangedItem.getCellNumber());
             if (foodBoxPreorder.getIdOfFoodBox() != null) {
                 foodBoxPreorder.setLocated(true);
-                if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW)) {
+                if ((foodBoxPreorder.getPosted() == null || foodBoxPreorder.getPosted() == 0) && foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW)) {
                     Org org = (Org) session.load(Org.class, idOfOrg);
                     //Забираем ячейку
                     logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
@@ -74,9 +74,10 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                         foodBoxCell.setBusycells(foodBoxCell.getBusycells() + 1);
                     }
                 }
+                foodBoxPreorder.setPosted(1);
             }
             foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
-            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))
+            if ((foodBoxPreorder.getPosted() == null || foodBoxPreorder.getPosted() == 1) && (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED)))
             {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
@@ -98,6 +99,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                     FoodBoxCells foodBoxCell = foodBoxCellsList.get(ind);
                     foodBoxCell.setBusycells(foodBoxCell.getBusycells() - 1);
                 }
+                foodBoxPreorder.setPosted(2);
                 logger.info(String.format("Заказ: %s освободил ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
             }
             foodBoxPreorder.setIdOfOrder(foodBoxPreorderChangedItem.getIdOfOrder());

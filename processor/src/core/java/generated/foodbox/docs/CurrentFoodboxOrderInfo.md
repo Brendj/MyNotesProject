@@ -3,10 +3,11 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **Long** | Идентификатор заказа. | 
-**foodboxOrderNumber** | **Long** | Номер фудбокс-заказа | 
+**foodboxOrderId** | **Long** | Идентификатор Фудбокс-заказа, передаваемый от ИС ПП | 
 **status** | **String** | Статус заказа в системе | 
 **dishes** | [**List&lt;OrderDish&gt;**](OrderDish.md) |  | 
-**expiresAt** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время, до которого клиент может забрать заказ | 
-**timeOrder** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время создания заказа | 
-**orderPrice** | **Long** | Общая стоимость заказа в копейках | 
+**expiredAt** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время, до которого клиент может забрать заказ | 
+**createdAt** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время создания заказа | 
+**totalPrice** | **Long** | Общая стоимость заказа в копейках | 
+**balanceLimit** | **Long** | Лимит дневных трат | 
+**balance** | **Long** | Остаток денежных средств | 

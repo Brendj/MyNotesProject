@@ -7,24 +7,23 @@ Method | HTTP request | Description
 [**addPersonFoodboxOrder**](_Api.md#addPersonFoodboxOrder) | **POST** /orders/foodbox | Создаёт заказ
 [**addPersonRegularOrders**](_Api.md#addPersonRegularOrders) | **POST** /orders/regular | Добавляет заказы.
 [**addPersonSingleOrder**](_Api.md#addPersonSingleOrder) | **POST** /orders/single | Создаёт заказ
-[**deletePersonFoodboxOrder**](_Api.md#deletePersonFoodboxOrder) | **DELETE** /orders/foodbox | Удаляет заказ.
+[**deletePersonFoodboxOrder**](_Api.md#deletePersonFoodboxOrder) | **DELETE** /orders/foodbox/{foodboxOrderId} | Удаляет заказ по идентификатору заказа.
 [**deletePersonRegularOrders**](_Api.md#deletePersonRegularOrders) | **DELETE** /orders/regular/{orderId} | Удаляет заказы.
 [**deletePersonSingleOrders**](_Api.md#deletePersonSingleOrders) | **DELETE** /orders/single/{orderId} | Удаляет заказ.
-[**getFoodboxInfo**](_Api.md#getFoodboxInfo) | **GET** /foodbox/info | Возвращает список разрешений по Фудбоксу для ОУ и клиента
-[**getPersonFoodboxOrderList**](_Api.md#getPersonFoodboxOrderList) | **GET** /orders/foodbox | Возвращает список всех фудбокс-заказов.
+[**getPersonFoodboxOrder**](_Api.md#getPersonFoodboxOrder) | **GET** /orders/foodbox/{foodboxOrderId} | Возвращает заказ по идентификатору заказа.
+[**getPersonFoodboxOrders**](_Api.md#getPersonFoodboxOrders) | **GET** /orders/foodbox | Возвращает список всех фудбокс-заказов.
 [**getPersonHandedOrders**](_Api.md#getPersonHandedOrders) | **GET** /orders/handed | Возвращает список выданных заказов.
 [**getPersonOrdersSummary**](_Api.md#getPersonOrdersSummary) | **GET** /orders/summary | Отчёт по предзаказам на 14 дней
 [**getPersonProhibitions**](_Api.md#getPersonProhibitions) | **GET** /menu/prohibitions | Возвращает список ограничений.
 [**getPersonRegularOrders**](_Api.md#getPersonRegularOrders) | **GET** /orders/regular | Возвращает список заказов.
 [**getPersonSingleOrders**](_Api.md#getPersonSingleOrders) | **GET** /orders/single | Возвращает список заказов.
-[**putFoodboxInfo**](_Api.md#putFoodboxInfo) | **PUT** /foodbox/info | Устанавливает разрешение по Фудбоксу для клиента
 [**setPersonProhibitions**](_Api.md#setPersonProhibitions) | **PUT** /menu/prohibitions | Установка ограничений на категории, подкатегории, блюда для клиента.
 [**setPersonSingleOrderAmount**](_Api.md#setPersonSingleOrderAmount) | **PUT** /orders/single/{orderId} | Обновляет отдельные параметры заказа.
 [**updatePersonRegularOrder**](_Api.md#updatePersonRegularOrder) | **PUT** /orders/regular/{orderId} | Обновляет заказ.
 
 <a name="addPersonFoodboxOrder"></a>
 # **addPersonFoodboxOrder**
-> OrderErrorInfo addPersonFoodboxOrder(body, clientId)
+> CurrentFoodboxOrderInfo addPersonFoodboxOrder(body, clientId, xRequestID)
 
 Создаёт заказ
 
@@ -55,8 +54,9 @@ apiKey.setApiKey("YOUR API KEY");
 _Api apiInstance = new _Api();
 FoodboxOrder body = new FoodboxOrder(); // FoodboxOrder | 
 ClientId clientId = new ClientId(); // ClientId | Идентификатор персоны из МЭШ.Контингент
+String xRequestID = "xRequestID_example"; // String | Идентификатор запроса
 try {
-    OrderErrorInfo result = apiInstance.addPersonFoodboxOrder(body, clientId);
+    CurrentFoodboxOrderInfo result = apiInstance.addPersonFoodboxOrder(body, clientId, xRequestID);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling _Api#addPersonFoodboxOrder");
@@ -70,10 +70,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **body** | [**FoodboxOrder**](FoodboxOrder.md)|  |
  **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
+ **xRequestID** | **String**| Идентификатор запроса | [optional]
 
 ### Return type
 
-[**OrderErrorInfo**](OrderErrorInfo.md)
+[**CurrentFoodboxOrderInfo**](CurrentFoodboxOrderInfo.md)
 
 ### Authorization
 
@@ -212,9 +213,9 @@ Name | Type | Description  | Notes
 
 <a name="deletePersonFoodboxOrder"></a>
 # **deletePersonFoodboxOrder**
-> deletePersonFoodboxOrder(clientId, id)
+> deletePersonFoodboxOrder(foodboxOrderId)
 
-Удаляет заказ.
+Удаляет заказ по идентификатору заказа.
 
 ### Example
 ```java
@@ -241,10 +242,9 @@ apiKey.setApiKey("YOUR API KEY");
 
 
 _Api apiInstance = new _Api();
-ClientId clientId = new ClientId(); // ClientId | Идентификатор персоны из МЭШ.Контингент
-Long id = 789L; // Long | Идентификатор заказа.
+Long foodboxOrderId = 789L; // Long | Идентификатор Фудбокс-заказа, передаваемый от ИС ПП
 try {
-    apiInstance.deletePersonFoodboxOrder(clientId, id);
+    apiInstance.deletePersonFoodboxOrder(foodboxOrderId);
 } catch (ApiException e) {
     System.err.println("Exception when calling _Api#deletePersonFoodboxOrder");
     e.printStackTrace();
@@ -255,8 +255,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
- **id** | **Long**| Идентификатор заказа. | [optional]
+ **foodboxOrderId** | **Long**| Идентификатор Фудбокс-заказа, передаваемый от ИС ПП |
 
 ### Return type
 
@@ -393,11 +392,11 @@ null (empty response body)
  - **Content-Type**: Not defined
  - **Accept**: application/json
 
-<a name="getFoodboxInfo"></a>
-# **getFoodboxInfo**
-> GetFoodboxInfo getFoodboxInfo(clientId)
+<a name="getPersonFoodboxOrder"></a>
+# **getPersonFoodboxOrder**
+> HistoryFoodboxOrderInfo getPersonFoodboxOrder(foodboxOrderId)
 
-Возвращает список разрешений по Фудбоксу для ОУ и клиента
+Возвращает заказ по идентификатору заказа.
 
 ### Example
 ```java
@@ -424,12 +423,12 @@ apiKey.setApiKey("YOUR API KEY");
 
 
 _Api apiInstance = new _Api();
-ClientId clientId = new ClientId(); // ClientId | Идентификатор персоны из МЭШ.Контингент
+Long foodboxOrderId = 789L; // Long | Идентификатор Фудбокс-заказа, передаваемый от ИС ПП
 try {
-    GetFoodboxInfo result = apiInstance.getFoodboxInfo(clientId);
+    HistoryFoodboxOrderInfo result = apiInstance.getPersonFoodboxOrder(foodboxOrderId);
     System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling _Api#getFoodboxInfo");
+    System.err.println("Exception when calling _Api#getPersonFoodboxOrder");
     e.printStackTrace();
 }
 ```
@@ -438,11 +437,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
+ **foodboxOrderId** | **Long**| Идентификатор Фудбокс-заказа, передаваемый от ИС ПП |
 
 ### Return type
 
-[**GetFoodboxInfo**](GetFoodboxInfo.md)
+[**HistoryFoodboxOrderInfo**](HistoryFoodboxOrderInfo.md)
 
 ### Authorization
 
@@ -453,9 +452,9 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/json
 
-<a name="getPersonFoodboxOrderList"></a>
-# **getPersonFoodboxOrderList**
-> HistoryFoodboxOrderInfo getPersonFoodboxOrderList(clientId, from, to, foodboxOrderNumber, sort)
+<a name="getPersonFoodboxOrders"></a>
+# **getPersonFoodboxOrders**
+> HistoryFoodboxOrderInfo getPersonFoodboxOrders(clientId, from, to, xRequestID, sort)
 
 Возвращает список всех фудбокс-заказов.
 
@@ -487,13 +486,13 @@ _Api apiInstance = new _Api();
 ClientId clientId = new ClientId(); // ClientId | Идентификатор персоны из МЭШ.Контингент
 LocalDate from = new LocalDate(); // LocalDate | Дата начала выборки.
 LocalDate to = new LocalDate(); // LocalDate | Дата конца выборки.
-Long foodboxOrderNumber = 789L; // Long | Номер фудбокс-заказа
+String xRequestID = "xRequestID_example"; // String | Идентификатор запроса
 String sort = "sort_example"; // String | Сортировка по дате факта.
 try {
-    HistoryFoodboxOrderInfo result = apiInstance.getPersonFoodboxOrderList(clientId, from, to, foodboxOrderNumber, sort);
+    HistoryFoodboxOrderInfo result = apiInstance.getPersonFoodboxOrders(clientId, from, to, xRequestID, sort);
     System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling _Api#getPersonFoodboxOrderList");
+    System.err.println("Exception when calling _Api#getPersonFoodboxOrders");
     e.printStackTrace();
 }
 ```
@@ -505,7 +504,7 @@ Name | Type | Description  | Notes
  **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
  **from** | **LocalDate**| Дата начала выборки. |
  **to** | **LocalDate**| Дата конца выборки. |
- **foodboxOrderNumber** | **Long**| Номер фудбокс-заказа |
+ **xRequestID** | **String**| Идентификатор запроса | [optional]
  **sort** | **String**| Сортировка по дате факта. | [optional] [enum: asc, desc]
 
 ### Return type
@@ -758,7 +757,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
- **onDate** | **LocalDate**| Дата, на которую необходимо вернуть данные |
+ **onDate** | **LocalDate**| Дата, на которую необходимо вернуть данные | [optional]
 
 ### Return type
 
@@ -820,72 +819,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
- **onDate** | **LocalDate**| Дата, на которую необходимо вернуть данные |
+ **onDate** | **LocalDate**| Дата, на которую необходимо вернуть данные | [optional]
 
 ### Return type
 
 [**List&lt;SingleOrder&gt;**](SingleOrder.md)
-
-### Authorization
-
-[agent](../README.md#agent)[apiKey](../README.md#apiKey)[bearerAuth](../README.md#bearerAuth)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a name="putFoodboxInfo"></a>
-# **putFoodboxInfo**
-> putFoodboxInfo(clientId, foodboxAvailability)
-
-Устанавливает разрешение по Фудбоксу для клиента
-
-### Example
-```java
-// Import classes:
-//import io.swagger.client.ApiClient;
-//import io.swagger.client.ApiException;
-//import io.swagger.client.Configuration;
-//import io.swagger.client.auth.*;
-//import io.swagger.client.api._Api;
-
-ApiClient defaultClient = Configuration.getDefaultApiClient();
-
-// Configure API key authorization: agent
-ApiKeyAuth agent = (ApiKeyAuth) defaultClient.getAuthentication("agent");
-agent.setApiKey("YOUR API KEY");
-// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-//agent.setApiKeyPrefix("Token");
-
-// Configure API key authorization: apiKey
-ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
-apiKey.setApiKey("YOUR API KEY");
-// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-//apiKey.setApiKeyPrefix("Token");
-
-
-_Api apiInstance = new _Api();
-ClientId clientId = new ClientId(); // ClientId | Идентификатор персоны из МЭШ.Контингент
-Boolean foodboxAvailability = true; // Boolean | Признак доступности использования фудбокса
-try {
-    apiInstance.putFoodboxInfo(clientId, foodboxAvailability);
-} catch (ApiException e) {
-    System.err.println("Exception when calling _Api#putFoodboxInfo");
-    e.printStackTrace();
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **clientId** | [**ClientId**](.md)| Идентификатор персоны из МЭШ.Контингент |
- **foodboxAvailability** | **Boolean**| Признак доступности использования фудбокса | [optional]
-
-### Return type
-
-null (empty response body)
 
 ### Authorization
 

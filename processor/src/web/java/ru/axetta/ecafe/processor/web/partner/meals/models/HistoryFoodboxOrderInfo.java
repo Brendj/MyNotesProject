@@ -9,51 +9,12 @@ import java.util.List;
  * История заказов или получение данных по конкретному заказу фудбокса
  */
 public class HistoryFoodboxOrderInfo {
-    private Boolean foodboxAvailabilityForEO = null;
-    private Boolean foodboxAvailability = null;
-    private List<FoodboxOrderInfo> ordersInfo = new ArrayList<FoodboxOrderInfo>();
-    private Long ordersAmount = null;
-    public HistoryFoodboxOrderInfo foodboxAvailabilityForEO(Boolean foodboxAvailabilityForEO) {
-        this.foodboxAvailabilityForEO = foodboxAvailabilityForEO;
-        return this;
-    }
+    private List<FoodboxOrderInfo> info = new ArrayList<FoodboxOrderInfo>();
+    private Long orders = null;
 
-
-
-    /**
-     * Признак доступности использования фудбокса для образовательной организации
-     * @return foodboxAvailabilityForEO
-     **/
-    public Boolean isFoodboxAvailabilityForEO() {
-        return foodboxAvailabilityForEO;
-    }
-    public void setFoodboxAvailabilityForEO(Boolean foodboxAvailabilityForEO) {
-        this.foodboxAvailabilityForEO = foodboxAvailabilityForEO;
-    }
-    public HistoryFoodboxOrderInfo foodboxAvailability(Boolean foodboxAvailability) {
-        this.foodboxAvailability = foodboxAvailability;
-        return this;
-    }
-
-
-
-    /**
-     * Признак доступности использования фудбокса
-     * @return foodboxAvailability
-     **/
-    public Boolean isFoodboxAvailability() {
-        return foodboxAvailability;
-    }
-    public void setFoodboxAvailability(Boolean foodboxAvailability) {
-        this.foodboxAvailability = foodboxAvailability;
-    }
-    public HistoryFoodboxOrderInfo ordersInfo(List<FoodboxOrderInfo> ordersInfo) {
-        this.ordersInfo = ordersInfo;
-        return this;
-    }
 
     public HistoryFoodboxOrderInfo addOrdersInfoItem(FoodboxOrderInfo ordersInfoItem) {
-        this.ordersInfo.add(ordersInfoItem);
+        this.info.add(ordersInfoItem);
         return this;
     }
 
@@ -61,16 +22,16 @@ public class HistoryFoodboxOrderInfo {
      * Get ordersInfo
      * @return ordersInfo
      **/
-    public List<FoodboxOrderInfo> getOrdersInfo() {
-        if (ordersInfo == null)
-            ordersInfo = new ArrayList<>();
-        return ordersInfo;
+    public List<FoodboxOrderInfo> getInfo() {
+        if (info == null)
+            info = new ArrayList<>();
+        return info;
     }
-    public void setOrdersInfo(List<FoodboxOrderInfo> ordersInfo) {
-        this.ordersInfo = ordersInfo;
+    public void setInfo(List<FoodboxOrderInfo> info) {
+        this.info = info;
     }
     public HistoryFoodboxOrderInfo ordersAmount(Long ordersAmount) {
-        this.ordersAmount = ordersAmount;
+        this.orders = ordersAmount;
         return this;
     }
 
@@ -80,11 +41,11 @@ public class HistoryFoodboxOrderInfo {
      * Количество заказов в списке
      * @return ordersAmount
      **/
-    public Long getOrdersAmount() {
-        return ordersAmount;
+    public Long getOrders() {
+        return orders;
     }
-    public void setOrdersAmount(Long ordersAmount) {
-        this.ordersAmount = ordersAmount;
+    public void setOrders(Long orders) {
+        this.orders = orders;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -95,15 +56,13 @@ public class HistoryFoodboxOrderInfo {
             return false;
         }
         HistoryFoodboxOrderInfo historyFoodboxOrderInfo = (HistoryFoodboxOrderInfo) o;
-        return Objects.equals(this.foodboxAvailabilityForEO, historyFoodboxOrderInfo.foodboxAvailabilityForEO) &&
-                Objects.equals(this.foodboxAvailability, historyFoodboxOrderInfo.foodboxAvailability) &&
-                Objects.equals(this.ordersInfo, historyFoodboxOrderInfo.ordersInfo) &&
-                Objects.equals(this.ordersAmount, historyFoodboxOrderInfo.ordersAmount);
+        return  Objects.equals(this.info, historyFoodboxOrderInfo.info) &&
+                Objects.equals(this.orders, historyFoodboxOrderInfo.orders);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(foodboxAvailabilityForEO, foodboxAvailability, ordersInfo, ordersAmount);
+        return java.util.Objects.hash(info, orders);
     }
 
     @Override
@@ -111,10 +70,8 @@ public class HistoryFoodboxOrderInfo {
         StringBuilder sb = new StringBuilder();
         sb.append("class HistoryFoodboxOrderInfo {\n");
 
-        sb.append("    foodboxAvailabilityForEO: ").append(toIndentedString(foodboxAvailabilityForEO)).append("\n");
-        sb.append("    foodboxAvailability: ").append(toIndentedString(foodboxAvailability)).append("\n");
-        sb.append("    ordersInfo: ").append(toIndentedString(ordersInfo)).append("\n");
-        sb.append("    ordersAmount: ").append(toIndentedString(ordersAmount)).append("\n");
+        sb.append("    ordersInfo: ").append(toIndentedString(info)).append("\n");
+        sb.append("    ordersAmount: ").append(toIndentedString(orders)).append("\n");
         sb.append("}");
         return sb.toString();
     }
