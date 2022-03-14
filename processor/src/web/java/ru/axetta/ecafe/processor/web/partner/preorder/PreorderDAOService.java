@@ -2634,8 +2634,19 @@ public class PreorderDAOService {
         if (md == null) wtDish = getWtDishById(idOfDish);
         if (wtDish == null)
             throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
-        if(wtDish.getDateOfEndMenuIncluding() != null && wtDish.getDateOfEndMenuIncluding().before(date))
-            throw new InvalidDatePreorderDishException("Блюдо с ид.=" + idOfDish.toString() + " будет исключено из меню до исполнения предзаказа");
+
+        Date dateOfEndMenuIncluding = wtDish.getDateOfEndMenuIncluding();
+
+        if(dateOfEndMenuIncluding != null){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateOfEndMenuIncluding);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.HOUR_OF_DAY, 3);
+
+            if(calendar.getTime().before(date) || calendar.getTime().equals(date)){
+                throw new InvalidDatePreorderDishException("Блюдо с ид.=" + idOfDish.toString() + " будет исключено из меню до исполнения предзаказа");
+            }
+        }
         return createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, amount, mobile, mobileGroupOnCreate);
     }
 
