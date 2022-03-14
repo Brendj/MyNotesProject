@@ -102,13 +102,13 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         }
 
         if (user.getIdOfRole().equals(User.DefaultRole.SFC.getIdentification())) {
-            if(!user.getSfcUserOrgs().isEmpty())
-                ids.addAll(user.getSfcUserOrgs().stream().map(SfcUserOrgs::getIdOfSfcUserOrg).collect(Collectors.toList()));
+            if(!user.getSfcUserOrgs().isEmpty()){
+                ids.addAll(user.getSfcUserOrgs().stream().map(s -> s.getOrg().getIdOfOrg()).collect(Collectors.toList()));
+            }
         }
 
         if (StringUtils.isNotBlank(idFilter)) {
             String[] stringIds = idFilter.split("\\s*,\\s*");
-
             for(String stringId : stringIds) {
                 try {
                     ids.add(Long.valueOf(stringId));
@@ -172,7 +172,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         orgCriteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
         orgCriteria.addOrder(Order.asc("idOfOrg"));
 
-        return (List<OrgShortItem>) orgCriteria.list();
+        return orgCriteria.list();
     }
 
     public List<SelectItem> getRegions() {
