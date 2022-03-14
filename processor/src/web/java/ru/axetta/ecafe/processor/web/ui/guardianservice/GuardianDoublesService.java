@@ -168,7 +168,8 @@ public class GuardianDoublesService {
 
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
         boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
-        boolean allCGDisabled = getAllCGDisabled(deleteGuardianList);
+        Map<Long, Boolean> cgDisabled = getCGDisabledMap(deleteGuardianList);
+        //boolean allCGDisabled = getAllCGDisabled(deleteGuardianList);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -189,7 +190,7 @@ public class GuardianDoublesService {
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
                 //Set<ClientGuardianNotificationSetting> notificationSettings
-                deleteGuardian(session, aliveGuardian, item, version, allCGDisabled);
+                deleteGuardian(session, aliveGuardian, item, version, cgDisabled);
 
             }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
@@ -225,17 +226,29 @@ public class GuardianDoublesService {
         return true;
     }
 
-    private boolean getAllCGDisabled(List<CGItem> list) {
+    private Map<Long, Boolean> getCGDisabledMap(List<CGItem> list) {
+        Map<Long, Boolean> result = new HashMap<>();
+        for (CGItem item : list) {
+            Boolean v = result.get(item.getIdOfClient());
+            if (v != null && !v) {
+                continue;
+            }
+            result.put(item.getIdOfClient(), item.getDisabled());
+        }
+        return result;
+    }
+
+    /*private boolean getAllCGDisabled(List<CGItem> list) {
         for (CGItem item : list) {
             if (!item.getDisabled()) {
                 return false;
             }
         }
         return true;
-    }
+    }*/
 
     private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version,
-                                boolean allCGDisabled) throws Exception {
+                                Map<Long, Boolean> mapDisabled) throws Exception {
         ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
 
         if (clientGuardian != null) {
@@ -251,10 +264,10 @@ public class GuardianDoublesService {
                             clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
                     logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
                 } else {
-                    addNotificationSettingsAndOptions(session, cg, clientGuardian, allCGDisabled);
+                    addNotificationSettingsAndOptions(session, cg, clientGuardian, mapDisabled);
                     if (cg.getDeletedState()) {
                         cg.setDeletedState(false);
-                        if (!allCGDisabled) {
+                        if (!mapDisabled.get(cg.getIdOfChildren())) {
                             cg.setDisabled(false);
                         }
                         logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
@@ -282,7 +295,7 @@ public class GuardianDoublesService {
     }
 
     private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG,
-                                                   ClientGuardian deletedCG, boolean allCGDisabled) {
+                                                   ClientGuardian deletedCG, Map<Long, Boolean> mapDisabled) {
         boolean changed = false;
         for (ClientGuardianNotificationSetting settingDeleted : deletedCG.getNotificationSettings()) {
             boolean found = false;
@@ -299,7 +312,7 @@ public class GuardianDoublesService {
                         settingDeleted.getNotifyType(), aliveCG.getIdOfGuardian()));
             }
         }
-        if (aliveCG.isDisabled() && !allCGDisabled) {
+        if (aliveCG.isDisabled() && !mapDisabled.get(aliveCG.getIdOfChildren())) {
             aliveCG.setDisabled(false);
             changed = true;
             logger.info(String.format("Client id = %s, Guardian id=%s set disabled false", aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian()));
