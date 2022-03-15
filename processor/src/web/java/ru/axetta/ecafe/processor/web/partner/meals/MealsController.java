@@ -163,14 +163,6 @@ public class MealsController extends Application {
             //Считаем количество свободных ячеек в фудбоксах
             countFree += (foodBoxCells1.getTotalcellscount() - foodBoxCells1.getBusycells());
         }
-        //Есди количество свободных ячеек не позволяет создавать новый заказ
-        if (countFree <= countunlocketed) {
-            logger.error(String.format("У организации с id = %s нет свободных ячеек фудбокса", client.getOrg().getIdOfOrg()));
-            OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-            orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_CELL.getCode());
-            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_CELL.toString());
-            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
-        }
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = new CurrentFoodboxOrderInfo();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         //Собираем данные для орг
@@ -280,6 +272,14 @@ public class MealsController extends Application {
                     orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
+            }
+            //Есди количество свободных ячеек не позволяет создавать новый заказ
+            if (countFree <= countunlocketed) {
+                logger.error(String.format("У организации с id = %s нет свободных ячеек фудбокса", client.getOrg().getIdOfOrg()));
+                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_CELL.getCode());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_CELL.toString());
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -823,10 +823,10 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
-        GetFoodboxInfo getFoodboxInfo = new GetFoodboxInfo();
-        getFoodboxInfo.setFoodboxAllowed(client.getFoodboxAvailability());
-        getFoodboxInfo.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
-        return Response.status(HttpURLConnection.HTTP_OK).entity(getFoodboxInfo).build();
+        ClientData clientData = new ClientData();
+        clientData.setFoodboxAllowed(client.getFoodboxAvailability());
+        clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
+        return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
     }
 
 
