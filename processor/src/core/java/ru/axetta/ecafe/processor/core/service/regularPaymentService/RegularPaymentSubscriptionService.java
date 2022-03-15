@@ -193,7 +193,7 @@ public class RegularPaymentSubscriptionService {
         for (Long id : subIds) {
             try {
                 BankSubscription bs = findBankSubscription(id);
-                if (bs.getValidToDate() != null && bs.getValidToDate().before(today)) {
+                if (bs.getValidToDate() != null && bs.getValidToDate().after(today)) {
                     deactivateSubscription(id);
                     if (notifyAboutExpiredSubscription()) {
                         regularPaymentNotificationService.sendNotification(bs);
