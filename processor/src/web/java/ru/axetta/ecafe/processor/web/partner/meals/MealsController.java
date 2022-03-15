@@ -825,7 +825,7 @@ public class MealsController extends Application {
         }
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
-        clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
+        clientData.setFoodboxAvailablе(client.getOrg().getUsedFoodbox());
         return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
     }
 
