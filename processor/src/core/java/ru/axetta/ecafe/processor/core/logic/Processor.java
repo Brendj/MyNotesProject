@@ -8184,15 +8184,44 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
-            DAOService.getInstance().deleteOldFoodBoxAvailable(org);
+            List<FoodBoxPreorderAvailable> foodBoxPreorderAvailables =
+                    DAOReadonlyService.getInstance().getFoodBoxPreorderAvailable(org);
+            List<Long> idOfDishes = new ArrayList<>();
+            for (FoodBoxPreorderAvailable foodBoxPreorderAvailableBD :foodBoxPreorderAvailables)
+            {
+                idOfDishes.add(foodBoxPreorderAvailableBD.getIdOfDish());
+            }
+//            DAOService.getInstance().deleteOldFoodBoxAvailable(org);
+            boolean finded = false;
             for (FoodBoxAvailableItem foodBoxAvailableItem : foodBoxDishRemain.getItems()) {
-                FoodBoxPreorderAvailable foodBoxPreorderAvailable = new FoodBoxPreorderAvailable();
-                foodBoxPreorderAvailable.setCreateDate(new Date());
-                foodBoxPreorderAvailable.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
-                foodBoxPreorderAvailable.setIdOfDish(foodBoxAvailableItem.getIdOfDish());
-                foodBoxPreorderAvailable.setVersion(0L);
-                foodBoxPreorderAvailable.setOrg(org);
-                persistenceSession.persist(foodBoxPreorderAvailable);
+                //Ищем такую запись по данным БД
+                for (FoodBoxPreorderAvailable foodBoxPreorderAvailableBD :foodBoxPreorderAvailables)
+                {
+                    if (foodBoxPreorderAvailableBD.getIdOfDish().equals(foodBoxAvailableItem.getIdOfDish()))
+                    {
+                        foodBoxPreorderAvailableBD.setUpdateDate(new Date());
+                        foodBoxPreorderAvailableBD.setVersion(foodBoxPreorderAvailableBD.getVersion()+1);
+                        foodBoxPreorderAvailableBD.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
+                        persistenceSession.merge(foodBoxPreorderAvailableBD);
+                        finded = true;
+                        idOfDishes.remove(foodBoxPreorderAvailableBD.getIdOfDish());
+                        break;
+                    }
+                }
+                if (!finded) {
+                    //Если не найдена, то создаем новую запись
+                    FoodBoxPreorderAvailable foodBoxPreorderAvailable = new FoodBoxPreorderAvailable();
+                    foodBoxPreorderAvailable.setCreateDate(new Date());
+                    foodBoxPreorderAvailable.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
+                    foodBoxPreorderAvailable.setIdOfDish(foodBoxAvailableItem.getIdOfDish());
+                    foodBoxPreorderAvailable.setVersion(0L);
+                    foodBoxPreorderAvailable.setOrg(org);
+                    persistenceSession.persist(foodBoxPreorderAvailable);
+                }
+            }
+            for (Long id: idOfDishes)
+            {
+                DAOService.getInstance().deleteOldFoodBoxAvailable(org,id);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;

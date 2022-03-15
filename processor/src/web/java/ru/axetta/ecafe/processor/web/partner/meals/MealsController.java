@@ -116,6 +116,12 @@ public class MealsController extends Application {
                 }
             }
         }
+        if (xrequestStr.isEmpty()) {
+            logger.error("Отсутствует x-request-id");
+            result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
+            result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
+        }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
         if (client == null) {
