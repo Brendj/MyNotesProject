@@ -3405,11 +3405,21 @@ public class DAOReadonlyService {
             List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
             for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
             {
-                    Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
-                    for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
+                Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+                for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
+                {
+                    if (foodBoxPreorderDish.getQty() == null)
+                        foodBoxPreorderDish.setQty(1);
+                    Integer val = countDish.get(foodBoxPreorderDish.getIdOfDish());
+                    if (val == null)
                     {
-                        countDish.merge(foodBoxPreorderDish.getIdOfDish(), foodBoxPreorderDish.getQty(), Integer::sum);
+                        countDish.put(foodBoxPreorderDish.getIdOfDish(), foodBoxPreorderDish.getQty());
                     }
+                    else
+                    {
+                        countDish.put(foodBoxPreorderDish.getIdOfDish(), val + foodBoxPreorderDish.getQty());
+                    }
+                }
             }
             return countDish;
         } catch (Exception e) {
