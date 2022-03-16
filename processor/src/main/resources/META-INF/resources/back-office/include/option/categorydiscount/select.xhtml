@@ -8,7 +8,8 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel id="modalCategorySelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:popupPanel id="modalCategorySelectorPanel" autosized="true" minWidth="500" minHeight="600"
+                     headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalCategorySelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
             <h:outputText escape="true" value="Выбор категории"/>
