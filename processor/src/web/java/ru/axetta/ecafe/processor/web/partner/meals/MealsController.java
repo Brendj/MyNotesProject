@@ -250,6 +250,7 @@ public class MealsController extends Application {
                 foodBoxPreorderDish.setFoodBoxPreorder(foodBoxPreorder);
                 foodBoxPreorderDish.setIdOfDish(orderDish.getDishId());
                 foodBoxPreorderDish.setPrice(orderDish.getPrice().intValue());
+                foodBoxPreorderDish.setQty(orderDish.getAmount());
                 if (orderDish.getPrice() != null)
                     priceAll += orderDish.getPrice();
                 foodBoxPreorderDish.setName(orderDish.getName());
