@@ -3323,16 +3323,6 @@ public class DAOReadonlyService {
         }
     }
 
-    public List<FoodBoxPreorderAvailable> getFoodBoxPreorderAvailable(Org org){
-        try {
-            Query q = entityManager.createQuery("SELECT c FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
-            q.setParameter("org", org);
-            return (List<FoodBoxPreorderAvailable>) q.getResultList();
-        } catch (NoResultException e){
-            return null;
-        }
-    }
-
     public Long getMaxVersionOfFoodBoxPreorder(){
         try {
             Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorder AS c");
