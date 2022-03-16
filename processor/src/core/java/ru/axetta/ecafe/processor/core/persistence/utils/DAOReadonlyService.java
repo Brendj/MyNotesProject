@@ -3313,22 +3313,11 @@ public class DAOReadonlyService {
         }
     }
 
-    public Long getMaxVersionOfFoodBoxPreorderAvailable(Org org){
+    public List<FoodBoxPreorderAvailable> getFoodBoxPreorderAvailable(Org org){
         try {
-            Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
+            Query q = entityManager.createQuery("SELECT c FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
             q.setParameter("org", org);
-            return (Long) q.getSingleResult();
-        } catch (NoResultException e){
-            return null;
-        }
-    }
-
-    public FoodBoxPreorderAvailable getFoodBoxPreorderAvailable(Org org, Long idOfDish){
-        try {
-            Query q = entityManager.createQuery("SELECT c FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org and c.idOfDish= :idOfDish");
-            q.setParameter("org", org);
-            q.setParameter("idOfDish", idOfDish);
-            return (FoodBoxPreorderAvailable) q.getSingleResult();
+            return (List<FoodBoxPreorderAvailable>) q.getResultList();
         } catch (NoResultException e){
             return null;
         }
@@ -3398,6 +3387,31 @@ public class DAOReadonlyService {
             query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
             List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
             return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Map<Long,Integer> getDishesCountActiveFoodBoxPreorderForOrg(Org org) {
+        try {
+            Map<Long,Integer> countDish = new HashMap<>();
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.org = :org "
+                    + "and fb.state between :new and :loaded");
+            query.setParameter("org", org);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
+            {
+                    Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+                    for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
+                    {
+                        countDish.merge(foodBoxPreorderDish.getIdOfDish(), foodBoxPreorderDish.getQty(), Integer::sum);
+                    }
+            }
+            return countDish;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
