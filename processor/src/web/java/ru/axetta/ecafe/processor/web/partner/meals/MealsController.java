@@ -173,6 +173,10 @@ public class MealsController extends Application {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), new Date());
+        //Получаем количество доступных блюд для орг
+        List <FoodBoxPreorderAvailable> foodBoxPreorderAvailables = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg());
+        //Получаем список активных заказов футбокса
+        Map<Long,Integer> orders = daoReadonlyService.getDishesCountActiveFoodBoxPreorderForOrg(client.getOrg());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -204,24 +208,36 @@ public class MealsController extends Application {
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
-                //Получаем количество доступных блюд
-                FoodBoxPreorderAvailable foodBoxPreorderAvailable = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg(), orderDish.getDishId());
                 try {
                     if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId()))) {
-//                        logger.error(String.format("Блюдо из заказа не доступно idOfDish: %s", orderDish.getDishId()));
-//                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-//                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
-//                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
-//                        return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                         continue;
                     }
-                    if (foodBoxPreorderAvailable == null || foodBoxPreorderAvailable.getAvailableQty() <= 0) {
-//                        logger.error(String.format("Количество блюд из заказа не доступно idOfDish: %s", orderDish.getDishId()));
-//                        OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-//                        orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH.getCode());
-//                        orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH.toString());
-//                        return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
-                        continue;
+                    Integer countAvailable = 0;
+                    for (FoodBoxPreorderAvailable foodBoxPreorderAvailable: foodBoxPreorderAvailables)
+                    {
+                        if (foodBoxPreorderAvailable.getIdOfDish().equals(orderDish.getDishId())) {
+                            countAvailable = foodBoxPreorderAvailable.getAvailableQty();
+                            break;
+                        }
+                    }
+                    //Получаем список заказов, которые могут использовать данный заказ
+                    Integer correntVal = orders.get(orderDish.getDishId());
+                    if (correntVal == null)
+                    {
+                        //т.е. нет активных заказов на это блюдо
+                        if (countAvailable < orderDish.getAmount())
+                        {
+                            orderDish.setAmount(countAvailable);
+                        }
+                    } else
+                    {
+                        Integer availableCount = countAvailable - correntVal;
+                        if (availableCount < 0)
+                            continue;
+                        if (availableCount < orderDish.getAmount())
+                        {
+                            orderDish.setAmount(countAvailable);
+                        }
                     }
                 } catch (Exception e) {
                     logger.error("Ошибка при сохранении заказа для Фудбокса", e);
@@ -236,17 +252,11 @@ public class MealsController extends Application {
                 foodBoxPreorderDish.setPrice(orderDish.getPrice().intValue());
                 if (orderDish.getPrice() != null)
                     priceAll += orderDish.getPrice();
-                //Если заказали больше, чем осталось
-                if (foodBoxPreorderAvailable.getAvailableQty() < orderDish.getAmount())
-                    foodBoxPreorderDish.setQty(foodBoxPreorderAvailable.getAvailableQty());
-                else
-                    foodBoxPreorderDish.setQty(orderDish.getAmount());
                 foodBoxPreorderDish.setName(orderDish.getName());
                 foodBoxPreorderDish.setBuffetCategoriesId(orderDish.getBuffetCategoryId());
                 foodBoxPreorderDish.setBuffetCategoriesName(orderDish.getBuffetCategoryName());
                 foodBoxPreorderDish.setCreateDate(new Date());
                 persistenceSession.persist(foodBoxPreorderDish);
-                DAOService.getInstance().updateFoodBoxAvailable(orderDish.getDishId(), client.getOrg(), foodBoxPreorderDish.getQty());
                 currentFoodboxOrderInfo.getDishes().add(orderDish);
             }
             if (!havegoodDish) {
