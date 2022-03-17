@@ -11,7 +11,7 @@ public class CurrentFoodboxOrderInfo {
     private Long foodboxOrderId = null;
     private String status = null;
     private List<OrderDish> dishes = new ArrayList<OrderDish>();
-    private String expiresAt = null;
+    private String expiredAt = null;
     private String createdAt = null;
     private Long totalPrice = null;
     private Long balanceLimit = null;
@@ -73,7 +73,7 @@ public class CurrentFoodboxOrderInfo {
         this.dishes = dishes;
     }
     public CurrentFoodboxOrderInfo expiresAt(String expiresAt) {
-        this.expiresAt = expiresAt;
+        this.expiredAt = expiresAt;
         return this;
     }
 
@@ -83,11 +83,11 @@ public class CurrentFoodboxOrderInfo {
      * Дата и время, до которого клиент может забрать заказ
      * @return expiresAt
      **/
-    public String getExpiresAt() {
-        return expiresAt;
+    public String getExpiredAt() {
+        return expiredAt;
     }
-    public void setExpiresAt(String expiresAt) {
-        this.expiresAt = expiresAt;
+    public void setExpiredAt(String expiredAt) {
+        this.expiredAt = expiredAt;
     }
     public CurrentFoodboxOrderInfo timeOrder(String timeOrder) {
         this.createdAt = timeOrder;
@@ -169,7 +169,7 @@ public class CurrentFoodboxOrderInfo {
         return Objects.equals(this.foodboxOrderId, currentFoodboxOrderInfo.foodboxOrderId) &&
                 Objects.equals(this.status, currentFoodboxOrderInfo.status) &&
                 Objects.equals(this.dishes, currentFoodboxOrderInfo.dishes) &&
-                Objects.equals(this.expiresAt, currentFoodboxOrderInfo.expiresAt) &&
+                Objects.equals(this.expiredAt, currentFoodboxOrderInfo.expiredAt) &&
                 Objects.equals(this.createdAt, currentFoodboxOrderInfo.createdAt) &&
                 Objects.equals(this.totalPrice, currentFoodboxOrderInfo.totalPrice) &&
                 Objects.equals(this.balanceLimit, currentFoodboxOrderInfo.balanceLimit) &&
@@ -178,7 +178,7 @@ public class CurrentFoodboxOrderInfo {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(foodboxOrderId, status, dishes, expiresAt, createdAt, totalPrice, balanceLimit, balance);
+        return java.util.Objects.hash(foodboxOrderId, status, dishes, expiredAt, createdAt, totalPrice, balanceLimit, balance);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class CurrentFoodboxOrderInfo {
         sb.append("    isppIdFoodbox: ").append(toIndentedString(foodboxOrderId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    dishes: ").append(toIndentedString(dishes)).append("\n");
-        sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
+        sb.append("    expiresAt: ").append(toIndentedString(expiredAt)).append("\n");
         sb.append("    timeOrder: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("    orderPrice: ").append(toIndentedString(totalPrice)).append("\n");
         sb.append("    currentBalanceLimit: ").append(toIndentedString(balanceLimit)).append("\n");
