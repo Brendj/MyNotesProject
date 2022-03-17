@@ -256,6 +256,7 @@ public class RegularPaymentSubscriptionService {
     }
 
     public boolean deactivateSubscription(Long subscriptionId) {
+        logger.info("start deactivation of subscription");
         PaymentResponse paymentResponse = sendSubscriptionRequest(subscriptionId, subscriptionDeleteRequest);
         return subscriptionDeleteRequest.postProcessResponse(null, subscriptionId, paymentResponse);
     }
