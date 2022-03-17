@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
+import org.hibernate.Transaction;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
@@ -19,7 +20,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import javax.faces.application.FacesMessage;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
@@ -396,8 +399,28 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
 
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+            JasperPrint jasperPrint = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                // Открываем не readonly сессию, так как далее будет создаваться временная таблица
+                // для оптимизации запросов
+                persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
+                        createDataSource(persistenceSession, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+
+            }
+            catch (Exception e) {
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
             Date generateEndTime = new Date();
             if (!exportToHTML) {
                 return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
