@@ -206,31 +206,31 @@ public class MealsController extends Application {
                     if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId()))) {
                         continue;
                     }
-                    Integer countAvailable = 0;
+                    Integer countAvailableinOrg = 0;
                     for (FoodBoxPreorderAvailable foodBoxPreorderAvailable: foodBoxPreorderAvailables)
                     {
                         if (foodBoxPreorderAvailable.getIdOfDish().equals(orderDish.getDishId())) {
-                            countAvailable = foodBoxPreorderAvailable.getAvailableQty();
+                            countAvailableinOrg = foodBoxPreorderAvailable.getAvailableQty();
                             break;
                         }
                     }
                     //Получаем список заказов, которые могут использовать данный заказ
-                    Integer correntVal = orders.get(orderDish.getDishId());
-                    if (correntVal == null)
+                    Integer correntValinOrders = orders.get(orderDish.getDishId());
+                    if (correntValinOrders == null)
                     {
                         //т.е. нет активных заказов на это блюдо
-                        if (countAvailable < orderDish.getAmount())
+                        if (countAvailableinOrg < orderDish.getAmount())
                         {
-                            orderDish.setAmount(countAvailable);
+                            orderDish.setAmount(countAvailableinOrg);
                         }
                     } else
                     {
-                        Integer availableCount = countAvailable - correntVal;
-                        if (availableCount < 0)
+                        Integer availableCount = countAvailableinOrg - correntValinOrders;
+                        if (availableCount < 1)
                             continue;
                         if (availableCount < orderDish.getAmount())
                         {
-                            orderDish.setAmount(countAvailable);
+                            orderDish.setAmount(availableCount);
                         }
                     }
                 } catch (Exception e) {
