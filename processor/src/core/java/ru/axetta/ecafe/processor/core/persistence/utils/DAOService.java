@@ -1284,9 +1284,10 @@ public class DAOService {
         q.executeUpdate();
     }
 
-    public void deleteOldFoodBoxAvailable(Org org) {
-        Query query = entityManager.createQuery("delete from FoodBoxPreorderAvailable where org=:org");
+    public void deleteOldFoodBoxAvailable(Org org, Long idOfDish) {
+        Query query = entityManager.createQuery("delete from FoodBoxPreorderAvailable where org=:org and idOfDish=:idOfDish");
         query.setParameter("org", org);
+        query.setParameter("idOfDish", idOfDish);
         query.executeUpdate();
     }
 
