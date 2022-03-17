@@ -124,8 +124,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            // Открываем не readonly сессию, так как далее будет создаваться временная таблица для оптимизации запросов
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
 
             List<BasicReportJob.OrgShortItem> orgShortItemList;
             if (idOfOrgList == null || idOfOrgList.isEmpty()) {
@@ -150,10 +149,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
             DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
             builder.setOrgShortItemList(orgShortItemList);
-            persistenceTransaction = persistenceSession.beginTransaction();
             dailySalesReport = (DailySalesByGroupsReport) builder.build(persistenceSession,startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
@@ -178,8 +174,6 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
         } catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
         } finally {
@@ -194,8 +188,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Transaction persistenceTransaction = null;
         Session persistenceSession = null;
         try {
-            // Открываем не readonly сессию, так как далее будет создаваться временная таблица для оптимизации запросов
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             List<BasicReportJob.OrgShortItem> orgShortItemList;
 
             if (idOfOrgList == null || idOfOrgList.isEmpty()) {
@@ -216,15 +209,10 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             }
             orgShortItemList = getOrgShortItemList(orgIdsList);
 
-            persistenceTransaction = persistenceSession.beginTransaction();
             buildReport(persistenceSession, orgShortItemList);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         }
         catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         }
         finally {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
