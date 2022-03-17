@@ -741,7 +741,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         Boolean foodBoxAvailable = true;
         try {
@@ -844,7 +844,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
