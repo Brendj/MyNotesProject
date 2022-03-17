@@ -200,14 +200,8 @@ public class MealsController extends Application {
             currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
             boolean havegoodDish = false;
+            Integer countDish = 0;
             for (OrderDish orderDish : foodboxOrder.getDishes()) {
-                if (orderDish.getAmount() > MAX_COUNT_DISH) {
-                    logger.error(String.format("Блюд заказано больше допустимого idOfDish: %s", orderDish.getDishId()));
-                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
-                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
-                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
-                }
                 try {
                     if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId()))) {
                         continue;
@@ -259,6 +253,14 @@ public class MealsController extends Application {
                 foodBoxPreorderDish.setCreateDate(new Date());
                 persistenceSession.persist(foodBoxPreorderDish);
                 currentFoodboxOrderInfo.getDishes().add(orderDish);
+                countDish += orderDish.getAmount();
+                if (countDish > MAX_COUNT_DISH) {
+                    logger.error(String.format("Блюд заказано больше допустимого idOfDish: %s", orderDish.getDishId()));
+                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
+                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+                }
             }
             if (!havegoodDish) {
                 logger.error(String.format("Все блюда из заказа не доступны foodBoxid: %s", xrequestStr));
