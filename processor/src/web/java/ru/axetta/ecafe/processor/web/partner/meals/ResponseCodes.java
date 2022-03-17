@@ -13,6 +13,7 @@ public enum ResponseCodes {
     RC_WRONG_KEY(120L, "Не удалось идентифицировать пользователя"),
     RC_WRONG_REQUST(130L, "Не все обязательные поля заполнены"),
     RC_WRONG_DATE(210L, "Неверная дата и время операции"),
+    RC_NOT_FOUND_AVAILABLE_CLIENT (140L, "У клиента не включен функционал"),
     RC_NOT_FOUND_CLIENT(150L, "Клиент не найден"),
     RC_NOT_FOUND_ORG(160L, "У организации не включен функционал"),
     RC_NOT_FOUND_FOODBOX(170L, "Заявка не найдена"),
