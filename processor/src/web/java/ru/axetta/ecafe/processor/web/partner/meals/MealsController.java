@@ -193,7 +193,6 @@ public class MealsController extends Application {
             foodBoxPreorder.setOrg(client.getOrg());
             foodBoxPreorder.setCreateDate(new Date());
             foodBoxPreorder.setIdFoodBoxExternal(xrequestStr);
-            foodBoxPreorder.setLocated(false);
             foodBoxPreorder.setPosted(0);
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());

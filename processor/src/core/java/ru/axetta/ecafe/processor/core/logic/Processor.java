@@ -8194,6 +8194,7 @@ public class Processor implements SyncProcessor {
 //            DAOService.getInstance().deleteOldFoodBoxAvailable(org);
             boolean finded = false;
             for (FoodBoxAvailableItem foodBoxAvailableItem : foodBoxDishRemain.getItems()) {
+                finded = false;
                 //Ищем такую запись по данным БД
                 for (FoodBoxPreorderAvailable foodBoxPreorderAvailableBD :foodBoxPreorderAvailables)
                 {
