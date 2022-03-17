@@ -167,6 +167,7 @@ public class GuardianDoublesService {
     }
 
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
+        if (allTheSameGuardian(deleteGuardianList)) return;
         boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
         Map<Long, Boolean> cgDisabled = getCGDisabledMap(deleteGuardianList);
         //boolean allCGDisabled = getAllCGDisabled(deleteGuardianList);
@@ -215,6 +216,18 @@ public class GuardianDoublesService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean allTheSameGuardian(List<CGItem> list) {
+        Long id = null;
+        for (CGItem item : list) {
+            if (id == null) {
+                id = item.getIdOfGuardin();
+                continue;
+            }
+            if (!item.getIdOfGuardin().equals(id)) return false;
+        }
+        return true;
     }
 
     private boolean getAllCGDeleted(List<CGItem> list) {
