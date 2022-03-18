@@ -9,8 +9,6 @@ import ru.iteco.cardsync.models.Card;
 import ru.iteco.cardsync.models.CardActionClient;
 import ru.iteco.cardsync.models.CardActionRequest;
 import ru.iteco.cardsync.models.Client;
-import ru.iteco.cardsync.repo.CardActionClientRepository;
-import ru.iteco.cardsync.repo.CardSyncRepository;
 import ru.iteco.cardsync.repo.ClientRepository;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -44,59 +41,6 @@ public class CardProcessorService {
         this.cardActionClientService = cardActionClientService;
         this.cardService = cardService;
         this.clientRepository = clientRepository;
-    }
-
-    public boolean newReq(BlockPersonEntranceRequest request)
-    {
-        List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestIdOLD(request.getId());
-        if (blockRequests.isEmpty()) {
-            return false;
-        }
-        if (blockRequests.get(0).getAudit().getCreateDate().getTime() > new Date(1599598800000L).getTime())
-            return true;
-        else
-            return false;
-    }
-
-    public void processUnblockRequestOLD(BlockPersonEntranceRequest request) {
-        try {
-            if (request == null) {
-                return;
-            }
-            List<CardActionRequest> blockRequests = cardActionRequestService.findRequestBlockByRequestIdOLD(request.getId());
-            if (blockRequests.isEmpty()) {
-                cardActionRequestService.writeRecordOLD(request, "В БД нет запроса на блокировку", false);
-                return;
-            }
-            //Для всех клиентов, заблокированных по одному id
-            for (CardActionRequest blockRequest: blockRequests) {
-                Client client = blockRequest.getClient();
-                if (client == null) {
-                    cardActionRequestService.writeRecordOLD(request, "Не найден клиент для разблокировки карт", false);
-                    continue;
-                }
-                List<Card> cardsActive = cardService.getActiveCard(client, false);
-                if (!cardsActive.isEmpty())
-                {
-                    cardActionRequestService.writeRecordOLD(request, "Есть активные карты на момент разблокировки", false, client);
-                    continue;
-                }
-                List<Card> cards = cardService.getBlockedCard(client);
-                if (CollectionUtils.isEmpty(cards)) {
-                    cardActionRequestService.writeRecordOLD(request, "Не найдено карт для разблокировки", false, client);
-                    continue;
-                }
-
-                for (Card c : cards) {
-                    cardService.unblockCard(c);
-                }
-
-                cardActionRequestService.writeRecordOLD(request, OK, true, client);
-            }
-        } catch (Exception e) {
-            log.error(String.format("Error when process request %s", request.getId()), e);
-            cardActionRequestService.writeRecordOLD(request, "Ошибка при обработке запроса: " + e.getMessage(), false);
-        }
     }
 
     public void processUnblockRequest(BlockPersonEntranceRequest request) {
