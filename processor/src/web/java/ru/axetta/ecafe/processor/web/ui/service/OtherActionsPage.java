@@ -30,6 +30,8 @@ import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.guardianservice.GuardianDoublesService;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserCreatePage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
@@ -49,12 +51,13 @@ import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*;
 
 @Component
 @Scope("session")
-public class OtherActionsPage extends OnlineReportPage {
+public class OtherActionsPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
 
     private String passwordForSearch;
     private String orgsForGenerateGuardians;
@@ -72,6 +75,43 @@ public class OtherActionsPage extends OnlineReportPage {
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
     private Integer processedMeshGuids;
     private Boolean showProcessedMeshGuids = false;
+    private SelectedOrgListType selectOrgType;
+    private List<OrgItem> orgItemsPreorder = new ArrayList<>(0);
+    private List<OrgItem> orgItemsRemoveDup = new ArrayList<>(0);
+    private List<OrgItem> orgItemsLoadMesh = new ArrayList<>(0);
+    protected String orgItemsPreorderFilter = "Не выбрано";
+    protected String orgItemsRemoveDupFilter = "Не выбрано";
+    protected String orgItemsLoadMeshFilter = "Не выбрано";
+
+    private static class OrgItem {
+        protected final Long idOfOrg;
+        private final String shortName;
+        private final Boolean mainBuilding;
+
+        OrgItem(Org org) {
+            this(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding());
+        }
+
+        public OrgItem(Long idOfOrg, String shortName) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.mainBuilding = Boolean.FALSE;
+        }
+
+        public OrgItem(Long idOfOrg, String shortName, Boolean mainBuilding) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.mainBuilding = mainBuilding;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+    }
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -539,11 +579,12 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void loadMeshGuidsForGuardians(FileUploadEvent event) {
-        if (CollectionUtils.isEmpty(idOfOrgList)) {
+        List<Long> orgList = orgItemsLoadMesh.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgList)) {
             printError("Не выбраны организации для загрузки мэш гуидов представителей");
             return;
         }
-        Collections.sort(idOfOrgList);
+        Collections.sort(orgList);
         UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
         try {
@@ -551,7 +592,7 @@ public class OtherActionsPage extends OnlineReportPage {
             inputStream = new ByteArrayInputStream(data);
             logger.info("Start loadMeshGuidsForGuardians");
             showProcessedMeshGuids = false;
-            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream, idOfOrgList);
+            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream, orgList);
             showProcessedMeshGuids = true;
             logger.info("End loadMeshGuidsForGuardians");
             printMessage("Файл загружен успешно");
@@ -835,8 +876,8 @@ public class OtherActionsPage extends OnlineReportPage {
     public void preorderRequestsManualGenerate() throws Exception {
         PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
         params.getIdOfOrgList().clear();
-        if (idOfOrgList != null) {
-            params.getIdOfOrgList().addAll(idOfOrgList);
+        if (orgItemsPreorder != null) {
+            params.getIdOfOrgList().addAll(orgItemsPreorder.stream().map(o -> o.idOfOrg).collect(Collectors.toList()));
         }
         params.getIdOfClientList().clear();
         if (getClientList() != null) {
@@ -939,12 +980,13 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runDeleteDoubleGuardians() {
-        if (CollectionUtils.isEmpty(idOfOrgList)) {
+        List<Long> orgList = orgItemsRemoveDup.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgList)) {
             printError("Не выбраны организации для обработки дублей представителей");
             return;
         }
-        Collections.sort(idOfOrgList);
-        for (long idOfOrg : idOfOrgList) {
+        Collections.sort(orgList);
+        for (long idOfOrg : orgList) {
             RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
         }
         printMessage("Операция обработки дублей представителей по выбранным организациям выполнена");
@@ -1006,6 +1048,64 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        switch (selectOrgType){
+            case ORG_LIST_PREORDER: {
+                orgItemsPreorder = setOrgListSection(orgMap, orgItemsPreorder);
+                orgItemsPreorderFilter = setOrgListFilter(orgItemsPreorder);
+            } break;
+            case ORG_LIST_REMOVE_DUPLICATES: {
+                orgItemsRemoveDup = setOrgListSection(orgMap, orgItemsRemoveDup);
+                orgItemsRemoveDupFilter = setOrgListFilter(orgItemsRemoveDup);
+            } break;
+            case ORG_LIST_LOAD_MESH: {
+                orgItemsLoadMesh = setOrgListSection(orgMap, orgItemsLoadMesh);
+                orgItemsLoadMeshFilter = setOrgListFilter(orgItemsLoadMesh);
+            } break;
+        }
+    }
+
+    private String setOrgListFilter(List<OrgItem> items){
+        if (items.isEmpty())
+            return "Не выбрано";
+        else return items.stream().map(o -> o.shortName).collect(Collectors.joining("; "));
+    }
+
+    private List<OrgItem> setOrgListSection(Map<Long, String> orgMap, List<OrgItem> items) {
+        if (orgMap != null && !orgMap.isEmpty()) {
+            return orgMap.keySet().stream().map(o -> new OrgItem(o, orgMap.get(o))).collect(Collectors.toList());
+        }
+        return items;
+    }
+
+    public String getGetStringIdOfOrgList() {
+        switch (selectOrgType){
+            case ORG_LIST_PREORDER: return orgItemsPreorder.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_LIST_REMOVE_DUPLICATES: return orgItemsRemoveDup.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_LIST_LOAD_MESH: return orgItemsLoadMesh.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+        }
+        return "";
+    }
+
+    public Object showOrgListSelectPreorderPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_PREORDER;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectRemoveDupPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_REMOVE_DUPLICATES;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectLoadMeshPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_LOAD_MESH;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
     public String getUpdateSpbClientDoubles() {
         return updateSpbClientDoubles;
     }
@@ -1052,5 +1152,33 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setShowProcessedMeshGuids(Boolean showProcessedMeshGuids) {
         this.showProcessedMeshGuids = showProcessedMeshGuids;
+    }
+
+    public void setSelectOrgType(int id) {
+        this.selectOrgType = SelectedOrgListType.values()[id];
+    }
+
+    public String getOrgItemsPreorderFilter() {
+        return orgItemsPreorderFilter;
+    }
+
+    public void setOrgItemsPreorderFilter(String orgItemsPreorderFilter) {
+        this.orgItemsPreorderFilter = orgItemsPreorderFilter;
+    }
+
+    public String getOrgItemsRemoveDupFilter() {
+        return orgItemsRemoveDupFilter;
+    }
+
+    public void setOrgItemsRemoveDupFilter(String orgItemsRemoveDupFilter) {
+        this.orgItemsRemoveDupFilter = orgItemsRemoveDupFilter;
+    }
+
+    public String getOrgItemsLoadMeshFilter() {
+        return orgItemsLoadMeshFilter;
+    }
+
+    public void setOrgItemsLoadMeshFilter(String orgItemsLoadMeshFilter) {
+        this.orgItemsLoadMeshFilter = orgItemsLoadMeshFilter;
     }
 }
