@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -165,7 +166,21 @@ public class MealsController extends Application {
             orderErrorInfo.setFoodboxOrderId(foodBoxPreorders.get(0).getIdOfOrder());
             return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
-
+        Long availableMoney = 0L;
+        if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
+            //Получаем истраченную сумму по кассе
+            Long usedSuminDay = daoReadonlyService.getSumForOrdersbyClientOnPeriod(client.getIdOfClient(), CalendarUtils.startOfDay(new Date()), CalendarUtils.endOfDay(new Date()));
+            Long usedSuminDayFoodBox = daoReadonlyService.getUsedMoneyFoodBoxPreorderForClient(client, CalendarUtils.startOfDay(new Date()), CalendarUtils.endOfDay(new Date()));
+            availableMoney = client.getExpenditureLimit() - usedSuminDay - usedSuminDayFoodBox;
+            if (availableMoney < 0) {
+                logger.error("Сумма заказа превышает дневной лимит трат");
+                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
+                orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+            }
+        }
         Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
         Integer countunlocketed = daoReadonlyService.getFoodBoxPreordersUnallocated(client.getOrg());
         Integer countFree = 0;
@@ -286,7 +301,7 @@ public class MealsController extends Application {
                 }
             }
             if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
-                if (priceAll > client.getExpenditureLimit()) {
+                if (priceAll > availableMoney) {
                     logger.error("Сумма заказа превышает дневной лимит трат");
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());

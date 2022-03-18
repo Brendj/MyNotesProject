@@ -3393,6 +3393,23 @@ public class DAOReadonlyService {
         }
     }
 
+    public Long getUsedMoneyFoodBoxPreorderForClient(Client client, Date startDate, Date endDate) {
+        try {
+            Query query = entityManager.createQuery("SELECT sum(fb.orderPrice) from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.state between :new and :execute and fb.createDate between :startDate and :endDate");
+            query.setParameter("client", client);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("execute", FoodBoxStateTypeEnum.EXECUTED);
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+            return (Long)query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+
     public Map<Long,Integer> getDishesCountActiveFoodBoxPreorderForOrg(Org org) {
         try {
             Map<Long,Integer> countDish = new HashMap<>();
@@ -3506,6 +3523,24 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /* Подсчет истраченного количества денег за период для клиента (для Фудбокса)*/
+    @SuppressWarnings("unchecked")
+    public Long getSumForOrdersbyClientOnPeriod(Long idOfClient, Date startDate, Date endDate) {
+        Query query = entityManager.createNativeQuery("select sum(cforder.rsum) from cf_orders cforder" +
+                " where cforder.state=0 and cforder.createddate between :startDate and :endDate and" +
+                " cforder.idofclient=:idOfClient and" +
+                " cforder.ordertype in (0,1) ");
+        query.setParameter("idOfClient",idOfClient);
+        query.setParameter("startDate",startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        Object res = query.getSingleResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigDecimal) res).longValue();
         }
     }
 }
