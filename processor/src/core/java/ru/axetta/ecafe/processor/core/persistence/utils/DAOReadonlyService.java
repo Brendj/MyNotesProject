@@ -3353,7 +3353,7 @@ public class DAOReadonlyService {
     public Integer getFoodBoxPreordersUnallocated(Org org) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
-                    + "where fb.org = :org and (fb.located is null or fb.located = false)");
+                    + "where fb.org = :org and (fb.posted = 0)");
             query.setParameter("org", org);
             List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
             return foodBoxPreorders.size();
