@@ -3403,7 +3403,10 @@ public class DAOReadonlyService {
             query.setParameter("execute", FoodBoxStateTypeEnum.EXECUTED);
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
-            return (Long)query.getSingleResult();
+            Object res = query.getSingleResult();
+            if (res==null)
+                return 0L;
+            return (Long)res;
         } catch (Exception e) {
             e.printStackTrace();
             return 0L;
