@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -880,7 +879,7 @@ public class MealsController extends Application {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
         foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(foodBoxPreorder.getCreateDate()) + "Z");
-        foodboxOrderInfo.setIsppIdFoodbox(foodBoxPreorder.getIdFoodBoxPreorder());
+        foodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
         Long sum = 0L;
         for (FoodBoxPreorderDish foodBoxPreorderDish : DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder)) {
             OrderDish orderDish = new OrderDish();
