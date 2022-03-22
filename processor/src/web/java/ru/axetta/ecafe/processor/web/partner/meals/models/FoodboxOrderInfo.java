@@ -10,7 +10,7 @@ import java.util.List;
  * Передача данных о заказе (в контексте списка).
  */
 public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
-    private Long isppIdFoodbox = null;
+    private Long foodboxOrderId = null;
     private String status = null;
     private String expiredAt = null;
     private String createdAt = null;
@@ -21,12 +21,12 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
      * Идентификатор заказа.
      * @return id
      **/
-    public Long getIsppIdFoodbox() {
-        return isppIdFoodbox;
+    public Long getFoodboxOrderId() {
+        return foodboxOrderId;
     }
 
-    public void setIsppIdFoodbox(Long isppIdFoodbox) {
-        this.isppIdFoodbox = isppIdFoodbox;
+    public void setFoodboxOrderId(Long foodboxOrderId) {
+        this.foodboxOrderId = foodboxOrderId;
     }
 
     public FoodboxOrderInfo status(String status) {
@@ -126,7 +126,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
             return false;
         }
         FoodboxOrderInfo foodboxOrderInfo = (FoodboxOrderInfo) o;
-        return Objects.equals(this.isppIdFoodbox, foodboxOrderInfo.isppIdFoodbox) &&
+        return Objects.equals(this.foodboxOrderId, foodboxOrderInfo.foodboxOrderId) &&
                 Objects.equals(this.status, foodboxOrderInfo.status) &&
                 Objects.equals(this.expiredAt, foodboxOrderInfo.expiredAt) &&
                 Objects.equals(this.createdAt, foodboxOrderInfo.createdAt) &&
@@ -136,7 +136,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(isppIdFoodbox, status, expiredAt, createdAt, dishes, totalPrice);
+        return java.util.Objects.hash(foodboxOrderId, status, expiredAt, createdAt, dishes, totalPrice);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
         StringBuilder sb = new StringBuilder();
         sb.append("class FoodboxOrderInfo {\n");
 
-        sb.append("    id: ").append(toIndentedString(isppIdFoodbox)).append("\n");
+        sb.append("    id: ").append(toIndentedString(foodboxOrderId)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    expiresAt: ").append(toIndentedString(expiredAt)).append("\n");
         sb.append("    timeOrder: ").append(toIndentedString(createdAt)).append("\n");
