@@ -9,7 +9,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="true" minWidth="850" minHeight="950"
-                     headerClass="modal-panel-header">
+                     followByScroll = "false" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
             <h:outputText escape="true" value="Выбор организации"/>
