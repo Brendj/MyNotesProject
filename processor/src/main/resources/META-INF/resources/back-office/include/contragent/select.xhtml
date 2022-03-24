@@ -8,7 +8,8 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalContragentSelectorPanel" autosized="false" width="460" height="550" headerClass="modal-panel-header">
+    <rich:popupPanel modal="true" id="modalContragentSelectorPanel" autosized="true" minWidth="500" minHeight="600"
+                     followByScroll = "false" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalContragentSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
             <h:outputText escape="true" value="Выбор контрагента"/>
@@ -26,10 +27,8 @@
                 <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
                 <h:inputText value="#{mainPage.contragentSelectPage.filter}" size="52" maxlength="128"
                              styleClass="input-text" />
-                <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
-                                 render="modalContragentSelectorForm" styleClass="command-link">
-                    <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                </a4j:commandLink>
+                <a4j:ajax event="keyup" listener="#{mainPage.showContragentSelectPage}"
+                          render="modalContragentSelectorTable"/>
                 <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
                                  render="modalContragentSelectorForm" styleClass="command-link">
                     <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />

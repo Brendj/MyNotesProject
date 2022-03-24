@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.util.Date;
 import java.util.Objects;
 
-public class ClientDiscountHistory {
+public class ClientDiscountHistory implements Comparable<ClientDiscountHistory>{
     private Long idOfClientDiscountHistory;
     private ClientDiscountHistoryOperationTypeEnum operationType;
     private Date registryDate;
@@ -80,11 +80,30 @@ public class ClientDiscountHistory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClientDiscountHistory that = (ClientDiscountHistory) o;
-        return Objects.equals(idOfClientDiscountHistory, that.idOfClientDiscountHistory);
+        return Objects.equals(idOfClientDiscountHistory, that.idOfClientDiscountHistory)
+                && operationType == that.operationType && Objects.equals(registryDate, that.registryDate)
+                && Objects.equals(client, that.client) && Objects.equals(categoryDiscount, that.categoryDiscount)
+                && Objects.equals(comment, that.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfClientDiscountHistory);
+        return Objects.hash(idOfClientDiscountHistory, operationType, registryDate, client, categoryDiscount, comment);
+    }
+
+    @Override
+    public int compareTo(ClientDiscountHistory other) {
+        int compareClients = this.client.getIdOfClient().compareTo(other.getClient().getIdOfClient());
+        if(compareClients != 0){
+            return compareClients;
+        }
+
+        int compareDiscounts = Long.compare(this.getCategoryDiscount().getIdOfCategoryDiscount(),
+                other.getCategoryDiscount().getIdOfCategoryDiscount());
+        if(compareDiscounts != 0){
+            return compareClients;
+        }
+
+        return this.operationType.compareTo(other.getOperationType());
     }
 }

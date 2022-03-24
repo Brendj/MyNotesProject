@@ -347,7 +347,6 @@ public class EventNotificationService {
     public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
 
         if (dataClient == null && !isNotificationEnabled(destClient, type, values)) {
-            logger.info("У клиента с л/с " + destClient.getContractId() + " отключен данный тип уведомления");
             return;
         }
         Boolean sms = null;
@@ -359,11 +358,7 @@ public class EventNotificationService {
                     sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian, eventTime);
                 }
             }
-        } else
-        {
-            logger.info("У клиента с л/с " + destClient.getContractId() + " отключен уведомление по SMS");
         }
-
         if (smsService.isEmailSentByPlatform()) {
             return;
         }

@@ -9,24 +9,22 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <script type="text/javascript">
-        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
-        element.click();
-        element.hidden = true;
-
-
         function disableButtons(value) {
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled = value;
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled = value;
         }
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
+        element.click();
+        element.hidden = true;
     </script>
 
-    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <a4j:commandLink id="otherActionsGridRender" value=""
                      render="otherActionsGrid"/>
+
+    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <!--Тест лога -->
-<h:panelGrid>
-    <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}"
-                 styleClass="borderless-grid borderless-grid-align-top" columns="2">
+<h:panelGrid id="otherActionsGrid">
+    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" columns="2">
         <h:panelGrid styleClass="borderless-grid">
 
             <a4j:commandButton value="Архивирование событий освобождения от посещения ОО"
@@ -252,14 +250,15 @@
                                   styleClass="output-text"/><br/>
                     <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
                     <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectPreorderPage}"
                                            render="modalOrgListSelectorPanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                            styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="0" target="#{otherActionsPage.selectOrgType}"/>
                             <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
                                                          target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                         </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.filter}}"/>
+                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsPreorderFilter}}"/>
                     </h:panelGroup>
 
                     <h:outputText styleClass="output-text" escape="true" value="Физ. лицо"/>
@@ -304,14 +303,15 @@
                                   styleClass="output-text"/><br/>
                     <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
                     <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectRemoveDupPage}"
                                            render="modalOrgListSelectorPanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                            styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="1" target="#{otherActionsPage.selectOrgType}"/>
                             <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
                                                          target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                         </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.filter}}"/>
+                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsRemoveDupFilter}}"/>
                     </h:panelGroup>
 
                     <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
@@ -326,14 +326,15 @@
                                   styleClass="output-text"/><br/>
                     <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
                     <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectLoadMeshPage()}"
                                            render="modalOrgListSelectorPanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                            styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="2" target="#{otherActionsPage.selectOrgType}"/>
                             <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
                                                          target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                         </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.filter}}"/>
+                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsLoadMeshFilter}}"/>
                     </h:panelGroup>
                     <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
                     <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
@@ -365,7 +366,7 @@
             <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
         </rich:panel>
 
-        <a4j:status id="reportGenerateStatus">
+        <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
             </f:facet>

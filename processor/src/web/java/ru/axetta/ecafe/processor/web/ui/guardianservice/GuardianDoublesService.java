@@ -1,7 +1,9 @@
 package ru.axetta.ecafe.processor.web.ui.guardianservice;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,7 +55,7 @@ public class GuardianDoublesService {
             String query_str = "select c.idofclient, cg.idofguardian, pg.surname, pg.firstname, " +
                     "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg as clientOrg, g.idoforg as guardianOrg, " +
                     "cg.idofclientguardian, ca.lastupdate, g.balance, g.idofclientgroup, g.lastupdate as guardianLU, " +
-                    "cg.deletedstate " +
+                    "cg.deletedstate, cg.disabled " +
                     "from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren " +
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
@@ -85,7 +87,8 @@ public class GuardianDoublesService {
                         HibernateUtils.getDbLong(row[12]),
                         HibernateUtils.getDbLong(row[13]),
                         HibernateUtils.getDbLong(row[14]),
-                        (Boolean)row[15]);
+                        (Boolean)row[15],
+                        HibernateUtils.getDbInt(row[16]));
                 result.add(item);
             }
             transaction.commit();
@@ -139,10 +142,11 @@ public class GuardianDoublesService {
         String log_message = "Processing doubles: ";
         for (CGItem item : processList) {
             log_message += String.format("\nFIO: %s, idOfClient: %s, idOfGuardian: %s, cardNo: %s, guardianClientGroup: %s, " +
-                    "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s",
+                    "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s, " +
+                    "clientGuardianDisabled: %s",
                     item.getFioPlusMobile(), item.getIdOfClient(),
                     item.getIdOfGuardin(), item.getCardno(), item.getIdOfClientGroup(), item.getBalance(), item.getGuardianLastUpdate(),
-                    item.getCardLastUpdate(), item.getDeletedState());
+                    item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled());
             if (item.getCardno() != null) {
                 cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
                         item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
@@ -163,7 +167,10 @@ public class GuardianDoublesService {
     }
 
     private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
+        if (allTheSameGuardian(deleteGuardianList)) return;
         boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
+        Map<Long, Boolean> cgDisabled = getCGDisabledMap(deleteGuardianList);
+        //boolean allCGDisabled = getAllCGDisabled(deleteGuardianList);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -183,7 +190,8 @@ public class GuardianDoublesService {
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
                     logger.info(String.format("Blocked card with cardno = %s", item.getCardno()));
                 }
-                deleteGuardian(session, aliveGuardian, item, version);
+                //Set<ClientGuardianNotificationSetting> notificationSettings
+                deleteGuardian(session, aliveGuardian, item, version, cgDisabled);
 
             }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
@@ -210,6 +218,18 @@ public class GuardianDoublesService {
         }
     }
 
+    private boolean allTheSameGuardian(List<CGItem> list) {
+        Long id = null;
+        for (CGItem item : list) {
+            if (id == null) {
+                id = item.getIdOfGuardin();
+                continue;
+            }
+            if (!item.getIdOfGuardin().equals(id)) return false;
+        }
+        return true;
+    }
+
     private boolean getAllCGDeleted(List<CGItem> list) {
         for (CGItem item : list) {
             if (!item.getDeletedState()) {
@@ -219,15 +239,32 @@ public class GuardianDoublesService {
         return true;
     }
 
-    private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version) throws Exception {
-        /*if (deletedGuardian.getBalance() > 0) {
-            logger.info(String.format("Cannot delete guardian idOfClient = %s, idOfGuardian = %s since balance > 0",
-                    deletedGuardian.getIdOfClient(), deletedGuardian.getIdOfGuardin()));
-            return;
-        }*/
-        List<ClientGuardian> clientGuardians = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
+    private Map<Long, Boolean> getCGDisabledMap(List<CGItem> list) {
+        Map<Long, Boolean> result = new HashMap<>();
+        for (CGItem item : list) {
+            Boolean v = result.get(item.getIdOfClient());
+            if (v != null && !v) {
+                continue;
+            }
+            result.put(item.getIdOfClient(), item.getDisabled());
+        }
+        return result;
+    }
 
-        for (ClientGuardian clientGuardian : clientGuardians) {
+    /*private boolean getAllCGDisabled(List<CGItem> list) {
+        for (CGItem item : list) {
+            if (!item.getDisabled()) {
+                return false;
+            }
+        }
+        return true;
+    }*/
+
+    private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version,
+                                Map<Long, Boolean> mapDisabled) throws Exception {
+        ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
+
+        if (clientGuardian != null) {
             if (!clientGuardian.getDeletedState()) {
                 ClientGuardian cg = getGuardianChildlink(session, aliveGuardian, clientGuardian);
                 if (cg == null) {
@@ -236,14 +273,19 @@ public class GuardianDoublesService {
                     clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                     clientGuardianHistory2.setReason(HISTORY_LABEL);
                     ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
-                            version, clientGuardian.isDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
+                            version, false, clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
                             clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
                     logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
-                } else if (cg.getDeletedState()) {
-                    cg.setDeletedState(false);
-                    cg.setNotificationSettings(clientGuardian.getNotificationSettings());
-                    logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
-                    session.update(cg);
+                } else {
+                    addNotificationSettingsAndOptions(session, cg, clientGuardian, mapDisabled);
+                    if (cg.getDeletedState()) {
+                        cg.setDeletedState(false);
+                        if (!mapDisabled.get(cg.getIdOfChildren())) {
+                            cg.setDisabled(false);
+                        }
+                        logger.info(String.format("Set deleted state false guardian id=%d to client id=%d", cg.getIdOfGuardian(), cg.getIdOfChildren()));
+                        session.update(cg);
+                    }
                 }
             }
         }
@@ -265,10 +307,72 @@ public class GuardianDoublesService {
         session.flush();
     }
 
-    private List<ClientGuardian> getClientGuardianByCGItem(Session session, CGItem item) {
+    private void addNotificationSettingsAndOptions(Session session, ClientGuardian aliveCG,
+                                                   ClientGuardian deletedCG, Map<Long, Boolean> mapDisabled) {
+        boolean changed = false;
+        for (ClientGuardianNotificationSetting settingDeleted : deletedCG.getNotificationSettings()) {
+            boolean found = false;
+            for (ClientGuardianNotificationSetting settingAlive : aliveCG.getNotificationSettings()) {
+                if (settingDeleted.getNotifyType().equals(settingAlive.getNotifyType())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                changed = true;
+                aliveCG.getNotificationSettings().add(new ClientGuardianNotificationSetting(aliveCG, settingDeleted.getNotifyType()));
+                logger.info(String.format("Added notification flag = %s to guardian id = %s",
+                        settingDeleted.getNotifyType(), aliveCG.getIdOfGuardian()));
+            }
+        }
+        if (aliveCG.isDisabled() && !mapDisabled.get(aliveCG.getIdOfChildren())) {
+            aliveCG.setDisabled(false);
+            changed = true;
+            logger.info(String.format("Client id = %s, Guardian id=%s set disabled false", aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian()));
+        }
+        boolean specialMenu = ClientManager.getInformedSpecialMenu(session, deletedCG.getIdOfChildren(), deletedCG.getIdOfGuardian());
+        boolean allowedPreorder = ClientManager.getAllowedPreorderByClient(session, deletedCG.getIdOfChildren(), deletedCG.getIdOfGuardian());
+        if (specialMenu || allowedPreorder) {
+            PreorderFlag preorderFlagAliveCG = getPreorderFlag(session, aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian());
+            if (preorderFlagAliveCG == null) {
+                Client client = DAOUtils.findClient(session, aliveCG.getIdOfChildren());
+                preorderFlagAliveCG = new PreorderFlag(client);
+            }
+            Client guardian = DAOUtils.findClient(session, aliveCG.getIdOfGuardian());
+            if (specialMenu) {
+                preorderFlagAliveCG.setInformedSpecialMenu(true);
+                preorderFlagAliveCG.setGuardianInformedSpecialMenu(guardian);
+                logger.info("Client id = %s, Guardian id=%s set ON special menu", aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian());
+            }
+            if (allowedPreorder) {
+                preorderFlagAliveCG.setAllowedPreorder(true);
+                preorderFlagAliveCG.setGuardianAllowedPreorder(guardian);
+                logger.info("Client id = %s, Guardian id=%s set ON allowed preorder", aliveCG.getIdOfChildren(), aliveCG.getIdOfGuardian());
+            }
+            session.saveOrUpdate(preorderFlagAliveCG);
+        }
+        if (changed) {
+            //aliveCG.setNotificationSettings(settings);
+            session.save(aliveCG);
+        }
+        session.flush();
+    }
+
+    private PreorderFlag getPreorderFlag(Session session, Long idOfClient, Long idOfGuardian) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("guardianInformedSpecialMenu.idOfClient", idOfGuardian));
+        List<PreorderFlag> list = criteria.list();
+        if (list.size() == 0) return null;
+        return list.get(0);
+    }
+
+    private ClientGuardian getClientGuardianByCGItem(Session session, CGItem item) {
         Query query = session.createQuery("select cg from ClientGuardian cg where cg.idOfClientGuardian = :id");
         query.setParameter("id", item.getIdOfClientGuardian());
-        return query.getResultList();
+        List<ClientGuardian> list = query.getResultList();
+        if (list.size() == 0) return null;
+        else return list.get(0);
     }
 
     private ClientGuardian getGuardianChildlink(Session session, CGItem aliveGuardian, ClientGuardian deletedGuardian) {
