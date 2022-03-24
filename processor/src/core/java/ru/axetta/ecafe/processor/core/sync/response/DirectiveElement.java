@@ -122,8 +122,6 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("PreorderSync","1"));
             DAOUtils.savePreorderDirectiveWithValue(session, org.getIdOfOrg(), false);
         }
-
-        directiveItemList.add(new DirectiveItem("FoodBoxServiceAvailable", (org.getUsedFoodbox())?"1":"0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
@@ -280,6 +278,8 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
         }
+
+        directiveItemList.add(new DirectiveItem("FoodBoxServiceAvailable", (org.getUsedFoodbox())?"1":"0"));
 
         //OrgWritableRepository.getInstance().saveOrg(org);
     }

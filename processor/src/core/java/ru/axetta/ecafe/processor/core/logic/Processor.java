@@ -1204,6 +1204,37 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        try {
+            FoodBoxPreorderChanged foodBoxPreorderChanged = request.getFoodBoxPreorderChanged();
+            if (foodBoxPreorderChanged != null) {
+                resFoodBoxChanged = processFoodBoxPreorderChanged(foodBoxPreorderChanged, request.getIdOfOrg());
+                foodBoxPreorderNew = processFoodBoxPreorderNew(request.getIdOfOrg(), foodBoxPreorderChanged.getMaxVersion());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorder: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxDishRemain foodBoxDishRemain = request.getFoodBoxDishRemain();
+            if (foodBoxDishRemain != null) {
+                processFoodBoxPreorderDishRemain(foodBoxDishRemain, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorderDishRemain: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxCellsSync foodBoxCellsSync = request.getFoodBoxCells();
+            if (foodBoxCellsSync != null) {
+                processFoodBoxCells(foodBoxCellsSync, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxCells: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
@@ -4044,7 +4075,7 @@ public class Processor implements SyncProcessor {
                 resClientBalanceHoldData = processClientBalanceHoldData(clientBalanceHoldData);
             }
         } catch (Exception e) {
-            String message = String.format("processClientBalanceHoldRequest: %s", e.getMessage());
+            String message = String.format("ClientBalanceHoldData: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -4065,7 +4096,7 @@ public class Processor implements SyncProcessor {
                 processFoodBoxPreorderDishRemain(foodBoxDishRemain, request.getIdOfOrg());
             }
         } catch (Exception e) {
-            String message = String.format("processClientBalanceHoldRequest: %s", e.getMessage());
+            String message = String.format("processFoodBoxPreorderDishRemain: %s", e.getMessage());
             logger.error(message, e);
         }
 

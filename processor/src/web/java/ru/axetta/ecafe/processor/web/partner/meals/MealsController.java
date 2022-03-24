@@ -904,12 +904,12 @@ public class MealsController extends Application {
     }
 
     private String getBuffetOpenTime() {
-        String openTime = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_OPEN_TIME, "");
+        String openTime = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_OPEN_TIME, "08:00");
         return openTime;
     }
 
     private String getBuffetCloseTime() {
-        String closeTime = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_CLOSE_TIME, "");
+        String closeTime = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_CLOSE_TIME, "19:00");
         return closeTime;
     }
 
