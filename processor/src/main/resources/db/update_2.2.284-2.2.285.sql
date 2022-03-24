@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2021. Axetta LLC. All Rights Reserved.
+ */
+
+-- Пакет обновлений v 285
 CREATE TABLE cf_SfcUserOrgs
 (
     idOfSfcUserOrg bigserial NOT NULL,
@@ -17,3 +22,5 @@ COMMENT ON COLUMN cf_SfcUserOrgs.idOfOrg IS 'Идентификатор орга
 ALTER TABLE cf_users ADD COLUMN deleteDateForBlock bigint;
 
 COMMENT ON COLUMN cf_users.deleteDateForBlock IS 'Дата блокировки учетной записи';
+
+--! ФИНАЛИЗИРОВАН 24.03.2022, НЕ МЕНЯТЬ
