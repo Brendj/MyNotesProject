@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserCreatePage;
 
 import javax.persistence.*;
 import java.io.BufferedReader;
@@ -759,7 +760,7 @@ public class DAOService {
     }
 
     @Transactional
-    public void updateInfoCurrentUser(List<Long> orgIds, List<Long> orgIdsCancel, User user) {
+    public void updateInfoCurrentUser(List<Long> orgIds, List<Long> orgIdsCancel, List<Long> orgItemsForUser, User user) {
         Session session = entityManager.unwrap(Session.class);
         session.refresh(user);
         session.flush();
@@ -774,9 +775,15 @@ public class DAOService {
         }
 
         for (Long orgIdCanceled : orgIdsCancel) {
-            Org org1 = (Org) session.load(Org.class, orgIdCanceled);
-            UserOrgs userOrgs1 = new UserOrgs(user, org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
-            session.save(userOrgs1);
+            Org org = (Org) session.load(Org.class, orgIdCanceled);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+            session.save(userOrgs);
+        }
+
+        for (Long orgItem: orgItemsForUser) {
+            Org org = (Org) session.load(Org.class, orgItem);
+            SfcUserOrgs sfcUserOrgs = new SfcUserOrgs(user, org);
+            session.save(sfcUserOrgs);
         }
     }
 
