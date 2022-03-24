@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.RequestUtils;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserCreatePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -51,9 +52,11 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
     protected List<Long> orgItems = new ArrayList<Long>(0);
     protected List<Long> orgItemsCanceled = new ArrayList<Long>(0);
+    protected List<Long> orgItemsForUser = new ArrayList<>(0);
 
     private String orgFilter = "Не выбрано";
     private String orgFilterCanceled = "Не выбрано";
+    private String orgItemsForUserFilter = "Не выбрано";
 
     private UserNotificationType selectOrgType;
 
@@ -82,6 +85,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
         orgItems.clear();
         orgItemsCanceled.clear();
+        orgItemsForUser.clear();
 
         selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
         Map<Long, String> orgList = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
@@ -90,6 +94,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
         Map<Long, String> orgListCanceled = daoReadonlyService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
         completeOrgListSelection(orgListCanceled);
+
     }
 
     public User getCurrentUser() throws Exception {
@@ -127,7 +132,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
                 currUser.setEmail(email);
                 currUser = daoService.setUserInfo(currUser);
 
-                daoService.updateInfoCurrentUser(this.orgItems, this.orgItemsCanceled, currUser);
+                daoService.updateInfoCurrentUser(this.orgItems, this.orgItemsCanceled, this.orgItemsForUser, currUser);
                 success = true;
 
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
@@ -326,4 +331,11 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         this.orgFilterCanceled = orgFilterCanceled;
     }
 
+    public String getOrgItemsForUserFilter() {
+        return orgItemsForUserFilter;
+    }
+
+    public void setOrgItemsForUserFilter(String orgItemsForUserFilter) {
+        this.orgItemsForUserFilter = orgItemsForUserFilter;
+    }
 }
