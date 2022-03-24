@@ -38,7 +38,7 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     private CodeMSP codeMSP;
     private Long selectedDiscount;
     private List<SelectItem> discounts = loadDiscounts();
-    private List<SelectItem> ageTypeGroups = loadAgeTypesGroups();
+    private List<SelectItem> ageTypeGroups = new LinkedList<>();
     private List<String> selectedTypes = new LinkedList<>();
 
     private List<SelectItem> loadAgeTypesGroups() {
@@ -161,6 +161,9 @@ public class CodeMSPEditPage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getAgeTypeGroups() {
+        if(ageTypeGroups.isEmpty()){
+            ageTypeGroups = loadAgeTypesGroups();
+        }
         return ageTypeGroups;
     }
 
