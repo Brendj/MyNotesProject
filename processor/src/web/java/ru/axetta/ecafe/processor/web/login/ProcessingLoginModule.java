@@ -177,6 +177,7 @@ public class ProcessingLoginModule implements LoginModule {
         loginSucceeded = false;
         Callback[] callbacks = new Callback[]{new NameCallback("Username"), new PasswordCallback("Password", false)};
         HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
+        User user;
         try {
             callbackHandler.handle(callbacks);
         } catch (Exception e) {
@@ -187,6 +188,11 @@ public class ProcessingLoginModule implements LoginModule {
         PasswordCallback passwordCallback = (PasswordCallback) callbacks[1];
         String plainPassword = new String(passwordCallback.getPassword());
         logger.debug("User \"{}\": try to login", username);
+        try {
+            user = getUserByName(username);
+        } catch (Exception e) {
+            throw new LoginException("User not found" + "\n" + e.getMessage());
+        }
         if (StringUtils.isEmpty(username)) {
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createLoginFaultRecord(request.getRemoteAddr(), null, null,
@@ -196,20 +202,14 @@ public class ProcessingLoginModule implements LoginModule {
             throw new LoginException("Username missing");
         }
         if (StringUtils.isEmpty(plainPassword)) {
-            User user;
-            try {
-                user = getUserByName(username);
-            } catch (Exception e) {
-                throw new LoginException("User not found" + "\n" + e.getMessage());
-            }
             processBadPassword(user, request);
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createLoginFaultRecord(request.getRemoteAddr(), username, null,
                             SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
             DAOService.getInstance().writeAuthJournalRecord(record);
-
             throw new LoginException(String.format("User \"%s\": password missing", username));
         }
+        user.checkDeleteDateForBlock();
         try {
             checkUserCredentials(plainPassword);
         } catch (Exception e) {

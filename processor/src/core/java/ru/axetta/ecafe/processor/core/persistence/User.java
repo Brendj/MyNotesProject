@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.CryptoPro.JCP.tools.SelfTests$TestDigest_2012_512;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -249,8 +250,8 @@ public class User {
         INFORMATION_SYSTEM_OPERATOR(9,"Оператор ИС"),
         CLASSROOM_TEACHER(10,"Классный руководитель"),
         CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
-        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)");
-
+        WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)"),
+        SFC(13, "Служба финансового контроля");
 
         private Integer identification;
         private String description;
@@ -316,6 +317,8 @@ public class User {
     private Boolean isGroup;
     private Org org;
     private Client client;
+    private Set<SfcUserOrgs> sfcUserOrgs = new HashSet<>();
+    private Date deleteDateForBlock;
 
     public String getRoleName() {
         return roleName;
@@ -568,6 +571,22 @@ public class User {
 
     public void setClient(Client client) { this.client = client; }
 
+    public Set<SfcUserOrgs> getSfcUserOrgs() {
+        return sfcUserOrgs;
+    }
+
+    public void setSfcUserOrgs(Set<SfcUserOrgs> sfcUserOrgs) {
+        this.sfcUserOrgs = sfcUserOrgs;
+    }
+
+    public Date getDeleteDateForBlock() {
+        return deleteDateForBlock;
+    }
+
+    public void setDeleteDateForBlock(Date deleteDateForBlock) {
+        this.deleteDateForBlock = deleteDateForBlock;
+    }
+
     /*
     * Если прошел срок, в течение которого было запрещено создавать пользователя с ранее существующим аккаунтом, то
     * отправляем удаленного пользователя в архив (добавляем к имени _archieved_XXX
@@ -722,40 +741,51 @@ public class User {
         return "SMS sending service is not defined in the system";
     }
 
-
-
     public boolean loginAllowed() {
         if (idOfRole.equals(DefaultRole.ADMIN_SECURITY.getIdentification())) {
             return true; //для роли администратора безопасности проверку на необходимость блокировки по времени неактивности не выполняем
         }
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
         if (lastEntryTime == null && CalendarUtils.getDifferenceInDays(getUpdateTime(), new Date(System.currentTimeMillis())) > days) {
-            block();
+            blockByBlockedUntilDate();
             return false; //пользователь никогда не выполнял вход и создан более days дней назад, блокируем его
         }
         if (lastEntryTime == null) {
             return true; //новый пользователь, создан менее days назад
         }
         if (CalendarUtils.getDifferenceInDays(lastEntryTime, new Date(System.currentTimeMillis())) > days) {
-            block();
+            blockByBlockedUntilDate();
             return false;
         }
         return true;
     }
 
-    private void block() {
+    public void checkDeleteDateForBlock(){
+        if(this.getDeleteDateForBlock() != null && new Date().after(this.getDeleteDateForBlock()))
+            blockByDeleteDateForBlock();
+    }
+
+    private void blockByDeleteDateForBlock(){
+        this.setBlocked(true);
+        DAOService.getInstance().setUserInfo(this);
+        block(SecurityJournalAuthenticate.EventType.BLOCK_USER, SecurityJournalAuthenticate.DenyCause.USER_BLOCKED.getIdentification());
+    }
+
+    private void blockByBlockedUntilDate(){
         this.setBlocked(true);
         this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
         DAOService.getInstance().setUserInfo(this);
+        block(SecurityJournalAuthenticate.EventType.BLOCK_USER, SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification());
+    }
 
+    private void block(SecurityJournalAuthenticate.EventType eventType, Integer denyCauseId) {
         HttpServletRequest request = RequestUtils.getCurrentHttpRequest();
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
         String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
         String comment = String.format("Пользователь %s заблокирован", userName);
         SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                .createUserEditRecord(SecurityJournalAuthenticate.EventType.BLOCK_USER, request.getRemoteAddr(),
-                        currentUserName, currentUser, true,
-                        SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), comment);
+                .createUserEditRecord(eventType, request.getRemoteAddr(),
+                        currentUserName, currentUser, true, denyCauseId, comment);
         DAOService.getInstance().writeAuthJournalRecord(record);
     }
 

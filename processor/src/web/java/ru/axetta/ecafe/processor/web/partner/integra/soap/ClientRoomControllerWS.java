@@ -260,6 +260,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
     private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
+    private static final String RC_INVALID_REGULAR_RANGE_DESC = "Создание повтора питания на один день запрещено";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -10296,7 +10297,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .savePreorderComplexes(preorderSaveListParam, guardianMobile, externalSystem);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
-        } catch (MenuDetailNotExistsException e) {
+        }  catch (MenuDetailNotExistsException | InvalidDatePreorderDishException e) {
             result.resultCode = RC_NOT_FOUND_MENUDETAIL;
             result.description = RC_NOT_FOUND_MENUDETAIL_DESC;
         } catch (NotEditedDayException e) {
@@ -10311,6 +10312,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (RegularExistsException e) {
             result.resultCode = RC_REGULAR_EXISTS;
             result.description = RC_REGULAR_EXISTS_DESC;
+        } catch (RegularRangeException e) {
+            result.resultCode = RC_INVALID_CREATOR;
+            result.description = RC_INVALID_REGULAR_RANGE_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;

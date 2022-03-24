@@ -27,10 +27,6 @@ public class CardActionRequestService {
         return cardActionRequestRepository.findByRequestIdAndProcessedAndActionType(id, true, 0);
     }
 
-    public List<CardActionRequest> findRequestBlockByRequestIdOLD(String id) {
-        return cardActionRequestRepository.findByRequestIdAndProcessedAndActionTypeOLD(id, true, 0);
-    }
-
     public List<CardActionRequest> findRequestBlockByRequestIdFull(String id) {
         return cardActionRequestRepository.findByRequestIdAndProcessedAndActionTypeFull(id, 0);
     }

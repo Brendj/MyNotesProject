@@ -102,6 +102,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -2083,6 +2084,9 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
+
+//                User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList, webARMppFilter);
                 } else {

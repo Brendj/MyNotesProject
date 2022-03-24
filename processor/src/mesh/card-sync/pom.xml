@@ -93,6 +93,11 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.bull.javamelody</groupId>
+            <artifactId>javamelody-spring-boot-starter</artifactId>
+            <version>1.88.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

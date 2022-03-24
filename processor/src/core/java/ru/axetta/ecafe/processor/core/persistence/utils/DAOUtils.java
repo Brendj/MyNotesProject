@@ -126,7 +126,7 @@ public class DAOUtils {
         return (Contract) persistenceSession.load(Contract.class, idOfContract);
     }
 
-    public static Client findClient(Session persistenceSession, long idOfClient) throws Exception {
+    public static Client findClient(Session persistenceSession, long idOfClient) {
         return (Client) persistenceSession.load(Client.class, idOfClient);
     }
 

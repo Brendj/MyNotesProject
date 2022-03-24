@@ -115,6 +115,8 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
                     code = SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR;
                 } else if (e instanceof InvalidMobileException) {
                     code = SBMSKPaymentsCodes.INVALID_MOBILE_ERROR;
+                } else if (e instanceof InvalidClientException) {
+                    code = SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR;
                 } else {
                     code = SBMSKPaymentsCodes.INTERNAL_ERROR;
                 }
