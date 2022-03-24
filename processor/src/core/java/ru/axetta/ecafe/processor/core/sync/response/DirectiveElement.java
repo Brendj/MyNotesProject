@@ -125,8 +125,6 @@ public class DirectiveElement implements AbstractToElement{
 
         Boolean newСashierMode = org.getNewСashierMode();
         directiveItemList.add(new DirectiveItem("NewСashierMode", newСashierMode ? "1" : "0"));
-		
-		directiveItemList.add(new DirectiveItem("FoodBoxServiceAvailable", (org.getUsedFoodbox())?"1":"0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
@@ -283,6 +281,8 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
         }
+
+        directiveItemList.add(new DirectiveItem("FoodBoxServiceAvailable", (org.getUsedFoodbox())?"1":"0"));
 
         //OrgWritableRepository.getInstance().saveOrg(org);
     }
