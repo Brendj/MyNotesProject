@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.Timestamp;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
@@ -42,6 +43,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS.processSummaryBase;
@@ -410,10 +412,8 @@ public class PreorderDAOService {
                                 false, amount, wtComplex.getDeleteState(), isRegular);
                     }
                     PreorderComplex currentPreorder = null;
-                    for (PreorderComplex preorderComplex: preorderComplexes)
-                    {
-                        if (preorderComplex.getArmComplexId() == wtComplex.getIdOfComplex().intValue())
-                        {
+                    for (PreorderComplex preorderComplex : preorderComplexes) {
+                        if (preorderComplex.getArmComplexId() == wtComplex.getIdOfComplex().intValue()) {
                             currentPreorder = preorderComplex;
                             break;
                         }
@@ -446,8 +446,7 @@ public class PreorderDAOService {
             //Находим заказы на комплексы, которые не актуальные по разным причинам
             List<PreorderComplex> preorderComplexesNotFound = new ArrayList<>();
             boolean find;
-            for (PreorderComplex preorderComplex : preorderComplexes)
-            {
+            for (PreorderComplex preorderComplex : preorderComplexes) {
                 find = false;
                 for (WtComplex wtComplex : wtComplexes) {
                     if (preorderComplex.getArmComplexId() == wtComplex.getIdOfComplex().intValue()) {
@@ -468,7 +467,7 @@ public class PreorderDAOService {
                 else if (complexName.toLowerCase().contains("обед"))
                     complexName = "Обед";
                 else if (complexName.toLowerCase().contains("ужин"))
-                complexName = "Ужин";
+                    complexName = "Ужин";
                 // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                 // если нет - режим фиксированной цены
                 Integer complexType = preorderComplex.getModeOfAdd();
@@ -536,8 +535,8 @@ public class PreorderDAOService {
     private Map<Integer, Integer> getAmountForPreorderComplexes(Client client, Date startDate, Date endDate) {
         Map<Integer, Integer> result = new HashMap<>();
         Query query = emReport.createQuery("SELECT pc.armComplexId, sum(pc.amount) FROM PreorderComplex pc "
-                    + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
-                    + "AND pc.deletedState = false group by pc.armComplexId");
+                + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
+                + "AND pc.deletedState = false group by pc.armComplexId");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
@@ -880,8 +879,7 @@ public class PreorderDAOService {
                 }
             }
         }
-        for (PreorderMenuDetail preorderMenuDetail: preorderMenuDetails)
-        {
+        for (PreorderMenuDetail preorderMenuDetail : preorderMenuDetails) {
             PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(preorderMenuDetail);
             menuItemExt.setGroup(preorderMenuDetail.getGroupName());
             menuItemExt.setName(preorderMenuDetail.getShortName());
@@ -983,7 +981,7 @@ public class PreorderDAOService {
 
     @Transactional(rollbackFor = Exception.class)
     public void savePreorderComplexes(PreorderSaveListParam list, String guardianMobile,
-            Integer externalSystem) throws Exception {
+                                      Integer externalSystem) throws Exception {
         //Собираем коллекцию в нужном виде
         Map<Integer, ComplexListParam> map = new HashMap<>();
         for (ComplexListParam complex : list.getComplexes()) {
@@ -1221,7 +1219,7 @@ public class PreorderDAOService {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setVersion(nextVersion);
                 }
-                if(externalSystem != null){
+                if (externalSystem != null) {
                     PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
                     preorderComplex.setExternalSystem(code);
                 }
@@ -1322,10 +1320,14 @@ public class PreorderDAOService {
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
                                        Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
                                        PreorderMobileGroupOnCreateType mobileGroupOnCreate, Date regularStartDate) throws Exception {
+
+        long days = ChronoUnit.DAYS.between(regularComplex.getStartDate().toInstant(), regularComplex.getEndDate().toInstant());
         if (regularStartDate == null ||
-                RegularPreorder.convertDate(regularComplex.getStartDate()).before(regularStartDate)) {
+                RegularPreorder.convertDate(regularComplex.getStartDate()).before(regularStartDate) || days < 0)
             throw new RegularWrongStartDate("Неверная дата начала повтора");
-        }
+        if (days < 1)
+            throw new RegularRangeException("Создание повтора питания на один день запрещено");
+
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
@@ -2140,7 +2142,7 @@ public class PreorderDAOService {
     private boolean forcePreorderComplexExists(RegularPreorder regularPreorder, Date date) {
         //существует ли актуальный предзаказ на комплекс без привязки к регуляру
         return em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc "
-                + "where pc.client = :client and pc.preorderDate = :date and pc.armComplexId = :complexId and pc.deletedState = false")
+                        + "where pc.client = :client and pc.preorderDate = :date and pc.armComplexId = :complexId and pc.deletedState = false")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("date", date)
                 .setParameter("complexId", regularPreorder.getIdOfComplex())
@@ -2150,7 +2152,7 @@ public class PreorderDAOService {
     private boolean forcePreorderMenuDetailExists(RegularPreorder regularPreorder, Date date) {
         //существует ли актуальный предзаказ на блюдо без привязки к регуляру
         return em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
-                + "where pmd.client = :client and pmd.preorderDate = :date and pmd.itemCode = :itemCode and pmd.deletedState = false")
+                        + "where pmd.client = :client and pmd.preorderDate = :date and pmd.itemCode = :itemCode and pmd.deletedState = false")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("date", date)
                 .setParameter("itemCode", regularPreorder.getItemCode())
@@ -2160,10 +2162,10 @@ public class PreorderDAOService {
     private boolean forcePreorderWtMenuDetailExists(RegularPreorder regularPreorder, Date date) {
         //существует ли актуальный предзаказ на блюдо без привязки к регуляру
         return em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
-                + "left join pmd.preorderComplex pc "
-                + "where pmd.client = :client and pmd.preorderDate = :date and "
-                //+ "pmd.regularPreorder is null and "
-                + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.deletedState = false")
+                        + "left join pmd.preorderComplex pc "
+                        + "where pmd.client = :client and pmd.preorderDate = :date and "
+                        //+ "pmd.regularPreorder is null and "
+                        + "pc.armComplexId = :idOfComplex and pmd.idOfDish = :idOfDish and pmd.deletedState = false")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("date", date)
                 .setParameter("idOfComplex", regularPreorder.getIdOfComplex())
@@ -2195,8 +2197,8 @@ public class PreorderDAOService {
 
     private List<PreorderComplex> getPreorderComplexesByRegular(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
         return em.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client = :client and pc.regularPreorder = :regularPreorder "
-                + "order by pc.createdDate desc")
+                        + "where pc.client = :client and pc.regularPreorder = :regularPreorder "
+                        + "order by pc.createdDate desc")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("regularPreorder", regularPreorder)
                 .getResultList();
@@ -2204,8 +2206,8 @@ public class PreorderDAOService {
 
     private List<PreorderComplex> getPreorderComplexesByClient(RegularPreorder regularPreorder, Date dateFrom, Date dateTo) {
         return em.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
-                + "order by pc.createdDate desc, pc.lastUpdate desc")
+                        + "where pc.client = :client and pc.preorderDate between :dateFrom and :dateTo and pc.armComplexId = :idOfComplex "
+                        + "order by pc.createdDate desc, pc.lastUpdate desc")
                 .setParameter("client", regularPreorder.getClient())
                 .setParameter("dateFrom", dateFrom)
                 .setParameter("dateTo", dateTo)
@@ -2424,7 +2426,7 @@ public class PreorderDAOService {
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
         }
-        if(externalSystem != null){
+        if (externalSystem != null) {
             PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
             preorderComplex.setExternalSystem(code);
         }
@@ -2432,8 +2434,8 @@ public class PreorderDAOService {
     }
 
     private PreorderComplex createWtPreorderComplex(Integer idOfComplex, Client client, Date date,
-            Integer complexAmount, WtComplex wtComplex, Long nextVersion, String guardianMobile,
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate, Integer externalSystem) throws MenuDetailNotExistsException {
+                                                    Integer complexAmount, WtComplex wtComplex, Long nextVersion, String guardianMobile,
+                                                    PreorderMobileGroupOnCreateType mobileGroupOnCreate, Integer externalSystem) throws MenuDetailNotExistsException {
         PreorderComplex preorderComplex = new PreorderComplex();
         preorderComplex.setClient(client);
         preorderComplex.setArmComplexId(idOfComplex);
@@ -2465,7 +2467,7 @@ public class PreorderDAOService {
         } else {
             throw new MenuDetailNotExistsException("Не найден комплекс с ид.=" + idOfComplex.toString());
         }
-        if(externalSystem != null){
+        if (externalSystem != null) {
             PreorderExternalSystemCode code = PreorderExternalSystemCode.getExternalSystemCode(externalSystem);
             preorderComplex.setExternalSystem(code);
         }
