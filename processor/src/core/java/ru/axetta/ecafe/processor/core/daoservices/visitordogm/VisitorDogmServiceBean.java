@@ -36,6 +36,7 @@ public class VisitorDogmServiceBean {
     final String FIND_ALL_TEMP_CARD_BY_VISITORDOGM = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=3 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_VISITORDOGM_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=3 order by ct.createDate desc";
     final String FIND_ENTER_EVENT_BY_VISITORDOGM ="select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.CardEventOperationItem(ee.idOfVisitor, ee.evtDateTime, ee.passDirection, ee.org.idOfOrg, ee.org.shortName, ee.org.refectoryType) from EnterEvent ee where ee.idOfVisitor in :idOfVisitors and ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc";
+    final String FIND_VISITORDOGM_ITEMS_BY_IDOFVISITOR = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.idOfVisitor = :idOfVisitor";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -52,6 +53,12 @@ public class VisitorDogmServiceBean {
                 + "or LOWER(v.driverLicenceNumber) like :filter "
                 + "or LOWER(v.warTicketNumber) like :filter"
                 + ") ";
+    }
+
+    public VisitorItem findVisitorsDogmByIdOfVisitor(Long idOfVisitor){
+        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_VISITORDOGM_ITEMS_BY_IDOFVISITOR, VisitorItem.class);
+        query.setParameter("idOfVisitor", idOfVisitor);
+        return query.getSingleResult();
     }
 
     public List<VisitorItem> findAllVisitorsDogm(){
