@@ -2631,11 +2631,23 @@ public class PreorderDAOService {
     }
 
     private PreorderMenuDetail createPreorderWtMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md,
-                                                          Date date, Long idOfDish, Integer amount, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
+                                                          Date date, Long idOfDish, Integer amount, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
         WtDish wtDish = null;
         if (md == null) wtDish = getWtDishById(idOfDish);
-        if (wtDish == null) {
+        if (wtDish == null)
             throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
+
+        Date dateOfEndMenuIncluding = wtDish.getDateOfEndMenuIncluding();
+
+        if(dateOfEndMenuIncluding != null){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateOfEndMenuIncluding);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.HOUR_OF_DAY, 3);
+
+            if(calendar.getTime().before(date) || calendar.getTime().equals(date)){
+                throw new InvalidDatePreorderDishException("Блюдо с ид.=" + idOfDish.toString() + " будет исключено из меню до исполнения предзаказа");
+            }
         }
         return createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, amount, mobile, mobileGroupOnCreate);
     }

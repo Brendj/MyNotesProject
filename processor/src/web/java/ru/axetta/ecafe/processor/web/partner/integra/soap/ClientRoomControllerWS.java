@@ -10297,7 +10297,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .savePreorderComplexes(preorderSaveListParam, guardianMobile, externalSystem);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
-        } catch (MenuDetailNotExistsException e) {
+        }  catch (MenuDetailNotExistsException | InvalidDatePreorderDishException e) {
             result.resultCode = RC_NOT_FOUND_MENUDETAIL;
             result.description = RC_NOT_FOUND_MENUDETAIL_DESC;
         } catch (NotEditedDayException e) {
