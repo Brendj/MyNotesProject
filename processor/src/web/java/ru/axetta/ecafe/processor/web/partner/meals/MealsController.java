@@ -289,7 +289,7 @@ public class MealsController extends Application {
             foodBoxPreorder.setOrderPrice(priceAll);
             persistenceSession.merge(foodBoxPreorder);
             currentFoodboxOrderInfo.setTotalPrice(priceAll);
-            if (client.getBalance() != null && client.getBalance() != 0) {
+            if (client.getBalance() != null) {
                 if (priceAll > client.getBalance()) {
                     logger.error("Сумма заказа превышает баланс клиента");
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
