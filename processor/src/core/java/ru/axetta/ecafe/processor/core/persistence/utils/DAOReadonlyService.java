@@ -3546,4 +3546,16 @@ public class DAOReadonlyService {
             return ((BigDecimal) res).longValue();
         }
     }
+
+    public List<ProhibitionMenu> findProhibitionMenuByClientId(Client client) {
+        try {
+            Query query = entityManager.createQuery("SELECT prhb from ProhibitionMenu prhb "
+                    + "where prhb.client = :client and prhb.deletedState = false");
+            query.setParameter("client", client);
+            return (List<ProhibitionMenu>) query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

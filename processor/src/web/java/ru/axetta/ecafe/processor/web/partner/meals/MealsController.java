@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
+import ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
@@ -471,7 +473,6 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
-        Client client = null;
         HistoryFoodboxOrderInfo historyFoodboxOrderInfo = new HistoryFoodboxOrderInfo();
         try {
             FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(isppIdFoodbox);
@@ -580,8 +581,12 @@ public class MealsController extends Application {
         }
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), onDate);
-        //Тут будет фильтр по остаткам
-
+        //Получаем количество доступных блюд для орг
+        List <FoodBoxPreorderAvailable> foodBoxPreorderAvailables = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg());
+        //Получаем список активных заказов футбокса
+        Map<Long,Integer> orders = daoReadonlyService.getDishesCountActiveFoodBoxPreorderForOrg(client.getOrg());
+        //Получаем список запретов
+        List<ProhibitionMenu> prohibitionMenus = daoReadonlyService.findProhibitionMenuByClientId(client);
         //
         //Расскидываем по классам
         PersonBuffetMenu personBuffetMenu = new PersonBuffetMenu();
@@ -590,10 +595,45 @@ public class MealsController extends Application {
         personBuffetMenu.buffetCloseTime(getBuffetCloseTime());
         Integer corCount = 0;
         for (WtDish wtDish : wtDishes) {
+            if (have_prohobition(wtDish, null, null, prohibitionMenus))
+                continue;
+            try {
+                Integer countAvailableinOrg = 0;
+                //Получаем количество блюда в буфете
+                for (FoodBoxPreorderAvailable foodBoxPreorderAvailable: foodBoxPreorderAvailables)
+                {
+                    if (foodBoxPreorderAvailable.getIdOfDish().equals(wtDish.getIdOfDish())) {
+                        countAvailableinOrg = foodBoxPreorderAvailable.getAvailableQty();
+                        break;
+                    }
+                }
+                //Получаем сколько уже заказано данного блюда
+                Integer correntValinOrders = orders.get(wtDish.getIdOfDish());
+                if (correntValinOrders != null) {
+                    //Проверяем, сколько ещё можно заказать
+                    int availableCount = countAvailableinOrg - correntValinOrders;
+                    if (availableCount < 1)
+                        continue;
+                }
+            } catch (Exception e) {
+                continue;
+            }
             //Находим все подкатегории
             List<WtCategoryItem> wtCategoryItemList = daoReadonlyService.getCategoryItemsByWtDish(wtDish.getIdOfDish());
+            boolean wtCategoryItemListEmp = false;
             if (wtCategoryItemList.isEmpty()) {
+                //Ставим флаг, что погкатегорий нет изначально
+                wtCategoryItemListEmp = true;
+            }
+            else {
+                //Убираем все подкатегории, которые не проходят по ограничению меню
+                wtCategoryItemList.removeIf(wtCategoryItem -> have_prohobition(null, null, wtCategoryItem, prohibitionMenus));
+            }
+            //Если подкатегорий не было изначально, то блюдо записываем в категорию
+            if (wtCategoryItemListEmp) {
                 WtCategory wtCategory = wtDish.getWtCategory();
+                if (have_prohobition(null, wtCategory, null, prohibitionMenus))
+                    continue;
                 Dish dish = new Dish();
                 ///
                 dish.setId(wtDish.getIdOfDish());
@@ -622,9 +662,11 @@ public class MealsController extends Application {
                 }
                 buffetMenuBuffetCategoriesItem.getDishes().add(dish);
             }
+            //Если все подкатегории оказались заблокированы, то не добавляем это блюдо
+            if (wtCategoryItemList.isEmpty())
+                continue;
             for (WtCategoryItem wtCategoryItem : wtCategoryItemList) {
                 WtCategory wtCategory = wtCategoryItem.getWtCategory();
-
                 Dish dish = new Dish();
                 ///
                 dish.setId(wtDish.getIdOfDish());
@@ -868,7 +910,9 @@ public class MealsController extends Application {
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailablе(client.getOrg().getUsedFoodbox());
-        return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
+        ClientDataMain clientDataMain = new ClientDataMain();
+        clientDataMain.setClientData(clientData);
+        return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
     }
 
 
@@ -924,5 +968,40 @@ public class MealsController extends Application {
         if (authentication != null)
             return true;
         return false;
+    }
+
+    private boolean have_prohobition (WtDish wtDish, WtCategory wtCategory, WtCategoryItem wtCategoryItem, List<ProhibitionMenu> prohibitionMenus)
+    {
+        boolean prohobition = false;
+        for (ProhibitionMenu prohibitionMenu: prohibitionMenus)
+        {
+            if (wtDish != null) {
+                if (prohibitionMenu.getWtDish() != null) {
+                    if (prohibitionMenu.getWtDish().getIdOfDish().equals(wtDish.getIdOfDish())) {
+                        prohobition = true;
+                        break;
+                    }
+                }
+                if (prohibitionMenu.getFilterText() != null && wtDish.getDishName() != null) {
+                    if (prohibitionMenu.getFilterText().equals(wtDish.getDishName())) {
+                        prohobition = true;
+                        break;
+                    }
+                }
+            }
+            if (prohibitionMenu.getWtCategory() != null && wtCategory != null) {
+                if (prohibitionMenu.getWtCategory().getIdOfCategory().equals(wtCategory.getIdOfCategory())) {
+                    prohobition = true;
+                    break;
+                }
+            }
+            if (prohibitionMenu.getWtCategoryItem() != null && wtCategoryItem != null) {
+                if (prohibitionMenu.getWtCategoryItem().getIdOfCategoryItem().equals(wtCategoryItem.getIdOfCategoryItem())) {
+                    prohobition = true;
+                    break;
+                }
+            }
+        }
+        return prohobition;
     }
 }
