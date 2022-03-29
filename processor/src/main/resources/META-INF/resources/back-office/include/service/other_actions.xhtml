@@ -9,371 +9,383 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
+        element.click();
+        element.hidden = true;
+
         function disableButtons(value) {
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled = value;
             document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled = value;
         }
-        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:otherActionsGridRender');
-        element.click();
-        element.hidden = true;
     </script>
 
+    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <a4j:commandLink id="otherActionsGridRender" value=""
                      render="otherActionsGrid"/>
-
-    <!--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"-->
     <!--Тест лога -->
-<h:panelGrid id="otherActionsGrid">
-    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" columns="2">
-        <h:panelGrid styleClass="borderless-grid">
+    <h:panelGrid>
+        <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}"
+                     styleClass="borderless-grid borderless-grid-align-top" columns="2">
+            <h:panelGrid styleClass="borderless-grid">
 
-            <a4j:commandButton value="Архивирование событий освобождения от посещения ОО"
-                               action="#{otherActionsPage.archvedExeption}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Архивирование событий освобождения от посещения ОО"
+                                   action="#{otherActionsPage.archvedExeption}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Запустить генерацию ключевых показателей"
-                               action="#{otherActionsPage.runProjectStateGenerator}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Запустить генерацию ключевых показателей"
+                                   action="#{otherActionsPage.runProjectStateGenerator}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Запустить синхронизацию с Реестрами"
-                               action="#{otherActionsPage.runImportRegisterClients}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Запустить синхронизацию с Реестрами"
+                                   action="#{otherActionsPage.runImportRegisterClients}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Запустить пересчет льготных правил"
-                               action="#{otherActionsPage.runBenefitsRecalculation}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Запустить пересчет льготных правил"
+                                   action="#{otherActionsPage.runBenefitsRecalculation}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Импорт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Импорт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Очистить журналы синхронизации" action="#{otherActionsPage.runSynchCleanup}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Очистить журналы синхронизации" action="#{otherActionsPage.runSynchCleanup}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
 
-            <a4j:commandButton value="Привязать клиентов к ЕМП" action="#{otherActionsPage.runBindEMPClients}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Запустить загрузку обновления из ЕМП"
-                               action="#{otherActionsPage.runReceiveEMPUpdates}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <rich:panel>
-                <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
-                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/><br/>
-                <h:outputText value="Список ид. организаций:"/>
-                <h:inputText value="#{otherActionsPage.orgsforCleaninig}" size="50"/>
-            </rich:panel>
-            <rich:panel>
-                <h:panelGrid columns="2">
-                    <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
-                                  styleClass="output-text"/><br/>
+                <a4j:commandButton value="Привязать клиентов к ЕМП" action="#{otherActionsPage.runBindEMPClients}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Запустить загрузку обновления из ЕМП"
+                                   action="#{otherActionsPage.runReceiveEMPUpdates}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <rich:panel>
+                    <a4j:commandButton value="Очистка таблиц меню - 2" action="#{otherActionsPage.cleaningMenuVersion2}"
+                                       render="mainMenu, workspaceTogglePanel" styleClass="command-button"/><br/>
+                    <h:outputText value="Список ид. организаций:"/>
+                    <h:inputText value="#{otherActionsPage.orgsforCleaninig}" size="50"/>
+                </rich:panel>
+                <rich:panel>
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true"
+                                      value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
+                                      styleClass="output-text"/><br/>
 
-                    <h:outputText styleClass="output-text" escape="true" value="л/с клиента"/>
-                    <h:inputText value="#{otherActionsPage.contractId}" size="50"/>
-                    <h:outputText escape="true" value="Начальная дата выборки" styleClass="output-text"/>
-                    <rich:calendar value="#{otherActionsPage.startDateEMP}" datePattern="dd.MM.yyyy"
+                        <h:outputText styleClass="output-text" escape="true" value="л/с клиента"/>
+                        <h:inputText value="#{otherActionsPage.contractId}" size="50"/>
+                        <h:outputText escape="true" value="Начальная дата выборки" styleClass="output-text"/>
+                        <rich:calendar value="#{otherActionsPage.startDateEMP}" datePattern="dd.MM.yyyy"
+                                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        </rich:calendar>
+                        <h:outputText escape="true" value="Конечная дата выборки" styleClass="output-text"/>
+                        <rich:calendar value="#{otherActionsPage.endDateEMP}" datePattern="dd.MM.yyyy"
+                                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        </rich:calendar>
+                        <a4j:commandButton value="Отправить события ЕМИАС в ЕМП"
+                                           action="#{otherActionsPage.runSendEMPEventEMIAS()}"
+                                           id="sendEMIASTestEMP"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    </h:panelGrid>
+                </rich:panel>
+                <a4j:commandButton value="Обновить статистику ЕМП"
+                                   action="#{otherActionsPage.runRecalculateEMPStatistics}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Повторная отправка не доставленных СМС" action="#{otherActionsPage.runTest}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <a4j:commandButton value="Запустить пересчет показателей СМС"
+                                   action="#{otherActionsPage.runSmsDeliveryRecalculation}"
+                                   render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
+                <rich:panel>
+                    <h:commandButton value="Модифицировать пароли" action="#{otherActionsPage.runPasswordReplacer}"
+                                     title="Заменяет все пароли == input на номер договора"
+                                     styleClass="command-button"/>
+                    <h:inputText value="#{otherActionsPage.passwordForSearch}"/>
+                    <h:commandButton value="Скачать" action="#{otherActionsPage.download}"
+                                     rendered="#{otherActionsPage.downloadable}"
+                                     styleClass="command-button"/>
+                </rich:panel>
+
+                <rich:panel>
+                    <a4j:commandButton value="Генерировать представителей"
+                                       action="#{otherActionsPage.runGenerateGuardians}"
+                                       id="generateGuardiansByOrgs"
+                                       title="Принудительное создание представителя клиентам из не предопределенных групп."
+                                       styleClass="command-button"/><br/>
+                    <h:outputText value="Список ид. организаций:"/>
+                    <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
+                </rich:panel>
+
+                <rich:panel>
+                    <a4j:commandButton value="Выгрузка данных по продажам"
+                                       action="#{otherActionsPage.runGenerateSummaryDownloadFile}"
+                                       title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
+                                       styleClass="command-button"/><br/>
+                    <h:outputText value="Дата:"/>
+                    <rich:calendar value="#{otherActionsPage.summaryDate}" datePattern="dd.MM.yyyy"
                                    converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        <a4j:ajax event="change"/>
                     </rich:calendar>
-                    <h:outputText escape="true" value="Конечная дата выборки" styleClass="output-text"/>
-                    <rich:calendar value="#{otherActionsPage.endDateEMP}" datePattern="dd.MM.yyyy"
+                </rich:panel>
+
+                <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
+                                   styleClass="command-button"/>
+                <a4j:commandButton value="Тест Scud Service" action="#{otherActionsPage.runScudTest}" id="runScudTest"
+                                   styleClass="command-button"/>
+                <a4j:commandButton value="Загрузка файла НСИ по контингенту" action="#{otherActionsPage.loadNSIFile}"
+                                   id="loadNSIFile"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Загрузка файла НСИ по сотрудникам"
+                                   action="#{otherActionsPage.loadNSIEmployeeFile}" id="loadNSIEmployeeFile"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <rich:panel>
+                    <a4j:commandButton value="Выгрузка транзакций для Фин Оператора"
+                                       action="#{otherActionsPage.runGenerateSummaryFinOperatorFile}"
+                                       title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
+                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    <h:outputText value="Дата:"/>
+                    <rich:calendar value="#{otherActionsPage.summaryFinOperatorDate}" datePattern="dd.MM.yyyy"
                                    converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        <a4j:ajax event="change"/>
                     </rich:calendar>
-                    <a4j:commandButton value="Отправить события ЕМИАС в ЕМП"
-                                       action="#{otherActionsPage.runSendEMPEventEMIAS()}"
-                                       id="sendEMIASTestEMP"
+                </rich:panel>
+
+                <a4j:commandButton value="Загрузка файла ЕСЗ с мигрантами"
+                                   action="#{otherActionsPage.loadESZMigrantsFile()}" id="loadESZMigrantsFile"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+
+                <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}"
+                                   id="loadESZMigrants"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+
+                <a4j:commandButton value="Обработка мигрантов (перевод в выбывшие)"
+                                   action="#{otherActionsPage.updateESZMigrants()}" id="updateESZMigrants"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+
+                <a4j:commandButton value="Запустить сервис обработки ЗЛП"
+                                   action="#{otherActionsPage.runApplicationForFoodProcessingService()}"
+                                   id="runApplicationForFoodProcessingService"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0"
+                                   action="#{otherActionsPage.runDTSZNDiscountsReviseService()}"
+                                   id="runDTSZNDiscountsReviseService"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Отравка статусов заявление ЛП в АИС Контингент"
+                                   action="#{otherActionsPage.sendToAISContingent()}" id="sendToAISContingent"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0(этап 2)"
+                                   action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}"
+                                   id="runDTSZNDiscountsReviseServicePart2"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Запустить обработку ЗЛП по результатам сверки"
+                                   action="#{otherActionsPage.runUpdateApplicationsForFoodTask()}"
+                                   id="runUpdateApplicationsForFoodTask"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <rich:panel>
+                    <a4j:commandButton value="Получить льготы по гуиду"
+                                       action="#{otherActionsPage.runUpdateDiscounts()}"
+                                       title="Источник данных указывается в настройках"
                                        styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                </h:panelGrid>
-            </rich:panel>
-            <a4j:commandButton value="Обновить статистику ЕМП" action="#{otherActionsPage.runRecalculateEMPStatistics}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Повторная отправка не доставленных СМС" action="#{otherActionsPage.runTest}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <a4j:commandButton value="Запустить пересчет показателей СМС"
-                               action="#{otherActionsPage.runSmsDeliveryRecalculation}"
-                               render="mainMenu, workspaceTogglePanel" styleClass="command-button"/>
-            <rich:panel>
-                <h:commandButton value="Модифицировать пароли" action="#{otherActionsPage.runPasswordReplacer}"
-                                 title="Заменяет все пароли == input на номер договора"
-                                 styleClass="command-button"/>
-                <h:inputText value="#{otherActionsPage.passwordForSearch}"/>
-                <h:commandButton value="Скачать" action="#{otherActionsPage.download}"
-                                 rendered="#{otherActionsPage.downloadable}"
-                                 styleClass="command-button"/>
-            </rich:panel>
-
-            <rich:panel>
-                <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}"
-                                   id="generateGuardiansByOrgs"
-                                   title="Принудительное создание представителя клиентам из не предопределенных групп."
-                                   styleClass="command-button"/><br/>
-                <h:outputText value="Список ид. организаций:"/>
-                <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
-            </rich:panel>
-
-            <rich:panel>
-                <a4j:commandButton value="Выгрузка данных по продажам"
-                                   action="#{otherActionsPage.runGenerateSummaryDownloadFile}"
-                                   title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
-                                   styleClass="command-button"/><br/>
-                <h:outputText value="Дата:"/>
-                <rich:calendar value="#{otherActionsPage.summaryDate}" datePattern="dd.MM.yyyy"
-                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-                    <a4j:ajax event="change"/>
-                </rich:calendar>
-            </rich:panel>
-
-            <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
-                               styleClass="command-button"/>
-            <a4j:commandButton value="Тест Scud Service" action="#{otherActionsPage.runScudTest}" id="runScudTest"
-                               styleClass="command-button"/>
-            <a4j:commandButton value="Загрузка файла НСИ по контингенту" action="#{otherActionsPage.loadNSIFile}"
-                               id="loadNSIFile"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Загрузка файла НСИ по сотрудникам"
-                               action="#{otherActionsPage.loadNSIEmployeeFile}" id="loadNSIEmployeeFile"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <rich:panel>
-                <a4j:commandButton value="Выгрузка транзакций для Фин Оператора"
-                                   action="#{otherActionsPage.runGenerateSummaryFinOperatorFile}"
-                                   title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
-                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                <h:outputText value="Дата:"/>
-                <rich:calendar value="#{otherActionsPage.summaryFinOperatorDate}" datePattern="dd.MM.yyyy"
-                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-                    <a4j:ajax event="change"/>
-                </rich:calendar>
-            </rich:panel>
-
-            <a4j:commandButton value="Загрузка файла ЕСЗ с мигрантами"
-                               action="#{otherActionsPage.loadESZMigrantsFile()}" id="loadESZMigrantsFile"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-
-            <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}"
-                               id="loadESZMigrants"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-
-            <a4j:commandButton value="Обработка мигрантов (перевод в выбывшие)"
-                               action="#{otherActionsPage.updateESZMigrants()}" id="updateESZMigrants"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-
-            <a4j:commandButton value="Запустить сервис обработки ЗЛП"
-                               action="#{otherActionsPage.runApplicationForFoodProcessingService()}"
-                               id="runApplicationForFoodProcessingService"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0"
-                               action="#{otherActionsPage.runDTSZNDiscountsReviseService()}"
-                               id="runDTSZNDiscountsReviseService"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Отравка статусов заявление ЛП в АИС Контингент"
-                               action="#{otherActionsPage.sendToAISContingent()}" id="sendToAISContingent"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0(этап 2)"
-                               action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}"
-                               id="runDTSZNDiscountsReviseServicePart2"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Запустить обработку ЗЛП по результатам сверки"
-                               action="#{otherActionsPage.runUpdateApplicationsForFoodTask()}"
-                               id="runUpdateApplicationsForFoodTask"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <rich:panel>
-                <a4j:commandButton value="Получить льготы по гуиду" action="#{otherActionsPage.runUpdateDiscounts()}"
-                                   title="Источник данных указывается в настройках"
-                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                <h:outputText value="GUID:"/>
-                <h:inputText value="#{otherActionsPage.guidForDiscountsUpdate}" size="50"/>
-            </rich:panel>
-            <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}" id="runMSRToFTP"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-        </h:panelGrid>
-        <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
-            <rich:panel>
-                <h:outputText escape="true" value="Загрузить производственный календарь для всех ОО"
-                              styleClass="output-text"/> <br/>
-                <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates"
-                               value="Скачать текущий календарь" styleClass="command-link"/>
-                <rich:fileUpload id="specialDatesFileUploadElement" styleClass="upload"
-                                 addLabel="Добавить..."
-                                 clearAllLabel="Очистить"
-                                 uploadLabel="Загрузить"
-                                 doneLabel="Готово"
-                                 onuploadcomplete="alert('Файл с производственным календарем загружен');"
-                                 fileUploadListener="#{otherActionsPage.specialDatesLoadFileListener}">
-                    <f:facet name="label">
-                        <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
-                    </f:facet>
-                    <a4j:ajax event="uploadcomplete" render="specialDatesFileLoaderPanel"/>
-                    <a4j:ajax event="clear" render="specialDatesFileLoaderPanel"/>
-                </rich:fileUpload>
-            </rich:panel>
-            <rich:panel>
-                <h:panelGrid columns="1">
-                    <h:outputText escape="true" value="Предзаказы" styleClass="output-text"/>
-                    <a4j:commandButton value="Сгенерировать регулярные предзаказы"
-                                       action="#{otherActionsPage.createRegularPreorders()}" id="createRegularPreorders"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам"
-                                       action="#{otherActionsPage.sendGoodRequestsNewReports()}"
-                                       id="sendGoodRequestsReport"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Проверка соответствия ОО клиента и предзаказа"
-                                       action="#{otherActionsPage.relevancePreordersToOrgs()}"
-                                       id="relevancePreordersToOrgs"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Проверка соответствия меню и предзаказа"
-                                       action="#{otherActionsPage.relevancePreordersToMenu()}"
-                                       id="relevancePreordersToMenu"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО"
-                                       action="#{otherActionsPage.relevancePreordersToOrgFlag()}"
-                                       id="relevancePreordersToOrgFlag"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Проверка группы клиента"
-                                       action="#{otherActionsPage.checkPreorderClientGroups()}"
-                                       id="checkPreorderClientGroups"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                    <a4j:commandButton value="Пересчет количественных показателей по предзаказам"
-                                       action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-                </h:panelGrid>
-            </rich:panel>
-            <rich:panel>
-                <h:panelGrid columns="2">
-                    <h:outputText escape="true" value="Выборочная генерация заявок по предзаказам"
-                                  styleClass="output-text"/><br/>
-                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
-                    <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectPreorderPage}"
-                                           render="modalOrgListSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="0" target="#{otherActionsPage.selectOrgType}"/>
-                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
-                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-                        </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsPreorderFilter}}"/>
-                    </h:panelGroup>
-
-                    <h:outputText styleClass="output-text" escape="true" value="Физ. лицо"/>
-                    <h:panelGroup id="clientFilter">
-                        <a4j:commandButton value="..."
-                                           action="#{mainPage.showClientSelectListPage(otherActionsPage.getClientList())}"
-                                           render="modalClientListSelectorPanel,selectedClientList"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalClientListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;" />
-                        <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                                      value=" {#{otherActionsPage.stringClientList}}"/>
-                    </h:panelGroup>
-                    <h:outputText escape="true" value="Дата" styleClass="output-text"/>
-                    <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
-                                   converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-                    </rich:calendar>
-                    <a4j:commandButton value="Создать заявки по выбранным параметрам"
-                                       action="#{otherActionsPage.preorderRequestsManualGenerate()}"
-                                       id="preorderRequestsManualGenerate"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                </h:panelGrid>
-            </rich:panel>
-            <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}"
-                               id="sendToAtolButton"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <a4j:commandButton value="Обработка копий комплексов веб арма ПП"
-                               action="#{otherActionsPage.processWtComplexes()}" id="processWtComplexesButton"
-                               styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
-            <rich:panel rendered="#{otherActionsPage.isSpb()}">
-                <a4j:commandButton value="Обработка дублей клиентов"
-                                   action="#{otherActionsPage.runProcessClientDoubles}" id="updateSpbClientDoubles"
-                                   title="Обработка дублей клиентов"
-                                   styleClass="command-button" onclick="disableButtons(true);"
-                                   oncomplete="disableButtons(false)"/><br/>
-                <h:outputText value="Ид. организаций:"/>
-                <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
-            </rich:panel>
-            <rich:panel>
-                <h:panelGrid columns="2">
-                    <h:outputText escape="true" value="Удаление дубликатов представителей"
-                                  styleClass="output-text"/><br/>
-                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
-                    <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectRemoveDupPage}"
-                                           render="modalOrgListSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="1" target="#{otherActionsPage.selectOrgType}"/>
-                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
-                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-                        </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsRemoveDupFilter}}"/>
-                    </h:panelGroup>
-
-                    <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
-                                       action="#{otherActionsPage.runDeleteDoubleGuardians()}"
-                                       id="deleteDoubleGuardians"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                </h:panelGrid>
-            </rich:panel>
-            <rich:panel id="loadMeshGuidsForGuardiansPanel">
-                <h:panelGrid columns="2">
-                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
-                                  styleClass="output-text"/><br/>
-                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
-                    <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectLoadMeshPage()}"
-                                           render="modalOrgListSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="2" target="#{otherActionsPage.selectOrgType}"/>
-                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
-                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-                        </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsLoadMeshFilter}}"/>
-                    </h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
-                    <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
+                    <h:outputText value="GUID:"/>
+                    <h:inputText value="#{otherActionsPage.guidForDiscountsUpdate}" size="50"/>
+                </rich:panel>
+                <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}"
+                                   id="runMSRToFTP"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
+                <rich:panel>
+                    <h:outputText escape="true" value="Загрузить производственный календарь для всех ОО"
+                                  styleClass="output-text"/> <br/>
+                    <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates"
+                                   value="Скачать текущий календарь" styleClass="command-link"/>
+                    <rich:fileUpload id="specialDatesFileUploadElement" styleClass="upload"
                                      addLabel="Добавить..."
                                      clearAllLabel="Очистить"
                                      uploadLabel="Загрузить"
                                      doneLabel="Готово"
-                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
-                                     listHeight="100" >
+                                     onuploadcomplete="alert('Файл с производственным календарем загружен');"
+                                     fileUploadListener="#{otherActionsPage.specialDatesLoadFileListener}">
                         <f:facet name="label">
                             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
                         </f:facet>
-                        <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
-                        <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
+                        <a4j:ajax event="uploadcomplete" render="specialDatesFileLoaderPanel"/>
+                        <a4j:ajax event="clear" render="specialDatesFileLoaderPanel"/>
                     </rich:fileUpload>
-                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
-                                  styleClass="report-error-output-text" rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
-                </h:panelGrid>
+                </rich:panel>
+                <rich:panel>
+                    <h:panelGrid columns="1">
+                        <h:outputText escape="true" value="Предзаказы" styleClass="output-text"/>
+                        <a4j:commandButton value="Сгенерировать регулярные предзаказы"
+                                           action="#{otherActionsPage.createRegularPreorders()}"
+                                           id="createRegularPreorders"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам"
+                                           action="#{otherActionsPage.sendGoodRequestsNewReports()}"
+                                           id="sendGoodRequestsReport"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Проверка соответствия ОО клиента и предзаказа"
+                                           action="#{otherActionsPage.relevancePreordersToOrgs()}"
+                                           id="relevancePreordersToOrgs"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Проверка соответствия меню и предзаказа"
+                                           action="#{otherActionsPage.relevancePreordersToMenu()}"
+                                           id="relevancePreordersToMenu"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО"
+                                           action="#{otherActionsPage.relevancePreordersToOrgFlag()}"
+                                           id="relevancePreordersToOrgFlag"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Проверка группы клиента"
+                                           action="#{otherActionsPage.checkPreorderClientGroups()}"
+                                           id="checkPreorderClientGroups"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                        <a4j:commandButton value="Пересчет количественных показателей по предзаказам"
+                                           action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                    </h:panelGrid>
+                </rich:panel>
+                <rich:panel>
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true" value="Выборочная генерация заявок по предзаказам"
+                                      styleClass="output-text"/><br/>
+                        <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectPreorderPage}"
+                                               render="modalOrgListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="0" target="#{otherActionsPage.selectOrgType}"/>
+                                <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true"
+                                          value=" {#{otherActionsPage.orgItemsPreorderFilter}}"/>
+                        </h:panelGroup>
+
+                        <h:outputText styleClass="output-text" escape="true" value="Физ. лицо"/>
+                        <h:panelGroup id="clientFilter">
+                            <a4j:commandButton value="..."
+                                               action="#{mainPage.showClientSelectListPage(otherActionsPage.getClientList())}"
+                                               render="modalClientListSelectorPanel,selectedClientList"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;"/>
+                            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                                          value=" {#{otherActionsPage.stringClientList}}"/>
+                        </h:panelGroup>
+                        <h:outputText escape="true" value="Дата" styleClass="output-text"/>
+                        <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                        </rich:calendar>
+                        <a4j:commandButton value="Создать заявки по выбранным параметрам"
+                                           action="#{otherActionsPage.preorderRequestsManualGenerate()}"
+                                           id="preorderRequestsManualGenerate"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    </h:panelGrid>
+                </rich:panel>
+                <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}"
+                                   id="sendToAtolButton"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <a4j:commandButton value="Обработка копий комплексов веб арма ПП"
+                                   action="#{otherActionsPage.processWtComplexes()}" id="processWtComplexesButton"
+                                   styleClass="command-button" render="mainMenu, workspaceTogglePanel"/>
+                <rich:panel rendered="#{otherActionsPage.isSpb()}">
+                    <a4j:commandButton value="Обработка дублей клиентов"
+                                       action="#{otherActionsPage.runProcessClientDoubles}" id="updateSpbClientDoubles"
+                                       title="Обработка дублей клиентов"
+                                       styleClass="command-button" onclick="disableButtons(true);"
+                                       oncomplete="disableButtons(false)"/><br/>
+                    <h:outputText value="Ид. организаций:"/>
+                    <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
+                </rich:panel>
+                <rich:panel>
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true" value="Удаление дубликатов представителей"
+                                      styleClass="output-text"/><br/>
+                        <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectRemoveDupPage}"
+                                               render="modalOrgListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="1" target="#{otherActionsPage.selectOrgType}"/>
+                                <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true"
+                                          value=" {#{otherActionsPage.orgItemsRemoveDupFilter}}"/>
+                        </h:panelGroup>
+
+                        <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
+                                           action="#{otherActionsPage.runDeleteDoubleGuardians()}"
+                                           id="deleteDoubleGuardians"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    </h:panelGrid>
+                </rich:panel>
+                <rich:panel id="loadMeshGuidsForGuardiansPanel">
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
+                                      styleClass="output-text"/><br/>
+                        <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectLoadMeshPage()}"
+                                               render="modalOrgListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="2" target="#{otherActionsPage.selectOrgType}"/>
+                                <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true"
+                                          value=" {#{otherActionsPage.orgItemsLoadMeshFilter}}"/>
+                        </h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
+                        <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
+                                         addLabel="Добавить..."
+                                         clearAllLabel="Очистить"
+                                         uploadLabel="Загрузить"
+                                         doneLabel="Готово"
+                                         fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
+                                         listHeight="100">
+                            <f:facet name="label">
+                                <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                            </f:facet>
+                            <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
+                            <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
+                        </rich:fileUpload>
+                        <h:outputText escape="true"
+                                      value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
+                                      styleClass="report-error-output-text"
+                                      rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
+                    </h:panelGrid>
+                </rich:panel>
+            </h:panelGrid>
+
+            <rich:panel rendered="#{otherActionsPage.isSpb()}">
+                <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"
+                                   id="updateSpbCardUids"
+                                   title="Запуск скрипта по преобразовыванию уидов карт"
+                                   styleClass="command-button" onclick="disableButtons(true);"
+                                   oncomplete="disableButtons(false)"/><br/>
+                <h:outputText value="Список ид. организаций:"/>
+                <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
             </rich:panel>
+
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
         </h:panelGrid>
-
-        <rich:panel rendered="#{otherActionsPage.isSpb()}">
-            <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"
-                               id="updateSpbCardUids"
-                               title="Запуск скрипта по преобразовыванию уидов карт"
-                               styleClass="command-button" onclick="disableButtons(true);"
-                               oncomplete="disableButtons(false)"/><br/>
-            <h:outputText value="Список ид. организаций:"/>
-            <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
-        </rich:panel>
-
-        <a4j:status>
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-            </f:facet>
-        </a4j:status>
-
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
     </h:panelGrid>
-</h:panelGrid>
 </ui:composition>
