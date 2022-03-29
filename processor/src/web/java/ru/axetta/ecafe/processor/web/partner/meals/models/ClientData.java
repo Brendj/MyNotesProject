@@ -22,6 +22,7 @@ public class ClientData {
     private Boolean foodboxAllowed = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean foodboxAvailablе = null;
+
     public ClientData clientId(ClientId clientId) {
         this.clientId = clientId;
         return this;
