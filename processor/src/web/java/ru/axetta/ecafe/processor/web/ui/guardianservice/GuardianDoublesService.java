@@ -273,7 +273,7 @@ public class GuardianDoublesService {
                     clientGuardianHistory2.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                     clientGuardianHistory2.setReason(HISTORY_LABEL);
                     ClientManager.addGuardianByClient(session, deletedGuardian.getIdOfClient(), aliveGuardian.getIdOfGuardin(),
-                            version, false, clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
+                            version, deletedGuardian.getDisabled(), clientGuardian.getRelation(), ClientManager.getNotificationSettings(clientGuardian),
                             clientGuardian.getCreatedFrom(), clientGuardian.getRepresentType(), clientGuardianHistory2);
                     logger.info(String.format("Added guardian id=%d to client id=%d", aliveGuardian.getIdOfGuardin(), deletedGuardian.getIdOfClient()));
                 } else {
