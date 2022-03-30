@@ -57,7 +57,7 @@ public class OkuRestController extends Application {
         }
     }
 
-    @Path(value = "getPurchases")
+    /*@Path(value = "getPurchases")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ public class OkuRestController extends Application {
             logger.error("Unable to check client", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorResult.notFound());
         }
-    }
+    }*/
 
     @Path(value = "getPurchasesAll")
     @GET
