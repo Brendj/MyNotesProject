@@ -227,10 +227,11 @@ public class MealsController extends Application {
                         continue;
                     //Находим все подкатегории
                     List<WtCategoryItem> wtCategoryItemList = daoReadonlyService.getCategoryItemsByWtDish(wtDish.getIdOfDish());
-                    if (wtCategoryItemList.isEmpty()) {
-                        //Значит у блюда изначально не было подкатегории
+                    if (!wtCategoryItemList.isEmpty()) {
+                        //Значит у блюда изначально были подкатегории
                         //Убираем все подкатегории, которые не проходят по ограничению меню
                         wtCategoryItemList.removeIf(wtCategoryItem -> have_prohobition(null, null, wtCategoryItem, prohibitionMenus));
+                        //Если после удаления всех запрещенных подкатегорий ничего не осталось, то не добавляем блюдо
                         if (wtCategoryItemList.isEmpty())
                             continue;
                     }
