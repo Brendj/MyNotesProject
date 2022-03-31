@@ -44,8 +44,10 @@ public class MealsController extends Application {
     private Logger logger = LoggerFactory.getLogger(MealsController.class);
     public static final String BUFFET_OPEN_TIME = "ecafe.processor.meals.buffetOpenTime";
     public static final String BUFFET_CLOSE_TIME = "ecafe.processor.meals.buffetCloseTime";
+    public static final String BUFFET_OPEN = "ecafe.processor.meals.buffetOpen";
     public static final Integer MAX_COUNT_DISH = 5;
     public static final int HTTP_UNPROCESSABLE_ENTITY = 422;
+    public static final Integer ONE_HOUR = 3600000;
 
     public static final Integer MAX_COUNT = 40;//Максимальное количество блюд для возвращения в методе
     protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -76,19 +78,19 @@ public class MealsController extends Application {
         Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
         DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
         try {
-            if (createTime < (CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime())).getTime()) ||
-                    createTime > (CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime())).getTime())) {
+            Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
+            Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
+            if (!getBuffetOpenFlag() || (createTime < (startOpen.getTime()) || createTime > (closeEnd.getTime() - ONE_HOUR))) {
                 logger.error("Заказ пришел на время закрытия буфета");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-                orderErrorInfo.setBuffetOpenAt(getBuffetOpenTime());
-                orderErrorInfo.setBuffetCloseAt(getBuffetCloseTime());
+                orderErrorInfo.getDetails().setBuffetOpenAt(getBuffetOpenTime());
+                orderErrorInfo.getDetails().setBuffetCloseAt(getBuffetCloseTime());
                 return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         } catch (Exception e) {
         }
-        ;
 
 
         if (contractIdStr.isEmpty()) {
@@ -164,7 +166,7 @@ public class MealsController extends Application {
             OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_HAVE_PREORDER.getCode());
             orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.toString());
-            orderErrorInfo.setFoodboxOrderId(foodBoxPreorders.get(0).getIdOfOrder());
+            orderErrorInfo.getDetails().setFoodboxOrderId(foodBoxPreorders.get(0).getIdOfOrder());
             return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
         Long availableMoney = 0L;
@@ -178,7 +180,7 @@ public class MealsController extends Application {
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
-                orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
                 return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         }
@@ -197,6 +199,8 @@ public class MealsController extends Application {
         List <FoodBoxPreorderAvailable> foodBoxPreorderAvailables = daoReadonlyService.getFoodBoxPreorderAvailable(client.getOrg());
         //Получаем список активных заказов футбокса
         Map<Long,Integer> orders = daoReadonlyService.getDishesCountActiveFoodBoxPreorderForOrg(client.getOrg());
+        //Получаем список запретов
+        List<ProhibitionMenu> prohibitionMenus = daoReadonlyService.findProhibitionMenuByClientId(client);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -213,7 +217,7 @@ public class MealsController extends Application {
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
-            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + 3600000)) + "Z");
+            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + ONE_HOUR)) + "Z");
             currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(new Date()) + "Z");
             currentFoodboxOrderInfo.setBalance(client.getBalance());
             currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
@@ -222,7 +226,20 @@ public class MealsController extends Application {
             Integer countDish = 0;
             for (OrderDish orderDish : foodboxOrder.getDishes()) {
                 try {
-                    if (!wtDishes.contains(daoReadonlyService.getWtDishById(orderDish.getDishId()))) {
+                    WtDish wtDish = daoReadonlyService.getWtDishById(orderDish.getDishId());
+                    WtCategory wtCategory = wtDish.getWtCategory();
+                    if (have_prohobition(wtDish, wtCategory, null, prohibitionMenus))
+                        continue;
+                    //Находим все подкатегории
+                    List<WtCategoryItem> wtCategoryItemList = daoReadonlyService.getCategoryItemsByWtDish(wtDish.getIdOfDish());
+                    if (wtCategoryItemList.isEmpty()) {
+                        //Значит у блюда изначально не было подкатегории
+                        //Убираем все подкатегории, которые не проходят по ограничению меню
+                        wtCategoryItemList.removeIf(wtCategoryItem -> have_prohobition(null, null, wtCategoryItem, prohibitionMenus));
+                        if (wtCategoryItemList.isEmpty())
+                            continue;
+                    }
+                    if (!wtDishes.contains(wtDish)) {
                         continue;
                     }
                     Integer countAvailableinOrg = 0;
@@ -297,7 +314,7 @@ public class MealsController extends Application {
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
-                    orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                    orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
@@ -307,7 +324,7 @@ public class MealsController extends Application {
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
-                    orderErrorInfo.setBalanceLimit(client.getExpenditureLimit());
+                    orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
@@ -961,6 +978,16 @@ public class MealsController extends Application {
     private String getBuffetCloseTime() {
         String closeTime = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_CLOSE_TIME, "19:00");
         return closeTime;
+    }
+
+    private Boolean getBuffetOpenFlag() {
+        try {
+            String openBuf = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_OPEN, "false");
+            return Boolean.parseBoolean(openBuf);
+        } catch (Exception e)
+        {
+            return false;
+        }
     }
 
     private boolean validateAccess() {
