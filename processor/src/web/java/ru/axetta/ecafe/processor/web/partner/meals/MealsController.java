@@ -31,6 +31,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -650,7 +651,7 @@ public class MealsController extends Application {
                 dish.setId(wtDish.getIdOfDish());
                 dish.setCode(wtDish.getBarcode());
                 dish.setName(wtDish.getDishName());
-                dish.setPrice(wtDish.getPrice().longValue());
+                dish.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
                 dish.setIngredients(wtDish.getComponentsOfDish());
                 dish.setCalories(wtDish.getCalories());
                 dish.setWeight(wtDish.getQty());
@@ -683,7 +684,7 @@ public class MealsController extends Application {
                 dish.setId(wtDish.getIdOfDish());
                 dish.setCode(wtDish.getBarcode());
                 dish.setName(wtDish.getDishName());
-                dish.setPrice(wtDish.getPrice().longValue());
+                dish.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
                 dish.setIngredients(wtDish.getComponentsOfDish());
                 dish.setCalories(wtDish.getCalories());
                 dish.setWeight(wtDish.getQty());
