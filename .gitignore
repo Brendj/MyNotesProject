@@ -8,7 +8,5 @@
 **/*.iws
 **/dataSources/
 
-# /processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/
-/processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/NewCard.hbm.xml
 **/target/
-
+**/log
