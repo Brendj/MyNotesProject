@@ -38,6 +38,8 @@ public class PreorderMenuDetail {
     private String mobile;
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
     private Long idOfDish;
+    private Integer toPay;
+    private Integer amountToPay;
 
 
     public PreorderMenuDetail() {
@@ -316,5 +318,21 @@ public class PreorderMenuDetail {
 
     public void setIdOfDish(Long idOfDish) {
         this.idOfDish = idOfDish;
+    }
+
+    public Integer getToPay() {
+        return toPay;
+    }
+
+    public void setToPay(Integer toPay) {
+        this.toPay = toPay;
+    }
+
+    public Integer getAmountToPay() {
+        return amountToPay;
+    }
+
+    public void setAmountToPay(Integer amountToPay) {
+        this.amountToPay = amountToPay;
     }
 }

@@ -5,6 +5,12 @@ ALTER TABLE cf_preorder_complex
 COMMENT ON COLUMN cf_preorder_complex.topay
   IS 'Отметка "К оплате"';
 
+ALTER TABLE cf_preorder_menudetail
+    ADD COLUMN toPay integer,
+    ADD COLUMN amountToPay integer;
+COMMENT ON COLUMN cf_preorder_menudetail.topay IS 'Отметка "К оплате"';
+COMMENT ON COLUMN cf_preorder_menudetail.amounttopay IS 'Количество "К оплате"';
+
 alter table cf_orgs
     add column newСashiermode boolean default false;
 COMMENT ON COLUMN cf_orgs.newСashiermode

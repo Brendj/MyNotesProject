@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
+import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
@@ -32,6 +33,14 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
                 preorderComplex.setVersion(version);
                 preorderComplex.setLastUpdate(new Date());
                 session.merge(preorderComplex);
+            }
+            for (PreOrdersFeedingToPayDetailItem detailItem : item.getDetails()) {
+                PreorderMenuDetail pmd = DAOUtils.getPreorderMenuDetailByIdOfDish(preorderComplex, detailItem.getIdOfDish());
+                if (pmd != null) {
+                    pmd.setAmountToPay(detailItem.getQty());
+                    pmd.setToPay(detailItem.getToPay());
+                    session.merge(pmd);
+                }
             }
         }
         session.flush();
