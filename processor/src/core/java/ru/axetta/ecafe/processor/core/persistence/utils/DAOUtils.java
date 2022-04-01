@@ -2402,7 +2402,7 @@ public class DAOUtils {
         return null;
     }
 
-    private static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
+    public static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getIdOfDish().equals(idOfDish) && !pmd.getDeletedState()) {
                 return pmd;
