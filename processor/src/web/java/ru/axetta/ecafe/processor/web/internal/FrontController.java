@@ -1733,7 +1733,7 @@ public class FrontController extends HttpServlet {
                 if (!isLongUid) {
                     exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                     if (exCard != null) {
-                        throw new NoUniqueCardNoException(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                        throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                     }
                 } else {
                     exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
