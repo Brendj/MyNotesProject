@@ -167,7 +167,7 @@ public class MealsController extends Application {
             OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_HAVE_PREORDER.getCode());
             orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.toString());
-            orderErrorInfo.getDetails().setFoodboxOrderId(foodBoxPreorders.get(0).getIdOfOrder());
+            orderErrorInfo.getDetails().setFoodboxOrderId(foodBoxPreorders.get(0).getIdFoodBoxPreorder());
             return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
         Long availableMoney = 0L;
