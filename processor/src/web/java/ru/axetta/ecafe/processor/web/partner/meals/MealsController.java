@@ -283,8 +283,13 @@ public class MealsController extends Application {
                 foodBoxPreorderDish.setIdOfDish(orderDish.getDishId());
                 foodBoxPreorderDish.setPrice(orderDish.getPrice().intValue());
                 foodBoxPreorderDish.setQty(orderDish.getAmount());
-                if (orderDish.getPrice() != null)
-                    priceAll += orderDish.getPrice();
+                if (orderDish.getPrice() != null) {
+                    if (orderDish.getAmount() == null) {
+                        priceAll += orderDish.getPrice();
+                    } else {
+                        priceAll += (orderDish.getPrice() * orderDish.getAmount());
+                    }
+                }
                 foodBoxPreorderDish.setName(orderDish.getName());
                 foodBoxPreorderDish.setBuffetCategoriesId(orderDish.getBuffetCategoryId());
                 foodBoxPreorderDish.setBuffetCategoriesName(orderDish.getBuffetCategoryName());
@@ -952,7 +957,14 @@ public class MealsController extends Application {
             orderDish.setName(foodBoxPreorderDish.getName());
             orderDish.setBuffetCategoryId(foodBoxPreorderDish.getBuffetCategoriesId());
             orderDish.setBuffetCategoryName(foodBoxPreorderDish.getBuffetCategoriesName());
-            sum += foodBoxPreorderDish.getPrice();
+            if (foodBoxPreorderDish.getPrice() != null) {
+                if (foodBoxPreorderDish.getQty() == null)
+                {
+                    sum += foodBoxPreorderDish.getPrice();
+                } else {
+                    sum += (foodBoxPreorderDish.getPrice() * foodBoxPreorderDish.getQty());
+                }
+            }
             foodboxOrderInfo.getDishes().add(orderDish);
         }
         foodboxOrderInfo.setTotalPrice(sum);
