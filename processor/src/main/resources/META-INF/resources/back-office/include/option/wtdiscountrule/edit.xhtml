@@ -208,10 +208,15 @@
                             <!-- Чек-боксы-->
                             <rich:column headerClass="column-header">
                                 <h:selectBooleanCheckbox value="#{complex.checked}" styleClass="output-text"
-                                                         rendered="#{complex.wtComplex.deleteState == 0}"/>
+                                                         rendered="#{complex.wtComplex.deleteState == 0}">
+                                                            <a4j:ajax event="change"/>
+                                </h:selectBooleanCheckbox>
                                 <h:selectBooleanCheckbox value="#{complex.checked}" styleClass="output-disabled-text"
-                                                         rendered="#{complex.wtComplex.deleteState == 1}"/>
+                                                         rendered="#{complex.wtComplex.deleteState == 1}">
+                                                            <a4j:ajax event="change"/>
+                                </h:selectBooleanCheckbox>
                             </rich:column>
+
 
                             <!-- Название контрагента-->
                             <rich:column headerClass="column-header">
