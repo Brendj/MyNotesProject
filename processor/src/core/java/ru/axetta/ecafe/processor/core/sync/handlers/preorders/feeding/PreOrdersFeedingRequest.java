@@ -27,10 +27,13 @@ public class PreOrdersFeedingRequest implements SectionRequest {
                 PreOrdersFeedingToPayItem item = new PreOrdersFeedingToPayItem(XMLUtils.getAttributeValue(nodeElement, "Guid"),
                         XMLUtils.getIntegerAttributeValue(nodeElement, "ToPay"));
                 Node podElement = nodeElement.getFirstChild();
-                if (podElement.getNodeName().equals("POD")) {
-                    PreOrdersFeedingToPayDetailItem detailItem = new PreOrdersFeedingToPayDetailItem(XMLUtils.getLongAttributeValue(podElement, "IdOfDish"),
-                            XMLUtils.getIntegerAttributeValue(podElement, "ToPay"), XMLUtils.getIntegerAttributeValue(podElement, "Qty"));
-                    item.getDetails().add(detailItem);
+                while (podElement != null) {
+                    if (podElement.getNodeName().equals("POD")) {
+                        PreOrdersFeedingToPayDetailItem detailItem = new PreOrdersFeedingToPayDetailItem(XMLUtils.getLongAttributeValue(podElement, "IdOfDish"),
+                                XMLUtils.getIntegerAttributeValue(podElement, "ToPay"), XMLUtils.getIntegerAttributeValue(podElement, "Qty"));
+                        item.getDetails().add(detailItem);
+                    }
+                    podElement = podElement.getNextSibling();
                 }
                 items.add(item);
             }
