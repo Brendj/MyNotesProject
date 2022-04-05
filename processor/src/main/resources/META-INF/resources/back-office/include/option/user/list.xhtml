@@ -113,6 +113,30 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <f:facet name="header">
+                        <h:outputText escape="true" value="Дата создания"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.createdDate}" converter="dateConverter"
+                                  styleClass="output-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="УЗ создателя" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.userCreate}"
+                                  styleClass="output-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="УЗ последнего редактирования"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.userEdit}"
+                                  styleClass="output-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
                         <h:outputText escape="true" value="Код активации"/>
                     </f:facet>
                     <a4j:commandLink render="workspaceForm" action="#{mainPage.userSendActivationCode(item.userName)}"

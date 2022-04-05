@@ -319,6 +319,9 @@ public class User {
     private Client client;
     private Set<SfcUserOrgs> sfcUserOrgs = new HashSet<>();
     private Date deleteDateForBlock;
+    private Date createdDate;
+    private User userCreate;
+    private User userEdit;
 
     public String getRoleName() {
         return roleName;
@@ -585,6 +588,30 @@ public class User {
 
     public void setDeleteDateForBlock(Date deleteDateForBlock) {
         this.deleteDateForBlock = deleteDateForBlock;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public User getUserCreate() {
+        return userCreate;
+    }
+
+    public void setUserCreate(User userCreate) {
+        this.userCreate = userCreate;
+    }
+
+    public User getUserEdit() {
+        return userEdit;
+    }
+
+    public void setUserEdit(User userEdit) {
+        this.userEdit = userEdit;
     }
 
     /*

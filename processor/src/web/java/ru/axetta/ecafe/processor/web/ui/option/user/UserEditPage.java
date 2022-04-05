@@ -184,6 +184,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
             User user = (User) session.get(User.class, idOfUser);
             user.setUserName(userName);
+            if(currentUser != null) {
+                User userEdit = session.load(User.class, currentUser.getIdOfUser());
+                user.setUserEdit(userEdit);
+            }
             if (changePassword) {
                 if (!StringUtils.equals(plainPassword, plainPasswordConfirmation)) {
                     throw new UserChangeGrantsException("Пароль и подтверждение пароля не совпадают");
