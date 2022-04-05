@@ -4,11 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import org.hibernate.FetchMode;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Function;
-import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -51,7 +49,10 @@ public class UserListPage extends BasicWorkspacePage {
         private final boolean blocked;
         private final List<Contragent> contragentList;
         private boolean phoneEmpty;
-        private Date blockedUntilDate;
+        private final Date blockedUntilDate;
+        private final Date createdDate;
+        private final String userCreate;
+        private final String userEdit;
 
         public Item(User user) {
             this.idOfUser = user.getIdOfUser();
@@ -61,6 +62,11 @@ public class UserListPage extends BasicWorkspacePage {
             this.lastEntryTime = user.getLastEntryTime();
             this.lastEntryIP = user.getLastEntryIP();
             this.blocked = user.isBlocked() != null && user.isBlocked();
+            this.createdDate = user.getCreatedDate();
+            this.userCreate = user.getUserCreate() == null ?
+                    null : user.getUserCreate().getUserName();
+            this.userEdit = user.getUserEdit() == null ?
+                    null : user.getUserEdit().getUserName();
             Set<Long> itemFunctions = new HashSet<Long>();
             Set<Function> userFunctions = user.getFunctions();
             for (Function function : userFunctions) {
@@ -115,6 +121,18 @@ public class UserListPage extends BasicWorkspacePage {
         public Date getBlockedUntilDate() {
             return blockedUntilDate;
         }
+
+        public Date getCreatedDate() {
+            return createdDate;
+        }
+
+        public String getUserCreate() {
+            return userCreate;
+        }
+
+        public String getUserEdit() {
+            return userEdit;
+        }
     }
 
     protected List<Item> items = Collections.emptyList();
@@ -131,6 +149,8 @@ public class UserListPage extends BasicWorkspacePage {
                 User.WebArmRole.WA_OEE.getIdentification(),
                 User.WebArmRole.WA_OPP_OEE.getIdentification());
         criteria.add(Restrictions.not(Restrictions.in("idOfRole", list)));
+//        criteria.setFetchMode("idOfUserCreate", FetchMode.JOIN);
+//        criteria.setFetchMode("idOfUserEdit", FetchMode.JOIN);
         List users = criteria.list();
         for (Object object : users) {
             User user = (User) object;
