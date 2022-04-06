@@ -481,6 +481,15 @@ public class ResMenuSupplier implements AbstractToElement {
             Element elem = document.createElement("ORI");
             XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
             XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
+            boolean isInvisible = false;
+            for (WtComplexInvisible complexInvisible : complex.getWtComplexesInvisible()){
+                if(complexInvisible.getIdOfOrg().equals(item.getIdOfOrg())){
+                    if(complexInvisible.getDeleteState() == 0) {
+                        isInvisible = true;
+                    }
+                }
+            }
+            XMLUtils.setAttributeIfNotNull(elem, "Invisible", isInvisible);
             orgs.appendChild(elem);
         }
 
