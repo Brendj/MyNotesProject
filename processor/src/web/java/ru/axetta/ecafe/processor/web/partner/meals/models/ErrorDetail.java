@@ -23,6 +23,8 @@ public class ErrorDetail {
     private String buffetCloseAt = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long foodboxOrderId = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long amount = null;
 
 
     /**
@@ -84,5 +86,13 @@ public class ErrorDetail {
 
     public void setFoodboxOrderId(Long foodboxOrderId) {
         this.foodboxOrderId = foodboxOrderId;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
     }
 }

@@ -38,6 +38,7 @@ public class FoodBoxPreorder  {
 
     public void setIdFoodBoxPreorder(Long idFoodBoxPreorder) {
         this.idFoodBoxPreorder = idFoodBoxPreorder;
+        this.setUpdateDate(new Date());
     }
 
     public FoodBoxStateTypeEnum getState() {
@@ -46,6 +47,7 @@ public class FoodBoxPreorder  {
 
     public void setState(FoodBoxStateTypeEnum state) {
         this.state = state;
+        this.setUpdateDate(new Date());
     }
 
     public Client getClient() {
@@ -54,6 +56,7 @@ public class FoodBoxPreorder  {
 
     public void setClient(Client client) {
         this.client = client;
+        this.setUpdateDate(new Date());
     }
 
     public Date getInitialDateTime() {
@@ -62,6 +65,7 @@ public class FoodBoxPreorder  {
 
     public void setInitialDateTime(Date initialDateTime) {
         this.initialDateTime = initialDateTime;
+        this.setUpdateDate(new Date());
     }
 
     public String getError() {
@@ -70,6 +74,7 @@ public class FoodBoxPreorder  {
 
     public void setError(String error) {
         this.error = error;
+        this.setUpdateDate(new Date());
     }
 
     public Long getIdOfFoodBox() {
@@ -78,6 +83,7 @@ public class FoodBoxPreorder  {
 
     public void setIdOfFoodBox(Long idOfFoodBox) {
         this.idOfFoodBox = idOfFoodBox;
+        this.setUpdateDate(new Date());
     }
 
     public Integer getCellNumber() {
@@ -86,6 +92,7 @@ public class FoodBoxPreorder  {
 
     public void setCellNumber(Integer cellNumber) {
         this.cellNumber = cellNumber;
+        this.setUpdateDate(new Date());
     }
 
     public Long getIdOfOrder() {
@@ -94,6 +101,7 @@ public class FoodBoxPreorder  {
 
     public void setIdOfOrder(Long idOfOrder) {
         this.idOfOrder = idOfOrder;
+        this.setUpdateDate(new Date());
     }
 
     public Integer getCancelReason() {
@@ -102,6 +110,7 @@ public class FoodBoxPreorder  {
 
     public void setCancelReason(Integer cancelReason) {
         this.cancelReason = cancelReason;
+        this.setUpdateDate(new Date());
     }
 
     public Long getVersion() {
@@ -110,6 +119,7 @@ public class FoodBoxPreorder  {
 
     public void setVersion(Long version) {
         this.version = version;
+        this.setUpdateDate(new Date());
     }
 
     public Date getCreateDate() {
@@ -118,6 +128,7 @@ public class FoodBoxPreorder  {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+        this.setUpdateDate(new Date());
     }
 
     public Date getUpdateDate() {
@@ -134,6 +145,7 @@ public class FoodBoxPreorder  {
 
     public void setOrg(Org org) {
         this.org = org;
+        this.setUpdateDate(new Date());
     }
 
     public String getIdFoodBoxExternal() {
@@ -142,6 +154,7 @@ public class FoodBoxPreorder  {
 
     public void setIdFoodBoxExternal(String idFoodBoxExternal) {
         this.idFoodBoxExternal = idFoodBoxExternal;
+        this.setUpdateDate(new Date());
     }
 
     public Long getOrderPrice() {
@@ -150,6 +163,7 @@ public class FoodBoxPreorder  {
 
     public void setOrderPrice(Long orderPrice) {
         this.orderPrice = orderPrice;
+        this.setUpdateDate(new Date());
     }
 
     public Integer getPosted() {
@@ -158,5 +172,6 @@ public class FoodBoxPreorder  {
 
     public void setPosted(Integer posted) {
         this.posted = posted;
+        this.setUpdateDate(new Date());
     }
 }

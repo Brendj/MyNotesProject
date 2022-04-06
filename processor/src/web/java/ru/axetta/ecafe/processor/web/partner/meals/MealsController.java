@@ -14,13 +14,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.service.CancelledFoodBoxService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
@@ -46,9 +46,10 @@ public class MealsController extends Application {
     public static final String BUFFET_OPEN_TIME = "ecafe.processor.meals.buffetOpenTime";
     public static final String BUFFET_CLOSE_TIME = "ecafe.processor.meals.buffetCloseTime";
     public static final String BUFFET_OPEN = "ecafe.processor.meals.buffetOpen";
+    public static final String BUFFET_HEALTH = "ecafe.processor.meals.health";
     public static final Integer MAX_COUNT_DISH = 5;
     public static final int HTTP_UNPROCESSABLE_ENTITY = 422;
-    public static final Integer ONE_HOUR = 3600000;
+    public static final Integer TIME_ALIVE = getHealthTime();
 
     public static final Integer MAX_COUNT = 40;//Максимальное количество блюд для возвращения в методе
     protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -81,7 +82,7 @@ public class MealsController extends Application {
         try {
             Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
             Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
-            if (!getBuffetOpenFlag() || (createTime < (startOpen.getTime()) || createTime > (closeEnd.getTime() - ONE_HOUR))) {
+            if (!getBuffetOpenFlag() || (createTime < (startOpen.getTime()) || createTime > (closeEnd.getTime() - TIME_ALIVE))) {
                 logger.error("Заказ пришел на время закрытия буфета");
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
@@ -218,14 +219,16 @@ public class MealsController extends Application {
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
-            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + ONE_HOUR)) + "Z");
+            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + TIME_ALIVE)) + "Z");
             currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(new Date()) + "Z");
             currentFoodboxOrderInfo.setBalance(client.getBalance());
             currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
             boolean havegoodDish = false;
             Integer countDish = 0;
+            boolean toMaxCount = false;
             for (OrderDish orderDish : foodboxOrder.getDishes()) {
+                //Проверки
                 try {
                     WtDish wtDish = daoReadonlyService.getWtDishById(orderDish.getDishId());
                     WtCategory wtCategory = wtDish.getWtCategory();
@@ -277,6 +280,11 @@ public class MealsController extends Application {
                     result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
                     return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
                 }
+                if (toMaxCount)
+                {
+                    countDish += orderDish.getAmount();
+                    continue;
+                }
                 havegoodDish = true;
                 FoodBoxPreorderDish foodBoxPreorderDish = new FoodBoxPreorderDish();
                 foodBoxPreorderDish.setFoodBoxPreorder(foodBoxPreorder);
@@ -299,11 +307,16 @@ public class MealsController extends Application {
                 countDish += orderDish.getAmount();
                 if (countDish > MAX_COUNT_DISH) {
                     logger.error(String.format("Блюд заказано больше допустимого idOfDish: %s", orderDish.getDishId()));
-                    OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                    orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
-                    orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
-                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+                    //Все последующие блюда мы будем проверять только для того, что бы узнать количество заказанного
+                    toMaxCount = true;
                 }
+            }
+            if (toMaxCount) {
+                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
+                orderErrorInfo.getDetails().setAmount(countDish.longValue());
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             if (!havegoodDish) {
                 logger.error(String.format("Все блюда из заказа не доступны foodBoxid: %s", xrequestStr));
@@ -321,7 +334,7 @@ public class MealsController extends Application {
                     OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
-                    orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
+                    orderErrorInfo.getDetails().setBalance(client.getBalance());
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
@@ -344,6 +357,8 @@ public class MealsController extends Application {
                 return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             persistenceTransaction.commit();
+            //Добавляем заказ для отслеживания
+            CancelledFoodBoxService.currentFoodBoxPreorders.put(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getCreateDate());
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Ошибка при сохранении заказа для Фудбокса", e);
@@ -1001,6 +1016,16 @@ public class MealsController extends Application {
         } catch (Exception e)
         {
             return false;
+        }
+    }
+
+    private static Integer getHealthTime() {
+        try {
+            String health = RuntimeContext.getInstance().getConfigProperties().getProperty(BUFFET_HEALTH, "7200000");
+            return Integer.parseInt(health);
+        } catch (Exception e)
+        {
+            return 7200000;
         }
     }
 
