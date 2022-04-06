@@ -46,6 +46,17 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                         foodBoxPreorderChangedItem.getId()));
                 return resFoodBoxChanged;
             }
+            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED) && foodBoxPreorder.getCancelReason().equals(4))
+            {
+                //Если предзаказ уже был отменен по окончанию срока жизни
+                ResFoodBoxChangedItem resFoodBoxChangedItem = new ResFoodBoxChangedItem();
+                resFoodBoxChangedItem.setError("");
+                resFoodBoxChangedItem.setId(foodBoxPreorder.getIdFoodBoxPreorder());
+                resFoodBoxChangedItem.setRes(0);
+                resFoodBoxChangedItem.setVersion(version + 1);
+                resFoodBoxChanged.getItems().add(resFoodBoxChangedItem);
+                continue;
+            }
             foodBoxPreorder.setError(foodBoxPreorderChangedItem.getError());
             foodBoxPreorder.setIdOfFoodBox(foodBoxPreorderChangedItem.getIdOfFoodBox());
             foodBoxPreorder.setCellNumber(foodBoxPreorderChangedItem.getCellNumber());
