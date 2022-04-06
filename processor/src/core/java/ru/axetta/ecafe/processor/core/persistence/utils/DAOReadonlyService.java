@@ -3393,6 +3393,20 @@ public class DAOReadonlyService {
         }
     }
 
+    public List<FoodBoxPreorder> getActiveFoodBoxPreorder() {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.state between :new and :loaded");
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Long getUsedMoneyFoodBoxPreorderForClient(Client client, Date startDate, Date endDate) {
         try {
             Query query = entityManager.createQuery("SELECT sum(fb.orderPrice) from FoodBoxPreorder fb "

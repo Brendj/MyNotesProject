@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service.cardblock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
@@ -22,6 +24,8 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.service.CancelledFoodBoxService;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -46,6 +50,7 @@ public class CardBlockUnblockService {
     public static final String UNBLOCK_COMMENT = "Режим самоизоляции снят";
     public static final String BLOCK_COMMENT = "Для владельца идентификатора действует режим самоизоляции";
     public static final String NODE_PROPERTY = "ecafe.processor.card.blocked.node";
+    private static final Logger logger = LoggerFactory.getLogger(CardBlockUnblockService.class);
 
     public static class SyncBlockOld implements Job {
 
@@ -61,6 +66,11 @@ public class CardBlockUnblockService {
                         .createOldDateSave(persistenceSession);
                 persistenceTransaction.commit();
             } catch (Exception e) {
+                logger.error("Failed execute CardBlockUnblockService", e);
+            }
+            finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
         }
     }
@@ -98,6 +108,7 @@ public class CardBlockUnblockService {
 
             scheduler.start();
         } catch (Exception e) {
+            logger.error("Failed scheduleSync CardBlockUnblockService", e);
         }
     }
 
