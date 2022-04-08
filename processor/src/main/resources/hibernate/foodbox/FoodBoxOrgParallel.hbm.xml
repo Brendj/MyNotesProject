@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel" table="cf_foodbox_org_parallel">
+        <id name="foodboxparallelId" column="id" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_foodbox_org_parallel_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
+                     not-null="true" update="false"/>
+        <property name="parallel" column="parallel" type="integer"/>
+        <property name="available" column="available" type="boolean"/>
+    </class>
+</hibernate-mapping>

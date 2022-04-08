@@ -207,7 +207,24 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
     <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preorderlp}" styleClass="input-text"/>
     <h:outputText escape="true" value="Использовать фудбокс" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.usedfoodbox}" styleClass="input-text"/>
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.usedfoodbox}" styleClass="input-text">
+        <a4j:ajax event="click" render="foodboxPanel"/>
+    </h:selectBooleanCheckbox>
+    <h:panelGrid id="foodboxPanel" styleClass="borderless-grid">
+        <rich:dataTable id="foodBox" value="#{mainPage.orgEditPage.foodBoxParallelUIS}"
+                        var="it"
+                        rows="#{mainPage.orgEditPage.foodBoxParallelUIS.size()}"
+                        columnClasses="left-aligned-column, center-aligned-column"
+                        footerClass="data-table-footer"
+                        rendered="#{mainPage.orgEditPage.usedfoodbox}">
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{it.nameParallel}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:selectBooleanCheckbox value="#{it.available}" styleClass="input-text"/>
+            </rich:column>
+        </rich:dataTable>
+    </h:panelGrid>
 </h:panelGrid>
 
 <h:outputText escape="true" value="Настройка рассылки и уведомлений:" styleClass="output-text-strong" />

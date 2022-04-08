@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.service.CommonTaskService;
@@ -178,6 +179,7 @@ public class Org implements Serializable {
     private Boolean governmentContract;
     private Boolean useLongCardNo;
     private Boolean usedFoodbox;
+    private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -1422,5 +1424,13 @@ public class Org implements Serializable {
 
     public void setUsedFoodbox(Boolean usedFoodbox) {
         this.usedFoodbox = usedFoodbox;
+    }
+
+    public Set<FoodBoxOrgParallel> getFoodBoxParallels() {
+        return foodBoxParallels;
+    }
+
+    public void setFoodBoxParallels(Set<FoodBoxOrgParallel> foodBoxParallels) {
+        this.foodBoxParallels = foodBoxParallels;
     }
 }

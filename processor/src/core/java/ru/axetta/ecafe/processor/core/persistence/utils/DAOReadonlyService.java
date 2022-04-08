@@ -3572,4 +3572,14 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public List<FoodBoxParallelType> getParallelsType() {
+        try {
+            Query query = entityManager.createQuery("SELECT type from FoodBoxParallelType type");
+            return (List<FoodBoxParallelType>) query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
