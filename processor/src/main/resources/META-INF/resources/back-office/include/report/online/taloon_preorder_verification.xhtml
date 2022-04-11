@@ -7,6 +7,16 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:taloonPreorderVerificationPanelGridRender');
+        element.click();
+        element.hidden = true;
+    </script>
+
+    <a4j:commandLink id="taloonPreorderVerificationPanelGridRender" value=""
+                     render="taloonPreorderVerificationPanelGrid"/>
+
     <h:panelGrid>
         <h:panelGrid id="taloonPreorderVerificationPanelGrid"
                      binding="#{mainPage.taloonPreorderVerificationPage.pageComponent}"
