@@ -1093,7 +1093,7 @@ public class DAOService {
     }
 
     public int setOrgCardSyncParam(List<Long> orgs) {
-        return entityManager.createQuery("update Org set cardSyncParam = true where idOfOrg in :orgs")
+        return entityManager.createQuery("update Org set cardSyncParam = true where idOfOrg in (:orgs)")
                 .setParameter("orgs", orgs)
                 .executeUpdate();
     }
