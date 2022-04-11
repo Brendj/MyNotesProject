@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountItem;
@@ -130,6 +131,22 @@ public class AccountsRegistryHandler {
         List<Client> clientList = Processor.getMigrants(idOfOrg);
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
+        }
+
+        return accountsRegistry;
+    }
+
+    @Transactional
+    public AccountsRegistry handlerCardsUpdate(long idOfOrg, Date lastUpdate) {
+        AccountsRegistry accountsRegistry = new AccountsRegistry();
+
+        List<Card> cardList = DAOReadonlyService.getInstance().getClientsForCardsUpdate(idOfOrg, lastUpdate);
+        for (Card card : cardList) {
+            if (card.getClient() == null) {
+                accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
+            } else {
+                accountsRegistry.getAccountItems().add(new AccountItem(card.getClient()));
+            }
         }
 
         return accountsRegistry;
