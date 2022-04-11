@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.service.CommonTaskService;
@@ -180,6 +181,7 @@ public class Org implements Serializable {
     private Boolean useLongCardNo;
     private Boolean usedFoodbox;
     private Boolean newСashierMode;
+	private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -1441,5 +1443,13 @@ public class Org implements Serializable {
 
     public void setNewСashierMode(Boolean newСashierMode) {
         this.newСashierMode = newСashierMode;
+    }
+	
+	public Set<FoodBoxOrgParallel> getFoodBoxParallels() {
+        return foodBoxParallels;
+    }
+
+    public void setFoodBoxParallels(Set<FoodBoxOrgParallel> foodBoxParallels) {
+        this.foodBoxParallels = foodBoxParallels;
     }
 }

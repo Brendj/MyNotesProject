@@ -24,6 +24,7 @@ import ru.axetta.ecafe.processor.core.service.CancelledFoodBoxService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
+import ru.axetta.ecafe.processor.web.ui.org.FoodBoxParallelUI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -871,9 +872,7 @@ public class MealsController extends Application {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        result.setCode(ResponseCodes.RC_OK.getCode().toString());
-        result.setDescription(ResponseCodes.RC_OK.toString());
-        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
+        return noContent();
     }
 
     @GET
@@ -946,12 +945,85 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
+        //Получаем параллель клиента
+        Integer parallel;
+        try {
+            parallel = extractDigits(client.getParallel());
+        } catch (Exception e) //т.е. не указана параллель
+        {
+            parallel = 0;
+        }
+        if (parallel == 0)
+        {
+            //Получаем параллель через название группы
+            Integer clas;
+            try {
+                clas = extractDigits(client.getClientGroup().getGroupName());
+            } catch (Exception e) //т.е. в названии группы нет чисел
+            {
+                clas = 0;
+            }
+            parallel = clas;
+        }
+        if (parallel ==  0)
+        {
+            return noContent();
+        } else
+        {
+            boolean availParal = false;
+            for (FoodBoxParallelType foodBoxParallelType: FoodBoxParallelType.FoodBoxByParallel.getParallelTypes())
+            {
+                //Проверяем актуальность параллели
+                if (foodBoxParallelType.getParallel().equals(parallel))
+                {
+                    availParal = true;
+                    break;
+                }
+            }
+            if (availParal)
+            {
+                //Проверяем параллель на доступность
+                for (FoodBoxOrgParallel foodBoxOrgParallel: client.getOrg().getFoodBoxParallels())
+                {
+                    if (foodBoxOrgParallel.getParallel().equals(parallel) && foodBoxOrgParallel.getAvailable().equals(false))
+                    {
+                        return noContent();
+                    }
+                }
+            }
+            else
+            {
+                return noContent();
+            }
+        }
+
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailablе(client.getOrg().getUsedFoodbox());
         ClientDataMain clientDataMain = new ClientDataMain();
         clientDataMain.setClientData(clientData);
         return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
+    }
+
+    private Response noContent()
+    {
+        Result result = new Result();
+        result.setCode(ResponseCodes.RC_OK.getCode().toString());
+        result.setDescription(ResponseCodes.RC_OK.toString());
+        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
+    }
+
+    public Integer extractDigits(String src) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < src.length(); i++) {
+            char c = src.charAt(i);
+            if (Character.isDigit(c)) {
+                builder.append(c);
+            } else {
+                return Integer.valueOf(builder.toString());
+            }
+        }
+        return Integer.valueOf(builder.toString());
     }
 
 

@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxParallelType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -15,10 +17,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -109,6 +108,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean preorderlp;
     private Boolean useLongCardNo;
     private Boolean usedfoodbox;
+    private List<FoodBoxParallelUI> foodBoxParallelUIS;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -129,6 +129,14 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Boolean useMealSchedule;
     private Boolean newСashierMode;
+
+    public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
+        return foodBoxParallelUIS;
+    }
+
+    public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
+        foodBoxParallelUIS = foodBoxParallelUIS;
+    }
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
@@ -317,7 +325,26 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
         this.useLongCardNo = org.getUseLongCardNo();
         this.usedfoodbox = org.getUsedFoodbox();
-
+        if (this.usedfoodbox) {
+            //Подготавливаем список параллелей
+            foodBoxParallelUIS = new ArrayList<>();
+            FoodBoxParallelUI foodBoxParallelUI;
+            for (FoodBoxParallelType foodBoxParallelType : FoodBoxParallelType.FoodBoxByParallel.getParallelTypes()) {
+                foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
+                        foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());
+                foodBoxParallelUIS.add(foodBoxParallelUI);
+            }
+            if (org.getFoodBoxParallels() != null) {
+                //Если есть настройки для данной орг, то мы их считываем
+                for (FoodBoxOrgParallel foodBoxOrgParallel : org.getFoodBoxParallels()) {
+                    for (FoodBoxParallelUI foodBoxParallelUI1 : foodBoxParallelUIS) {
+                        if (Objects.equals(foodBoxOrgParallel.getParallel(), foodBoxParallelUI1.getParallel())) {
+                            foodBoxParallelUI1.setAvailable(foodBoxOrgParallel.getAvailable());
+                        }
+                    }
+                }
+            }
+        }
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.newСashierMode = org.getNewСashierMode();
