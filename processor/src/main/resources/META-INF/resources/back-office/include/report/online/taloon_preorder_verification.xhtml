@@ -305,7 +305,7 @@
                                 <a4j:commandLink render="taloonPreorderVerificationTable"
                                                  rendered="#{detail.ppStateNotSelected}"
                                                  action="#{detail.cancelPpState}"
-                                                 onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; } if (#{!detail.needFillShippedQty}) { alert('Заполните отгрузку ПП'); }"
+                                                 onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; } if (#{!detail.needFillShippedQty}) { alert('Заполните отгрузку ПП для подтверждения'); }"
                                                  style="color:lightgray;">
                                     <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                                     <h:graphicImage value="/images/taloons/canceled-gray.png"/>
