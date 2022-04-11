@@ -104,7 +104,6 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean useLongCardId = false;
     private Boolean usedfoodbox = false;
     private List<FoodBoxParallelUI> foodBoxParallelUIS;
-    private static List<FoodBoxParallelType> parallelTypes = DAOReadonlyService.getInstance().getParallelsType();
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -651,7 +650,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         //Подготавливаем данные для паралеллей по фудбоксу
         foodBoxParallelUIS = new ArrayList<>();
         FoodBoxParallelUI foodBoxParallelUI;
-        for (FoodBoxParallelType foodBoxParallelType: parallelTypes)
+        for (FoodBoxParallelType foodBoxParallelType: FoodBoxParallelType.FoodBoxByParallel.getParallelTypes())
         {
             foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
                     foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());

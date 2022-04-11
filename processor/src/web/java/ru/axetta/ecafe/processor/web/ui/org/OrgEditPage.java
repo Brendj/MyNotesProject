@@ -150,7 +150,6 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preorderlp;
     private Boolean usedfoodbox;
     private List<FoodBoxParallelUI> foodBoxParallelUIS;
-    List<FoodBoxParallelType> parallelTypes = DAOReadonlyService.getInstance().getParallelsType();
 
     private Boolean useWebArm;
     private Boolean goodDateCheck;
@@ -699,7 +698,7 @@ public class OrgEditPage extends BasicWorkspacePage
         //Подготавливаем список параллелей
         foodBoxParallelUIS = new ArrayList<>();
         FoodBoxParallelUI foodBoxParallelUI;
-        for (FoodBoxParallelType foodBoxParallelType : parallelTypes) {
+        for (FoodBoxParallelType foodBoxParallelType : FoodBoxParallelType.FoodBoxByParallel.getParallelTypes()) {
             foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
                     foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());
             foodBoxParallelUIS.add(foodBoxParallelUI);

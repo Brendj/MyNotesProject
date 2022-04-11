@@ -5,6 +5,10 @@
 package ru.axetta.ecafe.processor.core.persistence.foodbox;
 
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+
+import java.util.List;
+
 public class FoodBoxParallelType {
     private Long parallelTypeId;
     private Integer parallel;
@@ -23,5 +27,21 @@ public class FoodBoxParallelType {
 
     public void setParallelTypeId(Long parallelTypeId) {
         this.parallelTypeId = parallelTypeId;
+    }
+
+    public static class FoodBoxByParallel {
+        private static List<FoodBoxParallelType> parallelTypes = null;
+
+        public static List<FoodBoxParallelType> getParallelTypes() {
+            if (parallelTypes == null)
+            {
+                parallelTypes = DAOReadonlyService.getInstance().getParallelsType();
+            }
+            return parallelTypes;
+        }
+
+        public static void setParallelTypes(List<FoodBoxParallelType> parallelTypes) {
+            FoodBoxByParallel.parallelTypes = parallelTypes;
+        }
     }
 }

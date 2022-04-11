@@ -109,7 +109,6 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean useLongCardNo;
     private Boolean usedfoodbox;
     private List<FoodBoxParallelUI> foodBoxParallelUIS;
-    private static List<FoodBoxParallelType> parallelTypes = DAOReadonlyService.getInstance().getParallelsType();
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -327,7 +326,7 @@ public class OrgViewPage extends BasicWorkspacePage {
             //Подготавливаем список параллелей
             foodBoxParallelUIS = new ArrayList<>();
             FoodBoxParallelUI foodBoxParallelUI;
-            for (FoodBoxParallelType foodBoxParallelType : parallelTypes) {
+            for (FoodBoxParallelType foodBoxParallelType : FoodBoxParallelType.FoodBoxByParallel.getParallelTypes()) {
                 foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
                         foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());
                 foodBoxParallelUIS.add(foodBoxParallelUI);
