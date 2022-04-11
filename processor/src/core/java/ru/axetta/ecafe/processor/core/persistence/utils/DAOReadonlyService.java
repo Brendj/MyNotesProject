@@ -2943,7 +2943,7 @@ public class DAOReadonlyService {
     public Date getLastProcessedCardUpdate() {
         try {
             String option = getOnlineOptionValue(Option.OPTION_LAST_PROCESSED_CARD_UPDATE);
-            return CalendarUtils.parseDateWithDayTime(option);
+            return new Date(Long.parseLong(option));
         } catch (Exception e) {
             return new Date();
         }
@@ -3600,9 +3600,14 @@ public class DAOReadonlyService {
     }
 
     public List<Long> findFriendlyOrgsIdsByListOrgs(Set<Long> orgs) {
-        return entityManager.createNativeQuery("select distinct friendlyorg from cf_friendly_organization where currentorg in (:list)")
+        List list = entityManager.createNativeQuery("select distinct friendlyorg from cf_friendly_organization where currentorg in (:list)")
                 .setParameter("list", orgs)
                 .getResultList();
+        List<Long> result = new ArrayList<>();
+        for (Object o : list) {
+            result.add(HibernateUtils.getDbLong(o));
+        }
+        return result;
     }
 
     public List<Card> getClientsForCardsUpdate(long idOfOrg, Date lastUpdate) {

@@ -49,7 +49,7 @@ public class CardUpdateSyncService {
             }
             List<Long> allOrgs = DAOReadonlyService.getInstance().findFriendlyOrgsIdsByListOrgs(orgsToSync);
             if (DAOService.getInstance().setOrgCardSyncParam(allOrgs) > 0) {
-                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(dateToSave), Option.OPTION_LAST_PROCESSED_CARD_UPDATE);
+                DAOService.getInstance().setOnlineOptionValue("" + dateToSave.getTime(), Option.OPTION_LAST_PROCESSED_CARD_UPDATE);
             }
             logger.info(String.format("CardUpdateSyncService set directive for %s orgs", allOrgs.size()));
         } catch (Exception e) {
