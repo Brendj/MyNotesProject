@@ -1477,6 +1477,10 @@ public class Processor implements SyncProcessor {
                     }
                     case ForMigrants: {
                         result = accountsRegistryHandler.handlerMigrants(request.getIdOfOrg());
+                        break;
+                    }
+                    case ForCardsUpdated: {
+                        result = accountsRegistryHandler.handlerCardsUpdate(request.getIdOfOrg(), requestSection.getCardLastUpdate());
                     }
                 }
                 if (result != null) {
