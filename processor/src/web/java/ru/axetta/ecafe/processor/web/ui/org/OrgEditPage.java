@@ -465,6 +465,7 @@ public class OrgEditPage extends BasicWorkspacePage
             for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {
                 session.delete(foodBoxOrgParallel);
             }
+            org.setFoodBoxParallels(null);
         } else
         {
             //Снимаем копию с оригинальной коллекции org.getFoodBoxParallels() т.к. потом из копии будет удаление
@@ -502,7 +503,8 @@ public class OrgEditPage extends BasicWorkspacePage
                 //Мы должны удалить реальный объект в бд, а не его копию
                 for (FoodBoxOrgParallel foodBoxOrgParallelReal: org.getFoodBoxParallels()) {
                     if (foodBoxOrgParallelReal.getFoodboxparallelId().equals(foodBoxOrgParallel.getFoodboxparallelId())) {
-                        session.delete(foodBoxOrgParallel);
+                        session.delete(foodBoxOrgParallelReal);
+                        org.getFoodBoxParallels().remove(foodBoxOrgParallelReal);
                         break;
                     }
                 }
@@ -513,6 +515,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 foodBoxOrgParallel.setOrg(org);
                 foodBoxOrgParallel.setAvailable(foodBoxParallelUI.isAvailable());
                 session.persist(foodBoxOrgParallel);
+                org.getFoodBoxParallels().add(foodBoxOrgParallel);
             }
         }
 		
