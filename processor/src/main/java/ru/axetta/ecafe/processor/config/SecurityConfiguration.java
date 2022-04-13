@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -94,6 +95,19 @@ public class SecurityConfiguration {
                     .logoutSuccessUrl("/back-office/login.faces")
                     .invalidateHttpSession(true);
 
+            security.sessionManagement().invalidSessionStrategy(((request, response) -> {
+                String loginUrl = request.getContextPath() + "/back-office/login.faces";
+                if("partial/ajax".equals(request.getHeader("Faces-Request"))) {
+                    response.setContentType("text/xml");
+                    response.getWriter()
+                            .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+                            .printf("<partial-response><redirect url=\"%s\"></redirect></partial-response>",
+                                    loginUrl);
+                } else{
+                    response.sendRedirect(loginUrl);
+                }
+            }));
+
             security.authorizeRequests().antMatchers("/back-office/index.faces").authenticated()
                     .antMatchers("/back-office/admin/index.faces").hasAnyAuthority(ProcessingLoginModule.ROLENAME_ADMIN)
                     .antMatchers("/back-office/director/index.faces").hasAnyAuthority(ProcessingLoginModule.ROLENAME_DIRECTOR)
@@ -101,6 +115,11 @@ public class SecurityConfiguration {
                     .csrf().disable();
 
             security.cors();
+        }
+
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/back-office/login.faces");
         }
 
         @Bean
