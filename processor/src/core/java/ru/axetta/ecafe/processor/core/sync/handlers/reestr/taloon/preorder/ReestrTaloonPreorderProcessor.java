@@ -54,11 +54,9 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
             for (TaloonPreorderItem item : reestrTaloonPreorder.getItems()) {
                 Session persistenceSession = null;
                 Transaction persistenceTransaction = null;
-
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
-
                     errorFound = !item.getResCode().equals(TaloonPreorderItem.ERROR_CODE_ALL_OK);
                     if (!errorFound) {
                         String guid = item.getGuid();
@@ -150,16 +148,17 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                         resItem.setResultCode(item.getResCode());
                         resItem.setErrorMessage(item.getErrorMessage());
                     }
-                    items.add(resItem);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
+                    items.add(resItem);
                     persistenceTransaction = null;
+                } catch (Exception ignore) {
+                    logger.error("Error saving TaloonPreorder");
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
                     HibernateUtils.close(persistenceSession, logger);
                 }
             }
-
         } catch (Exception e) {
             logger.error("Error saving ReestrTaloonPreorder", e);
             return null;
@@ -167,7 +166,6 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
         result.setItems(items);
         return result;
     }
-
 
     public ReestrTaloonPreorderData processData() throws Exception {
         ReestrTaloonPreorderData result = new ReestrTaloonPreorderData();
