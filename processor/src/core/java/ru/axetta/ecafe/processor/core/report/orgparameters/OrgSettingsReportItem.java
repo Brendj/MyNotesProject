@@ -53,6 +53,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private Boolean reverseMonthOfSale;
     private Boolean denyPayPlanForTimeDifference;
     private Boolean useWebArm;
+    private Boolean useWebArmAdmin;
     private Boolean useMealSchedule;
 
     //FeedingSetting Info
@@ -123,6 +124,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
             this.limit = setting.getLimit();
         }
         this.useWebArm = org.getUseWebArm();
+        this.useWebArmAdmin = org.getUseWebArmAdmin();
         this.useMealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
 
         this.oneActiveCard = org.getOneActiveCard();
@@ -380,6 +382,14 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public Boolean getUseWebArmAdmin() {
+        return useWebArmAdmin;
+    }
+
+    public void setUseWebArmAdmin(Boolean UseWebArmAdmin) {
+        this.useWebArmAdmin = UseWebArmAdmin;
     }
 
     @Override

@@ -8,24 +8,32 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <!--@elvariable id="RNIPLaunchService" type="ru.axetta.ecafe.processor.controllers.RNIPLaunchService"-->
-<h:panelGrid>
-    <h:panelGrid columns="4">
-        <h:outputLabel value="Период: "/>
-        <h:inputText value="#{mainPage.serviceRNIPPage.startDate}"/>
-        <h:outputLabel value=" - "/>
-        <h:inputText value="#{mainPage.serviceRNIPPage.endDate}"/>
+    <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:rnipPanelGridRender');
+        element.click();
+        element.hidden = true;
+    </script>
 
-        <a4j:commandButton value="Run" action="#{mainPage.serviceRNIPPage.run()}" status="serviceRNIPStatus"/>
-        <a4j:status id="serviceRNIPStatus">
+    <a4j:commandLink id="rnipPanelGridRender" value=""
+                     render="rnipPanelGrid"/>
+
+    <!--@elvariable id="RNIPLaunchService" type="ru.axetta.ecafe.processor.controllers.RNIPLaunchService"-->
+    <h:panelGrid id="rnipPanelGrid">
+        <h:panelGrid columns="4" >
+            <h:outputLabel value="Период: "/>
+            <h:inputText value="#{mainPage.serviceRNIPPage.startDate}"/>
+            <h:outputLabel value=" - "/>
+            <h:inputText value="#{mainPage.serviceRNIPPage.endDate}"/>
+            <a4j:commandButton value="Run" action="#{mainPage.serviceRNIPPage.run()}"/>
+        </h:panelGrid>
+        <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
             </f:facet>
         </a4j:status>
+        <h:panelGrid columns="1">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
     </h:panelGrid>
-    <h:panelGrid columns="1">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
-    </h:panelGrid>
-</h:panelGrid>
 </ui:composition>

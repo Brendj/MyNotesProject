@@ -481,8 +481,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
         //
         Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
-                + "(idofcomplex, idoforg, deletestate, createdate, idofuser, versionofcomplex) "
-                + "select idofcomplex, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(idofevent, idofcomplex, idoforg, deletestate, createdate, idofuser, versionofcomplex) "
+                + "select nextval('cf_wt_org_relation_aud_seq'), idofcomplex, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
                 + "(select idofuser from cf_users where username = 'admin') as idofuser, "
                 + "(select coalesce(max(versionofcomplex), 0) + 1 from cf_wt_org_relation_aud) as versionofcomplex "
                 + " from cf_wt_complexes_org where idoforg = :idOfOrg and idofcomplex in (:complexIds)");
@@ -515,8 +515,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
         //
         Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
-                + "(idofmenu, idoforg, deletestate, createdate, idofuser, versionofmenu) "
-                + "select idofmenu, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(idofevent, idofmenu, idoforg, deletestate, createdate, idofuser, versionofmenu) "
+                + "select nextval('cf_wt_org_relation_aud_seq'), idofmenu, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
                 + "(select idofuser from cf_users where username = 'admin') as idofuser, "
                 + "(select coalesce(max(versionofmenu), 0) + 1 from cf_wt_org_relation_aud) as versionofmenu "
                 + " from cf_wt_menu_org where idoforg = :idOfOrg and idofmenu in (:menuIds)");
@@ -549,8 +549,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
         //
         Query insQuery = session.createSQLQuery("insert into cf_wt_org_relation_aud"
-                + "(idoforggroup, idoforg, deletestate, createdate, idofuser, versionoforggroup) "
-                + "select idoforggroup, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
+                + "(idofevent, idoforggroup, idoforg, deletestate, createdate, idofuser, versionoforggroup) "
+                + "select nextval('cf_wt_org_relation_aud_seq'), idoforggroup, :idOfOrg, 1, cast(now() as timestamp) as createdate, "
                 + "(select idofuser from cf_users where username = 'admin') as idofuser, "
                 + "(select coalesce(max(versionoforggroup), 0) + 1 from cf_wt_org_relation_aud) as versionoforggroup "
                 + " from cf_wt_org_group_relations where idoforg = :idOfOrg and idoforggroup in (:orgGroupIds)");

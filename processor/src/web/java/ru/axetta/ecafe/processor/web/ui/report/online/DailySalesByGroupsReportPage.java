@@ -125,6 +125,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+
             List<BasicReportJob.OrgShortItem> orgShortItemList;
             if (idOfOrgList == null || idOfOrgList.isEmpty()) {
                 facesContext.addMessage(null,
@@ -149,7 +150,6 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
             builder.setOrgShortItemList(orgShortItemList);
             dailySalesReport = (DailySalesByGroupsReport) builder.build(persistenceSession,startDate, endDate, localCalendar);
-
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
@@ -185,31 +185,38 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     @Transactional
     public void buildReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Session persistenceSession = (Session) em.getDelegate();
-        List<BasicReportJob.OrgShortItem> orgShortItemList;
-
-        if (idOfOrgList == null || idOfOrgList.isEmpty()) {
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
-            return;
-        }
-        List<Long> orgIdsList;
-        if(includeFriendlyOrgs) {
-            orgIdsList = getFriendlyOrgsIds(persistenceSession);
-        }else {
-            orgIdsList = checkOrgIdListForPreorder(persistenceSession, idOfOrgList);
-        }
-        if (orgIdsList == null || orgIdsList.isEmpty()) {
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация, удовлетворяющая фильтру", null));
-            return;
-        }
-        orgShortItemList = getOrgShortItemList(orgIdsList);
-
+        Transaction persistenceTransaction = null;
+        Session persistenceSession = null;
         try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            List<BasicReportJob.OrgShortItem> orgShortItemList;
+
+            if (idOfOrgList == null || idOfOrgList.isEmpty()) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
+                return;
+            }
+            List<Long> orgIdsList;
+            if (includeFriendlyOrgs) {
+                orgIdsList = getFriendlyOrgsIds(persistenceSession);
+            } else {
+                orgIdsList = checkOrgIdListForPreorder(persistenceSession, idOfOrgList);
+            }
+            if (orgIdsList == null || orgIdsList.isEmpty()) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация, удовлетворяющая фильтру", null));
+                return;
+            }
+            orgShortItemList = getOrgShortItemList(orgIdsList);
+
             buildReport(persistenceSession, orgShortItemList);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
     }
 

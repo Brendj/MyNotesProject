@@ -126,7 +126,7 @@ public class DAOUtils {
         return (Contract) persistenceSession.load(Contract.class, idOfContract);
     }
 
-    public static Client findClient(Session persistenceSession, long idOfClient) throws Exception {
+    public static Client findClient(Session persistenceSession, long idOfClient) {
         return (Client) persistenceSession.load(Client.class, idOfClient);
     }
 
@@ -5757,5 +5757,11 @@ public class DAOUtils {
                 .createQuery("SELECT defaultSupplier FROM Org org where org.idOfOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
         return (Contragent) query.uniqueResult();
+    }
+
+    public static List<Long> findOrgByContragent(Session session, Contragent defaultSupplier) {
+        Query query = session.createQuery("SELECT org.idOfOrg FROM Org org where org.defaultSupplier = :defaultSupplier");
+        query.setParameter("defaultSupplier", defaultSupplier);
+        return query.list();
     }
 }

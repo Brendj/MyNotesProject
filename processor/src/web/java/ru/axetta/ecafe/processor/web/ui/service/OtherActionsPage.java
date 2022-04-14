@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import org.hibernate.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -21,15 +23,15 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.guardianservice.GuardianDoublesService;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserCreatePage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
@@ -48,16 +50,14 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*;
 
 @Component
 @Scope("session")
-public class OtherActionsPage extends OnlineReportPage {
+public class OtherActionsPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
 
     private String passwordForSearch;
     private String orgsForGenerateGuardians;
@@ -73,6 +73,45 @@ public class OtherActionsPage extends OnlineReportPage {
     private boolean allowGenerateGuardians = true;
     private String orgsforCleaninig;
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
+    private Integer processedMeshGuids;
+    private Boolean showProcessedMeshGuids = false;
+    private SelectedOrgListType selectOrgType;
+    private List<OrgItem> orgItemsPreorder = new ArrayList<>(0);
+    private List<OrgItem> orgItemsRemoveDup = new ArrayList<>(0);
+    private List<OrgItem> orgItemsLoadMesh = new ArrayList<>(0);
+    protected String orgItemsPreorderFilter = "Не выбрано";
+    protected String orgItemsRemoveDupFilter = "Не выбрано";
+    protected String orgItemsLoadMeshFilter = "Не выбрано";
+
+    private static class OrgItem {
+        protected final Long idOfOrg;
+        private final String shortName;
+        private final Boolean mainBuilding;
+
+        OrgItem(Org org) {
+            this(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding());
+        }
+
+        public OrgItem(Long idOfOrg, String shortName) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.mainBuilding = Boolean.FALSE;
+        }
+
+        public OrgItem(Long idOfOrg, String shortName, Boolean mainBuilding) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.mainBuilding = mainBuilding;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+    }
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -539,6 +578,161 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void loadMeshGuidsForGuardians(FileUploadEvent event) {
+        List<Long> orgList = orgItemsLoadMesh.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgList)) {
+            printError("Не выбраны организации для загрузки мэш гуидов представителей");
+            return;
+        }
+        Collections.sort(orgList);
+        UploadedFile item = event.getUploadedFile();
+        InputStream inputStream = null;
+        try {
+            byte[] data = item.getData();
+            inputStream = new ByteArrayInputStream(data);
+            logger.info("Start loadMeshGuidsForGuardians");
+            showProcessedMeshGuids = false;
+            processedMeshGuids = loadMeshGuidsForGuardiansFile(inputStream, orgList);
+            showProcessedMeshGuids = true;
+            logger.info("End loadMeshGuidsForGuardians");
+            printMessage("Файл загружен успешно");
+        } catch (Exception e) {
+            getLogger().error("Failed to load guardians mesh guids", e);
+            printMessage("Ошибка при загрузке файла с mesh гуидами представителей : " + e.getMessage());
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    private int loadMeshGuidsForGuardiansFileByOrg(Session session, List<Long> idOfOrgList, Long nextVersion) {
+        Query update_query = session.createNativeQuery("update cf_clients c set meshguid = temp.guid, clientregistryversion = :version " +
+                "from temp_guids temp where c.idofclient = temp.idofclient and c.idofclientgroup not in (1100000060, 1100000070) " +
+                "and c.idoforg in (:idOfOrgList)" +
+                "and not exists (select guid from temp_double_guids t where t.guid = temp.guid)");
+        update_query.setParameter("version", nextVersion);
+        update_query.setParameterList("idOfOrgList", idOfOrgList);
+        return update_query.executeUpdate();
+    }
+
+    private int loadMeshGuidsForGuardiansFile(InputStream inputStream, List<Long> idOfOrgList) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        long nextVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Query query = session.createNativeQuery("create temp table temp_guids (idOfClient bigint, guid character varying(36)) on commit drop");
+            query.executeUpdate();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            int lineNo = 0;
+            String currLine = reader.readLine();
+            Long idOfClient;
+            String meshGuid;
+            String temp_query_str = "insert into temp_guids(idofclient, guid) values";
+            while (null != currLine) {
+                if (lineNo == 0) {
+                    currLine = reader.readLine();
+                    lineNo++;
+                    continue; //пропускаем заголовок
+                }
+                try {
+                    String[] arr = currLine.split("#");
+                    idOfClient = Long.valueOf(arr[0]);
+                    meshGuid = arr[1];
+                    if (meshGuid.startsWith("\"")) {
+                        meshGuid = meshGuid.substring(1, meshGuid.length()-1);
+                    }
+                } catch (Exception e) {
+                    idOfClient = null;
+                    meshGuid = null;
+                    logger.error("Error in loadMeshGuidsForGuardiansFile. LineNo=" + lineNo, e);
+                }
+                if (idOfClient != null) {
+                    temp_query_str += String.format("(%d, '%s'),", idOfClient, meshGuid);
+                }
+                if (lineNo % 5000 == 0) {
+                    temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                    Query temp_query = session.createNativeQuery(temp_query_str);
+                    temp_query.executeUpdate();
+                    temp_query_str = "insert into temp_guids(idofclient, guid) values";
+                    logger.info(String.format("Processed %s lines", lineNo));
+                }
+                currLine = reader.readLine();
+                lineNo++;
+            }
+            if (temp_query_str.length() > 50) {
+                temp_query_str = temp_query_str.substring(0, temp_query_str.length()-1);
+                Query temp_query = session.createNativeQuery(temp_query_str);
+                temp_query.executeUpdate();
+                logger.info(String.format("Processed %s lines", lineNo));
+            }
+            //дубли гуидов по выгрузке
+            Query temp_doubles_query =
+                    session.createNativeQuery("select cast(count(t.idofclient) as bigint) as amount, guid " +
+                            "from temp_guids t join cf_clients c on t.idofclient = c.idofclient " +
+                            "where c.idofclientgroup not in (1100000060, 1100000070) " +
+                            "group by guid having count(t.idofclient) > 1 order by 1 desc");
+            List list = temp_doubles_query.getResultList();
+            String doubleGuidList = "";
+            if (list.size() > 0) {
+                for (Object o : list) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
+                    doubleGuidList += (String)row[1] + ",";
+                }
+                doubleGuidList = doubleGuidList.substring(0, doubleGuidList.length()-1);
+            }
+            Query temp_guids_filter = session.createNativeQuery("create temp table temp_double_guids (guid character varying(36)) on commit drop");
+            temp_guids_filter.executeUpdate();
+            if (doubleGuidList.length() > 0) {
+                temp_guids_filter = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", doubleGuidList));
+                temp_guids_filter.executeUpdate();
+            }
+
+            //отсеиваем существующие в БД гуиды
+            Query exist_guids_query = session.createNativeQuery("select t.idofclient, t.guid " +
+                    "from temp_guids t join cf_clients c on t.guid = c.meshguid");
+            List list2 = exist_guids_query.getResultList();
+            String existingGuids = "";
+            if (list2.size() > 0) {
+                for (Object o : list2) {
+                    Object[] row = (Object[]) o;
+                    logger.info(String.format("Existing guids: %s - idofclient = %d", (String) row[1], HibernateUtils.getDbLong(row[0])));
+                    existingGuids += (String) row[1] + ",";
+                }
+                existingGuids = existingGuids.substring(0, existingGuids.length()-1);
+            }
+            if (existingGuids.length() > 0) {
+                exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                        "select unnest(string_to_array('%s', ','))", existingGuids));
+                exist_guids_query.executeUpdate();
+            }
+
+            Set<Long> processedOrgs = new HashSet<>();
+            int result = 0;
+            int res = 0;
+            for (Long idOfOrg : idOfOrgList) {
+                if (processedOrgs.contains(idOfOrg)) continue;
+                List<Long> friendlyOrgs = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+                res = loadMeshGuidsForGuardiansFileByOrg(session, friendlyOrgs, nextVersion);
+                logger.info(String.format("Updated %s client records", res));
+                result += res;
+                processedOrgs.addAll(friendlyOrgs);
+            }
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in loadMeshGuidsForGuardiansFile: ", e);
+            return 0;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public void specialDatesLoadFileListener(FileUploadEvent event) {
         UploadedFile item = event.getUploadedFile();
         InputStream inputStream = null;
@@ -682,8 +876,8 @@ public class OtherActionsPage extends OnlineReportPage {
     public void preorderRequestsManualGenerate() throws Exception {
         PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
         params.getIdOfOrgList().clear();
-        if (idOfOrgList != null) {
-            params.getIdOfOrgList().addAll(idOfOrgList);
+        if (orgItemsPreorder != null) {
+            params.getIdOfOrgList().addAll(orgItemsPreorder.stream().map(o -> o.idOfOrg).collect(Collectors.toList()));
         }
         params.getIdOfClientList().clear();
         if (getClientList() != null) {
@@ -785,6 +979,19 @@ public class OtherActionsPage extends OnlineReportPage {
         this.guidForDiscountsUpdate = guidForDiscountsUpdate;
     }
 
+    public void runDeleteDoubleGuardians() {
+        List<Long> orgList = orgItemsRemoveDup.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orgList)) {
+            printError("Не выбраны организации для обработки дублей представителей");
+            return;
+        }
+        Collections.sort(orgList);
+        for (long idOfOrg : orgList) {
+            RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForOrg(idOfOrg);
+        }
+        printMessage("Операция обработки дублей представителей по выбранным организациям выполнена");
+    }
+
     public void runUpdateSpbCardUids() throws Exception {
         try {
             List<Long> orgs = getOrgsForCardsUpdate();
@@ -841,6 +1048,64 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        switch (selectOrgType){
+            case ORG_LIST_PREORDER: {
+                orgItemsPreorder = setOrgListSection(orgMap, orgItemsPreorder);
+                orgItemsPreorderFilter = setOrgListFilter(orgItemsPreorder);
+            } break;
+            case ORG_LIST_REMOVE_DUPLICATES: {
+                orgItemsRemoveDup = setOrgListSection(orgMap, orgItemsRemoveDup);
+                orgItemsRemoveDupFilter = setOrgListFilter(orgItemsRemoveDup);
+            } break;
+            case ORG_LIST_LOAD_MESH: {
+                orgItemsLoadMesh = setOrgListSection(orgMap, orgItemsLoadMesh);
+                orgItemsLoadMeshFilter = setOrgListFilter(orgItemsLoadMesh);
+            } break;
+        }
+    }
+
+    private String setOrgListFilter(List<OrgItem> items){
+        if (items.isEmpty())
+            return "Не выбрано";
+        else return items.stream().map(o -> o.shortName).collect(Collectors.joining("; "));
+    }
+
+    private List<OrgItem> setOrgListSection(Map<Long, String> orgMap, List<OrgItem> items) {
+        if (orgMap != null && !orgMap.isEmpty()) {
+            return orgMap.keySet().stream().map(o -> new OrgItem(o, orgMap.get(o))).collect(Collectors.toList());
+        }
+        return items;
+    }
+
+    public String getGetStringIdOfOrgList() {
+        switch (selectOrgType){
+            case ORG_LIST_PREORDER: return orgItemsPreorder.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_LIST_REMOVE_DUPLICATES: return orgItemsRemoveDup.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_LIST_LOAD_MESH: return orgItemsLoadMesh.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+        }
+        return "";
+    }
+
+    public Object showOrgListSelectPreorderPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_PREORDER;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectRemoveDupPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_REMOVE_DUPLICATES;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectLoadMeshPage(){
+        selectOrgType = SelectedOrgListType.ORG_LIST_LOAD_MESH;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
     public String getUpdateSpbClientDoubles() {
         return updateSpbClientDoubles;
     }
@@ -871,5 +1136,49 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Integer getProcessedMeshGuids() {
+        return processedMeshGuids;
+    }
+
+    public void setProcessedMeshGuids(Integer processedMeshGuids) {
+        this.processedMeshGuids = processedMeshGuids;
+    }
+
+    public Boolean getShowProcessedMeshGuids() {
+        return showProcessedMeshGuids;
+    }
+
+    public void setShowProcessedMeshGuids(Boolean showProcessedMeshGuids) {
+        this.showProcessedMeshGuids = showProcessedMeshGuids;
+    }
+
+    public void setSelectOrgType(int id) {
+        this.selectOrgType = SelectedOrgListType.values()[id];
+    }
+
+    public String getOrgItemsPreorderFilter() {
+        return orgItemsPreorderFilter;
+    }
+
+    public void setOrgItemsPreorderFilter(String orgItemsPreorderFilter) {
+        this.orgItemsPreorderFilter = orgItemsPreorderFilter;
+    }
+
+    public String getOrgItemsRemoveDupFilter() {
+        return orgItemsRemoveDupFilter;
+    }
+
+    public void setOrgItemsRemoveDupFilter(String orgItemsRemoveDupFilter) {
+        this.orgItemsRemoveDupFilter = orgItemsRemoveDupFilter;
+    }
+
+    public String getOrgItemsLoadMeshFilter() {
+        return orgItemsLoadMeshFilter;
+    }
+
+    public void setOrgItemsLoadMeshFilter(String orgItemsLoadMeshFilter) {
+        this.orgItemsLoadMeshFilter = orgItemsLoadMeshFilter;
     }
 }

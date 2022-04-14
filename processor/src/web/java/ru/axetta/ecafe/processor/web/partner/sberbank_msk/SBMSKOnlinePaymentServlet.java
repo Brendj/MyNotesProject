@@ -115,6 +115,8 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
                     code = SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR;
                 } else if (e instanceof InvalidMobileException) {
                     code = SBMSKPaymentsCodes.INVALID_MOBILE_ERROR;
+                } else if (e instanceof InvalidClientException) {
+                    code = SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR;
                 } else {
                     code = SBMSKPaymentsCodes.INTERNAL_ERROR;
                 }
@@ -132,8 +134,11 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
 
             } catch (Exception e) {
                 SBMSKPaymentsCodes code;
-                if (e instanceof InvalidINNException)
+                if (e instanceof InvalidINNException) {
                     code = SBMSKPaymentsCodes.NOT_FOUND_INN;
+                } else if (e instanceof InvalidClientException) {
+                    code = SBMSKPaymentsCodes.CLIENT_NOT_FOUND_ERROR;
+                }
                 else {
                     code = SBMSKPaymentsCodes.INTERNAL_ERROR;
                     logger.error("Failed to process request", e);

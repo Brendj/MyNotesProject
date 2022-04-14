@@ -33,13 +33,14 @@ public class EMPSendSmsToUserService implements IAuthorizeUserBySms {
     public String sendCodeAndGetError(User user, String code) throws IOException {
         logger.info("Start using new EMP service");
         EMPReqestSmsType empReqestSmsType = new EMPReqestSmsType(
-                RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.token", ""),
                 user.getPhone(),
                 String.format("Код авторизации - %s", code),
                 RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.source", ""));
 
         PostMethod httpMethod = new PostMethod(RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.url", ""));
         httpMethod.addRequestHeader("Content-Type", "application/json; charset=utf-8");
+        httpMethod.addRequestHeader("x-ext-emp-token",
+                RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.token", ""));
         setParametrsForRequest(httpMethod, empReqestSmsType);
         String response = "";
         try {
@@ -66,13 +67,12 @@ public class EMPSendSmsToUserService implements IAuthorizeUserBySms {
             return errCode;
         } catch (Exception e) {
             return String.format("Error parsing response from EMP: %s", response);
-        }
-        finally {
+        } finally {
             httpMethod.releaseConnection();
         }
     }
 
-    private void setParametrsForRequest (PostMethod httpMethod, EMPReqestSmsType empReqestSmsType) throws IOException {
+    private void setParametrsForRequest(PostMethod httpMethod, EMPReqestSmsType empReqestSmsType) throws IOException {
         //Установка параметров запроса
         ObjectMapper objectMapper = new ObjectMapper();
         String serialized = objectMapper.writeValueAsString(empReqestSmsType);

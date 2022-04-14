@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import org.hibernate.Transaction;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
@@ -87,10 +88,14 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void apply() throws Exception {
         Session session = null;
+        Transaction persistenceTransaction = null;
         changedData = false;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
             builder.applyChanges(session, items);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             setItems(builder.getItems(session, startDate, endDate, idOfOrg));
         } finally {
             HibernateUtils.close(session, logger);

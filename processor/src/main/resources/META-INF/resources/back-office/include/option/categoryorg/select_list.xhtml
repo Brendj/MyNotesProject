@@ -8,8 +8,8 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalCategoryOrgListSelectorPanel" autosized="true"
-                     headerClass="modal-panel-header">
+    <rich:popupPanel modal="true" id="modalCategoryOrgListSelectorPanel" autosized="true" minWidth="500" minHeight="650"
+                     followByScroll = "false" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalCategoryOrgListSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
             <h:outputText escape="true" value="Категории организаций"/>

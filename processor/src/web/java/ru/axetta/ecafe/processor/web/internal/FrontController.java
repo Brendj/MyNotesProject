@@ -1730,9 +1730,16 @@ public class FrontController extends HttpServlet {
                     exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 }
             } else {
-                exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
-                if (exCard != null) {
-                    throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
+                if (!isLongUid) {
+                    exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                    if (exCard != null && !exCard.getState().equals(CardState.BLOCKED.getValue())) {
+                        throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                    }
+                } else {
+                    exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
+                    if (exCard != null) {
+                        throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
+                    }
                 }
             }
             if (null == exCard) {

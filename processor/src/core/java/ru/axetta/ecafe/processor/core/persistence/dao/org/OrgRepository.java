@@ -48,7 +48,8 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
     public List<OrgItem> findAllNames(){
         List<OrgItem> orgItemList = new ArrayList<OrgItem>();
-        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs  WHERE State =1 and OrganizationType=0 ORDER BY OfficialName ");
+        Query nativeQuery = entityManager.createNativeQuery(
+                "SELECT IdOfOrg, ShortName, District FROM CF_Orgs  WHERE State =1 ORDER BY OfficialName ");
 
         List<Object[]> temp = nativeQuery.getResultList();
         for(Object[] o : temp){
@@ -110,7 +111,7 @@ public class OrgRepository extends AbstractJpaDao<Org> {
     public List<OrgItem> findAllNamesByContragentTSP(long idOfContragent){
         List<OrgItem> orgItemList = new ArrayList<OrgItem>();
         Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs "
-                + " WHERE State =1 and OrganizationType=0 and DefaultSupplier=:idOfContragent and RefectoryType != 3 ORDER BY OfficialName ")
+                + " WHERE State =1 and DefaultSupplier=:idOfContragent and RefectoryType != 3 ORDER BY OfficialName ")
                 .setParameter("idOfContragent",idOfContragent);
 
         List<Object[]> temp = nativeQuery.getResultList();
@@ -124,7 +125,7 @@ public class OrgRepository extends AbstractJpaDao<Org> {
     public List<OrgItem> findAllNamesByContragentTSPByListOfOrgIds(long idOfContragent, List<Long> idOfOrgList){
         List<OrgItem> orgItemList = new ArrayList<OrgItem>();
         Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs "
-                + " WHERE State =1 and OrganizationType=0 and DefaultSupplier=:idOfContragent and RefectoryType != 3 and IdOfOrg in (:idOfOrgList) ORDER BY OfficialName ")
+                + " WHERE State =1 and DefaultSupplier=:idOfContragent and RefectoryType != 3 and IdOfOrg in (:idOfOrgList) ORDER BY OfficialName ")
                 .setParameter("idOfContragent",idOfContragent)
                 .setParameter("idOfOrgList", idOfOrgList);
 

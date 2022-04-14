@@ -8,8 +8,8 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="false" width="780" height="800"
-                     headerClass="modal-panel-header">
+    <rich:popupPanel modal="true" id="modalOrgSelectorPanel" autosized="true" minWidth="850" minHeight="950"
+                     followByScroll = "false" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
             <h:outputText escape="true" value="Выбор организации"/>
@@ -34,24 +34,34 @@
                                 <h:outputText escape="true" value="Фильтр: " styleClass="output-text"/>
                                 <h:inputText value="#{mainPage.orgSelectPage.filter}" size="48" maxlength="128"
                                              styleClass="input-text">
+                                    <a4j:ajax event="keyup" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:inputText>
                                 <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text"/>
                                 <h:inputText value="#{mainPage.orgSelectPage.idFilter}" size="48" maxlength="128"
                                              styleClass="input-text">
+                                    <a4j:ajax event="keyup" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:inputText>
                                 <h:outputText escape="true" value="ID в НСИ-3: " styleClass="output-text"/>
                                 <h:inputText value="#{mainPage.orgSelectPage.orgIdFromNsi}" size="48" maxlength="10"
                                              styleClass="input-text">
+                                    <a4j:ajax event="keyup" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:inputText>
                                 <h:outputText escape="true" value="ЕКИС Id: " styleClass="output-text"/>
                                 <h:inputText value="#{mainPage.orgSelectPage.ekisId}" size="48" maxlength="10"
                                              styleClass="input-text">
+                                    <a4j:ajax event="keyup" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:inputText>
                                 <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text"/>
                                 <h:selectOneMenu id="regionsList" value="#{mainPage.orgSelectPage.region}"
                                                  style="width:325px;"
                                                  disabled="#{mainPage.orgSelectPage.districtFilterDisabled}">
                                     <f:selectItems value="#{mainPage.orgSelectPage.regions}"/>
+                                    <a4j:ajax event="change" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:selectOneMenu>
                                 <h:outputText escape="true" value="Поставщик питания: " styleClass="output-text"/>
                                 <h:selectOneMenu id="contragentList"
@@ -59,13 +69,11 @@
                                                  value="#{mainPage.orgSelectPage.idOfSelectedContragent}"
                                                  styleClass="output-text" style="width:325px;">
                                     <f:selectItems value="#{mainPage.orgSelectPage.contragentsList}"/>
+                                    <a4j:ajax event="change" listener="#{mainPage.updateOrgSelectPage}"
+                                              render="modalOrgSelectorOrgTable" />
                                 </h:selectOneMenu>
                             </h:panelGrid>
                             <h:panelGrid columns="2" styleClass="borderless-grid">
-                                <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" render="modalOrgSelectorForm"
-                                                 styleClass="command-link">
-                                    <h:graphicImage value="/images/16x16/search.png" style="border: 0;"/>
-                                </a4j:commandLink>
                                 <a4j:commandLink
                                         action="#{mainPage.clearOrgSelectPage}"
                                         render="modalOrgSelectorForm"
@@ -84,8 +92,8 @@
                                     <h:panelGrid columns="2">
                                         <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
                                             <a4j:ajax event="click"
-                                                      action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
-                                                      render="modalOrgSelectorForm"/>
+                                                      listener="#{mainPage.updateOrgSelectPageWithItemDeselection}"
+                                                      render="modalOrgSelectorOrgTable"/>
                                         </h:selectBooleanCheckbox>
                                         <h:outputText styleClass="output-text" value="#{item.typeName}"/>
                                     </h:panelGrid>

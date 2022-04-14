@@ -59,6 +59,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showOtherSetting = true;
     private Boolean allFriendlyOrgs = true;
 
+    private Boolean allUseWebArmAdmin = true;
     private Boolean allUseWebArm = true;
     private Boolean allUsePaydableSubscriptionFeeding = true;
     private Boolean allVariableFeeding = true;
@@ -75,6 +76,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allUseMealSchedule = true;
 
     private void resetSelectedColumns() {
+        allUseWebArmAdmin = true;
         allUseWebArm = true;
         allUsePaydableSubscriptionFeeding = true;
         allVariableFeeding = true;
@@ -97,6 +99,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             return;
         }
         for(OrgSettingsReportItem item : items){
+            allUseWebArmAdmin &= item.getUseWebArmAdmin();
             allUseWebArm &= item.getUseWebArm();
             allUsePaydableSubscriptionFeeding &= item.getUsePaydableSubscriptionFeeding();
             allVariableFeeding &= item.getVariableFeeding();
@@ -214,6 +217,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     break;
                 case 13:
                     item.setUseMealSchedule(allUseMealSchedule);
+                    break;
+                case 14:
+                    item.setUseWebArmAdmin(allUseWebArmAdmin);
                     break;
             }
             item.change();
@@ -357,13 +363,16 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                             session, lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
 
-                    if(!item.getUseWebArm().equals(org.getUseWebArm())){
+                    if(!item.getUseWebArm().equals(org.getUseWebArm())
+                            || !item.getUseWebArmAdmin().equals(org.getUseWebArmAdmin())){
                         org.setUseWebArm(item.getUseWebArm());
+                        org.setUseWebArmAdmin(item.getUseWebArmAdmin());
                         for(Org friendlyOrg : org.getFriendlyOrg()){
                             if(friendlyOrg.equals(org)){
                                 continue;
                             }
                             friendlyOrg.setUseWebArm(item.getUseWebArm());
+                            friendlyOrg.setUseWebArmAdmin(item.getUseWebArmAdmin());
                         }
                     }
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, item.getUseMealSchedule(), session,
@@ -497,6 +506,14 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllUseWebArm(Boolean allUseWebArm) {
         this.allUseWebArm = allUseWebArm;
+    }
+
+    public Boolean getAllUseWebArmAdmin() {
+        return allUseWebArmAdmin;
+    }
+
+    public void setAllUseWebArmAdmin(Boolean allUseWebArmAdmin) {
+        this.allUseWebArmAdmin = allUseWebArmAdmin;
     }
 
     public Boolean getAllUsePaydableSubscriptionFeeding() {

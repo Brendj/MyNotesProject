@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.event;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRuleRoute;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ReportConditionItem;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,18 +55,16 @@ public class EventNotificationListPage extends BasicWorkspacePage {
             }
             this.documentFormat = reportHandleRule.getDocumentFormat();
             this.subject = reportHandleRule.getSubject();
-            this.routeAddresses = new LinkedList<String>();
-            addAddress(this.routeAddresses, reportHandleRule.getRoute0());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute1());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute2());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute3());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute4());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute5());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute6());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute7());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute8());
-            addAddress(this.routeAddresses, reportHandleRule.getRoute9());
-            this.ruleConditionItems = new LinkedList<ReportConditionItem>();
+
+            this.routeAddresses = new LinkedList<>();
+            this.routeAddresses.addAll(
+                    reportHandleRule.getRoutes()
+                            .stream()
+                            .map(ReportHandleRuleRoute::getRoute)
+                            .collect(Collectors.toList())
+            );
+
+            this.ruleConditionItems = new LinkedList<>();
             for (RuleCondition currRuleCondition : ruleConditions) {
                 if (currRuleCondition.isTypeCondition()) {
                     this.ruleConditionItems.add(new ReportConditionItem(currRuleCondition));
@@ -74,12 +74,6 @@ public class EventNotificationListPage extends BasicWorkspacePage {
 
         public boolean isEnabled() {
             return enabled;
-        }
-
-        private static void addAddress(List<String> addresses, String newAddress) {
-            if (StringUtils.isNotEmpty(newAddress)) {
-                addresses.add(newAddress);
-            }
         }
 
         private static String cutRuleName(String ruleName) {
@@ -147,11 +141,10 @@ public class EventNotificationListPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
+        List<RuleItem> newRuleItems = new LinkedList<>();
         Criteria notificationRulesCriteria = ReportHandleRule.createAllEventNotificationsCriteria(session);
-        List rules = notificationRulesCriteria.list();
-        for (Object currObject : rules) {
-            ReportHandleRule currRule = (ReportHandleRule) currObject;
+        List<ReportHandleRule> rules = notificationRulesCriteria.list();
+        for (ReportHandleRule currRule : rules) {
             newRuleItems.add(new RuleItem(session, currRule));
         }
         this.ruleItems = newRuleItems;
