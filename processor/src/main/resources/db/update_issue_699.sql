@@ -50,6 +50,8 @@ COMMENT ON COLUMN CF_Dul_Detail.CreateDate IS 'Дата создания зап�
 COMMENT ON COLUMN CF_Dul_Detail.LastUpdate IS 'Дата изменения записи';
 COMMENT ON COLUMN CF_Dul_Detail.DeleteState IS 'Признак удаления ';
 
+INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (15, 'Паспорт РФ');
+
 INSERT INTO cf_dul_detail (idofclient, document_type_id, series, number, createdate, lastupdate)
 SELECT idofclient, int4(15), passportseries, passportnumber,
        cast(extract(epoch from now()) * 1000 as bigint),
