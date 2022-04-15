@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
@@ -536,6 +537,7 @@ public class Client {
     public void setClientGroup(ClientGroup clientGroup) {
         // For Hibernate only
         this.clientGroup = clientGroup;
+        ClientParallel.addFoodBoxModifire(this);
     }
 
     public Person getPerson() {
@@ -1268,6 +1270,7 @@ public class Client {
 
     public void setParallel(String parallel) {
         this.parallel = parallel;
+        ClientParallel.addFoodBoxModifire(this);
     }
 
     public Boolean getUserOP() {
@@ -1296,7 +1299,7 @@ public class Client {
 
     public Boolean getFoodboxAvailability() {
         if (foodboxAvailability == null)
-            foodboxAvailability = true;
+            foodboxAvailability = false;
         return foodboxAvailability;
     }
 
