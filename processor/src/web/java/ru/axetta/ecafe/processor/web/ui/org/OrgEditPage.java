@@ -458,7 +458,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseLongCardNo(useLongCardNo);
         org.setUsedFoodbox(usedfoodbox);
         //Параллели для фудбокса
-        List<Client> clients = DAOUtils.findClientsByOrgFoodBox(session, idOfOrg);
+        List<Client> clients = DAOUtils.findClientsByOrg(session, idOfOrg);
         if (!usedfoodbox) {
             //Если фудбокс выключен, то удаляем настройки параллелей для орги
             for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {

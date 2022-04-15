@@ -5758,12 +5758,4 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         return (Contragent) query.uniqueResult();
     }
-
-    public static List<Client> findClientsByOrgFoodBox(Session session, Long idOfOrg) {
-        Criteria criteria = session.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        //Параметр null будет у тех, у кого не менялся параметр вообще (родители, педагоги и др.)
-        criteria.add(Restrictions.not(Restrictions.eq("foodboxAvailability", null)));
-        return criteria.list();
-    }
 }
