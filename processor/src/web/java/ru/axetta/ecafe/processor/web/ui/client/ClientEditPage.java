@@ -345,6 +345,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
+    private String middleGroup;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -707,6 +708,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setSpecialMenu(Boolean specialMenu) {
         this.specialMenu = specialMenu;
+    }
+
+    public String getMiddleGroup() {
+        return middleGroup;
+    }
+
+    public void setMiddleGroup(String middleGroup) {
+        this.middleGroup = middleGroup;
     }
 
     public void fill(Session session, Long idOfClient) throws Exception {
@@ -1201,6 +1210,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPassportNumber(this.passportNumber);
         client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
+        client.setMiddleGroup(this.middleGroup);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
