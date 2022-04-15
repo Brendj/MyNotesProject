@@ -487,28 +487,38 @@ public class OrgEditPage extends BasicWorkspacePage
                 foodBoxOrgParallel1.setOrg(foodBoxOrgParallel.getOrg());
                 foodBoxOrgParallelsCopy.add(foodBoxOrgParallel1);
             }
+            //Список параллелей, для которых мы убрали активность фудбокса
+            List<Integer> parallelsOld = new ArrayList<>();
+            //Список параллелей, для которых мы включили фудбокс
+            List<Integer> parallelsNew = new ArrayList<>();
             //Сначала обновляем записи в бд, которые уже есть по орг
-            Iterator<FoodBoxOrgParallel> iteratorBD = foodBoxOrgParallelsCopy.iterator();
-            while (iteratorBD.hasNext()) {
-                FoodBoxOrgParallel foodBoxOrgParallel = iteratorBD.next();
+            Iterator<FoodBoxOrgParallel> iteratorBDcopy = foodBoxOrgParallelsCopy.iterator();
+            while (iteratorBDcopy.hasNext()) {
+                FoodBoxOrgParallel foodBoxOrgParallelCopy = iteratorBDcopy.next();
                 Iterator<FoodBoxParallelUI> iteratorUI = foodBoxParallelUIS.iterator();
                 while (iteratorUI.hasNext()) {
                     FoodBoxParallelUI foodBoxOrgParallelUI = iteratorUI.next();
-                    if (foodBoxOrgParallel.getParallel().equals(foodBoxOrgParallelUI.getParallel())) {
+                    if (foodBoxOrgParallelCopy.getParallel().equals(foodBoxOrgParallelUI.getParallel())) {
                         //Мы должны обновить реальный об.ект в бд, а не его копию
                         for (FoodBoxOrgParallel foodBoxOrgParallelReal: org.getFoodBoxParallels()) {
                             if (foodBoxOrgParallelReal.getParallel().equals(foodBoxOrgParallelUI.getParallel())) {
                                 foodBoxOrgParallelReal.setAvailable(foodBoxOrgParallelUI.isAvailable());
+                                if (foodBoxOrgParallelUI.isAvailable())
+                                {
+                                    parallelsNew.add(foodBoxOrgParallelUI.getParallel());
+                                } else
+                                {
+                                    parallelsOld.add(foodBoxOrgParallelUI.getParallel());
+                                }
                                 session.update(foodBoxOrgParallelReal);
                                 break;
                             }
                         }
-                        iteratorBD.remove();
+                        iteratorBDcopy.remove();
                         iteratorUI.remove();
                     }
                 }
             }
-            List<Integer> parallelsOld = new ArrayList<>();
             for (FoodBoxOrgParallel foodBoxOrgParallel: foodBoxOrgParallelsCopy) {
                 //Если параллель больше не доступна
                 //Мы должны удалить реальный объект в бд, а не его копию
@@ -530,7 +540,6 @@ public class OrgEditPage extends BasicWorkspacePage
                     session.update(client);
                 }
             }
-            List<Integer> parallelsNew = new ArrayList<>();
             for (FoodBoxParallelUI foodBoxParallelUI: foodBoxParallelUIS) {
                 //Если добавили новую параллель
                 FoodBoxOrgParallel foodBoxOrgParallel = new FoodBoxOrgParallel();
@@ -539,7 +548,8 @@ public class OrgEditPage extends BasicWorkspacePage
                 foodBoxOrgParallel.setAvailable(foodBoxParallelUI.isAvailable());
                 session.persist(foodBoxOrgParallel);
                 org.getFoodBoxParallels().add(foodBoxOrgParallel);
-                parallelsNew.add(foodBoxParallelUI.getParallel());
+                if (foodBoxParallelUI.isAvailable())
+                    parallelsNew.add(foodBoxParallelUI.getParallel());
             }
             //Проставляем у всех клиентов из новых параллелей для орг флаг доступности фудбокса
             for (Client client: clients)
