@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxParallelType;
@@ -457,12 +458,20 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseLongCardNo(useLongCardNo);
         org.setUsedFoodbox(usedfoodbox);
         //Параллели для фудбокса
+        List<Client> clients = DAOUtils.findClientsByOrgFoodBox(session, idOfOrg);
         if (!usedfoodbox) {
             //Если фудбокс выключен, то удаляем настройки параллелей для орги
             for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {
                 session.delete(foodBoxOrgParallel);
             }
             org.setFoodBoxParallels(null);
+
+            //Отключаем все настройки доступа для клиентов в футбокс
+            for (Client client: clients)
+            {
+                client.setFoodboxAvailability(false);
+                session.update(client);
+            }
         } else
         {
             //Снимаем копию с оригинальной коллекции org.getFoodBoxParallels() т.к. потом из копии будет удаление
@@ -496,23 +505,47 @@ public class OrgEditPage extends BasicWorkspacePage
                     }
                 }
             }
+            List<Integer> parallelsOld = new ArrayList<>();
             for (FoodBoxOrgParallel foodBoxOrgParallel: foodBoxOrgParallelsCopy) {
+                //Если параллель больше не доступна
                 //Мы должны удалить реальный объект в бд, а не его копию
                 for (FoodBoxOrgParallel foodBoxOrgParallelReal: org.getFoodBoxParallels()) {
                     if (foodBoxOrgParallelReal.getFoodboxparallelId().equals(foodBoxOrgParallel.getFoodboxparallelId())) {
                         session.delete(foodBoxOrgParallelReal);
                         org.getFoodBoxParallels().remove(foodBoxOrgParallelReal);
+                        parallelsOld.add(foodBoxOrgParallelReal.getParallel());
                         break;
                     }
                 }
             }
+            //Проставляем у всех клиентов из убранных параллелей для орг флаг не доступности фудбокса
+            for (Client client: clients)
+            {
+                if (parallelsOld.contains(ClientParallel.getClientParallel(client)))
+                {
+                    client.setFoodboxAvailability(false);
+                    session.update(client);
+                }
+            }
+            List<Integer> parallelsNew = new ArrayList<>();
             for (FoodBoxParallelUI foodBoxParallelUI: foodBoxParallelUIS) {
+                //Если добавили новую параллель
                 FoodBoxOrgParallel foodBoxOrgParallel = new FoodBoxOrgParallel();
                 foodBoxOrgParallel.setParallel(foodBoxParallelUI.getParallel());
                 foodBoxOrgParallel.setOrg(org);
                 foodBoxOrgParallel.setAvailable(foodBoxParallelUI.isAvailable());
                 session.persist(foodBoxOrgParallel);
                 org.getFoodBoxParallels().add(foodBoxOrgParallel);
+                parallelsNew.add(foodBoxParallelUI.getParallel());
+            }
+            //Проставляем у всех клиентов из новых параллелей для орг флаг доступности фудбокса
+            for (Client client: clients)
+            {
+                if (parallelsNew.contains(ClientParallel.getClientParallel(client)))
+                {
+                    client.setFoodboxAvailability(true);
+                    session.update(client);
+                }
             }
         }
 

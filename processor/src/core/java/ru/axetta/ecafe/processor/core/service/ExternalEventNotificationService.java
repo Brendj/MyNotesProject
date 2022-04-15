@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -109,7 +110,7 @@ public class ExternalEventNotificationService {
                     .findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
             Integer clas;
             try {
-                clas = extractDigits(client.getClientGroup().getGroupName());
+                clas = ClientParallel.extractDigits(client.getClientGroup().getGroupName());
             } catch (NumberFormatException e) //т.е. в названии группы нет чисел
             {
                 clas = 0;
@@ -198,19 +199,6 @@ public class ExternalEventNotificationService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-    }
-
-    public Integer extractDigits(String src) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < src.length(); i++) {
-            char c = src.charAt(i);
-            if (Character.isDigit(c)) {
-                builder.append(c);
-            } else {
-                return Integer.valueOf(builder.toString());
-            }
-        }
-        return Integer.valueOf(builder.toString());
     }
 
     public boolean ClientHaveDiscount(Session session, Client client) {
