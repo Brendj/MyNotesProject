@@ -756,8 +756,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
-        this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
-        this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
+        if(dulDetailPassport != null) {
+            this.passportNumber = dulDetailPassport.getNumber();
+            this.passportSeries = dulDetailPassport.getSeries();
+        }
 
         fill(session, client);
     }
