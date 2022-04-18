@@ -17,7 +17,7 @@ public class CatalogService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-    public boolean educationFormIsHomeStudy(PersonEducation actualEdu) throws Exception {
+    public boolean educationFormIsHomeStudy(PersonEducation actualEdu) {
         EducationForm educationForm = actualEdu.getEducationForm();
         if(educationForm == null){
             throw new IllegalArgumentException("Arguments educationForm is NULL");
@@ -25,7 +25,7 @@ public class CatalogService {
 
         TrainingForm form = trainingFormRepo.getByIdAndArchiveIsFalse(educationForm.getId());
         if(form == null){
-            throw new Exception(String.format("TrainingForm by ID %d does exists", educationForm.getId()));
+            return false;
         }
         return form.getEducationForm().contains("Вне");
     }

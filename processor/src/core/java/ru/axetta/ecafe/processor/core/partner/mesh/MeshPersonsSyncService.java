@@ -135,7 +135,9 @@ public class MeshPersonsSyncService {
         }
         Integer id = education.getEducationForm() == null ? education.getEducationFormId() : education.getEducationForm().getId();
         MeshTrainingForm trainingForm = trainingForms.get(id);
-        if (trainingForm == null) throw new Exception(String.format("TrainingForm by ID %d does exists", id));
+        if (trainingForm == null){
+            return false;
+        }
         return trainingForm.getEducation_form().contains(OUT_ORG_GROUP_PREFIX);
     }
 
