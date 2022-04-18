@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -44,6 +45,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
+
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
@@ -52,6 +54,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
     private String fax;
+
+    public ClientEditPage() {
+    }
 
     public void setFax(String fax) {
         this.fax = fax;
@@ -748,6 +753,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
 
+        DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .getDulDetail(client, Client.PASSPORT_RF_TYPE);
+
+        this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
+        this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
+
         fill(session, client);
     }
 
@@ -1058,7 +1069,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet, client.getDiscountMode(), discountMode,
                         DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
                 client.setLastDiscountsUpdate(new Date());
-            } catch (Exception ignore){}
+            } catch (Exception ignore) {
+            }
         }
 
         if (CollectionUtils.isEmpty(this.idOfCategoryList)) {
@@ -1082,8 +1094,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
             //Для 17 типа мы не можем менять напрямую, только через 11
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
                 continue;
             }
 
@@ -1096,8 +1107,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
 
             //Если поменяли 11, то меняем и 17 событие
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                 ClientNotificationSetting culture = new ClientNotificationSetting(client, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
                 if (item.isEnabled()) {
                     client.getNotificationSettings().add(culture);
@@ -1180,7 +1190,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) || (this.idOfClientGroup == null
                     && client.getIdOfClientGroup() != null) || (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
-				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
                 clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                 clientGuardianHistory.setReason(String.format("Обновление данных клиента через карточку клиента id = %s",
@@ -1198,21 +1208,23 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setBirthDate(this.birthDate);
         client.setAgeTypeGroup(this.ageTypeGroup);
         client.setSpecialMenu(this.specialMenu);
-        client.setPassportNumber(this.passportNumber);
-        client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
+
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
         persistenceSession.update(client);
 
-        fill(persistenceSession, client);
+        fill(persistenceSession, client.getIdOfClient());
 
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
     }
+
 
     public void deletePDClient() throws Exception {
         this.person.firstName = "Ручная обработка";
@@ -1231,27 +1243,27 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public boolean predefined() {
-        if(ClientGroup.Predefined.parse(this.clientGroupName) == null)
+        if (ClientGroup.Predefined.parse(this.clientGroupName) == null)
             return true;
         else
             return false;
     }
 
     private void validateExistingGuardians() throws Exception {
-        if(clientGuardianItems.isEmpty()) {
+        if (clientGuardianItems.isEmpty()) {
             return;
         }
         StringBuilder notValidGuardianSB = new StringBuilder();
         StringBuilder notValidRepresentative = new StringBuilder();
-        for(ClientGuardianItem item : clientGuardianItems){
-            if(item.getRelation().equals(-1)){
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (item.getRelation().equals(-1)) {
                 notValidGuardianSB.append(item.getPersonName()).append(" ");
             }
             if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
                 notValidRepresentative.append(item.getPersonName()).append(" ");
             }
         }
-        if(notValidGuardianSB.length() > 0){
+        if (notValidGuardianSB.length() > 0) {
             throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
         }
         if (notValidRepresentative.length() > 0) {
@@ -1300,6 +1312,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getCategories().remove(categoryDiscount);
             }
         }
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .deleteDulDetail(persistenceSession, client, Client.PASSPORT_RF_TYPE);
+
         persistenceSession.delete(client);
     }
 
@@ -1349,9 +1364,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         removeListGuardianItems.clear();
         removeListWardItems.clear();
         this.lastConfirmMobile = client.getLastConfirmMobile();
-        this.specialMenu = client.getSpecialMenu();
-        this.passportNumber = client.getPassportNumber();
-        this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
         this.inOrgEnabledMultiCardMode = client.getOrg().multiCardModeIsEnabled();
@@ -1448,7 +1460,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         result[0] = new SelectItem(-1, "");
         int i = 0;
         for (ClientGuardianRelationType relType : ClientGuardianRelationType.values()) {
-            result[i+1] = new SelectItem(relType.getCode(), relType.getDescription());
+            result[i + 1] = new SelectItem(relType.getCode(), relType.getDescription());
             i++;
         }
 

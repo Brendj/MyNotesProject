@@ -60,6 +60,7 @@ public class Client {
     public static final String[] GROUP_NAME = {"Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
     public static final String[] GROUP_NAME_SCHOOL = {"Средняя школа","Основное общее образование","Начальное общее образование",
                                                "Среднее общее образование"};
+    public static final int PASSPORT_RF_TYPE = 15;
 
     private Long idOfClient;
     private long version;
@@ -153,6 +154,7 @@ public class Client {
 
     private Boolean userOP;
     private ClientsMobileHistory clientsMobileHistory = null;
+    private Set<DulDetail> dulDetail;
 
     protected Client() {
         // For Hibernate only
@@ -1291,5 +1293,13 @@ public class Client {
 
     public void setClearedSsoid(Boolean clearedSsoid) {
         this.clearedSsoid = clearedSsoid;
+    }
+
+    public Set<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(Set<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
     }
 }

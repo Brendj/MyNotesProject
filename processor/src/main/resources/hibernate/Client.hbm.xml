@@ -212,6 +212,12 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
         </set>
+        <set name="dulDetail" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DulDetail"/>
+        </set>
     </class>
 </hibernate-mapping>
 
