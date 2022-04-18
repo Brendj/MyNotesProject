@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
@@ -575,14 +576,18 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.specialMenu = client.getSpecialMenu();
         this.allowedPreorder = ClientManager.getAllowedPreorderByClient(session, client.getIdOfClient(), null);
-        this.passportNumber = client.getPassportNumber();
-        this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         this.parallel = client.getParallel();
         this.userOP = client.getUserOP();
 
-        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
+        DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
+        this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
+        this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
+
+        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                .getBalanceHoldListAsString(session, client.getIdOfClient());
     }
 
     public static List<ClientDiscountItem> buildClientDiscountItem(Session session, Client client) {
