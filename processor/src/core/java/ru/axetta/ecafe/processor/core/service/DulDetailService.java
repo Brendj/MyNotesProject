@@ -17,8 +17,10 @@ public class DulDetailService {
 
         DulDetail dulDetail = getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
-        if (passportNumber.isEmpty() && passportSeries.isEmpty() && dulDetail != null)
+        if (passportNumber.isEmpty() && passportSeries.isEmpty() && dulDetail != null){
             deleteDulDetail(session, dulDetail, Client.PASSPORT_RF_TYPE);
+            return;
+        }
 
         if (!passportSeries.isEmpty() && passportNumber.isEmpty())
             throw new Exception("Не заполнено поле \"Номер паспорта\"");
@@ -26,11 +28,13 @@ public class DulDetailService {
         if (passportSeries.isEmpty() && !passportNumber.isEmpty())
             throw new Exception("Не заполнено поле \"Серия паспорта\"");
 
-        if (!passportSeries.isEmpty() && dulDetail != null)
+        if (!passportSeries.isEmpty() && dulDetail != null) {
             updateDulDetail(session, dulDetail, passportNumber, passportSeries);
-        else if (!passportSeries.isEmpty())
+        }
+        else if (!passportSeries.isEmpty()) {
             createDulDetail(session, client.getIdOfClient(), Client.PASSPORT_RF_TYPE,
                     passportNumber, passportSeries);
+        }
     }
 
     public void deleteDulDetail(Session session, DulDetail dulDetail, int type) {
