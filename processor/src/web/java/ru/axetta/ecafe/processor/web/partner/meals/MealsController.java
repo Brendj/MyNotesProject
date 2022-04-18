@@ -840,9 +840,9 @@ public class MealsController extends Application {
         if (!ClientParallel.verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            result.setCode(ResponseCodes.RC_OK.getCode().toString());
-            result.setDescription(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         Boolean errorOrg = false;
         try {

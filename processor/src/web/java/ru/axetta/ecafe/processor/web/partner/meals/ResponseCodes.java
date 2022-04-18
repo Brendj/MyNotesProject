@@ -17,7 +17,8 @@ public enum ResponseCodes {
     RC_NOT_FOUND_CLIENT(150L, "Клиент не найден"),
     RC_NOT_FOUND_ORG(160L, "У организации не включен функционал"),
     RC_NOT_FOUND_FOODBOX(170L, "Заявка не найдена"),
-    RC_FOUND_FOODBOX(180L, "Заявка с данных идентификатором уже зарегистрирована");
+    RC_FOUND_FOODBOX(180L, "Заявка с данных идентификатором уже зарегистрирована"),
+    RC_NOT_FOUND_AVAILABLE_PARALLEL (190L, "Параллель клиента недоступна для фудбокса");
 
     private final Long code;
     private final String description;
