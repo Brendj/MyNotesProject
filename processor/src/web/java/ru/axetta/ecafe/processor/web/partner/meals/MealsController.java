@@ -831,6 +831,13 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
+        if (!ClientParallel.verifyParallelForClient(client))
+        {
+            logger.error("Клиент не входит в параллель");
+            result.setCode(ResponseCodes.RC_OK.getCode().toString());
+            result.setDescription(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
+        }
         Boolean errorOrg = false;
         try {
             if (!client.getOrg().getUsedFoodbox()) {
@@ -956,10 +963,12 @@ public class MealsController extends Application {
         //Проверяем, что параллель клиента доступна для заказа фудбокса
         if (!ClientParallel.verifyParallelForClient(client))
         {
+            logger.error("Клиент не входит в параллель");
             return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(clientDataMain).build();
         }
         else
         {
+            logger.error("Клиент входит в параллель");
             return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
         }
     }
