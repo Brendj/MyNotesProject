@@ -12,13 +12,13 @@ import java.util.Date;
 @Scope(value = "singleton")
 public class DulDetailService {
 
-    public void validateDulDetailPassport(Session persistenceSession, Client client,
-                                          String passportNumber, String passportSeries) throws Exception {
+    public void validateAndSetDulDetailPassport(Session session, Client client,
+                                                String passportNumber, String passportSeries) throws Exception {
 
-        DulDetail dulDetail = getDulDetail(client, Client.PASSPORT_RF_TYPE);
+        DulDetail dulDetail = getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
         if (passportNumber.isEmpty() && passportSeries.isEmpty() && dulDetail != null)
-            deleteDulDetail(persistenceSession, client, Client.PASSPORT_RF_TYPE);
+            deleteDulDetail(session, dulDetail, Client.PASSPORT_RF_TYPE);
 
         if (!passportSeries.isEmpty() && passportNumber.isEmpty())
             throw new Exception("Не заполнено поле \"Номер паспорта\"");
@@ -27,18 +27,17 @@ public class DulDetailService {
             throw new Exception("Не заполнено поле \"Серия паспорта\"");
 
         if (!passportSeries.isEmpty() && dulDetail != null)
-            updateDulDetail(persistenceSession, dulDetail, passportNumber, passportSeries);
+            updateDulDetail(session, dulDetail, passportNumber, passportSeries);
         else if (!passportSeries.isEmpty())
-            createDulDetail(persistenceSession, client.getIdOfClient(), Client.PASSPORT_RF_TYPE,
+            createDulDetail(session, client.getIdOfClient(), Client.PASSPORT_RF_TYPE,
                     passportNumber, passportSeries);
     }
 
-    public void deleteDulDetail(Session persistenceSession, Client client, int type) {
-        DulDetail dulDetail = getDulDetail(client, type);
+    public void deleteDulDetail(Session session, DulDetail dulDetail, int type) {
         if (dulDetail != null) {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
-            persistenceSession.update(dulDetail);
+            session.update(dulDetail);
         }
     }
 
@@ -63,7 +62,7 @@ public class DulDetailService {
         session.save(dulDetail);
     }
 
-    public DulDetail getDulDetail(Client client, int type) {
+    public DulDetail getDulDetailByClient(Client client, int type) {
         return client.getDulDetail()
                 .stream().filter(d -> d.getDocumentTypeId() == type && (
                         d.getDeleteState() == null || !d.getDeleteState()))

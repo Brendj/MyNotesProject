@@ -581,7 +581,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.userOP = client.getUserOP();
 
         DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .getDulDetail(client, Client.PASSPORT_RF_TYPE);
+                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
         this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
         this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();

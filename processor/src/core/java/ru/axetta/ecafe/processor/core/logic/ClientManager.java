@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -1120,8 +1121,11 @@ public class ClientManager {
         clientGuardianToSave.setRemarks(remark);
         clientGuardianToSave.setCreatedFrom(createdFrom);
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
-        clientGuardianToSave.setPassportNumber(passportNumber);
-        clientGuardianToSave.setPassportSeries(passportSeries);
+        if (passportNumber != null && passportSeries != null) {
+            RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                    .validateAndSetDulDetailPassport(session, clientGuardianToSave,
+                            passportNumber, passportSeries);
+        }
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         String ssoidOld = clientGuardianToSave.getSsoid();

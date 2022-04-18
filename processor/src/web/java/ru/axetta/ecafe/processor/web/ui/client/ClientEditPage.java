@@ -754,7 +754,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.changePassword = false;
 
         DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .getDulDetail(client, Client.PASSPORT_RF_TYPE);
+                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
 
         this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
         this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
@@ -1211,7 +1211,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setParallel(this.parallel);
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
+                .validateAndSetDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
@@ -1312,8 +1312,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getCategories().remove(categoryDiscount);
             }
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .deleteDulDetail(persistenceSession, client, Client.PASSPORT_RF_TYPE);
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        dulDetailService.deleteDulDetail(persistenceSession, dulDetailService
+                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE), Client.PASSPORT_RF_TYPE);
 
         persistenceSession.delete(client);
     }

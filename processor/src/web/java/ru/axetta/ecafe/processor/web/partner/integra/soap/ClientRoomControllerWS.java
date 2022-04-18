@@ -8883,8 +8883,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
                 guardian.setCreatedFromDesc(creatorMobile);
-                guardian.setPassportNumber(passportNumber);
-                guardian.setPassportSeries(passportSeries);
+                RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .validateAndSetDulDetailPassport(session, guardian, passportNumber, passportSeries);
                 session.update(guardian);
             }
 

@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
@@ -5639,12 +5640,12 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getBalanceToNotify() != null) {
                     client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
                 }
-                if (clientParamItem.getPassportNumber() != null) {
-                    client.setPassportNumber(clientParamItem.getPassportNumber());
+                if (clientParamItem.getPassportNumber() != null && clientParamItem.getPassportSeries() != null) {
+                    RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                            .validateAndSetDulDetailPassport(persistenceSession, client,
+                                    clientParamItem.getPassportNumber(), clientParamItem.getPassportSeries());
                 }
-                if (clientParamItem.getPassportSeries() != null) {
-                    client.setPassportSeries(clientParamItem.getPassportSeries());
-                }
+
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());

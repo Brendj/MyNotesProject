@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.idGenerator.IIdGenerator;
 import ru.axetta.ecafe.processor.core.utils.idGenerator.OrganizationUniqueGeneratorId;
 import ru.axetta.ecafe.processor.web.partner.schoolapi.Response.DTO.*;
@@ -526,9 +527,12 @@ public class SchoolApiService implements ISchoolApiService {
             iacClient.setBirthDate(client.getBirthDate());
             client.initClientMobileHistory(clientsMobileHistory);
             iacClient.setMobile(client.getMobile());
-            iacClient.setPassportSeries(client.getPassportSeries());
-            iacClient.setPassportNumber(client.getPassportNumber());
             iacClient.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
+            DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+            DulDetail dulDetailPassport = dulDetailService.getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
+            dulDetailService.validateAndSetDulDetailPassport(persistanceSession, iacClient,
+                    dulDetailPassport == null ? "" : dulDetailPassport.getNumber(),
+                    dulDetailPassport == null ? "" : dulDetailPassport.getSeries());
             persistanceSession.update(clientPerson);
             persistanceSession.update(iacClient);
             return;
