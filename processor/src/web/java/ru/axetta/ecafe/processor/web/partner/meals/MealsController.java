@@ -616,9 +616,9 @@ public class MealsController extends Application {
         //Проверяем параллель клиента
         if (!ClientParallel.verifyParallelForClient(client))
         {
-            result.setCode(ResponseCodes.RC_OK.getCode().toString());
-            result.setDescription(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         if (!client.getFoodboxAvailability()) {
             logger.error("У клиента не включен функционал фудбокса");
@@ -874,6 +874,7 @@ public class MealsController extends Application {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             client.setFoodboxAvailability(foodBoxAvailable);
+            client.setFoodboxavailabilityguardian(true);
             persistenceSession.merge(client);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -970,7 +971,7 @@ public class MealsController extends Application {
         if (!ClientParallel.verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(clientDataMain).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(clientDataMain).build();
         }
         else
         {

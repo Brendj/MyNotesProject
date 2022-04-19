@@ -35,7 +35,7 @@ public class MealsJwtFilter extends OncePerRequestFilter {
         String token = getMealsTokenFromRequest(servletRequest);
         try {
             MealsUserDetails customUserDetails;
-            if (!token.equals("test")) {
+            if (token == null || !token.equals("test")) {
                 jwtProvider.validateToken(token);
                 String msh = jwtProvider.getMshFromToken(token);
                 customUserDetails = new MealsUserDetails(msh);

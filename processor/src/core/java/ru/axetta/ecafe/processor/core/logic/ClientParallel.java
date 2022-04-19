@@ -9,9 +9,12 @@ public class ClientParallel {
     public static void addFoodBoxModifire (Client client)
     {
         //Автоматическое открытие/закрытие фудбокса в зависимости от параллели
-        if (verifyParallelForClient(client))
-        {
-            client.setFoodboxAvailability(true);
+        if (!client.getFoodboxavailabilityguardian()) {
+            if (verifyParallelForClient(client)) {
+                client.setFoodboxAvailability(true);
+            } else {
+                client.setFoodboxAvailability(false);
+            }
         }
     }
 

@@ -149,6 +149,7 @@ public class Client {
     private String iacRegId;
     private Boolean multiCardMode;
     private Boolean foodboxAvailability;
+    private Boolean foodboxavailabilityguardian;
 
     private String parallel;
 
@@ -537,7 +538,6 @@ public class Client {
     public void setClientGroup(ClientGroup clientGroup) {
         // For Hibernate only
         this.clientGroup = clientGroup;
-        ClientParallel.addFoodBoxModifire(this);
     }
 
     public Person getPerson() {
@@ -1254,7 +1254,6 @@ public class Client {
 
     public void setParallel(String parallel) {
         this.parallel = parallel;
-        ClientParallel.addFoodBoxModifire(this);
     }
 
     public Boolean getUserOP() {
@@ -1297,5 +1296,15 @@ public class Client {
 
     public void setDulDetail(Set<DulDetail> dulDetail) {
         this.dulDetail = dulDetail;
+    }
+	
+	public Boolean getFoodboxavailabilityguardian() {
+        if (foodboxavailabilityguardian == null)
+            foodboxavailabilityguardian = false;
+        return foodboxavailabilityguardian;
+    }
+
+    public void setFoodboxavailabilityguardian(Boolean foodboxavailabilityguardian) {
+        this.foodboxavailabilityguardian = foodboxavailabilityguardian;
     }
 }
