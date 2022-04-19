@@ -67,9 +67,12 @@ public class DulDetailService {
     }
 
     public DulDetail getDulDetailByClient(Client client, int type) {
-        return client.getDulDetail()
-                .stream().filter(d -> d.getDocumentTypeId() == type && (
-                        d.getDeleteState() == null || !d.getDeleteState()))
-                .findAny().orElse(null);
+        if(client.getDulDetail() != null) {
+            return client.getDulDetail()
+                    .stream().filter(d -> d.getDocumentTypeId() == type && (
+                            d.getDeleteState() == null || !d.getDeleteState()))
+                    .findAny().orElse(null);
+        }
+        return null;
     }
 }

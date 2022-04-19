@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -217,7 +218,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Date birthDate;
     private String ageTypeGroup;
     private Boolean specialMenu;
-
+    private String passportNumber;
+    private String passportSeries;
     public String getFax() {
         return fax;
     }
@@ -503,6 +505,22 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.specialMenu = specialMenu;
     }
 
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    public String getPassportSeries() {
+        return passportSeries;
+    }
+
+    public void setPassportSeries(String passportSeries) {
+        this.passportSeries = passportSeries;
+    }
+
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -660,9 +678,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateAndSetDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
         clean();
-
         return (Client) persistenceSession.load(Client.class, client.getIdOfClient());
     }
 
