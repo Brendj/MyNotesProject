@@ -470,6 +470,7 @@ public class OrgEditPage extends BasicWorkspacePage
             for (Client client: clients)
             {
                 client.setFoodboxAvailability(false);
+                client.setFoodboxavailabilityguardian(false);
                 session.update(client);
             }
         } else
@@ -534,6 +535,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 if (parallelsOld.contains(ClientParallel.getClientParallel(client)))
                 {
                     client.setFoodboxAvailability(false);
+                    client.setFoodboxavailabilityguardian(false);
                     session.update(client);
                 }
             }
