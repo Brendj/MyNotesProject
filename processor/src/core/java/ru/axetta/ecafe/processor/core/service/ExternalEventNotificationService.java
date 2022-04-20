@@ -110,7 +110,7 @@ public class ExternalEventNotificationService {
                     .findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
             Integer clas;
             try {
-                clas = ClientParallel.extractDigits(client.getClientGroup().getGroupName());
+                clas = new ClientParallel().extractDigits(client.getClientGroup().getGroupName());
             } catch (NumberFormatException e) //т.е. в названии группы нет чисел
             {
                 clas = 0;

@@ -608,7 +608,7 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         //Проверяем параллель клиента
-        if (!ClientParallel.verifyParallelForClient(client))
+        if (!new ClientParallel().verifyParallelForClient(client))
         {
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
@@ -831,7 +831,7 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
-        if (!ClientParallel.verifyParallelForClient(client))
+        if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
@@ -962,7 +962,7 @@ public class MealsController extends Application {
         ClientDataMain clientDataMain = new ClientDataMain();
         clientDataMain.setClientData(clientData);
         //Проверяем, что параллель клиента доступна для заказа фудбокса
-        if (!ClientParallel.verifyParallelForClient(client))
+        if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(clientDataMain).build();
