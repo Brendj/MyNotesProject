@@ -19,6 +19,7 @@
         <property name="documentTypeId" column="document_type_id" type="integer" not-null="true"/>
         <property name="series" column="series" type="string" length="64" not-null="false"/>
         <property name="number" column="number" type="string" length="64" not-null="true"/>
+        <property name="subdivisionCode" column="subdivision_code" type="string" length="64" not-null="false"/>
         <property name="issuer" column="issuer" type="string" length="64" not-null="false"/>
         <property name="issued" column="issued" type="string" length="64" not-null="false"/>
         <property name="expiration" column="expiration" type="string" length="64" not-null="false"/>
@@ -27,5 +28,7 @@
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="deleteState" column="deletestate" type="java.lang.Boolean"/>
+        <many-to-one name="dulGuide" class="ru.axetta.ecafe.processor.core.persistence.DulGuide" column="document_type_id" lazy="false" not-null="true"
+                     update="false" insert="false"/>
     </class>
 </hibernate-mapping>

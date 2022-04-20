@@ -183,10 +183,6 @@
 
             <h:outputText escape="true" value="СНИЛС" styleClass="output-text"/>
             <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="14" styleClass="input-text"/>
-            <h:outputText escape="true" value="Серия паспорта" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientEditPage.passportSeries}" maxlength="64" styleClass="input-text"/>
-            <h:outputText escape="true" value="Номер паспорта" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientEditPage.passportNumber}" maxlength="64" styleClass="input-text"/>
             <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text"/>
             <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
             <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text"/>
@@ -209,6 +205,84 @@
             <rich:calendar value="#{mainPage.clientEditPage.birthDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false"/>
+
+            <h:outputText escape="true" value="Документы" styleClass="output-text"/>
+            <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientEditPage.dulDetail}"
+                            var="dul"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            footerClass="data-table-footer-center">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Название документа"/>
+                    </f:facet>
+                        <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Серия"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Кем выдан"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Когда выдан"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.issued}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата истечения срока действия"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.expiration}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText value="Удалить" escape="true"/>
+                    </f:facet>
+                    <a4j:commandLink styleClass="command-link"
+                                     render="dulDetailEditTable">
+                        <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                        <f:setPropertyActionListener value="true"
+                                                     target="#{dul.deleteState}"/>
+                    </a4j:commandLink>
+                </rich:column>
+
+                <f:facet name="footer">
+                    <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
+                                       render="dulDetailEditTable"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
+                                       styleClass="command-link">
+                        <f:setPropertyActionListener value="guardian"
+                                                     target="#{mainPage.clientEditPage.typeAddClient}"/>
+                    </a4j:commandButton>
+                </f:facet>
+
+            </rich:dataTable>
 
             <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
             <rich:dataTable id="clientGuardianEditTable" value="#{mainPage.clientEditPage.clientGuardianItems}"

@@ -3,17 +3,20 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.util.Date;
 
 public class DulDetail {
-    private long id;
+    private Long id;
     private Client client;
     private int documentTypeId;
     private String series;
     private String number;
+    private String subdivisionCode;
     private String issuer;
     private String issued;
     private String expiration;
     private Date createDate;
     private Date lastUpdate;
     private Boolean deleteState;
+
+    private DulGuide dulGuide;
 
     public Boolean getDeleteState() {
         return deleteState;
@@ -71,6 +74,14 @@ public class DulDetail {
         this.number = number;
     }
 
+    public String getSubdivisionCode() {
+        return subdivisionCode;
+    }
+
+    public void setSubdivisionCode(String subdivisionCode) {
+        this.subdivisionCode = subdivisionCode;
+    }
+
     public String getSeries() {
         return series;
     }
@@ -95,11 +106,19 @@ public class DulDetail {
         this.client = client;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public DulGuide getDulGuide() {
+        return dulGuide;
+    }
+
+    public void setDulGuide(DulGuide dulGuide) {
+        this.dulGuide = dulGuide;
     }
 }

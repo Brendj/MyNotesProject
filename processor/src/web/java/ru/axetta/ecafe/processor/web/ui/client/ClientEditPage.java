@@ -35,6 +35,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 
@@ -82,28 +83,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
     public String getCardRequest() {
         return cardRequest;
     }
 
     public void setCardRequest(String cardRequest) {
         this.cardRequest = cardRequest;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
     }
 
     public String getBalanceHold() {
@@ -341,8 +326,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
-    private String passportNumber;
-    private String passportSeries;
     private String cardRequest;
     private String balanceHold;
     private Boolean inOrgEnabledMultiCardMode;
@@ -350,6 +333,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
+    private List<DulDetail> dulDetail;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -714,6 +698,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.specialMenu = specialMenu;
     }
 
+    public List<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(List<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         idOfCategoryList.clear();
@@ -752,15 +744,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
-
-        DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
-
-        if(dulDetailPassport != null) {
-            this.passportNumber = dulDetailPassport.getNumber();
-            this.passportSeries = dulDetailPassport.getSeries();
-        }
-
+        this.dulDetail = client.getDulDetail()
+                .stream().filter(d -> d.getDeleteState() == null
+                        || !d.getDeleteState()).collect(Collectors.toList());
         fill(session, client);
     }
 
@@ -1212,14 +1198,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setSpecialMenu(this.specialMenu);
         client.setParallel(this.parallel);
 
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSetDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulDetails(persistenceSession, this.dulDetail);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
         persistenceSession.update(client);
 
-        fill(persistenceSession, client.getIdOfClient());
+        fill(persistenceSession, client);
 
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
@@ -1315,8 +1300,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-        dulDetailService.deleteDulDetail(persistenceSession, dulDetailService
-                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE), Client.PASSPORT_RF_TYPE);
+        dulDetailService.deleteDulDetail(persistenceSession, new ArrayList<>(client.getDulDetail()));
 
         persistenceSession.delete(client);
     }
@@ -1486,4 +1470,5 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
+
 }
