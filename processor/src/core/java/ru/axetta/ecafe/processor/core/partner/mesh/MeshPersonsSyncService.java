@@ -53,7 +53,7 @@ public class MeshPersonsSyncService {
 
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
-    private MeshRestClient meshRestClient;
+    protected MeshRestClient meshRestClient;
 
     protected MeshPersonsSyncService(){
         String serviceAddress;
