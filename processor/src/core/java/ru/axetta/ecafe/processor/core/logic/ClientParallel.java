@@ -10,7 +10,7 @@ public class ClientParallel {
     {
         //Автоматическое открытие/закрытие фудбокса в зависимости от параллели
         if (!client.getFoodboxavailabilityguardian()) {
-            if (verifyParallelForClient(client)) {
+            if (new ClientParallel().verifyParallelForClient(client)) {
                 client.setFoodboxAvailability(true);
             } else {
                 client.setFoodboxAvailability(false);
@@ -18,10 +18,10 @@ public class ClientParallel {
         }
     }
 
-    public static boolean verifyParallelForClient (Client client)
+    public boolean verifyParallelForClient (Client client)
     {
         //Получаем параллель клиента
-        Integer parallel = ClientParallel.getClientParallel(client);
+        Integer parallel = getClientParallel(client);
         if (parallel ==  0)
         {
             return false;
@@ -57,7 +57,7 @@ public class ClientParallel {
     }
 
     //Получение параллели клиента (0 - параллель не определена)
-    public static Integer getClientParallel (Client client)
+    public Integer getClientParallel (Client client)
     {
         //Получаем параллель клиента
         Integer parallel;
@@ -82,7 +82,7 @@ public class ClientParallel {
         return parallel;
     }
 
-    public static Integer extractDigits(String src) {
+    public Integer extractDigits(String src) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < src.length(); i++) {
             char c = src.charAt(i);

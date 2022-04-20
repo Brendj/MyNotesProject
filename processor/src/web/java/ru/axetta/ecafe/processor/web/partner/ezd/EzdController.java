@@ -296,7 +296,7 @@ public class EzdController extends Application {
                             String complexname = requestsEzdMenuView.getComplexname();
                             goodComplex = false;
                             try {
-                                clas = ClientParallel.extractDigits(curGroupName);
+                                clas = new ClientParallel().extractDigits(curGroupName);
                             } catch (NumberFormatException e) //т.е. в названии группы нет чисел
                             {
                                 clas = 0;
@@ -389,7 +389,7 @@ public class EzdController extends Application {
                                     if (date1.getTime() > startDate.getTime() && date1.getTime() < endDate.getTime()) {
                                         goodComplex = false;
                                         try {
-                                            clas = ClientParallel.extractDigits(curGroupName);
+                                            clas = new ClientParallel().extractDigits(curGroupName);
                                         } catch (NumberFormatException e) //т.е. в названии группы нет чисел
                                         {
                                             clas = 0;

@@ -461,21 +461,16 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setUseLongCardNo(useLongCardNo);
         org.setUsedFoodbox(usedfoodbox);
         //Параллели для фудбокса
-        List<Client> clients = DAOUtils.findClientsByOrg(session, idOfOrg);
+
         if (!usedfoodbox) {
             //Если фудбокс выключен, то удаляем настройки параллелей для орги
             for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {
                 session.delete(foodBoxOrgParallel);
             }
             org.setFoodBoxParallels(null);
-
-            //Отключаем все настройки доступа для клиентов в футбокс
-            for (Client client: clients)
-            {
-                client.setFoodboxAvailability(false);
-                client.setFoodboxavailabilityguardian(false);
-                session.update(client);
-            }
+            //Изменяем параметр футбокс клиентов на по-умолчанию
+            DAOUtils.updateClientsByOrgFoodBox(session, false, 0,
+                    null, org.getIdOfOrg());
         } else
         {
             //Снимаем копию с оригинальной коллекции org.getFoodBoxParallels() т.к. потом из копии будет удаление
@@ -492,6 +487,10 @@ public class OrgEditPage extends BasicWorkspacePage
             List<Integer> parallelsOld = new ArrayList<>();
             //Список параллелей, для которых мы включили фудбокс
             List<Integer> parallelsNew = new ArrayList<>();
+            //Список параллелей, которые мы убрали из футбокса
+            List<Integer> globalparallelsOld = new ArrayList<>();
+            //Список параллелей, которые мы добавили из футбокса
+            List<Integer> globalparallelsNew = new ArrayList<>();
             //Сначала обновляем записи в бд, которые уже есть по орг
             Iterator<FoodBoxOrgParallel> iteratorBDcopy = foodBoxOrgParallelsCopy.iterator();
             while (iteratorBDcopy.hasNext()) {
@@ -527,20 +526,20 @@ public class OrgEditPage extends BasicWorkspacePage
                     if (foodBoxOrgParallelReal.getFoodboxparallelId().equals(foodBoxOrgParallel.getFoodboxparallelId())) {
                         session.delete(foodBoxOrgParallelReal);
                         org.getFoodBoxParallels().remove(foodBoxOrgParallelReal);
-                        parallelsOld.add(foodBoxOrgParallelReal.getParallel());
+                        globalparallelsOld.add(foodBoxOrgParallelReal.getParallel());
                         break;
                     }
                 }
             }
+            //Проставляем у всех клиентов из выключенных параллелей для орг флаг не доступности фудбокса
+            if (!parallelsOld.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, false, 2,
+                        parallelsOld, org.getIdOfOrg());
+            }
             //Проставляем у всех клиентов из убранных параллелей для орг флаг не доступности фудбокса
-            for (Client client: clients)
-            {
-                if (parallelsOld.contains(ClientParallel.getClientParallel(client)))
-                {
-                    client.setFoodboxAvailability(false);
-                    client.setFoodboxavailabilityguardian(false);
-                    session.update(client);
-                }
+            if (!globalparallelsOld.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, false, 0,
+                        globalparallelsOld, org.getIdOfOrg());
             }
             for (FoodBoxParallelUI foodBoxParallelUI: foodBoxParallelUIS) {
                 //Если добавили новую параллель
@@ -551,16 +550,17 @@ public class OrgEditPage extends BasicWorkspacePage
                 session.persist(foodBoxOrgParallel);
                 org.getFoodBoxParallels().add(foodBoxOrgParallel);
                 if (foodBoxParallelUI.isAvailable())
-                    parallelsNew.add(foodBoxParallelUI.getParallel());
+                    globalparallelsNew.add(foodBoxParallelUI.getParallel());
+            }
+            //Проставляем у всех клиентов из включенных параллелей для орг флаг доступности фудбокса
+            if (!parallelsNew.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, true, 2,
+                        parallelsNew, org.getIdOfOrg());
             }
             //Проставляем у всех клиентов из новых параллелей для орг флаг доступности фудбокса
-            for (Client client: clients)
-            {
-                if (parallelsNew.contains(ClientParallel.getClientParallel(client)))
-                {
-                    client.setFoodboxAvailability(true);
-                    session.update(client);
-                }
+            if (!globalparallelsNew.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, true, 0,
+                        globalparallelsNew, org.getIdOfOrg());
             }
         }
 		
