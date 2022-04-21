@@ -149,8 +149,8 @@ public class CreateClientRequestDTO {
         session.save(client);
         client.initClientMobileHistory(clientsMobileHistory);
         client.setMobile(createClientRequestDTO.getMobile());
-        client.setPassportSeries(createClientRequestDTO.getPassportSeries());
-        client.setPassportNumber(createClientRequestDTO.getPassportNumber());
+//        client.setPassportSeries(createClientRequestDTO.getPassportSeries());
+//        client.setPassportNumber(createClientRequestDTO.getPassportNumber());
         client.setAddress("");
         return client;
     }

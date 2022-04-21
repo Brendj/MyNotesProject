@@ -150,10 +150,6 @@
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.san}" maxlength="14" styleClass="input-text" readonly="true"/>
-    <h:outputText escape="true" value="Серия паспорта" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.passportSeries}" maxlength="64" styleClass="input-text" readonly="true"/>
-    <h:outputText escape="true" value="Номер паспорта" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.passportNumber}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.externalId}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
@@ -171,6 +167,76 @@
     <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
     <rich:calendar value="#{mainPage.clientViewPage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" readonly="true" />
+
+    <h:outputText escape="true" value="Документы" styleClass="output-text"/>
+    <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientViewPage.dulDetail}"
+                    var="dul"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    footerClass="data-table-footer-center">
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
+            <f:facet name="header">
+                <h:outputText escape="true" value="Название документа"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Серия"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.series}"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Номер"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.number}"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.subdivisionCode}"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Кем выдан"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.issuer}"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Когда выдан"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.issued}" />
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата истечения срока действия"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.expiration}" />
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата создания записи"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.createDate}" converter="dateTimeConverter"/>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата изменения записи"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{dul.lastUpdate}" converter="dateTimeConverter"/>
+        </rich:column>
+
+    </rich:dataTable>
 
     <h:outputText escape="true" value="Кружки/Секции" styleClass="output-text" rendered="#{mainPage.clientViewPage.visitsSections}"/>
     <rich:dataTable id="clientSectionsViewTable" value="#{mainPage.clientViewPage.clientSectionsItems}" var="clientSection"

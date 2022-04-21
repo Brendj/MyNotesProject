@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -435,6 +436,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             session = RuntimeContext.getInstance().createPersistenceSession();
             tr = session.beginTransaction();
             Client client = DAOUtils.findClient(session, clientId);
+            DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
             ClientGroup cg = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(
                     client.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_DELETED.getValue()));
             if (cg == null) {
@@ -446,7 +448,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                             .getExternalContext().getRemoteUser(), null);
             client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(session));
+            List<DulDetail> dulDetails = new ArrayList<>(client.getDulDetail());
+            dulDetails.forEach(d -> d.setDeleteState(true));
             session.update(client);
+            dulDetailService.validateAndSaveDulDetails(session, dulDetails, client.getIdOfClient());
             tr.commit();
             tr = null;
         } catch (Exception ex) {
