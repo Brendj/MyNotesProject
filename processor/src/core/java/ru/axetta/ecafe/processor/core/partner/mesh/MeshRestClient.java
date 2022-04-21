@@ -71,6 +71,29 @@ public class MeshRestClient {
         }
     }
 
+    private MeshResponseWithStatusCode executeRequestWithErrorProcess(HttpMethodBase httpMethod, URL url) throws Exception {
+        try {
+            HttpClient httpClient = getHttpClient(url);
+            int statusCode = httpClient.executeMethod(httpMethod);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            try {
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                int nRead;
+                byte[] data = new byte[1024*1024];
+                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+                return new MeshResponseWithStatusCode(buffer.toByteArray(), statusCode);
+            } catch (Exception e) {
+                return new MeshResponseWithStatusCode(null, statusCode);
+            }
+        } finally {
+            httpMethod.releaseConnection();
+        }
+    }
+
     public byte[] executeCreateCategory(String meshGuid, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + "/persons/" + meshGuid + "/category");
         logger.info("Execute POST request to MESH REST: " + url);
@@ -85,10 +108,28 @@ public class MeshRestClient {
         return executeRequest(httpMethod, url);
     }
 
+    public MeshResponseWithStatusCode executePostMethod(String relativeUrl, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + relativeUrl);
+        logger.info("Execute POST request to MESH REST: " + url);
+        PostMethod httpMethod = new PostMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                parameters,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        return executeRequestWithErrorProcess(httpMethod, url);
+    }
+
     private HttpClient getHttpClient(URL url) {
         HttpClient httpClient = new HttpClient();
-        httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
-                new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(), 443));
+        if (url.getProtocol().equals("https")) {
+            httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
+                    new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), url.getPort()));
+        } else {
+            httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort());
+        }
         return httpClient;
     }
 

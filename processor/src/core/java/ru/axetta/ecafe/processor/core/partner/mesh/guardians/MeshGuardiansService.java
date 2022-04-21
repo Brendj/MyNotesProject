@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
@@ -10,14 +11,13 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.DocumentType;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.ResponsePersons;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -29,16 +29,14 @@ import java.util.List;
 public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshGuardiansService.class);
     private static final String PERSONS_LIKE_URL = "/persons/like";
+    private static final String DOCUMENT_CREATE_URL = "/persons/%s/documents";
     public static final String PERSONS_LIKE_EXPAND = "children";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
     public static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final Integer PASSPORT_TYPE_ID = 15;
+    public static final String MK_ERROR = "Ошибка в МЭШ Контингент: %s";
 
-
-    public MeshGuardiansService(MeshGuardianConverter meshGuardianConverter) {
-
-    }
 
     private MeshGuardianConverter getMeshGuardianConverter() {
         return RuntimeContext.getAppContext().getBean(MeshGuardianConverter.class);
@@ -54,13 +52,49 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             TypeFactory typeFactory = objectMapper.getTypeFactory();
             CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
             List<SimilarPerson> similarPersons = objectMapper.readValue(result, collectionType);
-            return new PersonResponse().okResponse(getMeshGuardianConverter().toDTO(similarPersons));
+            return new PersonResponse(getMeshGuardianConverter().toDTO(similarPersons)).okResponse();
         } catch (MeshGuardianNotEnoughClientDataException e) {
             return new PersonResponse().notEnoughClientDataResponse(e.getMessage());
         } catch (Exception e) {
             logger.error("Error in searchPerson: ", e);
             return new PersonResponse().internalErrorResponse();
         }
+    }
+
+    public DocumentResponse createPersonDocument(Client client) {
+        try {
+//            checkClientData(client);
+            ObjectMapper objectMapper = new ObjectMapper();
+            PersonDocument parameter = buildPersonDocument();
+            String json = objectMapper.writeValueAsString(parameter);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreateDocumentUrl(client), json);
+
+            if (result.getCode() == HttpStatus.SC_OK) {
+                PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
+                return getMeshGuardianConverter().toDTO(personDocument);
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toDTO(errorResponse);
+                //return new DocumentResponse(result.getCode(), String.format(MK_ERROR, new String(result.getResponse(), StandardCharsets.UTF_8)));
+            }
+        } catch (Exception e) {
+            logger.error("Error in createPersonDocument: ", e);
+            return new DocumentResponse().internalErrorResponse();
+        }
+    }
+
+    PersonDocument buildPersonDocument() {
+        PersonDocument personDocument = new PersonDocument();
+        personDocument.setId(0);
+        personDocument.setPersonId(PERSON_ID_STUB);
+        personDocument.setDocumentTypeId(15);
+        personDocument.setNumber("123456");
+        personDocument.setSeries("9922");
+        return personDocument;
+    }
+
+    private String buildCreateDocumentUrl(Client client) {
+        return String.format(DOCUMENT_CREATE_URL, client.getMeshGUID());
     }
 
     private String buildSearchPersonParameters(Client client) throws Exception {

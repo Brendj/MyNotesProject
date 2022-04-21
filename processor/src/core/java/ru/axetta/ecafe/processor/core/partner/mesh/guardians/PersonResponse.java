@@ -2,22 +2,21 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import java.util.List;
 
-public class PersonResponse {
-    public static Integer OK_CODE = 0;
-    public static String OK_MESSAGE = "OK";
-    public static Integer NOT_ENOUGH_CLIENT_DATA_CODE = 1;
-    public static String NOT_ENOUGH_CLIENT_DATA_MESSAGE = "В карточке клиента не хватает данных: ";
-    public static Integer INTERNAL_ERROR_CODE = 2;
-    public static String INTERNAL_ERROR_MESSAGE = "Внутренняя ошибка";
+public class PersonResponse extends MeshGuardianResponse {
 
-    private Integer code;
-    private String message;
     private List<MeshGuardianPerson> response;
 
-    public PersonResponse okResponse(List<MeshGuardianPerson> response) {
+    public PersonResponse() {
+        super();
+    }
+
+    public PersonResponse(List<MeshGuardianPerson> response) {
+        this.setResponse(response);
+    }
+
+    public PersonResponse okResponse() {
         this.setCode(OK_CODE);
         this.setMessage(OK_MESSAGE);
-        this.setResponse(response);
         return this;
     }
 
