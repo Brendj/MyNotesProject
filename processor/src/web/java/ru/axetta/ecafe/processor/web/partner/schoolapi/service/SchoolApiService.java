@@ -529,12 +529,15 @@ public class SchoolApiService implements ISchoolApiService {
             iacClient.setMobile(client.getMobile());
             iacClient.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistanceSession));
             DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-            DulDetail dulDetailPassport = dulDetailService.getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
-            dulDetailService.validateAndSetDulDetailPassport(persistanceSession, iacClient,
-                    dulDetailPassport == null ? "" : dulDetailPassport.getNumber(),
-                    dulDetailPassport == null ? "" : dulDetailPassport.getSeries());
+            DulDetail dulDetailPassport = dulDetailService.getPassportDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
+
+            if(dulDetailPassport != null) {
+                dulDetailPassport.setClient(iacClient);
+                dulDetailService.validateAndSaveDulDetails(persistanceSession, Collections.singletonList(dulDetailPassport), iacClient.getIdOfClient());
+            }
             persistanceSession.update(clientPerson);
             persistanceSession.update(iacClient);
+
             return;
         }
     }

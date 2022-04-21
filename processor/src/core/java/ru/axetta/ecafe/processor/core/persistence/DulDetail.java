@@ -1,19 +1,50 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.util.Date;
+import java.util.Objects;
 
 public class DulDetail {
-    private long id;
+    private Long id;
     private Client client;
-    private int documentTypeId;
+    private Long documentTypeId;
     private String series;
     private String number;
+    private String subdivisionCode;
     private String issuer;
     private String issued;
     private String expiration;
     private Date createDate;
     private Date lastUpdate;
     private Boolean deleteState;
+    private DulGuide dulGuide;
+
+    public DulDetail(Client client, Long documentTypeId, DulGuide dulGuide) {
+        this.client = client;
+        this.documentTypeId = documentTypeId;
+        this.dulGuide = dulGuide;
+    }
+
+    public DulDetail(Long documentTypeId, DulGuide dulGuide) {
+        this.documentTypeId = documentTypeId;
+        this.dulGuide = dulGuide;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DulDetail dulDetail = (DulDetail) o;
+        return Objects.equals(id, dulDetail.id) && Objects.equals(documentTypeId, dulDetail.documentTypeId)
+                && Objects.equals(series, dulDetail.series) && Objects.equals(number, dulDetail.number)
+                && Objects.equals(subdivisionCode, dulDetail.subdivisionCode) && Objects.equals(issuer, dulDetail.issuer)
+                && Objects.equals(issued, dulDetail.issued) && Objects.equals(expiration, dulDetail.expiration)
+                && Objects.equals(deleteState, dulDetail.deleteState);
+    }
+
+    public DulDetail() {
+    }
 
     public Boolean getDeleteState() {
         return deleteState;
@@ -71,6 +102,14 @@ public class DulDetail {
         this.number = number;
     }
 
+    public String getSubdivisionCode() {
+        return subdivisionCode;
+    }
+
+    public void setSubdivisionCode(String subdivisionCode) {
+        this.subdivisionCode = subdivisionCode;
+    }
+
     public String getSeries() {
         return series;
     }
@@ -79,11 +118,11 @@ public class DulDetail {
         this.series = series;
     }
 
-    public int getDocumentTypeId() {
+    public Long getDocumentTypeId() {
         return documentTypeId;
     }
 
-    public void setDocumentTypeId(int documentTypeId) {
+    public void setDocumentTypeId(Long documentTypeId) {
         this.documentTypeId = documentTypeId;
     }
 
@@ -95,11 +134,19 @@ public class DulDetail {
         this.client = client;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public DulGuide getDulGuide() {
+        return dulGuide;
+    }
+
+    public void setDulGuide(DulGuide dulGuide) {
+        this.dulGuide = dulGuide;
     }
 }

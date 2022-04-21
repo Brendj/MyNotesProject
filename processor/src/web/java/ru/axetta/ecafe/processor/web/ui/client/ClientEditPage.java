@@ -29,6 +29,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -36,6 +37,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 
@@ -50,7 +52,8 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
-        ClientSelectPage.CompleteHandler {
+        ClientSelectPage.CompleteHandler,
+        DulSelectPage.CompleteHandler {
 
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
@@ -83,28 +86,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
     public String getCardRequest() {
         return cardRequest;
     }
 
     public void setCardRequest(String cardRequest) {
         this.cardRequest = cardRequest;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
     }
 
     public String getBalanceHold() {
@@ -149,6 +136,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setClientSSOID(String clientSSOID) {
         this.clientSSOID = clientSSOID;
+    }
+
+    @Override
+    public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
+        Client client = session.load(Client.class, this.idOfClient);
+        this.dulDetail.add(new DulDetail(client, dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {
@@ -342,8 +335,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
-    private String passportNumber;
-    private String passportSeries;
     private String cardRequest;
     private String balanceHold;
     private Boolean inOrgEnabledMultiCardMode;
@@ -352,6 +343,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
     private String middleGroup;
+    private List<DulDetail> dulDetail = new ArrayList<>();
+    private Date currentDate;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -724,6 +717,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.middleGroup = middleGroup;
     }
 
+    public List<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(List<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
+    }
+
+    public Date getCurrentDate() {
+        return currentDate;
+    }
+
+    public void setCurrentDate(Date currentDate) {
+        this.currentDate = currentDate;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         idOfCategoryList.clear();
@@ -762,15 +771,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
-
-        DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
-
-        if(dulDetailPassport != null) {
-            this.passportNumber = dulDetailPassport.getNumber();
-            this.passportSeries = dulDetailPassport.getSeries();
-        }
-
+        this.dulDetail = client.getDulDetail()
+                .stream().filter(d -> d.getDeleteState() == null
+                        || !d.getDeleteState()).collect(Collectors.toList());
+        this.dulDetail.sort(Comparator.comparing(p -> p.getDulGuide().getName()));
         fill(session, client);
     }
 
@@ -1224,7 +1228,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setMiddleGroup(this.middleGroup);
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSetDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
 
         //Получаем параллель клиента после изменений
         ClientParallel.addFoodBoxModifire(client);
@@ -1233,14 +1237,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         persistenceSession.update(client);
 
-        fill(persistenceSession, client.getIdOfClient());
+        fill(persistenceSession, client);
 
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
     }
-
 
     public void deletePDClient() throws Exception {
         this.person.firstName = "Ручная обработка";
@@ -1314,6 +1317,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void removeClient(Session persistenceSession) throws Exception {
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
+        Long idOfClient = client.getIdOfClient();
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
         if (!client.getOrders().isEmpty()) {
             throw new Exception("Имеются зарегистрированные заказы");
         }
@@ -1328,11 +1333,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getCategories().remove(categoryDiscount);
             }
         }
-        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-        dulDetailService.deleteDulDetail(persistenceSession, dulDetailService
-                .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE), Client.PASSPORT_RF_TYPE);
-
         persistenceSession.delete(client);
+
+        List<DulDetail> dulDetails = new ArrayList<>(client.getDulDetail());
+        dulDetails.forEach(d -> d.setDeleteState(true));
+        dulDetailService.validateAndSaveDulDetails(persistenceSession, dulDetails, idOfClient);
     }
 
     private void fill(Session session, Client client) throws Exception {
@@ -1389,6 +1394,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
+        this.currentDate = new Date();
     }
 
     public String getIdOfCategoryListString() {
@@ -1500,4 +1506,5 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
+
 }

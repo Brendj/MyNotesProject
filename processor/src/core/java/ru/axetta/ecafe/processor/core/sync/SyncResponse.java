@@ -458,7 +458,7 @@ public class SyncResponse {
                 this.san = client.getSan();
                 this.specialMenu = client.getSpecialMenu();
                 DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                        .getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
+                        .getPassportDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
                 this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
                 this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
                 this.multiCardMode = client.activeMultiCardMode();
