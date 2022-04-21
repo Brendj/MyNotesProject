@@ -958,7 +958,7 @@ public class MealsController extends Application {
         }
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
-        clientData.setFoodboxAvailablе(client.getOrg().getUsedFoodbox());
+        clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
         ClientDataMain clientDataMain = new ClientDataMain();
         clientDataMain.setClientData(clientData);
         //Проверяем, что параллель клиента доступна для заказа фудбокса
