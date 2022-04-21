@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -35,7 +36,8 @@ import java.util.*;
  */
 public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
-        ClientGroupSelectPage.CompleteHandler {
+        ClientGroupSelectPage.CompleteHandler,
+        DulSelectPage.CompleteHandler {
 
     public Long getBalanceToNotify() {
         return balanceToNotify;
@@ -43,6 +45,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setBalanceToNotify(Long balanceToNotify) {
         this.balanceToNotify = balanceToNotify;
+    }
+
+    @Override
+    public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
+        this.dulDetail.add(new DulDetail(dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {
@@ -218,8 +225,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Date birthDate;
     private String ageTypeGroup;
     private Boolean specialMenu;
-    private String passportNumber;
-    private String passportSeries;
+    private List<DulDetail> dulDetail = new ArrayList<>();
     public String getFax() {
         return fax;
     }
@@ -505,20 +511,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.specialMenu = specialMenu;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
+    public List<DulDetail> getDulDetail() {
+        return dulDetail;
     }
 
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
+    public void setDulDetail(List<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
     }
 
     public void fill(Session session) throws HibernateException {
@@ -678,10 +676,17 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSetDulDetailPassport(persistenceSession, client, this.passportNumber, this.passportSeries);
         clean();
-        return (Client) persistenceSession.load(Client.class, client.getIdOfClient());
+
+        Client createdClient =  persistenceSession.load(Client.class, client.getIdOfClient());
+
+        for (DulDetail dul: this.dulDetail)
+            dul.setClient(client);
+
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, createdClient.getIdOfClient());
+
+        return createdClient;
     }
 
     private void clean() {

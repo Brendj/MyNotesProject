@@ -60,7 +60,7 @@ public class Client {
     public static final String[] GROUP_NAME = {"Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
     public static final String[] GROUP_NAME_SCHOOL = {"Средняя школа","Основное общее образование","Начальное общее образование",
                                                "Среднее общее образование"};
-    public static final int PASSPORT_RF_TYPE = 15;
+    public static final Long PASSPORT_RF_TYPE = 15L;
 
     private Long idOfClient;
     private long version;

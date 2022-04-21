@@ -1121,11 +1121,6 @@ public class ClientManager {
         clientGuardianToSave.setRemarks(remark);
         clientGuardianToSave.setCreatedFrom(createdFrom);
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
-        if (passportNumber != null && passportSeries != null) {
-            RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                    .validateAndSetDulDetailPassport(session, clientGuardianToSave,
-                            passportNumber, passportSeries);
-        }
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         String ssoidOld = clientGuardianToSave.getSsoid();
@@ -1151,6 +1146,16 @@ public class ClientManager {
         }
         logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         session.update(clientGuardianToSave);
+
+        DulDetail dulDetail = new DulDetail();
+        dulDetail.setNumber(passportNumber);
+        dulDetail.setSeries(passportSeries);
+        dulDetail.setClient(clientGuardianToSave);
+        dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }

@@ -8,7 +8,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalDulSelectorPanel" autosized="false" width="620" height="600"
+    <rich:popupPanel modal="true" id="modalDulSelectorPanel" autosized="true"
                      headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalDulSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
@@ -16,59 +16,42 @@
         </f:facet>
 
         <rich:dataTable width="100%" align="center" id="modalDulSelectorTable"
-                        value="#{mainPage.clientSelectPage.items}" var="item" rows="8"
+                        value="#{mainPage.dulSelectPage.dulGuideList}" var="item" rows="20"
                         footerClass="data-table-footer" columnClasses="left-aligned-column"
                         rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
                         onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
                         onrowclick="#{rich:element('detail')}.click();">
 
-            <rich:column width="1">
+            <rich:column width="1" >
                 <f:facet name="header">
-                    <h:outputText escape="true" value=""/>
+                    <h:outputText escape="true" value="" />
                 </f:facet>
-                <a4j:commandButton id="detail" execute="@this" value=""
-                                   style="display: none;" action="#{mainPage.completeClientSelection}"
-                                   render="#{mainPage.topMostPage.pageComponent.id}"
-                                   oncomplete="#{rich:component('modalDulSelectorPanel')}.hide();">
-                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.clientSelectPage.selectedItem}"/>
+                <a4j:commandButton id="detail" execute="@this" value="" style="display: none;"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.hide();"
+                                   action="#{mainPage.completeDulSelectSelection}"
+                                   render="#{mainPage.topMostPage.pageComponent.id}, modalClientSelectorForm">
+                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.dulSelectPage.dulGuide}" />
                 </a4j:commandButton>
             </rich:column>
 
             <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="ФИО"/>
-                </f:facet>
-                <h:outputText escape="true" value="#{item.caption}" styleClass="output-text"/>
+                <h:outputText escape="true" value="#{item.name}" styleClass="output-text"/>
             </rich:column>
 
             <f:facet name="footer">
-                <rich:dataScroller for="modalDulSelectorTable" renderIfSinglePage="false" maxPages="5"
-                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
-                    <f:facet name="previous">
-                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
-                    </f:facet>
-                    <f:facet name="next">
-                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
-                    </f:facet>
-                </rich:dataScroller>
+                <h:panelGroup styleClass="borderless-div">
+
+                    <a4j:commandButton value="Отмена"
+                                       render="#{mainPage.topMostPage.pageComponent.id}"
+                                       action="#{mainPage.completeDulSelectSelection}"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.hide();"
+                                       styleClass="command-button" style="width: 80px;">
+                        <f:setPropertyActionListener value="#{null}"
+                                                     target="#{mainPage.clientSelectPage.selectedItem}"/>
+                    </a4j:commandButton>
+                </h:panelGroup>
             </f:facet>
         </rich:dataTable>
-
-        <td style="text-align: right;">
-            <h:panelGroup styleClass="borderless-div">
-                <a4j:commandButton value="Ok" action="#{mainPage.completeClientSelection}"
-                                   render="#{mainPage.topMostPage.pageComponent.id}"
-                                   oncomplete="#{rich:component('modalDulSelectorPanel')}.hide();"
-                                   styleClass="command-button" style="width: 80px; margin-right: 4px;"/>
-                <a4j:commandButton value="Отмена" action="#{mainPage.completeClientSelection}"
-                                   render="#{mainPage.topMostPage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.hide();"
-                                   styleClass="command-button" style="width: 80px;">
-                    <f:setPropertyActionListener value="#{null}"
-                                                 target="#{mainPage.clientSelectPage.selectedItem}"/>
-                </a4j:commandButton>
-            </h:panelGroup>
-        </td>
 
     </rich:popupPanel>
 </ui:composition>

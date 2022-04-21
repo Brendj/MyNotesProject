@@ -28,6 +28,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -50,7 +51,8 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
-        ClientSelectPage.CompleteHandler {
+        ClientSelectPage.CompleteHandler,
+        DulSelectPage.CompleteHandler {
 
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
@@ -133,6 +135,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setClientSSOID(String clientSSOID) {
         this.clientSSOID = clientSSOID;
+    }
+
+    @Override
+    public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
+        Client client = session.load(Client.class, this.idOfClient);
+        this.dulDetail.add(new DulDetail(client, dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {
@@ -333,7 +341,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
-    private List<DulDetail> dulDetail;
+    private List<DulDetail> dulDetail = new ArrayList<>();
+    private Date currentDate;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -706,6 +715,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.dulDetail = dulDetail;
     }
 
+    public Date getCurrentDate() {
+        return currentDate;
+    }
+
+    public void setCurrentDate(Date currentDate) {
+        this.currentDate = currentDate;
+    }
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         idOfCategoryList.clear();
@@ -747,6 +764,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.dulDetail = client.getDulDetail()
                 .stream().filter(d -> d.getDeleteState() == null
                         || !d.getDeleteState()).collect(Collectors.toList());
+        this.dulDetail.sort(Comparator.comparing(p -> p.getDulGuide().getName()));
         fill(session, client);
     }
 
@@ -1198,7 +1216,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setSpecialMenu(this.specialMenu);
         client.setParallel(this.parallel);
 
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulDetails(persistenceSession, this.dulDetail);
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
@@ -1211,7 +1230,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             processor.updateNotificationParams(client);
         }
     }
-
 
     public void deletePDClient() throws Exception {
         this.person.firstName = "Ручная обработка";
@@ -1285,6 +1303,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void removeClient(Session persistenceSession) throws Exception {
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
+        Long idOfClient = client.getIdOfClient();
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
         if (!client.getOrders().isEmpty()) {
             throw new Exception("Имеются зарегистрированные заказы");
         }
@@ -1299,10 +1319,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getCategories().remove(categoryDiscount);
             }
         }
-        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-        dulDetailService.deleteDulDetail(persistenceSession, new ArrayList<>(client.getDulDetail()));
-
         persistenceSession.delete(client);
+
+        List<DulDetail> dulDetails = new ArrayList<>(client.getDulDetail());
+        dulDetails.forEach(d -> d.setDeleteState(true));
+        dulDetailService.validateAndSaveDulDetails(persistenceSession, dulDetails, idOfClient);
     }
 
     private void fill(Session session, Client client) throws Exception {
@@ -1359,6 +1380,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
+        this.currentDate = new Date();
     }
 
     public String getIdOfCategoryListString() {

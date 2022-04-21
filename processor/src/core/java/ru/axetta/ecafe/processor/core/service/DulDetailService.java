@@ -7,106 +7,78 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = "singleton")
 public class DulDetailService {
 
-    public void validateAndSetDulDetailPassport(Session session, Client client,
-                                                String passportNumber, String passportSeries) throws Exception {
-
-        DulDetail dulDetail = getDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
-
-        if (passportSeries == null || passportSeries.isEmpty())
-            throw new Exception("Не заполнено поле \"Серия паспорта\"");
-
-        if (passportNumber == null || passportNumber.isEmpty())
-            throw new Exception("Не заполнено поле \"Номер паспорта\"");
-
-        if (dulDetail != null) {
-            updateDulDetail(session, dulDetail, passportNumber, passportSeries);
-        } else {
-            createDulDetail(session, client.getIdOfClient(), Client.PASSPORT_RF_TYPE,
-                    passportNumber, passportSeries);
-        }
-    }
-
     @Transactional(rollbackFor = Exception.class)
-    public void validateDulDetails(Session session, List<DulDetail> dulDetails) throws Exception {
+    public void validateAndSaveDulDetails(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
+        Client client = session.get(Client.class, idOfClient);
+        Set<DulDetail> originDulDetails = new HashSet<>();
         Date currentDate = new Date();
-        validateDulDetailPassport(dulDetails);
+        boolean change;
+
+        if (client.getDulDetail() != null)
+            originDulDetails = client.getDulDetail().stream()
+                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
+                    .collect(Collectors.toSet());
 
         for (DulDetail dulDetail : dulDetails) {
-            if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty()) {
-                throw new Exception("Не заполнено обязательное поле \"Номер документа\"");
+            if (dulDetail.getDeleteState() == null) {
+                dulDetail.setDeleteState(false);
             }
-            if (dulDetail.getCreateDate() == null) {
-                dulDetail.setCreateDate(currentDate);
+            if (dulDetail.getDeleteState() && dulDetail.getCreateDate() == null) {
+                continue;
             }
-            dulDetail.setLastUpdate(currentDate);
-            session.saveOrUpdate(dulDetail);
-        }
-    }
-
-    private void validateDulDetailPassport(List<DulDetail> dulDetails) throws Exception {
-        DulDetail dulDetail = getDulDetailByType(dulDetails, Client.PASSPORT_RF_TYPE);
-
-        if (dulDetail != null) {
-            if (!dulDetail.getSeries().isEmpty() && dulDetail.getNumber().isEmpty())
-                throw new Exception("Не заполнено поле \"Номер документа\"");
-            if (dulDetail.getSeries().isEmpty() && !dulDetail.getNumber().isEmpty())
-                throw new Exception("Не заполнено поле \"Серия документа\"");
-        }
-
-    }
-
-    public void deleteDulDetail(Session session, List<DulDetail> dulDetails) {
-        for(DulDetail dulDetail: dulDetails) {
-            if (dulDetail != null) {
-                dulDetail.setDeleteState(true);
-                dulDetail.setLastUpdate(new Date());
-                session.update(dulDetail);
+            if (dulDetail.getDeleteState()) {
+                dulDetail.setLastUpdate(currentDate);
+                deleteDulDetail(session, dulDetail);
+                continue;
+            }
+            change = true;
+            for (DulDetail originDul : originDulDetails) {
+                if (dulDetail.equals(originDul)) {
+                    change = false;
+                    break;
+                }
+            }
+            if (change) {
+                if (dulDetail.getCreateDate() == null) {
+                    dulDetail.setCreateDate(currentDate);
+                    dulDetail.setLastUpdate(currentDate);
+                    saveDulDetail(session, dulDetail);
+                } else {
+                    dulDetail.setLastUpdate(currentDate);
+                    updateDulDetail(session, dulDetail);
+                }
             }
         }
     }
 
-    public void updateDulDetail(Session session, DulDetail dulDetail, String number, String series) {
-        dulDetail.setSeries(series);
-        dulDetail.setNumber(number);
-        dulDetail.setLastUpdate(new Date());
-        session.update(dulDetail);
+    private void updateDulDetail(Session session, DulDetail dulDetail) {
+        session.merge(dulDetail);
     }
 
-    public void createDulDetail(Session session, Long idOfClient, int type, String number, String series) {
-        Date date = new Date();
-        DulDetail dulDetail = new DulDetail();
-        dulDetail.setNumber(number);
-        dulDetail.setSeries(series);
-        dulDetail.setCreateDate(date);
-        dulDetail.setLastUpdate(date);
-        dulDetail.setDocumentTypeId(type);
-        dulDetail.setDeleteState(false);
-        Client client = session.load(Client.class, idOfClient);
-        dulDetail.setClient(client);
+    private void saveDulDetail(Session session, DulDetail dulDetail) {
         session.save(dulDetail);
     }
 
-    public DulDetail getDulDetailByClient(Client client, int type) {
+    private void deleteDulDetail(Session session, DulDetail dulDetail) {
+        session.merge(dulDetail);
+    }
+
+    //todo на переходный период (пока толстый клиент не доработался)
+    public DulDetail getPassportDulDetailByClient(Client client, Long type) {
         if (client.getDulDetail() != null) {
             return client.getDulDetail()
-                    .stream().filter(d -> d.getDocumentTypeId() == type && (
+                    .stream().filter(d -> Objects.equals(d.getDocumentTypeId(), type) && (
                             d.getDeleteState() == null || !d.getDeleteState()))
                     .findAny().orElse(null);
         }
         return null;
     }
 
-    public DulDetail getDulDetailByType(List<DulDetail> dulDetails, int type) {
-        return dulDetails
-                .stream().filter(d -> d.getDocumentTypeId() == type)
-                .findAny().orElse(null);
-    }
 }

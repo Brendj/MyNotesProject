@@ -6,6 +6,10 @@ CREATE TABLE CF_Dul_Guide
     CONSTRAINT CF_Dul_Guide_pk PRIMARY KEY (Document_type_id)
 );
 
+COMMENT ON TABLE CF_Dul_Guide IS 'Справочника ДУЛ';
+COMMENT ON COLUMN CF_Dul_Guide.Document_type_id IS 'Код типа ДУЛ';
+COMMENT ON COLUMN CF_Dul_Guide.Name IS 'Наименование';
+
 CREATE SEQUENCE CF_Dul_Detail_id
     INCREMENT BY 1
     MINVALUE 1
@@ -15,6 +19,7 @@ CREATE SEQUENCE CF_Dul_Detail_id
 CREATE TABLE CF_Dul_Detail
 (
     Id INT8 DEFAULT nextval('CF_Dul_Detail_id') NOT NULL,
+    IdMKDocument INT8,
     IdOfClient INT8 NOT NULL,
     Document_Type_Id INT4 NOT NULL,
     Series VARCHAR(64),
@@ -32,12 +37,9 @@ CREATE TABLE CF_Dul_Detail
     CONSTRAINT CF_Dul_Detail_Guide_fk FOREIGN KEY (document_type_id) REFERENCES CF_Dul_Guide (document_type_id)
 );
 
-COMMENT ON TABLE CF_Dul_Guide IS 'Справочника ДУЛ';
-COMMENT ON COLUMN CF_Dul_Guide.Document_type_id IS 'Код типа ДУЛ';
-COMMENT ON COLUMN CF_Dul_Guide.Name IS 'Наименование';
-
 COMMENT ON TABLE CF_Dul_Detail IS 'ДУЛ по представителям';
-COMMENT ON COLUMN CF_Dul_Detail.Id IS 'Идентификатор документа МК';
+COMMENT ON COLUMN CF_Dul_Detail.Id IS 'Идентификатор документа';
+COMMENT ON COLUMN CF_Dul_Detail.IdMKDocument IS 'Идентификатор документа в МЭШ Контингенте';
 COMMENT ON COLUMN CF_Dul_Detail.IdOfClient IS 'Ссылка на идентификатор клиента';
 COMMENT ON COLUMN CF_Dul_Detail.Document_Type_Id IS 'Идентификатор типа документа по справочнику "Вид документа"';
 COMMENT ON COLUMN CF_Dul_Detail.Series IS 'Серия документа';
