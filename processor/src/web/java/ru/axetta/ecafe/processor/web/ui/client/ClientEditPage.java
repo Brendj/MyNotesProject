@@ -1370,6 +1370,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
+        this.middleGroup = client.getMiddleGroup();
     }
 
     public String getIdOfCategoryListString() {
