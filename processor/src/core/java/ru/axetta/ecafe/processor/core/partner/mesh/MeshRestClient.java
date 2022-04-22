@@ -122,6 +122,29 @@ public class MeshRestClient {
         return executeRequestWithErrorProcess(httpMethod, url);
     }
 
+    public MeshResponseWithStatusCode executeDeleteMethod(String relativeUrl) throws Exception {
+        URL url = new URL(getServiceAddress() + relativeUrl);
+        logger.info("Execute DELETE request to MESH REST: " + url);
+        DeleteMethod httpMethod = new DeleteMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+
+        return executeRequestWithErrorProcess(httpMethod, url);
+    }
+
+    public MeshResponseWithStatusCode executePutMethod(String relativeUrl, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + relativeUrl);
+        logger.info("Execute POST request to MESH REST: " + url);
+        PutMethod httpMethod = new PutMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        StringRequestEntity requestEntity = new StringRequestEntity(
+                parameters,
+                "application/json",
+                "UTF-8");
+        httpMethod.setRequestEntity(requestEntity);
+
+        return executeRequestWithErrorProcess(httpMethod, url);
+    }
+
     private HttpClient getHttpClient(URL url) {
         HttpClient httpClient = new HttpClient();
         if (url.getProtocol().equals("https")) {

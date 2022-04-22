@@ -6,6 +6,7 @@ public class DocumentResponse extends MeshGuardianResponse {
     private int documentTypeId;
     private String series;
     private String number;
+    private Long id;
 
     public DocumentResponse() {
         super();
@@ -21,13 +22,14 @@ public class DocumentResponse extends MeshGuardianResponse {
         this.documentTypeId = personDocument.getDocumentTypeId();
         this.series = personDocument.getSeries();
         this.number = personDocument.getNumber();
+        this.id = personDocument.getId().longValue();
     }
 
-    /*public DocumentResponse okResponse() {
+    public DocumentResponse okResponse() {
         this.setCode(OK_CODE);
         this.setMessage(OK_MESSAGE);
         return this;
-    }*/
+    }
 
     public DocumentResponse internalErrorResponse() {
         this.setCode(INTERNAL_ERROR_CODE);
@@ -63,5 +65,13 @@ public class DocumentResponse extends MeshGuardianResponse {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

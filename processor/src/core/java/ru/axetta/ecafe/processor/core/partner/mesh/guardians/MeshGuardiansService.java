@@ -15,11 +15,15 @@ import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DulDetail;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +34,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshGuardiansService.class);
     private static final String PERSONS_LIKE_URL = "/persons/like";
     private static final String DOCUMENT_CREATE_URL = "/persons/%s/documents";
+    private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     public static final String PERSONS_LIKE_EXPAND = "children";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -61,13 +66,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public DocumentResponse createPersonDocument(Client client) {
+    public DocumentResponse createPersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
-//            checkClientData(client);
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonDocument parameter = buildPersonDocument();
+            PersonDocument parameter = buildPersonDocument(dulDetail);
             String json = objectMapper.writeValueAsString(parameter);
-            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreateDocumentUrl(client), json);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreateDocumentUrl(meshGuid), json);
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
@@ -75,7 +79,6 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
-                //return new DocumentResponse(result.getCode(), String.format(MK_ERROR, new String(result.getResponse(), StandardCharsets.UTF_8)));
             }
         } catch (Exception e) {
             logger.error("Error in createPersonDocument: ", e);
@@ -83,18 +86,63 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    PersonDocument buildPersonDocument() {
+    public DocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, dulDetail.getIdMkDocument()));
+
+            if (result.getCode() == HttpStatus.SC_OK) {
+                return new DocumentResponse().okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in deletePersonDocument: ", e);
+            return new DocumentResponse().internalErrorResponse();
+        }
+    }
+
+    public DocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            PersonDocument parameter = buildPersonDocument(dulDetail);
+            String json = objectMapper.writeValueAsString(parameter);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, dulDetail.getIdMkDocument()), json);
+
+            if (result.getCode() == HttpStatus.SC_OK) {
+                PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
+                return getMeshGuardianConverter().toDTO(personDocument);
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in modifyPersonDocument: ", e);
+            return new DocumentResponse().internalErrorResponse();
+        }
+    }
+
+    PersonDocument buildPersonDocument(DulDetail dulDetail) {
         PersonDocument personDocument = new PersonDocument();
         personDocument.setId(0);
         personDocument.setPersonId(PERSON_ID_STUB);
-        personDocument.setDocumentTypeId(15);
-        personDocument.setNumber("123456");
-        personDocument.setSeries("9922");
+        personDocument.setDocumentTypeId(dulDetail.getDocumentTypeId().intValue());
+        personDocument.setNumber(dulDetail.getNumber());
+        personDocument.setSeries(dulDetail.getSeries());
+        personDocument.setSubdivisionCode(dulDetail.getSubdivisionCode());
+        personDocument.setIssued(dulDetail.getIssued());
+        personDocument.setIssuer(dulDetail.getIssuer());
+        personDocument.setExpiration(dulDetail.getExpiration());
         return personDocument;
     }
 
-    private String buildCreateDocumentUrl(Client client) {
-        return String.format(DOCUMENT_CREATE_URL, client.getMeshGUID());
+    private String buildCreateDocumentUrl(String meshGuid) {
+        return String.format(DOCUMENT_CREATE_URL, meshGuid);
+    }
+
+    private String buildDeleteAndModifyDocumentUrl(String meshGuid, Long id) {
+        return String.format(DOCUMENT_DELETE_URL, meshGuid, id);
     }
 
     private String buildSearchPersonParameters(Client client) throws Exception {
@@ -122,16 +170,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    //todo брать документ из новой таблицы документов клиента
     private List<PersonDocument> getClientDocument(Client client) {
-        if (StringUtils.isEmpty(client.getPassportNumber())) return null;
-        PersonDocument document = new PersonDocument();
-        document.setId(0);
-        document.setPersonId(PERSON_ID_STUB);
-        document.setDocumentTypeId(PASSPORT_TYPE_ID);
-        document.setNumber(client.getPassportNumber());
-        document.setSeries(client.getPassportSeries());
-        return Arrays.asList(document);
+        if (client.getDulDetail().isEmpty()) return null;
+        List<PersonDocument> result = new ArrayList<>();
+        for (DulDetail dulDetail : client.getDulDetail()) {
+            result.add(buildPersonDocument(dulDetail));
+        }
+        return result;
     }
 
     private String convertDate(Date date) throws MeshGuardianNotEnoughClientDataException {
