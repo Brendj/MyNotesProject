@@ -7,6 +7,7 @@ import java.util.Objects;
 
 public class DulDetail {
     private Long id;
+    private Long idMkDocument;
     private Client client;
     private Long documentTypeId;
     private String series;
@@ -148,5 +149,13 @@ public class DulDetail {
 
     public void setDulGuide(DulGuide dulGuide) {
         this.dulGuide = dulGuide;
+    }
+
+    public Long getIdMkDocument() {
+        return idMkDocument;
+    }
+
+    public void setIdMkDocument(Long idMkDocument) {
+        this.idMkDocument = idMkDocument;
     }
 }
