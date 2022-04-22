@@ -14,7 +14,6 @@ import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
 import ru.iteco.meshsync.mesh.service.DAO.CatalogService;
 import ru.iteco.meshsync.mesh.service.DAO.ClassService;
-import ru.iteco.meshsync.mesh.service.DAO.EntityChangesService;
 import ru.iteco.meshsync.mesh.service.DAO.ServiceJournalService;
 import ru.iteco.meshsync.models.ClassEntity;
 import ru.iteco.meshsync.models.EntityChanges;
@@ -56,20 +55,17 @@ public class MeshService {
 
     private final PersonRepo personRepo;
     private final RestService restService;
-    private final EntityChangesService entityChangesService;
     private final CatalogService catalogService;
     private final ServiceJournalService serviceJournalService;
     private final ClassService classService;
 
     public MeshService(PersonRepo personRepo,
                        RestService restService,
-                       EntityChangesService entityChangesService,
                        CatalogService catalogService,
                        ServiceJournalService serviceJournalService,
                        ClassService classService) {
         this.personRepo = personRepo;
         this.restService = restService;
-        this.entityChangesService = entityChangesService;
         this.catalogService = catalogService;
         this.serviceJournalService = serviceJournalService;
         this.classService = classService;
@@ -102,7 +98,10 @@ public class MeshService {
                 default:
                     throw new UnknownActionTypeException();
             }
-        } catch (Exception e) {
+        } catch (ApiException e) {
+        log.error(String.format("Catch error from MESH-Server when process Class ID: %s :\n Code: %d \n Body: %s",
+                entityChanges.getUid(), e.getCode(), e.getResponseBody()));
+        }catch (Exception e) {
             log.error("Cant process ModelClass change", e);
             return false;
         }
@@ -129,7 +128,6 @@ public class MeshService {
                 if (person == null) {
                     log.warn("Get action DELETE from Kafka for person GUID: " + entityChanges.getPersonGUID()
                             + ", but in our DB not data about this person");
-                    entityChangesService.deleteChangesForPersonGUID(entityChanges.getPersonGUID());
                 } else {
                     person.setDeleteState(true);
                     serviceJournalService.writeMessage("Из Apache Kafka получен пакет с меткой \"Удален\"",
