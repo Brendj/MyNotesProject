@@ -14,6 +14,7 @@
                 <param name="sequence_name">cf_dul_detail_id</param>
             </generator>
         </id>
+        <property name="idMkDocument" column="idmkdocument" type="long" not-null="false"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" update="false"/>
         <property name="documentTypeId" column="document_type_id" type="long" not-null="false"/>
