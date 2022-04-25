@@ -2563,7 +2563,13 @@ public class ClientManager {
         criteria.add(Restrictions.ne("deletedState", true));
         criteria.add(Restrictions.eq("disabled", false));
         return !criteria.list().isEmpty();
+    }
 
+    public static List<Client> findClientsBySan(Session session, String san){
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("san", san));
+        criteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        return (List<Client>) criteria.list();
     }
 
 }

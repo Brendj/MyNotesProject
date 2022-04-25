@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.hibernate.type.TrueFalseType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
@@ -662,6 +663,17 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
 
+        if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
+            if(this.san == null || this.san.isEmpty()) {
+                throw new Exception("Поле СНИЛС обязательное для заполнения");
+            }
+            List<Client> foundClients = ClientManager.findClientsBySan(persistenceSession, this.san);
+            if (foundClients.isEmpty()){
+                throw new Exception("Клиент с введенным значением СНИЛС уже существует");
+            }
+        }
+        client.setSan(this.san);
+
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.update(client);
@@ -679,10 +691,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         clean();
 
         Client createdClient =  persistenceSession.load(Client.class, client.getIdOfClient());
-
         for (DulDetail dul: this.dulDetail)
             dul.setClient(client);
-
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, createdClient.getIdOfClient());
 
