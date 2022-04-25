@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.DocumentResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianPerson;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
@@ -57,23 +58,29 @@ public class DulDetailService {
         }
     }
 
-    private void updateDulDetail(Session session, DulDetail dulDetail, Client client) {
+    private void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
-            meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
+            DocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
+            if (documentResponse.getCode() != 0)
+                throw new Exception(documentResponse.getMessage());
         }
         session.merge(dulDetail);
     }
 
-    private void saveDulDetail(Session session, DulDetail dulDetail, Client client) {
+    private void saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
-            meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
+            DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
+            if (documentResponse.getCode() != 0)
+                throw new Exception(documentResponse.getMessage());
         }
         session.save(dulDetail);
     }
 
-    private void deleteDulDetail(Session session, DulDetail dulDetail, Client client) {
+    private void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
-            meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
+            DocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
+            if (documentResponse.getCode() != 0)
+                throw new Exception(documentResponse.getMessage());
         }
         session.merge(dulDetail);
     }
