@@ -1671,7 +1671,7 @@ public class PreorderDAOService {
         List<WtDish> wtDishes = new ArrayList<>();
         if (complexItem != null) {
             wtDishes = DAOReadExternalsService.getInstance()
-                    .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(preorderDate), CalendarUtils.endOfDay(preorderDate));
+                    .getWtDishesByComplexItemAndDates(complexItem, preorderDate, preorderDate);
         }
         if (complexItem == null || preorderComplex.getPreorderMenuDetails().size() == 0 || wtDishes.size() == 0) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
@@ -2828,7 +2828,7 @@ public class PreorderDAOService {
         query.setParameter("complexItem", complexItem);
         query.setParameter("idOfDish", idOfDish);
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
-        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
         try {
             return (WtDish) query.getSingleResult();
         } catch (Exception e) {
