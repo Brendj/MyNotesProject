@@ -1,7 +1,5 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -37,11 +35,19 @@ public class DulDetail {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DulDetail dulDetail = (DulDetail) o;
-        return Objects.equals(id, dulDetail.id) && Objects.equals(documentTypeId, dulDetail.documentTypeId)
+        return Objects.equals(id, dulDetail.id) && Objects.equals(idMkDocument, dulDetail.idMkDocument)
+                && Objects.equals(documentTypeId, dulDetail.documentTypeId)
                 && Objects.equals(series, dulDetail.series) && Objects.equals(number, dulDetail.number)
-                && Objects.equals(subdivisionCode, dulDetail.subdivisionCode) && Objects.equals(issuer, dulDetail.issuer)
-                && Objects.equals(issued, dulDetail.issued) && Objects.equals(expiration, dulDetail.expiration)
+                && Objects.equals(subdivisionCode, dulDetail.subdivisionCode)
+                && Objects.equals(issuer, dulDetail.issuer) && Objects.equals(issued, dulDetail.issued)
+                && Objects.equals(expiration, dulDetail.expiration)
                 && Objects.equals(deleteState, dulDetail.deleteState);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, idMkDocument, documentTypeId, series, number, subdivisionCode, issuer,
+                issued, expiration, deleteState);
     }
 
     public DulDetail() {

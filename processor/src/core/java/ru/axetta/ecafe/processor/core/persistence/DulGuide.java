@@ -14,6 +14,11 @@ public class DulGuide {
         return documentTypeId.equals(dulGuide.documentTypeId);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(documentTypeId);
+    }
+
     public Long getDocumentTypeId() {
         return documentTypeId;
     }

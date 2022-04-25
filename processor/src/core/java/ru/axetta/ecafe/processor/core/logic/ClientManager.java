@@ -2556,4 +2556,14 @@ public class ClientManager {
         q.setParameterList("clientList", clientList);
         q.executeUpdate();
     }
+
+    public static boolean isClientGuardian(Session session, Long idOfClient) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.ne("deletedState", true));
+        criteria.add(Restrictions.eq("disabled", false));
+        return !criteria.list().isEmpty();
+
+    }
+
 }
