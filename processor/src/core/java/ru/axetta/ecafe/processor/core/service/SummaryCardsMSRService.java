@@ -130,10 +130,10 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
             filename += "/" + FILENAME_PREFIX_CLIENT + df.format(endDate) + ".csv";
 
-            String query_str = "select card.cardNo, client.clientGUID from Card card inner join card.client client "
+            String query_str = "select card.cardNo, coalesce(client.meshGUID, '') as meshguid from Card card inner join card.client client "
                     + "where client.clientGroup.compositeIdOfClientGroup.idOfClientGroup NOT between :group_employees and :group_deleted "
                     + "and card.state in (:card_states) and card.validTime > :date "
-                    + "and client.ageTypeGroup in :schoolchild and client.clientGUID is not null";
+                    + "and client.ageTypeGroup in :schoolchild and client.meshGUID is not null";
 
             Query query = entityManager.createQuery(query_str);
 
@@ -148,16 +148,16 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             result = formatedList (query.getResultList(), result, false, null);
 
 
-            query_str = " select distinct cf_cards.cardno, cf_clients.clientguid, cf_cards.ValidDate\n"
+            query_str = " select distinct cf_cards.cardno, coalesce(cf_clients.meshguid, '') as meshguid\n"
                     + " from cf_clients\n"
                     + " inner join cf_client_guardian on cf_client_guardian.idofchildren = cf_clients.idofclient\n"
                     + " inner join cf_cards on cf_client_guardian.idofguardian = cf_cards.idofclient\n"
                     + " inner join cf_clientgroups on cf_clientgroups.idofclientgroup = cf_clients.idofclientgroup and cf_clientgroups.idoforg = cf_clients.idoforg\n"
                     + " where cf_clients.idofclientgroup not between :group_employees and :group_deleted\n"
-                    + " and cf_clients.clientguid is not null  \n"
+                    + " and cf_clients.meshguid is not null  \n"
                     + " and cf_cards.state in (:card_states)  \n"
-                    + " and cf_client_guardian.deletedstate is false and cf_client_guardian.disabled = 0 \n"
-                    + " and cf_clients.agetypegroup in (:schoolchild)";
+                    + " and cf_client_guardian.deletedstate = false and cf_client_guardian.disabled = 0 \n"
+                    + " and cf_clients.agetypegroup in (:schoolchild) and cf_cards.validDate > :date";
 
             query = entityManager.createNativeQuery(query_str);
 
@@ -165,6 +165,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
             query.setParameter("card_states", card_states);
             query.setParameter("schoolchild", before_school_group);
+            query.setParameter("date", startDate.getTime());
 
             result = formatedList (query.getResultList(), result, true, startDate);
             uploadFile (filename, result);
@@ -196,9 +197,6 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
 
     private List<String> formatedList (List list, List<String>  result, boolean parent, Date startDate)
     {
-        Long time = 0L;
-        if (startDate != null)
-            time = startDate.getTime();
         for (Object o : list) {
             Object row[] = (Object[]) o;
             //guid не пустой
@@ -211,14 +209,12 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                 cardId = convertCardId(cardId);
                 StringBuilder b = new StringBuilder();
                 if (parent) {
-                    if ((((BigInteger) row[2]).longValue() > time)) {
-                        b.append(row[1]).append("\t").append(cardId).append("\t").append("1");
-                        result.add(b.toString());
-                    }
+                    b.append(cardId).append("\t").append("1").append("\t").append(row[1]);
+                    result.add(b.toString());
                 }
                 else
                 {
-                    b.append(row[1]).append("\t").append(cardId).append("\t").append("0");
+                    b.append(cardId).append("\t").append("0").append("\t").append(row[1]);
                     result.add(b.toString());
                 }
             }
