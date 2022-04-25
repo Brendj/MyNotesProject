@@ -62,7 +62,7 @@ public class DulDetailService {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
             if (documentResponse.getCode() != 0)
-                throw new Exception(documentResponse.getMessage());
+                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
         }
         session.merge(dulDetail);
     }
@@ -71,7 +71,7 @@ public class DulDetailService {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
             if (documentResponse.getCode() != 0)
-                throw new Exception(documentResponse.getMessage());
+                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
         }
         session.save(dulDetail);
     }
@@ -80,7 +80,7 @@ public class DulDetailService {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
             if (documentResponse.getCode() != 0)
-                throw new Exception(documentResponse.getMessage());
+                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
         }
         session.merge(dulDetail);
     }
