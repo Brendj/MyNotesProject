@@ -5,7 +5,10 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonPropertyOrder({
@@ -33,10 +36,10 @@ import java.util.*;
     "service_type",
     "organization"
 })
-public class Education implements Comparable {
-
+public class Education implements Comparable<Education> {
     public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 3, 4);
     public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Arrays.asList(3, 4);
+    public static final List<Integer> OUT_OF_ORG_TRAINING_FORM = Arrays.asList(4,5,6,7);
 
     @JsonProperty("id")
     private Integer id;
@@ -91,21 +94,6 @@ public class Education implements Comparable {
 
     public boolean empty(String valueActualFrom) {
         return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof Education)) {
-            return 1;
-        }
-
-        Education item = (Education) o;
-        if (empty(this.getTrainingEndAt()) && empty(item.getTrainingEndAt())) return 0;
-        if (!empty(this.getTrainingEndAt()) && empty(item.getTrainingEndAt())) return 1;
-        if (empty(this.getTrainingEndAt()) && !empty(item.getTrainingEndAt())) return -1;
-        if (this.getTrainingEndAt().equals(item.getTrainingEndAt())) return 0;
-        return this.getTrainingEndAt().compareTo(item.getTrainingEndAt());
-
     }
 
     @JsonProperty("id")
@@ -354,5 +342,14 @@ public class Education implements Comparable {
 
     public void setSetHomeStudy(Boolean setHomeStudy) {
         this.setHomeStudy = setHomeStudy;
+    }
+
+    @Override
+    public int compareTo(Education e) {
+        if (empty(this.getTrainingEndAt()) && empty(e.getTrainingEndAt())) return 0;
+        if (!empty(this.getTrainingEndAt()) && empty(e.getTrainingEndAt())) return 1;
+        if (empty(this.getTrainingEndAt()) && !empty(e.getTrainingEndAt())) return -1;
+        if (this.getTrainingEndAt().equals(e.getTrainingEndAt())) return 0;
+        return this.getTrainingEndAt().compareTo(e.getTrainingEndAt());
     }
 }

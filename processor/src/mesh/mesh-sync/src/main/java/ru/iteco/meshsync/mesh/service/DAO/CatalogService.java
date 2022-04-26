@@ -8,9 +8,13 @@ import ru.iteco.client.model.PersonEducation;
 import ru.iteco.meshsync.models.TrainingForm;
 import ru.iteco.meshsync.repo.TrainingFormRepo;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class CatalogService {
     private final TrainingFormRepo trainingFormRepo;
+    private final List<Integer> formsNotInOrgs = Arrays.asList(4,5,6,7);
 
     public CatalogService(TrainingFormRepo trainingFormRepo){
         this.trainingFormRepo = trainingFormRepo;
@@ -27,6 +31,7 @@ public class CatalogService {
         if(form == null){
             return false;
         }
-        return form.getEducationForm().contains("Вне");
+
+        return formsNotInOrgs.contains(form.getId());
     }
 }

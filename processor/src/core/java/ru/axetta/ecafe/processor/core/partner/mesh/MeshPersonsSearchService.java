@@ -36,7 +36,7 @@ public class MeshPersonsSearchService extends MeshPersonsSyncService {
     protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            Education education = findEducation(person);
+            Education education = findEducation(person, trainingForms);
             String classname = null;
             String guidNsi = null;
             try {
