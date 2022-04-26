@@ -147,7 +147,7 @@ public class MeshPersonsSyncService {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             personguid = person.getPersonId();
             Date birthdate = df.parse(person.getBirthdate());
-            Education education = findEducation(person);
+            Education education = findEducation(person, trainingForms);
             if (education == null) {
                 MeshSyncPerson meshSyncPerson = (MeshSyncPerson)session.get(MeshSyncPerson.class, personguid);
                 if (meshSyncPerson != null) {
@@ -158,8 +158,7 @@ public class MeshPersonsSyncService {
                 return;
             }
             Date endTraining = df.parse(education.getTrainingEndAt());
-            boolean deleted = false;
-            if (endTraining.before(new Date())) deleted = true;
+            boolean deleted = endTraining.before(new Date());
             String classname = null;
             Integer parallelid = null;
             Integer educationstageid = null;
@@ -238,14 +237,11 @@ public class MeshPersonsSyncService {
         }
     }
 
-    protected Education findEducation(ResponsePersons person) {
+    protected Education findEducation(ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
         try {
             Education result = null;
             Date now = CalendarUtils.startOfDay(new Date());
             List<Education> educations = person.getEducation();
-            educations.removeIf(
-                    education -> education.getServiceTypeId() == null || !Education.ACCEPTABLE_EDUCATIONS.contains(education.getServiceTypeId())
-            );
             educations.removeIf(education -> {
                 try {
                     return format.parse(education.getTrainingEndAt()).before(now);
@@ -254,10 +250,26 @@ public class MeshPersonsSyncService {
                 }
             });
             Collections.sort(educations);
-            result = person.getEducation().get(person.getEducation().size() - 1);
 
             if (educations.size() > 1) {
-                result.setSetHomeStudy(true);
+               for(Education e : educations){
+                   if(!Education.ACCEPTABLE_EDUCATIONS.contains(e.getServiceTypeId())){
+                       continue;
+                   }
+                   if(e.getServiceTypeId().equals(2)){ //"Образование"
+                       MeshTrainingForm form = trainingForms.get(e.getEducationFormId());
+                       if(form == null){
+                           return e;
+                       } else if(Education.OUT_OF_ORG_TRAINING_FORM.contains(form.getId())){
+                           e.setSetHomeStudy(true);
+                           return e;
+                       } else {
+                           return e;
+                       }
+                   } else if(Education.OUT_OF_ORG_EDUCATIONS.contains(e.getServiceTypeId())){
+                       result = e;
+                   }
+               }
             }
 
             return result;

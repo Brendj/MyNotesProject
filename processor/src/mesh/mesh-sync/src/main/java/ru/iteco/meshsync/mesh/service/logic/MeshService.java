@@ -157,7 +157,7 @@ public class MeshService {
                         }
                     }
 
-                    homeStudy = isHomeStudy(info.getEducation(), actualEdu);
+                    homeStudy = isHomeStudy(actualEdu);
                     inSupportedOrg = personRepo.personFromSupportedOrg(actualEdu.getOrganizationId());
 
                     if (person == null && !inSupportedOrg) {
@@ -215,14 +215,11 @@ public class MeshService {
         return !invalidData;
     }
 
-    private boolean isHomeStudy(List<PersonEducation> education, PersonEducation actualEdu) throws Exception {
-        LocalDate now = LocalDate.now();
-        boolean isHomeStudy = notInOrganization.contains(actualEdu.getServiceTypeId()) || catalogService.educationFormIsHomeStudy(actualEdu);
-        List<PersonEducation> allActualEducation = education.stream().filter(
-                e -> (enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null)
-                && actualEdu.getTrainingEndAt().isAfter(now)).collect(Collectors.toList());
-        boolean toManyActualEducations = CollectionUtils.isNotEmpty(allActualEducation) && allActualEducation.size() > 1;
-        return isHomeStudy || toManyActualEducations;
+    private boolean isHomeStudy(PersonEducation actualEdu) throws Exception {
+        if(actualEdu.getServiceTypeId().equals(ServiceType.EDUCATION.getCode())){
+            return catalogService.educationFormIsHomeStudy(actualEdu);
+        }
+        return true;
     }
 
     private ClassEntity changeEntityClass(ClassEntity classEntity, ModelClass modelClass) {
@@ -314,30 +311,32 @@ public class MeshService {
         if (CollectionUtils.isEmpty(allEdu)) {
             return null;
         }
+        LocalDate now = LocalDate.now();
 
         allEdu = allEdu
                 .stream()
                 .filter(e -> (enabledServiceTypeIds.contains(e.getServiceTypeId()) || e.getServiceTypeId() == null))
+                .filter(e -> e.getTrainingEndAt().isAfter(now))
                 .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
 
-        if (allEdu.size() > 1) {
-            LocalDate now = LocalDate.now();
-
-            List<PersonEducation> educationsOnBudget = new LinkedList<>();
-            for (PersonEducation e : allEdu) {
-                LocalDate trainingEndAt = e.getTrainingEndAt();
-
-
-                if (trainingEndAt.isAfter(now) && e.getFinancingType().getName().equals("Бюджет")) {
-                    educationsOnBudget.add(e);
-                }
-            }
-            if (!educationsOnBudget.isEmpty()) {
-                return educationsOnBudget.get(educationsOnBudget.size() - 1);
-            }
+        if(allEdu.isEmpty()){
+            return null;
         }
 
-        return allEdu.get(allEdu.size() - 1);
+        PersonEducation result = null;
+        if (allEdu.size() > 1) {
+            for(PersonEducation e : allEdu) {
+                if (e.getServiceTypeId().equals(ServiceType.EDUCATION.getCode())) { //"Образование"
+                    return e;
+                } else if (notInOrganization.contains(e.getServiceTypeId())) {
+                    result = e;
+                }
+            }
+
+            return result;
+        }
+
+        return allEdu.get(0);
     }
 }
