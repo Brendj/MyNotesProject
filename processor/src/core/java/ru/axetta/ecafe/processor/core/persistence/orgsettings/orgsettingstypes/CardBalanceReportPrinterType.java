@@ -14,7 +14,7 @@ import java.util.Map;
 
 public enum CardBalanceReportPrinterType implements SettingType {
 
-    CARD_BALANCE_PRINTER_NAME(10701, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS DocumentItem Writer
+    CARD_BALANCE_PRINTER_NAME(10701, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS Document Writer
     CARD_BALANCE_TOTAL_TAPE_WIDTH(10702, "Общая ширина ленты принтера", OrgSettingsDataTypes.INT32), // возможные значения 42,48, по умолчанию 42
     CARD_BALANCE_COLUMN_SEPARATOR_WIDTH(10703, "Ширина разделителя между колонками", OrgSettingsDataTypes.INT32), // возможные значения 1,2,3, по умолчанию 1
     CARD_BALANCE_COLUMN_WIDTH_NAME(10704, "Ширина колонки наименование", OrgSettingsDataTypes.INT32), // определяется по формуле TOTAL_TAPE_WIDTH - COLUMN_SEPARATOR_WIDTH * 2 - COLUMN_WIDTH_CARD_NUMBER - COLUMN_WIDTH_BALANCE

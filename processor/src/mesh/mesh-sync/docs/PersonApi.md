@@ -21,9 +21,9 @@ Method | HTTP request | Description
 [**personsPersonIdContactsIdDelete**](PersonApi.md#personsPersonIdContactsIdDelete) | **DELETE** /persons/{person_id}/contacts/{id} | Удаление контакта персоны
 [**personsPersonIdContactsIdPut**](PersonApi.md#personsPersonIdContactsIdPut) | **PUT** /persons/{person_id}/contacts/{id} | Изменение контакта персоны
 [**personsPersonIdContactsPost**](PersonApi.md#personsPersonIdContactsPost) | **POST** /persons/{person_id}/contacts | Создание нового контакта персоны
-[**personsPersonIdDocumentsIdDelete**](PersonApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documentItems/{id} | Удаление документа персоны
-[**personsPersonIdDocumentsIdPut**](PersonApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documentItems/{id} | Изменение документа персоны
-[**personsPersonIdDocumentsPost**](PersonApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documentItems | Создание нового документа персоны
+[**personsPersonIdDocumentsIdDelete**](PersonApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documents/{id} | Удаление документа персоны
+[**personsPersonIdDocumentsIdPut**](PersonApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documents/{id} | Изменение документа персоны
+[**personsPersonIdDocumentsPost**](PersonApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documents | Создание нового документа персоны
 [**personsPersonIdEducationIdDelete**](PersonApi.md#personsPersonIdEducationIdDelete) | **DELETE** /persons/{person_id}/education/{id} | Удаление данных об обучении персоны. Метод должен использоваться только в случае добавления ошибочной записи об обучении. В случае отчисления необходимо использовать метод PUT.
 [**personsPersonIdEducationIdPut**](PersonApi.md#personsPersonIdEducationIdPut) | **PUT** /persons/{person_id}/education/{id} | Изменение данных об обучении персоны
 [**personsPersonIdEducationPost**](PersonApi.md#personsPersonIdEducationPost) | **POST** /persons/{person_id}/education | Добавление новых данных об обучении

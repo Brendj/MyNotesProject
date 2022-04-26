@@ -246,7 +246,7 @@ Class | Method | HTTP request | Description
 *CreateApi* | [**personsPersonIdAgentsPost**](docs/CreateApi.md#personsPersonIdAgentsPost) | **POST** /persons/{person_id}/agents | 
 *CreateApi* | [**personsPersonIdCategoryPost**](docs/CreateApi.md#personsPersonIdCategoryPost) | **POST** /persons/{person_id}/category | Добавление новых данных о категории
 *CreateApi* | [**personsPersonIdContactsPost**](docs/CreateApi.md#personsPersonIdContactsPost) | **POST** /persons/{person_id}/contacts | Создание нового контакта персоны
-*CreateApi* | [**personsPersonIdDocumentsPost**](docs/CreateApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documentItems | Создание нового документа персоны
+*CreateApi* | [**personsPersonIdDocumentsPost**](docs/CreateApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documents | Создание нового документа персоны
 *CreateApi* | [**personsPersonIdEducationPost**](docs/CreateApi.md#personsPersonIdEducationPost) | **POST** /persons/{person_id}/education | Добавление новых данных об обучении
 *CreateApi* | [**personsPersonIdPreventionsPost**](docs/CreateApi.md#personsPersonIdPreventionsPost) | **POST** /persons/{person_id}/preventions | Добавление информации об учете персоны
 *DeleteApi* | [**deleteCategory**](docs/DeleteApi.md#deleteCategory) | **DELETE** /categories/{id} | Удаление категории
@@ -255,7 +255,7 @@ Class | Method | HTTP request | Description
 *DeleteApi* | [**personsPersonIdAgentsIdDelete**](docs/DeleteApi.md#personsPersonIdAgentsIdDelete) | **DELETE** /persons/{person_id}/agents/{id} | Удаление представителя персоны
 *DeleteApi* | [**personsPersonIdCategoryIdDelete**](docs/DeleteApi.md#personsPersonIdCategoryIdDelete) | **DELETE** /persons/{person_id}/category/{id} | Удаление данных о категории персоны
 *DeleteApi* | [**personsPersonIdContactsIdDelete**](docs/DeleteApi.md#personsPersonIdContactsIdDelete) | **DELETE** /persons/{person_id}/contacts/{id} | Удаление контакта персоны
-*DeleteApi* | [**personsPersonIdDocumentsIdDelete**](docs/DeleteApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documentItems/{id} | Удаление документа персоны
+*DeleteApi* | [**personsPersonIdDocumentsIdDelete**](docs/DeleteApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documents/{id} | Удаление документа персоны
 *DeleteApi* | [**personsPersonIdEducationIdDelete**](docs/DeleteApi.md#personsPersonIdEducationIdDelete) | **DELETE** /persons/{person_id}/education/{id} | Удаление данных об обучении персоны. Метод должен использоваться только в случае добавления ошибочной записи об обучении. В случае отчисления необходимо использовать метод PUT.
 *DeleteApi* | [**personsPersonIdPreventionsIdDelete**](docs/DeleteApi.md#personsPersonIdPreventionsIdDelete) | **DELETE** /persons/{person_id}/preventions/{id} | Удаление информации об учете
 *GetApi* | [**classesGet**](docs/GetApi.md#classesGet) | **GET** /classes | Поиск классов
@@ -279,9 +279,9 @@ Class | Method | HTTP request | Description
 *PersonApi* | [**personsPersonIdContactsIdDelete**](docs/PersonApi.md#personsPersonIdContactsIdDelete) | **DELETE** /persons/{person_id}/contacts/{id} | Удаление контакта персоны
 *PersonApi* | [**personsPersonIdContactsIdPut**](docs/PersonApi.md#personsPersonIdContactsIdPut) | **PUT** /persons/{person_id}/contacts/{id} | Изменение контакта персоны
 *PersonApi* | [**personsPersonIdContactsPost**](docs/PersonApi.md#personsPersonIdContactsPost) | **POST** /persons/{person_id}/contacts | Создание нового контакта персоны
-*PersonApi* | [**personsPersonIdDocumentsIdDelete**](docs/PersonApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documentItems/{id} | Удаление документа персоны
-*PersonApi* | [**personsPersonIdDocumentsIdPut**](docs/PersonApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documentItems/{id} | Изменение документа персоны
-*PersonApi* | [**personsPersonIdDocumentsPost**](docs/PersonApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documentItems | Создание нового документа персоны
+*PersonApi* | [**personsPersonIdDocumentsIdDelete**](docs/PersonApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documents/{id} | Удаление документа персоны
+*PersonApi* | [**personsPersonIdDocumentsIdPut**](docs/PersonApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documents/{id} | Изменение документа персоны
+*PersonApi* | [**personsPersonIdDocumentsPost**](docs/PersonApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documents | Создание нового документа персоны
 *PersonApi* | [**personsPersonIdEducationIdDelete**](docs/PersonApi.md#personsPersonIdEducationIdDelete) | **DELETE** /persons/{person_id}/education/{id} | Удаление данных об обучении персоны. Метод должен использоваться только в случае добавления ошибочной записи об обучении. В случае отчисления необходимо использовать метод PUT.
 *PersonApi* | [**personsPersonIdEducationIdPut**](docs/PersonApi.md#personsPersonIdEducationIdPut) | **PUT** /persons/{person_id}/education/{id} | Изменение данных об обучении персоны
 *PersonApi* | [**personsPersonIdEducationPost**](docs/PersonApi.md#personsPersonIdEducationPost) | **POST** /persons/{person_id}/education | Добавление новых данных об обучении
@@ -303,7 +303,7 @@ Class | Method | HTTP request | Description
 *UpdateApi* | [**personsPersonIdAgentsIdPut**](docs/UpdateApi.md#personsPersonIdAgentsIdPut) | **PUT** /persons/{person_id}/agents/{id} | Изменение связи персоны и представителя
 *UpdateApi* | [**personsPersonIdCategoryIdPut**](docs/UpdateApi.md#personsPersonIdCategoryIdPut) | **PUT** /persons/{person_id}/category/{id} | Изменение данных о категории
 *UpdateApi* | [**personsPersonIdContactsIdPut**](docs/UpdateApi.md#personsPersonIdContactsIdPut) | **PUT** /persons/{person_id}/contacts/{id} | Изменение контакта персоны
-*UpdateApi* | [**personsPersonIdDocumentsIdPut**](docs/UpdateApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documentItems/{id} | Изменение документа персоны
+*UpdateApi* | [**personsPersonIdDocumentsIdPut**](docs/UpdateApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documents/{id} | Изменение документа персоны
 *UpdateApi* | [**personsPersonIdEducationIdPut**](docs/UpdateApi.md#personsPersonIdEducationIdPut) | **PUT** /persons/{person_id}/education/{id} | Изменение данных об обучении персоны
 *UpdateApi* | [**personsPersonIdIdsPut**](docs/UpdateApi.md#personsPersonIdIdsPut) | **PUT** /persons/{person_id}/ids | Изменение идентификаторов персоны
 *UpdateApi* | [**personsPersonIdPreventionsIdPut**](docs/UpdateApi.md#personsPersonIdPreventionsIdPut) | **PUT** /persons/{person_id}/preventions/{id} | Изменение данных об учете персоны

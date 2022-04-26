@@ -1120,7 +1120,7 @@ public class Manager implements AbstractToElement {
         return conflict;
     }
 
-    private String createStringElement(DocumentItem document, DistributedObject distributedObject)
+    private String createStringElement(Document document, DistributedObject distributedObject)
             throws TransformerException {
         Element element = document.createElement("O");
         element = distributedObject.toElement(element);

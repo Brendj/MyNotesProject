@@ -46,7 +46,7 @@
             <!--<array>-->
                 <!--<value>ru/axetta/ecafe/processor/core/persistence/*</value>-->
                 <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/*</value>-->
-                <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/documentItems/*</value>-->
+                <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/documents/*</value>-->
                 <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/*</value>-->
                 <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/*</value>-->
                 <!--<value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/*</value>-->

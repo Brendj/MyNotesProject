@@ -97,7 +97,7 @@ public class SOAPXMLSignatureManager_1_6_3 extends SignatureManager {
 	}
 
 	/**
-	 * Function signs XML SOAP document. DocumentItem has been already signed in getMessage.
+	 * Function signs XML SOAP document. Document has been already signed in getMessage.
 	 * @param docStr - XML SOAP string.
 	 * @return signed document.
 	 */

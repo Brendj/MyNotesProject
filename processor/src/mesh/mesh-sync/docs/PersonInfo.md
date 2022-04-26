@@ -23,7 +23,7 @@ Name | Type | Description | Notes
 **createdAt** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время создания |  [optional]
 **updatedAt** | [**OffsetDateTime**](OffsetDateTime.md) | Дата и время изменения |  [optional]
 **addresses** | [**List&lt;PersonAddress&gt;**](PersonAddress.md) | Адреса персоны |  [optional]
-**documentItems** | [**List&lt;PersonDocument&gt;**](PersonDocument.md) | Документы персоны |  [optional]
+**documents** | [**List&lt;PersonDocument&gt;**](PersonDocument.md) | Документы персоны |  [optional]
 **contacts** | [**List&lt;PersonContact&gt;**](PersonContact.md) | Контакты персоны |  [optional]
 **preventions** | [**List&lt;PersonPrevention&gt;**](PersonPrevention.md) | Инфомация о постановках на учет |  [optional]
 **categories** | [**List&lt;PersonCategory&gt;**](PersonCategory.md) |  |  [optional]

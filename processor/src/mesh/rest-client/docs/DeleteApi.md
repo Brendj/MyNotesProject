@@ -10,7 +10,7 @@ Method | HTTP request | Description
 [**personsPersonIdAgentsIdDelete**](DeleteApi.md#personsPersonIdAgentsIdDelete) | **DELETE** /persons/{person_id}/agents/{id} | Удаление представителя персоны
 [**personsPersonIdCategoryIdDelete**](DeleteApi.md#personsPersonIdCategoryIdDelete) | **DELETE** /persons/{person_id}/category/{id} | Удаление данных о категории персоны
 [**personsPersonIdContactsIdDelete**](DeleteApi.md#personsPersonIdContactsIdDelete) | **DELETE** /persons/{person_id}/contacts/{id} | Удаление контакта персоны
-[**personsPersonIdDocumentsIdDelete**](DeleteApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documentItems/{id} | Удаление документа персоны
+[**personsPersonIdDocumentsIdDelete**](DeleteApi.md#personsPersonIdDocumentsIdDelete) | **DELETE** /persons/{person_id}/documents/{id} | Удаление документа персоны
 [**personsPersonIdEducationIdDelete**](DeleteApi.md#personsPersonIdEducationIdDelete) | **DELETE** /persons/{person_id}/education/{id} | Удаление данных об обучении персоны. Метод должен использоваться только в случае добавления ошибочной записи об обучении. В случае отчисления необходимо использовать метод PUT.
 [**personsPersonIdPreventionsIdDelete**](DeleteApi.md#personsPersonIdPreventionsIdDelete) | **DELETE** /persons/{person_id}/preventions/{id} | Удаление информации об учете
 
