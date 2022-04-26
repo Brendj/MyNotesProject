@@ -151,7 +151,7 @@ public class MeshPersonsSyncService {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 personguid = person.getPersonId();
                 Date birthdate = df.parse(person.getBirthdate());
-                Education education = findEducation(person);
+                Education education = findEducation(person, trainingForms);
                 if (education == null) {
                     Query query = session.createQuery("update MeshSyncPerson m" +
                             " set m.lastupdateRest = :lastupdateRest, m.deletestate = :deletestate" +
