@@ -10,7 +10,7 @@ Method | HTTP request | Description
 [**personsPersonIdAgentsIdPut**](UpdateApi.md#personsPersonIdAgentsIdPut) | **PUT** /persons/{person_id}/agents/{id} | Изменение связи персоны и представителя
 [**personsPersonIdCategoryIdPut**](UpdateApi.md#personsPersonIdCategoryIdPut) | **PUT** /persons/{person_id}/category/{id} | Изменение данных о категории
 [**personsPersonIdContactsIdPut**](UpdateApi.md#personsPersonIdContactsIdPut) | **PUT** /persons/{person_id}/contacts/{id} | Изменение контакта персоны
-[**personsPersonIdDocumentsIdPut**](UpdateApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documents/{id} | Изменение документа персоны
+[**personsPersonIdDocumentsIdPut**](UpdateApi.md#personsPersonIdDocumentsIdPut) | **PUT** /persons/{person_id}/documentItems/{id} | Изменение документа персоны
 [**personsPersonIdEducationIdPut**](UpdateApi.md#personsPersonIdEducationIdPut) | **PUT** /persons/{person_id}/education/{id} | Изменение данных об обучении персоны
 [**personsPersonIdIdsPut**](UpdateApi.md#personsPersonIdIdsPut) | **PUT** /persons/{person_id}/ids | Изменение идентификаторов персоны
 [**personsPersonIdPreventionsIdPut**](UpdateApi.md#personsPersonIdPreventionsIdPut) | **PUT** /persons/{person_id}/preventions/{id} | Изменение данных об учете персоны

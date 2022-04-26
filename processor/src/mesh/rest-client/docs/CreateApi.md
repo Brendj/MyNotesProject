@@ -11,7 +11,7 @@ Method | HTTP request | Description
 [**personsPersonIdAgentsPost**](CreateApi.md#personsPersonIdAgentsPost) | **POST** /persons/{person_id}/agents | 
 [**personsPersonIdCategoryPost**](CreateApi.md#personsPersonIdCategoryPost) | **POST** /persons/{person_id}/category | Добавление новых данных о категории
 [**personsPersonIdContactsPost**](CreateApi.md#personsPersonIdContactsPost) | **POST** /persons/{person_id}/contacts | Создание нового контакта персоны
-[**personsPersonIdDocumentsPost**](CreateApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documents | Создание нового документа персоны
+[**personsPersonIdDocumentsPost**](CreateApi.md#personsPersonIdDocumentsPost) | **POST** /persons/{person_id}/documentItems | Создание нового документа персоны
 [**personsPersonIdEducationPost**](CreateApi.md#personsPersonIdEducationPost) | **POST** /persons/{person_id}/education | Добавление новых данных об обучении
 [**personsPersonIdPreventionsPost**](CreateApi.md#personsPersonIdPreventionsPost) | **POST** /persons/{person_id}/preventions | Добавление информации об учете персоны
 

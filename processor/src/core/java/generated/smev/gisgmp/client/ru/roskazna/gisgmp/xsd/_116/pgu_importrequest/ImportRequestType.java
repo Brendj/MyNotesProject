@@ -29,7 +29,7 @@ import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.Paym
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="Document" maxOccurs="unbounded">
+ *                   &lt;element name="DocumentItem" maxOccurs="unbounded">
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -99,7 +99,7 @@ public class ImportRequestType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="Document" maxOccurs="unbounded">
+     *         &lt;element name="DocumentItem" maxOccurs="unbounded">
      *           &lt;complexType>
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -126,7 +126,7 @@ public class ImportRequestType {
     })
     public static class Package {
 
-        @XmlElement(name = "Document", required = true)
+        @XmlElement(name = "DocumentItem", required = true)
         protected List<ImportRequestType.Package.Document> document;
 
         /**

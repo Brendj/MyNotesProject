@@ -13,7 +13,7 @@ import java.text.ParseException;
  */
 public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue{
 
-    private String a;//a: Microsoft XPS Document Writer - название принтера
+    private String a;//a: Microsoft XPS DocumentItem Writer - название принтера
     private String b;//b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
     private String c;//c: 1 - ширина разделителя между колонками (возможные значения 1,2,3, по умолчанию 1)
     private String d;//d: 22 - ширина колонки наименование (определяется по формуле: d = b – c*2 – e – f)

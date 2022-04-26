@@ -14,7 +14,7 @@ import java.util.Map;
 
 public enum CashierCheckPrinterType implements SettingType {
 
-    CASHIER_CHECK_PRINTER_NAME(10750, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS Document Writer
+    CASHIER_CHECK_PRINTER_NAME(10750, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS DocumentItem Writer
     CASHIER_CHECK_TOTAL_TAPE_WIDTH(10751, "Общая ширина ленты принтера", OrgSettingsDataTypes.INT32), // возможные значения 42,48, по умолчанию 42
     CASHIER_CHECK_COLUMN_SEPARATOR_WIDTH(10752, "Ширина разделителя между колонками", OrgSettingsDataTypes.INT32), // возможные значения 1,2,3, по умолчанию 1
     CASHIER_CHECK_COLUMN_WIDTH_NAME(10753, "Ширина колонки наименование", OrgSettingsDataTypes.INT32), // определяется по формуле TOTAL_TAPE_WIDTH - COLUMN_SEPARATOR_WIDTH * 2 - COLUMN_WIDTH_QTY - COLUMN_WIDTH_COST - COLUMN_WIDTH_PRICE

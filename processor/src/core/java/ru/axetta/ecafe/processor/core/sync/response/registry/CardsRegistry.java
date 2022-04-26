@@ -9,7 +9,7 @@
 //import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 //import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
 //
-//import org.w3c.dom.Document;
+//import org.w3c.dom.DocumentItem;
 //import org.w3c.dom.Element;
 //
 //import java.util.LinkedList;
@@ -28,7 +28,7 @@
 //    private List<CardsItem> itemList;
 //
 //
-//    public Element toElement(Document document) throws Exception {
+//    public Element toElement(DocumentItem document) throws Exception {
 //        Element element = document.createElement(SYNC_NAME);
 //        for (CardsItem item : this.itemList) {
 //            element.appendChild(item.toElement(document));

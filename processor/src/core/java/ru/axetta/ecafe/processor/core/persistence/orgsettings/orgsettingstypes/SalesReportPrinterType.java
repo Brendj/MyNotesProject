@@ -14,7 +14,7 @@ import java.util.Map;
 
 public enum SalesReportPrinterType implements SettingType {
 
-    SALES_REPORT_PRINTER_NAME(10730, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS Document Writer
+    SALES_REPORT_PRINTER_NAME(10730, "Название принтера", OrgSettingsDataTypes.STRING), // Microsoft XPS DocumentItem Writer
     SALES_REPORT_TOTAL_TAPE_WIDTH(10731, "Общая ширина ленты принтера", OrgSettingsDataTypes.INT32), // возможные значения 42,48, по умолчанию 42
     SALES_REPORT_COLUMN_SEPARATOR_WIDTH(10732, "Ширина разделителя между колонками", OrgSettingsDataTypes.INT32), // возможные значения 1,2,3, по умолчанию 1
     SALES_REPORT_COLUMN_WIDTH_NAME(10733, "Ширина колонки наименование", OrgSettingsDataTypes.INT32), // определяется по формуле TOTAL_TAPE_WIDTH - COLUMN_SEPARATOR_WIDTH * 2 - COLUMN_WIDTH_QTY - COLUMN_WIDTH_COST

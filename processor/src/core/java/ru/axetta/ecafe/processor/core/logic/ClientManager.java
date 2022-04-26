@@ -1150,7 +1150,7 @@ public class ClientManager {
         DulDetail dulDetail = new DulDetail();
         dulDetail.setNumber(passportNumber);
         dulDetail.setSeries(passportSeries);
-        dulDetail.setClient(clientGuardianToSave);
+        dulDetail.setIdOfClient(clientGuardianToSave.getIdOfClient());
         dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)

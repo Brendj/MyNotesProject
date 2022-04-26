@@ -162,9 +162,9 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
     private void setDefaultValue(ECafeSettings eCafeSettings) {
         switch (eCafeSettings.getSettingsId().getId()){
-            case 0: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;19;3;10;10;Спасибо;"); break;
-            case 1: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;22;6;12;Спасибо;"); break;
-            case 2: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;16;12;12;Спасибо;"); break;
+            case 0: eCafeSettings.setSettingValue("Microsoft XPS DocumentItem Writer;42;1;19;3;10;10;Спасибо;"); break;
+            case 1: eCafeSettings.setSettingValue("Microsoft XPS DocumentItem Writer;42;1;22;6;12;Спасибо;"); break;
+            case 2: eCafeSettings.setSettingValue("Microsoft XPS DocumentItem Writer;42;1;16;12;12;Спасибо;"); break;
             case 3: eCafeSettings.setSettingValue("0;0:00;100;");break;
             case 4: eCafeSettings.setSettingValue("5;2;0;2;");break;
             case 5: eCafeSettings.setSettingValue("Резерв;2;");break;

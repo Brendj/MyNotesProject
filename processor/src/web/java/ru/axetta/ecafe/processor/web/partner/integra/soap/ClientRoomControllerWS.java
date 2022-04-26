@@ -8889,7 +8889,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 DulDetail dulDetail = new DulDetail();
                 dulDetail.setNumber(passportNumber);
                 dulDetail.setSeries(passportSeries);
-                dulDetail.setClient(guardian);
+                dulDetail.setIdOfClient(guardian.getIdOfClient());
                 dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
                 RuntimeContext.getAppContext().getBean(DulDetailService.class)

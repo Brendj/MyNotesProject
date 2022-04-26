@@ -139,8 +139,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     @Override
     public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
-        Client client = session.load(Client.class, this.idOfClient);
-        this.dulDetail.add(new DulDetail(client, dulGuide.getDocumentTypeId(), dulGuide));
+        this.dulDetail.add(new DulDetail(this.idOfClient, dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {

@@ -671,7 +671,7 @@ public class RNIPLoadPaymentsService {
 
 
     public SOAPMessage send(SOAPMessage message) throws Exception {
-        // Use SAAJ to convert Document to SOAPElement
+        // Use SAAJ to convert DocumentItem to SOAPElement
         SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = sfc.createConnection();
         //URL_ADDR = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);

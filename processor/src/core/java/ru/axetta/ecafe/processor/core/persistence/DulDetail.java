@@ -6,7 +6,7 @@ import java.util.Objects;
 public class DulDetail {
     private Long id;
     private Long idMkDocument;
-    private Client client;
+    private Long idOfClient;
     private Long documentTypeId;
     private String series;
     private String number;
@@ -19,8 +19,8 @@ public class DulDetail {
     private Boolean deleteState;
     private DulGuide dulGuide;
 
-    public DulDetail(Client client, Long documentTypeId, DulGuide dulGuide) {
-        this.client = client;
+    public DulDetail(Long idOfClient, Long documentTypeId, DulGuide dulGuide) {
+        this.idOfClient = idOfClient;
         this.documentTypeId = documentTypeId;
         this.dulGuide = dulGuide;
     }
@@ -133,12 +133,12 @@ public class DulDetail {
         this.documentTypeId = documentTypeId;
     }
 
-    public Client getClient() {
-        return client;
+    public Long getIdOfClient() {
+        return idOfClient;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 
     public Long getId() {

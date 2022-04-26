@@ -312,13 +312,13 @@ public class SMEVExample {
     public static void send (String xmlText, SOAPMessage mmm)
         {
             try {
-                // Load the XML text into a DOM Document
+                // Load the XML text into a DOM DocumentItem
                 DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
                 builderFactory.setNamespaceAware(true);
                 /*InputStream stream  = new ByteArrayInputStream(xmlText.getBytes());
-                Document doc = builderFactory.newDocumentBuilder().parse(stream);*/
+                DocumentItem doc = builderFactory.newDocumentBuilder().parse(stream);*/
 
-                // Use SAAJ to convert Document to SOAPElement
+                // Use SAAJ to convert DocumentItem to SOAPElement
                 SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
                 SOAPConnection connection = sfc.createConnection();
                 /*MessageFactory msgFactory = MessageFactory.newInstance();

@@ -31,7 +31,7 @@ public class CombinedSignatureManager extends EfficiencyThread {
 	}
 
 	synchronized private void printOperationResult(boolean result) {
-		System.out.println("Document verification failed in CombainedSignatureManager thread " + this.name + 
+		System.out.println("DocumentItem verification failed in CombainedSignatureManager thread " + this.name +
 				" (" + result + ")");
 
 	}

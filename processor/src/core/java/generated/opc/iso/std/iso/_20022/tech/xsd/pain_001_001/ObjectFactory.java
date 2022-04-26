@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Document_QNAME = new QName("urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", "Document");
+    private final static QName _Document_QNAME = new QName("urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", "DocumentItem");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: iso.std.iso._20022.tech.xsd.pain_001_001
@@ -565,7 +565,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Document }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", name = "Document")
+    @XmlElementDecl(namespace = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", name = "DocumentItem")
     public JAXBElement<Document> createDocument(Document value) {
         return new JAXBElement<Document>(_Document_QNAME, Document.class, null, value);
     }

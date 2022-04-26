@@ -687,13 +687,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         clean();
 
-        Client createdClient =  persistenceSession.load(Client.class, client.getIdOfClient());
         for (DulDetail dul: this.dulDetail)
-            dul.setClient(client);
+            dul.setIdOfClient(client.getIdOfClient());
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, createdClient.getIdOfClient());
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
 
-        return createdClient;
+        return client;
     }
 
     private void clean() {

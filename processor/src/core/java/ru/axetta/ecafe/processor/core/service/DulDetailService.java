@@ -6,10 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.DocumentResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianPerson;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
@@ -58,29 +55,27 @@ public class DulDetailService {
         }
     }
 
-    private void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+    public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
-            if (documentResponse.getCode() != 0)
-                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
+            checkError(documentResponse);
         }
         session.merge(dulDetail);
     }
 
-    private void saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+    public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
-            if (documentResponse.getCode() != 0)
-                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
+            checkError(documentResponse);
         }
         session.save(dulDetail);
+        return dulDetail.getId();
     }
 
-    private void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+    public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
-            if (documentResponse.getCode() != 0)
-                throw new Exception(String.format("Ошибка сохранения документов \"%s\"", documentResponse.getMessage()));
+            checkError(documentResponse);
         }
         session.merge(dulDetail);
     }
@@ -92,6 +87,10 @@ public class DulDetailService {
         return true;
     }
 
+    private void checkError(DocumentResponse documentResponse) throws Exception {
+        if (documentResponse.getCode() != 0)
+            throw new MeshDocumentSaveException(documentResponse.getMessage());
+    }
 
     //todo на переходный период (пока толстый клиент не доработался)
     public DulDetail getPassportDulDetailByClient(Client client, Long type) {

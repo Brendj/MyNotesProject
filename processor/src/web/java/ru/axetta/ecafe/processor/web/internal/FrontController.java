@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentSaveException;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -2791,4 +2793,119 @@ public class FrontController extends HttpServlet {
         }
         return result;
     }
+
+    @WebMethod(operationName = "createDocumentForClient")
+    public DocumentResponse createDocumentForClient(
+            @WebParam(name = "dulDetail") DocumentItem documentItem) {
+
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Long idOfDocument;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
+
+            if (client == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            if (documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
+            DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
+            idOfDocument = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e){
+            logger.error("Error in createDocumentForClient", e);
+            if (e instanceof MeshDocumentSaveException) {
+                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_SAVE,
+                        DocumentResponse.ERROR_MESH_DOCUMENT_SAVE_MESSAGE);
+            } else {
+                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                        e.getMessage());
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new DocumentResponse(idOfDocument);
+    }
+
+    @WebMethod(operationName = "updateDocumentForClient")
+    public DocumentResponse updateDocumentForClient(
+            @WebParam(name = "dulDetail") DocumentItem documentItem) {
+
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
+
+            if (client == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            if (documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
+            DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
+            dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e){
+            logger.error("Error in updateDocumentForClient", e);
+            if (e instanceof MeshDocumentSaveException) {
+                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_SAVE,
+                        DocumentResponse.ERROR_MESH_DOCUMENT_SAVE_MESSAGE);
+            } else {
+                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                        e.getMessage());
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+    }
+
+    private DulDetail fillingDulDetail(Session session, DocumentItem documentItem){
+        DulDetail dulDetail;
+        Date currentDate = new Date();
+
+        if(documentItem.getIdDocument() == null) {
+            dulDetail = new DulDetail();
+            dulDetail.setCreateDate(currentDate);
+            dulDetail.setDeleteState(false);
+        }
+        else
+            dulDetail = session.get(DulDetail.class, documentItem.getIdDocument());
+
+        dulDetail.setDocumentTypeId(documentItem.getDocumentTypeId());
+        if(documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L)
+            dulDetail.setIdOfClient(documentItem.getIdOfClient());
+        dulDetail.setSeries(documentItem.getSeries());
+        dulDetail.setNumber(documentItem.getNumber());
+        dulDetail.setSubdivisionCode(documentItem.getSubdivisionCode());
+        dulDetail.setIssuer(documentItem.getIssuer());
+        dulDetail.setIssued(documentItem.getIssued());
+        dulDetail.setExpiration(documentItem.getExpiration());
+        dulDetail.setLastUpdate(currentDate);
+        return dulDetail;
+    }
+
 }
