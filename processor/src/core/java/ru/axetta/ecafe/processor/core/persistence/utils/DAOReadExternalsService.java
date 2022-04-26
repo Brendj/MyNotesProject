@@ -354,8 +354,8 @@ public class DAOReadExternalsService {
                 + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("complex", complex);
-        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate), TemporalType.TIMESTAMP);
+        query.setParameter("endDate", CalendarUtils.startOfDay(endDate), TemporalType.TIMESTAMP);
         return (List<WtDish>) query.getResultList();
     }
 
@@ -383,8 +383,8 @@ public class DAOReadExternalsService {
         sql += " AND dish.deleteState = 0";
         Query query = entityManager.createQuery(sql);
         query.setParameter("complexItem", complexItem);
-        query.setParameter("startDate", startDate, TemporalType.DATE);
-        query.setParameter("endDate", endDate, TemporalType.DATE);
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.startOfDay(endDate), TemporalType.DATE);
         return (List<WtDish>) query.getResultList();
     }
 
