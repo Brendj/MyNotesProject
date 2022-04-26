@@ -51,7 +51,7 @@ public class PersonAgent {
     @JsonProperty("agent_type")
     private AgentType agentType;
     @JsonProperty("agent_person")
-    private Object agentPerson;
+    private ResponsePersons agentPerson;
     @JsonProperty("validation_errors")
     private Object validationErrors;
     @JsonIgnore
@@ -188,12 +188,12 @@ public class PersonAgent {
     }
 
     @JsonProperty("agent_person")
-    public Object getAgentPerson() {
+    public ResponsePersons getAgentPerson() {
         return agentPerson;
     }
 
     @JsonProperty("agent_person")
-    public void setAgentPerson(Object agentPerson) {
+    public void setAgentPerson(ResponsePersons agentPerson) {
         this.agentPerson = agentPerson;
     }
 

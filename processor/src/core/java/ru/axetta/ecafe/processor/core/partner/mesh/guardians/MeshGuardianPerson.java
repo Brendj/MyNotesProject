@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
+import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 
 import java.text.DateFormat;
@@ -29,6 +30,18 @@ public class MeshGuardianPerson {
         this.snils = similarPerson.getPerson().getSnils();
         this.gender = getMeshGender(similarPerson.getPerson().getGenderId());
         this.degree = similarPerson.getDegree();
+    }
+
+    public MeshGuardianPerson(PersonAgent personAgent) throws Exception {
+        this.meshGuid = personAgent.getPersonId();
+        if (personAgent.getAgentPerson() != null) {
+            this.firstName = personAgent.getAgentPerson().getFirstname();
+            this.secondName = personAgent.getAgentPerson().getPatronymic();
+            this.surname = personAgent.getAgentPerson().getLastname();
+            this.birthDate = getDateFromString(personAgent.getAgentPerson().getBirthdate());
+            this.snils = personAgent.getAgentPerson().getSnils();
+            this.gender = getMeshGender(personAgent.getAgentPerson().getGenderId());
+        }
     }
 
     private Date getDateFromString(String date) throws Exception {
