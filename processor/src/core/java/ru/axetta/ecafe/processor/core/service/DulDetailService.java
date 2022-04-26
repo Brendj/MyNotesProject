@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.DocumentResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianPerson;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 

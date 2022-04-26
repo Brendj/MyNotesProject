@@ -12,19 +12,14 @@ import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
-import ru.axetta.ecafe.processor.core.partner.mesh.MeshRestClient;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -33,10 +28,12 @@ import java.util.List;
 public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshGuardiansService.class);
     private static final String PERSONS_LIKE_URL = "/persons/like";
+    private static final String PERSONS_CREATE_URL = "/persons/%s/agents";
     private static final String DOCUMENT_CREATE_URL = "/persons/%s/documents";
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
-    public static final String PERSONS_LIKE_EXPAND = "children";
+    public static final String PERSONS_LIKE_EXPAND = "children,documents";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
+    public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
     public static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final Integer PASSPORT_TYPE_ID = 15;
@@ -47,7 +44,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return RuntimeContext.getAppContext().getBean(MeshGuardianConverter.class);
     }
 
-    public PersonResponse searchPerson(Client client) {
+    public PersonListResponse searchPerson(Client client) {
         try {
             checkClientData(client);
             String parameters = String.format("?person=%s&expand=%s&limit=%s", URLEncoder
@@ -57,11 +54,30 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             TypeFactory typeFactory = objectMapper.getTypeFactory();
             CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
             List<SimilarPerson> similarPersons = objectMapper.readValue(result, collectionType);
-            return new PersonResponse(getMeshGuardianConverter().toDTO(similarPersons)).okResponse();
+            return new PersonListResponse(getMeshGuardianConverter().toDTO(similarPersons)).okResponse();
         } catch (MeshGuardianNotEnoughClientDataException e) {
-            return new PersonResponse().notEnoughClientDataResponse(e.getMessage());
+            return new PersonListResponse().notEnoughClientDataResponse(e.getMessage());
         } catch (Exception e) {
             logger.error("Error in searchPerson: ", e);
+            return new PersonListResponse().internalErrorResponse();
+        }
+    }
+
+    public PersonResponse createPerson(Client child, Client guardian) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            PersonAgent personAgent = buildPersonAgent(guardian);
+            String json = objectMapper.writeValueAsString(personAgent);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(child.getMeshGUID()), json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
+                return new PersonResponse(getMeshGuardianConverter().toDTO(personResult)).okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in createPerson: ", e);
             return new PersonResponse().internalErrorResponse();
         }
     }
@@ -137,6 +153,23 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return personDocument;
     }
 
+    private PersonAgent buildPersonAgent(Client guardian) throws Exception {
+        PersonAgent personAgent = new PersonAgent();
+        personAgent.setAgentTypeId(GUARDIAN_DEFAULT_TYPE);
+        if (StringUtils.isEmpty(guardian.getMeshGUID())) {
+            personAgent.setAgentPerson(buildResponsePerson(guardian));
+        } else {
+            personAgent.setAgentPersonId(guardian.getMeshGUID());
+        }
+
+        return personAgent;
+    }
+
+
+    private String buildCreatePersonUrl(String meshGuid) {
+        return String.format(PERSONS_CREATE_URL, meshGuid);
+    }
+
     private String buildCreateDocumentUrl(String meshGuid) {
         return String.format(DOCUMENT_CREATE_URL, meshGuid);
     }
@@ -145,7 +178,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return String.format(DOCUMENT_DELETE_URL, meshGuid, id);
     }
 
-    private String buildSearchPersonParameters(Client client) throws Exception {
+    private ResponsePersons buildResponsePerson(Client client) throws Exception {
         ResponsePersons person = new ResponsePersons();
         person.setId(0);
         person.setPersonId(PERSON_ID_STUB);
@@ -156,6 +189,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         person.setGenderId(getGender(client.getGender()));
         person.setSnils(client.getSan());
         person.setDocuments(getClientDocument(client));
+        return person;
+    }
+
+    private String buildSearchPersonParameters(Client client) throws Exception {
+        ResponsePersons person = buildResponsePerson(client);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(person);

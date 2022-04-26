@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.ErrorResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 
@@ -20,6 +21,14 @@ public class MeshGuardianConverter {
 
     public MeshGuardianPerson toDTO(SimilarPerson similarPerson) throws Exception {
         return new MeshGuardianPerson(similarPerson);
+    }
+
+    public MeshGuardianPerson toDTO(PersonAgent personAgent) throws Exception {
+        return new MeshGuardianPerson(personAgent);
+    }
+
+    public PersonResponse toPersonDTO(ErrorResponse errorResponse) {
+        return new PersonResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
     public DocumentResponse toDTO(PersonDocument personDocument) {
