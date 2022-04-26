@@ -1212,12 +1212,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if(this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
-            List<Client> foundClients = ClientManager.findClientsBySan(persistenceSession, this.san);
-            for (Client foundClient : foundClients) {
-                if (foundClient.getSan().equals(this.san) && !foundClient.getIdOfClient().equals(this.idOfClient)){
-                    throw new Exception("Клиент с введенным значением СНИЛС уже существует");
-                }
-            }
+            ClientManager.validateSan(persistenceSession, this.san, idOfClient);
         }
         client.setSan(this.san);
 

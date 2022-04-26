@@ -667,10 +667,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             if(this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
-            List<Client> foundClients = ClientManager.findClientsBySan(persistenceSession, this.san);
-            if (foundClients.isEmpty()){
-                throw new Exception("Клиент с введенным значением СНИЛС уже существует");
-            }
+            ClientManager.validateSan(persistenceSession, this.san, null);
         }
         client.setSan(this.san);
 
