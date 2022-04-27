@@ -12,6 +12,12 @@ public class DocumentResponse extends ResponseItem{
         this.message = OK_MESSAGE;
         this.idDocument = idDocument;
     }
+
+    public DocumentResponse(List<DocumentItem> documentItems) {
+        this.code = OK;
+        this.message = OK_MESSAGE;
+        this.documentItems = documentItems;
+    }
     public DocumentResponse(int code, String message) {
         this.code = code;
         this.message = message;

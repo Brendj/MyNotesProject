@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.service;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

@@ -38,7 +38,8 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_GUARDIAN = 460;
     public static final int ERROR_LONG_CARDNO_MATCH_ORG = 470;
     public static final int ERROR_LONG_CARDNO_NOT_UNIQUE = 480;
-    public static final int ERROR_MESH_DOCUMENT_SAVE = 490;
+    public static final int ERROR_MESH_DOCUMENT_NOT_SAVE = 490;
+    public static final int ERROR_DOCUMENT_NOT_FOUND = 500;
 
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
@@ -72,7 +73,8 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE = "Не указан longCardNo для организации "
             + "с включенным флагом использования длинных UID";
     public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
-    public static final String ERROR_MESH_DOCUMENT_SAVE_MESSAGE = "Ошибка сохранения в Метод МЭШ Контингент";
+    public static final String ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE = "Ошибка сохранения в Метод МЭШ Контингент";
+    public static final String ERROR_DOCUMENT_NOT_FOUND_MESSAGE = "Документы по запросу не найдены";
 
     public int code;
     public String message;
