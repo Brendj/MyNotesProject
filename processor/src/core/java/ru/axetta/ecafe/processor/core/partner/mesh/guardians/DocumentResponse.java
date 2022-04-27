@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,10 +38,15 @@ public class DocumentResponse extends MeshGuardianResponse {
         this.idOfClient = Long.parseLong(personDocument.getPersonId());
         this.subdivisionCode = personDocument.getSubdivisionCode();
         this.issuer = personDocument.getIssuer();
-        this.issued = new SimpleDateFormat("dd.MM.yyyy").parse(personDocument.getIssued());
-        this.expiration = new SimpleDateFormat("dd.MM.yyyy").parse(personDocument.getExpiration());
-        this.createDate = new SimpleDateFormat("dd.MM.yyyy").parse(personDocument.getCreatedAt());
-        this.lastUpdate = new SimpleDateFormat("dd.MM.yyyy").parse(personDocument.getUpdatedAt());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        if (personDocument.getIssued() != null)
+            this.issued = df.parse(personDocument.getIssued());
+        if (personDocument.getExpiration() != null)
+            this.expiration = df.parse(personDocument.getExpiration());
+        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        this.createDate = df2.parse(personDocument.getCreatedAt());
+        if (personDocument.getUpdatedAt() != null)
+            this.lastUpdate = df2.parse(personDocument.getUpdatedAt());
     }
 
     public DocumentResponse okResponse() {
