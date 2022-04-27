@@ -62,7 +62,7 @@ public class PersonDocument {
     @JsonProperty("issued")
     private String issued;
     @JsonProperty("expiration")
-    private Object expiration;
+    private String expiration;
     @JsonProperty("attachments")
     private Object attachments;
     @JsonProperty("document_type")
@@ -233,12 +233,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("expiration")
-    public Object getExpiration() {
+    public String getExpiration() {
         return expiration;
     }
 
     @JsonProperty("expiration")
-    public void setExpiration(Object expiration) {
+    public void setExpiration(String expiration) {
         this.expiration = expiration;
     }
 

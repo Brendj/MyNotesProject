@@ -27,9 +27,6 @@ public class DulDetailService {
         Set<DulDetail> originDulDetails = new HashSet<>();
         Date currentDate = new Date();
 
-        if(client == null)
-            throw new Exception(String.format("Клиент с id %s не найден", idOfClient));
-
         if (client.getDulDetail() != null)
             originDulDetails = client.getDulDetail().stream()
                     .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
@@ -68,6 +65,7 @@ public class DulDetailService {
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
+            dulDetail.setIdMkDocument(documentResponse.getId());
         }
         session.save(dulDetail);
         return dulDetail.getId();

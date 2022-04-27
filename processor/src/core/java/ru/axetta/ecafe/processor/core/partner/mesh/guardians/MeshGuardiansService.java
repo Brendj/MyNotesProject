@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -140,6 +141,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     PersonDocument buildPersonDocument(DulDetail dulDetail) {
+        Format formatter = new SimpleDateFormat("dd.MM.yyyy");
         PersonDocument personDocument = new PersonDocument();
         personDocument.setId(0);
         personDocument.setPersonId(PERSON_ID_STUB);
@@ -147,9 +149,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         personDocument.setNumber(dulDetail.getNumber());
         personDocument.setSeries(dulDetail.getSeries());
         personDocument.setSubdivisionCode(dulDetail.getSubdivisionCode());
-        personDocument.setIssued(dulDetail.getIssued());
+        personDocument.setIssued(formatter.format(dulDetail.getIssued()));
         personDocument.setIssuer(dulDetail.getIssuer());
-        personDocument.setExpiration(dulDetail.getExpiration());
+        personDocument.setExpiration(formatter.format(dulDetail.getExpiration()));
         return personDocument;
     }
 

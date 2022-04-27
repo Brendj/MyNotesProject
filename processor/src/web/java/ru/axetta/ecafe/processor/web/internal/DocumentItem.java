@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.web.internal;
 
+import java.util.Date;
+
 public class DocumentItem {
     private Long idDocument;
     private Long idOfClient;
@@ -8,8 +10,8 @@ public class DocumentItem {
     private String number;
     private String subdivisionCode;
     private String issuer;
-    private String issued;
-    private String expiration;
+    private Date issued;
+    private Date expiration;
 
     public Long getIdDocument() {
         return idDocument;
@@ -67,19 +69,19 @@ public class DocumentItem {
         this.issuer = issuer;
     }
 
-    public String getIssued() {
+    public Date getIssued() {
         return issued;
     }
 
-    public void setIssued(String issued) {
+    public void setIssued(Date issued) {
         this.issued = issued;
     }
 
-    public String getExpiration() {
+    public Date getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(String expiration) {
+    public void setExpiration(Date expiration) {
         this.expiration = expiration;
     }
 }

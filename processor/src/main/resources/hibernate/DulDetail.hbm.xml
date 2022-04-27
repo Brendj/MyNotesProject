@@ -21,8 +21,8 @@
         <property name="number" column="number" type="string" length="64" not-null="true"/>
         <property name="subdivisionCode" column="subdivision_code" type="string" length="64" not-null="false"/>
         <property name="issuer" column="issuer" type="string" length="64" not-null="false"/>
-        <property name="issued" column="issued" type="string" length="64" not-null="false"/>
-        <property name="expiration" column="expiration" type="string" length="64" not-null="false"/>
+        <property name="issued" column="issued" type="ru.axetta.ecafe.processor.core.persistence.DateType" length="64" not-null="false"/>
+        <property name="expiration" column="expiration" type="ru.axetta.ecafe.processor.core.persistence.DateType" length="64" not-null="false"/>
         <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"

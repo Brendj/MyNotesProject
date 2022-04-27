@@ -212,14 +212,14 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Когда выдан"/>
             </f:facet>
-            <h:outputText escape="true" value="#{dul.issued}" />
+            <h:outputText escape="true" value="#{dul.issued}" converter="dateConverter"/>
         </rich:column>
 
         <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата истечения срока действия"/>
             </f:facet>
-            <h:outputText escape="true" value="#{dul.expiration}" />
+            <h:outputText escape="true" value="#{dul.expiration}" converter="dateConverter"/>
         </rich:column>
 
         <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">

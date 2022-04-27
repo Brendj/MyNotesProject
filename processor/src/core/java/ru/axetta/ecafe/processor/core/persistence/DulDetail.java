@@ -12,8 +12,8 @@ public class DulDetail {
     private String number;
     private String subdivisionCode;
     private String issuer;
-    private String issued;
-    private String expiration;
+    private Date issued;
+    private Date expiration;
     private Date createDate;
     private Date lastUpdate;
     private Boolean deleteState;
@@ -77,20 +77,20 @@ public class DulDetail {
         this.lastUpdate = lastUpdate;
     }
 
-    public String getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(String expiration) {
-        this.expiration = expiration;
-    }
-
-    public String getIssued() {
+    public Date getIssued() {
         return issued;
     }
 
-    public void setIssued(String issued) {
+    public void setIssued(Date issued) {
         this.issued = issued;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 
     public String getIssuer() {
