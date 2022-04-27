@@ -2438,15 +2438,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
 
-            // получить блюда по детализации заказов orderdetails
+            // получить блюда для детализации заказов orderdetails
             Set<WtDish> dishes = DAOReadExternalsService.getInstance()
                     .getWtDishesByOrderDetails(detailsList, startDate, endDate);
-            if (dishes == null || dishes.size() == 0) {
-                result.resultCode = RC_OK;
-                result.description = RC_OK_DESC;
-                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
-                return result;
-            }
 
             Map<Long, Date> lastProcessMap = new HashMap<>();
             for (Order order : ordersList) {

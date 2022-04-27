@@ -5,12 +5,14 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
+import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding> {
@@ -22,8 +24,31 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
         this.preOrdersFeedingRequest = preOrdersFeedingRequest;
     }
 
+    private void processToPayList() {
+        Long version = DAOUtils.nextVersionByPreorderComplex(session);
+        for (PreOrdersFeedingToPayItem item : preOrdersFeedingRequest.getItems()) {
+            PreorderComplex preorderComplex = DAOUtils.getPreorderComplexByGuid(session, item.getGuid());
+            if (preorderComplex != null) {
+                preorderComplex.setToPay(item.getToPay());
+                preorderComplex.setVersion(version);
+                preorderComplex.setLastUpdate(new Date());
+                session.merge(preorderComplex);
+            }
+            for (PreOrdersFeedingToPayDetailItem detailItem : item.getDetails()) {
+                PreorderMenuDetail pmd = DAOUtils.getPreorderMenuDetailByIdOfDish(preorderComplex, detailItem.getIdOfDish());
+                if (pmd != null) {
+                    pmd.setAmountToPay(detailItem.getQty());
+                    pmd.setToPay(detailItem.getToPay());
+                    session.merge(pmd);
+                }
+            }
+        }
+        session.flush();
+    }
+
     @Override
     public PreOrdersFeeding process() throws Exception {
+        processToPayList();
         PreOrdersFeeding result = new PreOrdersFeeding();
         List<PreOrdersFeedingItem> items = new ArrayList<PreOrdersFeedingItem>();
 

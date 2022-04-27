@@ -740,10 +740,6 @@
         <role-name>AuthorizedUser</role-name>
     </security-role>
 
-    <session-config>
-        <session-timeout>20</session-timeout>
-    </session-config>
-
     <error-page>
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/sessionexpired.jsp</location>

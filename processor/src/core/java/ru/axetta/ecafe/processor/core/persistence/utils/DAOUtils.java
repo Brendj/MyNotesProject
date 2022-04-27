@@ -2402,7 +2402,7 @@ public class DAOUtils {
         return null;
     }
 
-    private static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
+    public static PreorderMenuDetail getPreorderMenuDetailByIdOfDish(PreorderComplex preorderComplex, Long idOfDish) {
         for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
             if (pmd.getIdOfDish().equals(idOfDish) && !pmd.getDeletedState()) {
                 return pmd;
@@ -3933,6 +3933,14 @@ public class DAOUtils {
         query.setParameter("idOfOrg", orgOwner);
         query.setParameter("date", startDate);
         return query.list();
+    }
+
+    public static PreorderComplex getPreorderComplexByGuid(Session session, String guid) {
+        Query query = session.createQuery("select pc from PreorderComplex pc where pc.guid = :guid");
+        query.setParameter("guid", guid);
+        List<PreorderComplex> list = query.getResultList();
+        if (list.size() > 0) return list.get(0);
+        return null;
     }
 
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,

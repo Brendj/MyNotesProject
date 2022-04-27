@@ -4419,17 +4419,12 @@ public class Processor implements SyncProcessor {
     private ResReestrTaloonPreorder processReestrTaloonPreorder(ReestrTaloonPreorder reestrTaloonPreorder)
             throws Exception {
         Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         ResReestrTaloonPreorder resReestrTaloonPreorder = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new ReestrTaloonPreorderProcessor(persistenceSession, reestrTaloonPreorder);
+            AbstractProcessor processor = new ReestrTaloonPreorderProcessor(persistenceSession, reestrTaloonPreorder, persistenceSessionFactory);
             resReestrTaloonPreorder = (ResReestrTaloonPreorder) processor.process();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
         return resReestrTaloonPreorder;
@@ -4444,7 +4439,7 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ReestrTaloonPreorderProcessor processor = new ReestrTaloonPreorderProcessor(persistenceSession,
-                    reestrTaloonPreorder);
+                    reestrTaloonPreorder, persistenceSessionFactory);
             reestrTaloonPreorderData = processor.processData();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -4454,6 +4449,7 @@ public class Processor implements SyncProcessor {
         }
         return reestrTaloonPreorderData;
     }
+
 
     private ZeroTransactionData processZeroTransactionsData(ZeroTransactions zeroTransactions) throws Exception {
         Session persistenceSession = null;

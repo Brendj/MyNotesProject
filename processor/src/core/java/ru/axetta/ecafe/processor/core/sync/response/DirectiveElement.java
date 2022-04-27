@@ -122,6 +122,9 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("PreorderSync","1"));
             DAOUtils.savePreorderDirectiveWithValue(session, org.getIdOfOrg(), false);
         }
+
+        Boolean newСashierMode = org.getNewСashierMode();
+        directiveItemList.add(new DirectiveItem("NewСashierMode", newСashierMode ? "1" : "0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
