@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class MeshGuardianConverter {
         return new PersonResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
-    public DocumentResponse toDTO(PersonDocument personDocument) {
+    public DocumentResponse toDTO(PersonDocument personDocument) throws ParseException {
         return new DocumentResponse(personDocument);
     }
 

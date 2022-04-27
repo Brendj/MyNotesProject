@@ -44,11 +44,11 @@ public class PersonDocument {
     @JsonProperty("created_by")
     private String createdBy;
     @JsonProperty("updated_by")
-    private Object updatedBy;
+    private String updatedBy;
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("updated_at")
-    private Object updatedAt;
+    private String updatedAt;
     @JsonProperty("document_type_id")
     private Integer documentTypeId;
     @JsonProperty("series")
@@ -56,7 +56,7 @@ public class PersonDocument {
     @JsonProperty("number")
     private String number;
     @JsonProperty("subdivision_code")
-    private Object subdivisionCode;
+    private String subdivisionCode;
     @JsonProperty("issuer")
     private String issuer;
     @JsonProperty("issued")
@@ -64,7 +64,7 @@ public class PersonDocument {
     @JsonProperty("expiration")
     private String expiration;
     @JsonProperty("attachments")
-    private Object attachments;
+    private String attachments;
     @JsonProperty("document_type")
     private DocumentType documentType;
     @JsonProperty("validation_errors")
@@ -143,12 +143,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("updated_by")
-    public Object getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
     @JsonProperty("updated_by")
-    public void setUpdatedBy(Object updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 
@@ -163,12 +163,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("updated_at")
-    public Object getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     @JsonProperty("updated_at")
-    public void setUpdatedAt(Object updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -203,12 +203,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("subdivision_code")
-    public Object getSubdivisionCode() {
+    public String getSubdivisionCode() {
         return subdivisionCode;
     }
 
     @JsonProperty("subdivision_code")
-    public void setSubdivisionCode(Object subdivisionCode) {
+    public void setSubdivisionCode(String subdivisionCode) {
         this.subdivisionCode = subdivisionCode;
     }
 
@@ -243,12 +243,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("attachments")
-    public Object getAttachments() {
+    public String getAttachments() {
         return attachments;
     }
 
     @JsonProperty("attachments")
-    public void setAttachments(Object attachments) {
+    public void setAttachments(String attachments) {
         this.attachments = attachments;
     }
 
