@@ -257,10 +257,18 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 this.printError("- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
                 throw new RuntimeException("Bad password");
             }
-            User user = new User(userName, plainPassword, phone, new Date());
+            Date currentDate = new Date();
+            User user = new User(userName, plainPassword, phone, currentDate);
             user.setEmail(email);
             user.setDeleteDateForBlock(deleteDateForBlock);
+            user.setCreatedDate(currentDate);
             User.DefaultRole role = null;
+
+            if(currentUser != null) {
+                User userCreate = session.load(User.class, currentUser.getIdOfUser());
+                user.setUserCreate(userCreate);
+            }
+
             if (idOfRole < UserRoleEnumTypeMenu.OFFSET) {
                 role = User.DefaultRole.parse(idOfRole);
             }
