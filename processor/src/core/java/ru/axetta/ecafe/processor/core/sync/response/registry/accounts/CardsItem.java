@@ -41,11 +41,12 @@ public class CardsItem {
     private Integer transitionState;    //Состояние перехода
     private Integer cardSignCertNum; //номер сертификата эцп
     private Long longCardId;      // Длинный UID карты
+    private Date cardLastUpdate;  //Дата и время последнего обновления карты - опционально
 
 
     public CardsItem(long cardNo, int cardType, int state, long idOfClient, String lockReason, Date validDate,
             Date issueDate, long orgOwner, boolean temp, Long visistorId, Long contractId, Long printedNo,
-            boolean isLongUid, Long longCardId) {
+            boolean isLongUid, Long longCardId, Date cardLastUpdate) {
         this.cardNo = cardNo;
         this.cardType = cardType;
         this.state = state;
@@ -60,6 +61,7 @@ public class CardsItem {
         this.printedNo = printedNo;
         this.isLongUid = isLongUid;
         this.longCardId = longCardId;
+        this.cardLastUpdate = cardLastUpdate;
     }
 
     public CardsItem(Card card, Client client) {
@@ -98,6 +100,7 @@ public class CardsItem {
         if(null != card.getLongCardNo()){
             this.longCardId = card.getLongCardNo();
         }
+        this.cardLastUpdate = card.getUpdateTime();
     }
 
     public CardsItem(Card card, Visitor visitor){
@@ -271,7 +274,9 @@ public class CardsItem {
         if(null != longCardId){
             element.setAttribute("LongCardId", this.longCardId.toString());
         }
-
+        if (cardLastUpdate != null) {
+            element.setAttribute("CardLastUpdate", CalendarUtils.dateTimeToString(this.cardLastUpdate));
+        }
         return element;
     }
 
