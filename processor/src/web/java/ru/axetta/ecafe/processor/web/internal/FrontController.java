@@ -2921,7 +2921,7 @@ public class FrontController extends HttpServlet {
         DocumentResponse documentResponse;
 
         try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (idOfClient == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
