@@ -964,18 +964,20 @@ public class MealsController extends Application {
         }
         ClientData clientData = new ClientData();
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
-        clientData.setFoodboxAvailablе(client.getOrg().getUsedFoodbox());
+        clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
         ClientDataMain clientDataMain = new ClientDataMain();
         clientDataMain.setClientData(clientData);
         //Проверяем, что параллель клиента доступна для заказа фудбокса
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(clientDataMain).build();
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         else
         {
-            logger.error("Клиент входит в параллель");
+            logger.info("Клиент входит в параллель");
             return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
         }
     }
@@ -983,11 +985,12 @@ public class MealsController extends Application {
 
     private FoodboxOrderInfo convertData(FoodBoxPreorder foodBoxPreorder) {
         FoodboxOrderInfo foodboxOrderInfo = new FoodboxOrderInfo();
-        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000)) + "Z");
+        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
+                CalendarUtils.convertdateInUTC(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000))) + "Z");
         if (foodBoxPreorder.getState() != null) {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
-        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(foodBoxPreorder.getCreateDate()) + "Z");
+        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(CalendarUtils.convertdateInUTC(foodBoxPreorder.getCreateDate())) + "Z");
         foodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
         Long sum = 0L;
         for (FoodBoxPreorderDish foodBoxPreorderDish : DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder)) {

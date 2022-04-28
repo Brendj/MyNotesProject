@@ -21,7 +21,7 @@ public class ClientData {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean foodboxAllowed = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean foodboxAvailablе = null;
+    private Boolean foodboxAvailable = null;
 
     public ClientData clientId(ClientId clientId) {
         this.clientId = clientId;
@@ -109,7 +109,7 @@ public class ClientData {
         this.foodboxAllowed = foodboxAllowed;
     }
     public ClientData foodboxAvailablе(Boolean foodboxAvailablе) {
-        this.foodboxAvailablе = foodboxAvailablе;
+        this.foodboxAvailable = foodboxAvailablе;
         return this;
     }
 
@@ -120,10 +120,10 @@ public class ClientData {
      * @return foodboxAvailablе
      **/
     public Boolean isFoodboxAvailablе() {
-        return foodboxAvailablе;
+        return foodboxAvailable;
     }
-    public void setFoodboxAvailablе(Boolean foodboxAvailablе) {
-        this.foodboxAvailablе = foodboxAvailablе;
+    public void setFoodboxAvailable(Boolean foodboxAvailable) {
+        this.foodboxAvailable = foodboxAvailable;
     }
     @Override
     public boolean equals(java.lang.Object o) {
@@ -139,12 +139,12 @@ public class ClientData {
                 Objects.equals(this.preorderAllowed, clientData.preorderAllowed) &&
                 Objects.equals(this.balance, clientData.balance) &&
                 Objects.equals(this.foodboxAllowed, clientData.foodboxAllowed) &&
-                Objects.equals(this.foodboxAvailablе, clientData.foodboxAvailablе);
+                Objects.equals(this.foodboxAvailable, clientData.foodboxAvailable);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(clientId, organization, preorderAllowed, balance, foodboxAllowed, foodboxAvailablе);
+        return java.util.Objects.hash(clientId, organization, preorderAllowed, balance, foodboxAllowed, foodboxAvailable);
     }
 
     @Override
@@ -157,7 +157,7 @@ public class ClientData {
         sb.append("    preorderAllowed: ").append(toIndentedString(preorderAllowed)).append("\n");
         sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
         sb.append("    foodboxAllowed: ").append(toIndentedString(foodboxAllowed)).append("\n");
-        sb.append("    foodboxAvailablе: ").append(toIndentedString(foodboxAvailablе)).append("\n");
+        sb.append("    foodboxAvailablе: ").append(toIndentedString(foodboxAvailable)).append("\n");
         sb.append("}");
         return sb.toString();
     }
