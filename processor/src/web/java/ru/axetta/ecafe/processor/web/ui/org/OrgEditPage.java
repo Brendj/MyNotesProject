@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.web.ui.org;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxParallelType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
@@ -146,6 +149,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean multiCardModeEnabled;
     private Boolean participantOP;
     private Boolean preorderlp;
+	private Boolean usedfoodbox;
+    private List<FoodBoxParallelUI> foodBoxParallelUIS;
     private Boolean useWebArm;
     private Boolean useWebArmAdmin;
     private Boolean goodDateCheck;
@@ -454,7 +459,111 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
-        org.setNewСashierMode(newСashierMode);
+		org.setNewСashierMode(newСashierMode);
+        org.setUsedFoodbox(usedfoodbox);
+        //Параллели для фудбокса
+
+        if (!usedfoodbox) {
+            //Если фудбокс выключен, то удаляем настройки параллелей для орги
+            for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {
+                session.delete(foodBoxOrgParallel);
+            }
+            org.setFoodBoxParallels(null);
+            //Изменяем параметр футбокс клиентов на по-умолчанию
+            DAOUtils.updateClientsByOrgFoodBox(session, false, 0,
+                    null, org.getIdOfOrg());
+        } else
+        {
+            //Снимаем копию с оригинальной коллекции org.getFoodBoxParallels() т.к. потом из копии будет удаление
+            Set<FoodBoxOrgParallel> foodBoxOrgParallelsCopy = new HashSet<>();
+            for (FoodBoxOrgParallel foodBoxOrgParallel: org.getFoodBoxParallels()) {
+                FoodBoxOrgParallel foodBoxOrgParallel1 = new FoodBoxOrgParallel();
+                foodBoxOrgParallel1.setFoodboxparallelId(foodBoxOrgParallel.getFoodboxparallelId());
+                foodBoxOrgParallel1.setParallel(foodBoxOrgParallel.getParallel());
+                foodBoxOrgParallel1.setAvailable(foodBoxOrgParallel.getAvailable());
+                foodBoxOrgParallel1.setOrg(foodBoxOrgParallel.getOrg());
+                foodBoxOrgParallelsCopy.add(foodBoxOrgParallel1);
+            }
+            //Список параллелей, для которых мы убрали активность фудбокса
+            List<Integer> parallelsOld = new ArrayList<>();
+            //Список параллелей, для которых мы включили фудбокс
+            List<Integer> parallelsNew = new ArrayList<>();
+            //Список параллелей, которые мы убрали из футбокса
+            List<Integer> globalparallelsOld = new ArrayList<>();
+            //Список параллелей, которые мы добавили из футбокса
+            List<Integer> globalparallelsNew = new ArrayList<>();
+            //Сначала обновляем записи в бд, которые уже есть по орг
+            Iterator<FoodBoxOrgParallel> iteratorBDcopy = foodBoxOrgParallelsCopy.iterator();
+            while (iteratorBDcopy.hasNext()) {
+                FoodBoxOrgParallel foodBoxOrgParallelCopy = iteratorBDcopy.next();
+                Iterator<FoodBoxParallelUI> iteratorUI = foodBoxParallelUIS.iterator();
+                while (iteratorUI.hasNext()) {
+                    FoodBoxParallelUI foodBoxOrgParallelUI = iteratorUI.next();
+                    if (foodBoxOrgParallelCopy.getParallel().equals(foodBoxOrgParallelUI.getParallel())) {
+                        //Мы должны обновить реальный об.ект в бд, а не его копию
+                        for (FoodBoxOrgParallel foodBoxOrgParallelReal: org.getFoodBoxParallels()) {
+                            if (foodBoxOrgParallelReal.getParallel().equals(foodBoxOrgParallelUI.getParallel())) {
+                                foodBoxOrgParallelReal.setAvailable(foodBoxOrgParallelUI.isAvailable());
+                                if (foodBoxOrgParallelUI.isAvailable())
+                                {
+                                    parallelsNew.add(foodBoxOrgParallelUI.getParallel());
+                                } else
+                                {
+                                    parallelsOld.add(foodBoxOrgParallelUI.getParallel());
+                                }
+                                session.update(foodBoxOrgParallelReal);
+                                break;
+                            }
+                        }
+                        iteratorBDcopy.remove();
+                        iteratorUI.remove();
+                    }
+                }
+            }
+            for (FoodBoxOrgParallel foodBoxOrgParallel: foodBoxOrgParallelsCopy) {
+                //Если параллель больше не доступна
+                //Мы должны удалить реальный объект в бд, а не его копию
+                for (FoodBoxOrgParallel foodBoxOrgParallelReal: org.getFoodBoxParallels()) {
+                    if (foodBoxOrgParallelReal.getFoodboxparallelId().equals(foodBoxOrgParallel.getFoodboxparallelId())) {
+                        session.delete(foodBoxOrgParallelReal);
+                        org.getFoodBoxParallels().remove(foodBoxOrgParallelReal);
+                        globalparallelsOld.add(foodBoxOrgParallelReal.getParallel());
+                        break;
+                    }
+                }
+            }
+            //Проставляем у всех клиентов из выключенных параллелей для орг флаг не доступности фудбокса
+            if (!parallelsOld.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, false, 2,
+                        parallelsOld, org.getIdOfOrg());
+            }
+            //Проставляем у всех клиентов из убранных параллелей для орг флаг не доступности фудбокса
+            if (!globalparallelsOld.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, false, 0,
+                        globalparallelsOld, org.getIdOfOrg());
+            }
+            for (FoodBoxParallelUI foodBoxParallelUI: foodBoxParallelUIS) {
+                //Если добавили новую параллель
+                FoodBoxOrgParallel foodBoxOrgParallel = new FoodBoxOrgParallel();
+                foodBoxOrgParallel.setParallel(foodBoxParallelUI.getParallel());
+                foodBoxOrgParallel.setOrg(org);
+                foodBoxOrgParallel.setAvailable(foodBoxParallelUI.isAvailable());
+                session.persist(foodBoxOrgParallel);
+                org.getFoodBoxParallels().add(foodBoxOrgParallel);
+                if (foodBoxParallelUI.isAvailable())
+                    globalparallelsNew.add(foodBoxParallelUI.getParallel());
+            }
+            //Проставляем у всех клиентов из включенных параллелей для орг флаг доступности фудбокса
+            if (!parallelsNew.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, true, 2,
+                        parallelsNew, org.getIdOfOrg());
+            }
+            //Проставляем у всех клиентов из новых параллелей для орг флаг доступности фудбокса
+            if (!globalparallelsNew.isEmpty()) {
+                DAOUtils.updateClientsByOrgFoodBox(session, true, 0,
+                        globalparallelsNew, org.getIdOfOrg());
+            }
+        }
 
         manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
                 lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
@@ -623,7 +732,31 @@ public class OrgEditPage extends BasicWorkspacePage
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.useMealSchedule = mealSchedule != null && mealSchedule;
-        this.newСashierMode = org.getNewСashierMode();
+		this.newСashierMode = org.getNewСashierMode();
+        this.usedfoodbox = org.getUsedFoodbox();
+        prepareParallels();
+        if (org.getFoodBoxParallels() != null) {
+            //Если есть настройки для данной орг, то мы их считываем
+            for (FoodBoxOrgParallel foodBoxOrgParallel : org.getFoodBoxParallels()) {
+                for (FoodBoxParallelUI foodBoxParallelUI1 : foodBoxParallelUIS) {
+                    if (Objects.equals(foodBoxOrgParallel.getParallel(), foodBoxParallelUI1.getParallel())) {
+                        foodBoxParallelUI1.setAvailable(foodBoxOrgParallel.getAvailable());
+                    }
+                }
+            }
+        }
+    }
+
+    private void prepareParallels()
+    {
+        //Подготавливаем список параллелей
+        foodBoxParallelUIS = new ArrayList<>();
+        FoodBoxParallelUI foodBoxParallelUI;
+        for (FoodBoxParallelType foodBoxParallelType : FoodBoxParallelType.FoodBoxByParallel.getParallelTypes()) {
+            foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
+                    foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());
+            foodBoxParallelUIS.add(foodBoxParallelUI);
+        }
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1320,6 +1453,22 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setNewСashierMode(Boolean newСashierMode) {
         this.newСashierMode = newСashierMode;
+    }
+
+    public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
+    }
+
+    public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
+        return foodBoxParallelUIS;
+    }
+
+    public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
+        this.foodBoxParallelUIS = foodBoxParallelUIS;
     }
 
     public static class ContragentItem {

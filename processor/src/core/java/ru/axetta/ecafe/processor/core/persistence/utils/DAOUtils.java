@@ -5772,4 +5772,59 @@ public class DAOUtils {
         query.setParameter("defaultSupplier", defaultSupplier);
         return query.list();
     }
+	
+	public static boolean updateClientsByOrgFoodBox (Session session, boolean foodboxavailability,
+                                                 Integer foodboxavailabilityguardianInt, List<Integer> parallels,
+                                                 Long idOfOrg) {
+        try {
+            boolean foodboxavailabilityguardian = false;
+            if (foodboxavailabilityguardianInt == 0)
+                foodboxavailabilityguardian = false;
+            if (foodboxavailabilityguardianInt == 1)
+                foodboxavailabilityguardian = true;
+            StringBuilder paral1 = new StringBuilder();
+            StringBuilder paral2 = new StringBuilder();
+            if (parallels != null) {
+                for (Integer paral : parallels) {
+                    paral1.append("'").append(paral).append("',");
+                    paral2.append(paral).append("%,");
+                }
+                paral1 = new StringBuilder(paral1.substring(0, paral1.length() - 1));
+                paral2 = new StringBuilder(paral2.substring(0, paral2.length() - 1));
+            }
+            String sql;
+            if (foodboxavailabilityguardianInt == 2)
+            {
+                sql = "update cf_clients set foodboxavailability = :foodboxavailability" +
+                        " where idofclient in \n" +
+                        "(select cc.idofclient from cf_clients cc left join cf_clientgroups cc2 \n" +
+                        "on cc.idofclientgroup = cc2.idofclientgroup and cc.idoforg = cc2.idoforg where \n" +
+                        "cc.idoforg = :idoforg ";
+            }
+            else {
+                sql = "update cf_clients set foodboxavailability = :foodboxavailability, " +
+                        " foodboxavailabilityguardian = :foodboxavailabilityguardian where idofclient in \n" +
+                        "(select cc.idofclient from cf_clients cc left join cf_clientgroups cc2 \n" +
+                        "on cc.idofclientgroup = cc2.idofclientgroup and cc.idoforg = cc2.idoforg where \n" +
+                        "cc.idoforg = :idoforg ";
+            }
+            if (parallels != null) {
+                sql += " and (\"parallel\" in (" + paral1 + ") or cc2.groupname ~~ ANY('{" +
+                        paral2 + "}')))";
+            } else {
+                sql += ")";
+            }
+            Query query = session.createSQLQuery(sql);
+            query.setParameter("foodboxavailability", foodboxavailability);
+            if (foodboxavailabilityguardianInt != 2)
+                query.setParameter("foodboxavailabilityguardian", foodboxavailabilityguardian);
+            query.setParameter("idoforg", idOfOrg);
+            query.executeUpdate();
+            return true;
+        } catch (Exception e)
+        {
+            logger.error("Error in updateClientsByOrgFoodBox", e);
+            return false;
+        }
+    }
 }

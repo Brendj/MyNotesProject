@@ -132,7 +132,6 @@ public class LibraryController extends Application {
     }
 
     private boolean validateAccess(String key) {
-        //Узнаем, нужно ли использовать проверку по ip
         String keyinternal = RuntimeContext.getInstance().getConfigProperties().getProperty(KEY_FOR_LIBRARY, "");
         if (!key.isEmpty() && key.equals(keyinternal))
             return true;

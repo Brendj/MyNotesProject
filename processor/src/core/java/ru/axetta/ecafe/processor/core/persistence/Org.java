@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.service.CommonTaskService;
@@ -178,7 +179,9 @@ public class Org implements Serializable {
     private Boolean gooddatecheck;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
-    private Boolean newСashierMode;
+	private Boolean newСashierMode;
+    private Boolean usedFoodbox;
+    private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -259,6 +262,7 @@ public class Org implements Serializable {
         this.useWebArmAdmin = false;
         this.governmentContract = false;
         this.useLongCardNo = false;
+        this.usedFoodbox = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1429,5 +1433,23 @@ public class Org implements Serializable {
 
     public void setNewСashierMode(Boolean newСashierMode) {
         this.newСashierMode = newСashierMode;
+    }
+	
+	public Boolean getUsedFoodbox() {
+        if (usedFoodbox == null)
+            return false;
+        return usedFoodbox;
+    }
+
+    public void setUsedFoodbox(Boolean usedFoodbox) {
+        this.usedFoodbox = usedFoodbox;
+    }
+
+    public Set<FoodBoxOrgParallel> getFoodBoxParallels() {
+        return foodBoxParallels;
+    }
+
+    public void setFoodBoxParallels(Set<FoodBoxOrgParallel> foodBoxParallels) {
+        this.foodBoxParallels = foodBoxParallels;
     }
 }

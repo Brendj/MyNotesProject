@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Node;

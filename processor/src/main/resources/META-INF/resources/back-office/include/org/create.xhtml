@@ -203,9 +203,29 @@
                 <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text"/>
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preordersEnabled}" styleClass="input-text"/>
                 <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text"/>
-                <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text"/>
+		<h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text"/>
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.newСashierMode}" styleClass="input-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text" />
+                <h:outputText escape="true" value="Использовать фудбокс" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.usedfoodbox}" styleClass="input-text">
+                    <a4j:ajax event="click" render="foodboxPanel"/>
+                </h:selectBooleanCheckbox>
+                <h:panelGrid id="foodboxPanel" styleClass="borderless-grid">
+                    <rich:dataTable id="foodBox" value="#{mainPage.orgCreatePage.foodBoxParallelUIS}"
+                                    var="it"
+                                    rows="#{mainPage.orgCreatePage.foodBoxParallelUIS.size()}"
+                                    columnClasses="left-aligned-column, center-aligned-column"
+                                    footerClass="data-table-footer"
+                                    rendered="#{mainPage.orgCreatePage.usedfoodbox}">
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{it.nameParallel}" styleClass="output-text"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:selectBooleanCheckbox value="#{it.available}" styleClass="input-text"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </h:panelGrid>
+                <h:panelGroup />
             </h:panelGrid>
 
             <h:outputText escape="true" value="Настройки рассылки и уведомлений:" styleClass="output-text-strong"/>

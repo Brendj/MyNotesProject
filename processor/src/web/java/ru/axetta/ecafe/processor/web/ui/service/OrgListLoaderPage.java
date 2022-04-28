@@ -268,6 +268,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             }
             org.setGuid(guid);
             org.setPreorderlp(false); // Предварительные заявки по ЛП - для синхронизации
+            org.setUsedFoodbox(false);
             session.save(org);
 
             OrgSync orgSync = new OrgSync();

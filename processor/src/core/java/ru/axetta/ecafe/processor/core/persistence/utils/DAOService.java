@@ -1289,5 +1289,18 @@ public class DAOService {
         q.setParameter("oldID", cardSign.getIdOfCardSign());
         q.executeUpdate();
     }
+
+    public void deleteOldFoodBoxAvailable(Org org, Long idOfDish) {
+        Query query = entityManager.createQuery("delete from FoodBoxPreorderAvailable where org=:org and idOfDish=:idOfDish");
+        query.setParameter("org", org);
+        query.setParameter("idOfDish", idOfDish);
+        query.executeUpdate();
+    }
+
+    public void deleteFoodBox(Long foodboxesid) {
+        Query query = entityManager.createQuery("delete from FoodBoxCells where foodboxesid=:foodboxesid");
+        query.setParameter("foodboxesid", foodboxesid);
+        query.executeUpdate();
+    }
 }
 

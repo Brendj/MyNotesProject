@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish" table="cf_foodbox_preorders_dish">
+        <id name="idFoodBoxPreorderDish" column="id" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_foodbox_preorders_dish_id_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="foodBoxPreorder" class="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder" column="foodboxid"
+                     not-null="true" update="false"/>
+        <property name="idOfDish" column="idofdish" type="long"/>
+        <property name="price" column="price" type="int"/>
+        <property name="qty" column="qty" type="int"/>
+        <property name="name" column="name" type="string"/>
+        <property name="buffetCategoriesId" column="buffetCategoriesId" type="long"/>
+        <property name="buffetCategoriesName" column="buffetCategoriesName" type="string"/>
+        <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="updateDate" column="updatedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

@@ -219,6 +219,12 @@ public class CalendarUtils {
         return new Date(date.getTime()-offset);
     }
 
+    public static Date convertdateInLocal(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        int offset = c.get(Calendar.ZONE_OFFSET);
+        return new Date(date.getTime()+offset);
+    }
+
     public static Date truncateToDayOfMonthAndAddDay(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);

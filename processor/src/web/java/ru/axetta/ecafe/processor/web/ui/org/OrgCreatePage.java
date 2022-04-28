@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxParallelType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -99,7 +101,9 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long orgIdFromNsi = null;
     private Boolean governmentContract = false;
     private Boolean useLongCardId = false;
-    private Boolean newСashierMode;
+	private Boolean newСashierMode;
+    private Boolean usedfoodbox = false;
+    private List<FoodBoxParallelUI> foodBoxParallelUIS = null;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -347,13 +351,29 @@ public class OrgCreatePage extends BasicWorkspacePage
     public void setSubordination(String subordination) {
         this.subordination = subordination;
     }
-
-    public Boolean getNewСashierMode() {
+	
+	public Boolean getNewСashierMode() {
         return newСashierMode;
     }
 
     public void setNewСashierMode(Boolean newСashierMode) {
         this.newСashierMode = newСashierMode;
+    }
+
+    public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
+    }
+
+    public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
+        return foodBoxParallelUIS;
+    }
+
+    public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
+        this.foodBoxParallelUIS = foodBoxParallelUIS;
     }
 
     public static class ContragentItem {
@@ -635,6 +655,16 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void fill(Session session) throws Exception {
         this.state = 0;
+        if (foodBoxParallelUIS == null) {
+            //Подготавливаем данные для паралеллей по фудбоксу
+            foodBoxParallelUIS = new ArrayList<>();
+            FoodBoxParallelUI foodBoxParallelUI;
+            for (FoodBoxParallelType foodBoxParallelType : FoodBoxParallelType.FoodBoxByParallel.getParallelTypes()) {
+                foodBoxParallelUI = new FoodBoxParallelUI("Доступен для " +
+                        foodBoxParallelType.getParallel() + " параллели", true, foodBoxParallelType.getParallel());
+                foodBoxParallelUIS.add(foodBoxParallelUI);
+            }
+        }
     }
 
     public void createOrg(Session session) throws Exception {
@@ -714,8 +744,21 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
-        org.setNewСashierMode(newСashierMode);
+		org.setNewСashierMode(newСashierMode);
+        org.setUsedFoodbox(usedfoodbox);
         session.save(org);
+        FoodBoxOrgParallel foodBoxOrgParallel;
+        if (usedfoodbox)
+        {
+            for (FoodBoxParallelUI foodBoxParallelUI: foodBoxParallelUIS)
+            {
+                foodBoxOrgParallel = new FoodBoxOrgParallel();
+                foodBoxOrgParallel.setParallel(foodBoxParallelUI.getParallel());
+                foodBoxOrgParallel.setOrg(org);
+                foodBoxOrgParallel.setAvailable(foodBoxParallelUI.isAvailable());
+                session.save(foodBoxOrgParallel);
+            }
+        }
         OrgSync orgSync = new OrgSync();
         orgSync.setIdOfPacket(0L);
         orgSync.setOrg(org);
