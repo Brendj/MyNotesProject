@@ -224,7 +224,7 @@ public class MealsController extends Application {
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
             currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
-                    CalendarUtils.convertdateInUTC(new Date(new Date().getTime() + TIME_ALIVE)) + "Z"));
+                    CalendarUtils.convertdateInUTC(new Date(new Date().getTime() + TIME_ALIVE))) + "Z");
             currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(
                     CalendarUtils.convertdateInUTC(new Date())) + "Z");
             currentFoodboxOrderInfo.setBalance(client.getBalance());
