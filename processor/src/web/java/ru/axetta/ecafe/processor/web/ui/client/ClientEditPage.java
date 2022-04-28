@@ -1232,6 +1232,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setAgeTypeGroup(this.ageTypeGroup);
         client.setSpecialMenu(this.specialMenu);
         client.setParallel(this.parallel);
+        if(middleGroup != null && !middleGroup.isEmpty())
+            createMiddleGroup(persistenceSession, this.org.idOfOrg, this.clientGroupName, this.middleGroup);
         client.setMiddleGroup(this.middleGroup);
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
@@ -1250,6 +1252,36 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private void createMiddleGroup(Session session, Long idOfOrg, String groupName, String middleGroupName) throws Exception {
+        List<GroupNamesToOrgs> groupNamesToOrgList = DAOUtils.findMiddleGroupNamesToOrgByIdOfOrg(session, idOfOrg);
+
+        if (groupNamesToOrgList.stream().anyMatch(g -> g.getGroupName().equals(middleGroupName)
+                && !g.getParentGroupName().equals(groupName))){
+            throw new Exception("Подгруппа уже существует в другой группе данной организации");
+        }
+
+        if (groupNamesToOrgList.stream().anyMatch(g -> g.getGroupName().equals(middleGroupName)
+                && g.getParentGroupName().equals(groupName))){
+            return;
+        }
+        Org org = session.get(Org.class, idOfOrg);
+        Org mainBuildingOrg = org.getFriendlyOrg().stream().filter(Org::getMainBuilding).findAny().orElse(null);
+
+        if(mainBuildingOrg == null) {
+            throw new Exception(String.format("Не найден главный корпус у организации с id = %s", idOfOrg));
+        }
+
+        GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+        groupNamesToOrgs.setIdOfOrg(idOfOrg);
+        groupNamesToOrgs.setIdOfMainOrg(mainBuildingOrg.getIdOfOrg());
+        groupNamesToOrgs.setMainBuilding(1);
+        groupNamesToOrgs.setVersion(DAOUtils.nextVersionByGroupNameToOrg(session));
+        groupNamesToOrgs.setGroupName(middleGroupName);
+        groupNamesToOrgs.setParentGroupName(groupName);
+        groupNamesToOrgs.setIsMiddleGroup(true);
+        session.save(groupNamesToOrgs);
     }
 
     public void deletePDClient() throws Exception {
