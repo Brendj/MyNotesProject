@@ -63,6 +63,10 @@ public class WtMenu {
     @OneToMany(mappedBy = "menu")
     private Set<WtMenuGroupMenu> menuGroupMenus = new HashSet<>();
 
+    @OneToMany(mappedBy = "idOfMenu", fetch = FetchType.LAZY)
+    private Set<WtMenuInvisibleDish> wtMenuInvisibleDishes = new HashSet<>();
+
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "cf_wt_menu_org", joinColumns = @JoinColumn(name = "idOfMenu"), inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
@@ -137,6 +141,14 @@ public class WtMenu {
 
     public void setMenuGroupMenus(Set<WtMenuGroupMenu> menuGroupMenus) {
         this.menuGroupMenus = menuGroupMenus;
+    }
+
+    public Set<WtMenuInvisibleDish> getWtMenuInvisibleDishes() {
+        return wtMenuInvisibleDishes;
+    }
+
+    public void setWtMenuInvisibleDishes(Set<WtMenuInvisibleDish> wtMenuInvisibleDishes) {
+        this.wtMenuInvisibleDishes = wtMenuInvisibleDishes;
     }
 
     public Set<Org> getOrgs() {

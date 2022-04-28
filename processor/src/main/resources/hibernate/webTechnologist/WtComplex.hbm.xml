@@ -104,6 +104,13 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem"/>
         </set>
 
+        <set name="wtComplexesInvisible" lazy="false">
+            <key>
+                <column name="idOfComplex"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexInvisible"/>
+        </set>
+
         <set name="discountRules" lazy="true" table="cf_wt_discountrules_complexes">
             <key column="idOfComplex"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
