@@ -46,6 +46,9 @@
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg" fetch="select" lazy="proxy"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient" fetch="select"/>
         <property name="deleteDateForBlock" column="deleteDateForBlock" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="false"/>
+        <many-to-one name="userCreate" column="idOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User"/>
+        <many-to-one name="userEdit" column="idOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User"/>
 
         <set name="contragents" table="CF_UserContragents">
             <key column="IdOfUser"/>

@@ -1106,7 +1106,6 @@ public class GoodRequestsNewReportService {
     public static class Item implements Comparable {
 
         final private static String STR_YEAR_DATE_FORMAT = "EE dd.MM";
-        final private static DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
         private String orgNum;
         private String officialName;
         private String goodName;
@@ -1155,7 +1154,7 @@ public class GoodRequestsNewReportService {
             this.officialName = officialName;
             this.goodName = goodName;
             this.doneDate = doneDate;
-            doneDateStr = YEAR_DATE_FORMAT.format(doneDate);
+            doneDateStr = getYearDateFormat().format(doneDate);
             this.totalCount = totalCount;
             this.dailySample = dailySample;
             this.tempClients = tempClients;
@@ -1430,6 +1429,10 @@ public class GoodRequestsNewReportService {
 
         public void setPrice(Long price) {
             this.price = price;
+        }
+
+        public DateFormat getYearDateFormat(){
+            return new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
         }
     }
 

@@ -116,6 +116,9 @@ public class WtComplex {
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
+    @OneToMany(mappedBy = "idOfComplex", fetch = FetchType.LAZY)
+    private Set<WtComplexInvisible> wtComplexesInvisible = new HashSet<>();
+
     @Column(name = "idOfOrgGroup", insertable = false, updatable = false)
     private Long idOfOrgGroup;
 
@@ -351,6 +354,14 @@ public class WtComplex {
 
     public void setWtComplexesItems(Set<WtComplexesItem> wtComplexesItems) {
         this.wtComplexesItems = wtComplexesItems;
+    }
+
+    public Set<WtComplexInvisible> getWtComplexesInvisible() {
+        return wtComplexesInvisible;
+    }
+
+    public void setWtComplexesInvisible(Set<WtComplexInvisible> wtComplexesInvisible) {
+        this.wtComplexesInvisible = wtComplexesInvisible;
     }
 
     public String getBarcode() {

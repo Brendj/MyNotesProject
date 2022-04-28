@@ -151,6 +151,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean goodDateCheck;
     private Long orgIdFromNsi = null;
     private Boolean useMealSchedule;
+    private Boolean newСashierMode;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -453,6 +454,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
+        org.setNewСashierMode(newСashierMode);
 
         manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
                 lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
@@ -621,6 +623,7 @@ public class OrgEditPage extends BasicWorkspacePage
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.useMealSchedule = mealSchedule != null && mealSchedule;
+        this.newСashierMode = org.getNewСashierMode();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1309,6 +1312,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setGoodDateCheck(Boolean goodDateCheck) {
         this.goodDateCheck = goodDateCheck;
+    }
+
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
     }
 
     public static class ContragentItem {

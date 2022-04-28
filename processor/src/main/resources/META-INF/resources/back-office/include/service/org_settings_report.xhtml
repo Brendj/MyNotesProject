@@ -206,6 +206,9 @@
                             <h:outputText escape="true" value="Оплата/сторнирование месяц продажи + 5 дней следующего" />
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                            <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" />
+                        </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
                             <h:outputText escape="true" value="Контроль расхождения времени оплаты" />
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" rowspan="2">
@@ -236,77 +239,82 @@
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showRequisite}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseGovernmentContract}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(12)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(12)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseWebArmAdmin}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(14)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(14)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseWebArm}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(0)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(0)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUsePaydableSubscriptionFeeding}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(1)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(1)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allVariableFeeding}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(2)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(2)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allPreordersEnabled}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(3)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(3)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allReverseMonthOfSale}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(4)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(4)}"/>
+                            </h:selectBooleanCheckbox>
+                        </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                            <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allNewСashierMode}" disabled="false">
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(15)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allDenyPayPlanForTimeDifference}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(5)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(5)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseMealSchedule}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(13)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(13)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allOneActiveCard}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(6)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(6)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allEnableDuplicateCard}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(7)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(7)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allMultiCardModeEnabled}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(8)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(8)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allNeedVerifyCardSign}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(9)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(9)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allRequestForVisitsToOtherOrg}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(10)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(10)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allIsWorkInSummerTime}" disabled="false">
-                                <a4j:ajax render="orgSettingsTable" event="change" action="#{orgSettingsReportPage.doMarkAll(11)}"/>
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(11)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                     </rich:columnGroup>
@@ -410,6 +418,11 @@
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false" styleClass="checkboxes">
+                        <a4j:ajax event="change" listener="#{item.change()}" />
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                    <h:selectBooleanCheckbox value="#{item.newСashierMode}" disabled="false" styleClass="checkboxes">
                         <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
