@@ -140,8 +140,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     @Override
     public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
-        Client client = session.load(Client.class, this.idOfClient);
-        this.dulDetail.add(new DulDetail(client, dulGuide.getDocumentTypeId(), dulGuide));
+        this.dulDetail.add(new DulDetail(this.idOfClient, dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {
@@ -1217,6 +1216,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
+
+        if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
+            if(this.san == null || this.san.isEmpty()) {
+                throw new Exception("Поле СНИЛС обязательное для заполнения");
+            }
+            ClientManager.validateSan(persistenceSession, this.san, idOfClient);
+        }
+        client.setSan(this.san);
 
         resetNewFlags();
         client.setOrg(org);

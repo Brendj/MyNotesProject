@@ -5790,7 +5790,7 @@ public class Processor implements SyncProcessor {
                 DulDetail dulDetail = new DulDetail();
                 dulDetail.setNumber(clientParamItem.getPassportNumber());
                 dulDetail.setSeries(clientParamItem.getPassportSeries());
-                dulDetail.setClient(client);
+                dulDetail.setIdOfClient(client.getIdOfClient());
                 dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
                 RuntimeContext.getAppContext().getBean(DulDetailService.class)

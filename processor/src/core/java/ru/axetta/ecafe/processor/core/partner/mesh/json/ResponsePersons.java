@@ -84,7 +84,7 @@ public class ResponsePersons {
     @JsonProperty("addresses")
     private Object addresses;
     @JsonProperty("documents")
-    private Object documents;
+    private List<PersonDocument> documents = null;
     @JsonProperty("contacts")
     private Object contacts;
     @JsonProperty("preventions")
@@ -96,7 +96,7 @@ public class ResponsePersons {
     @JsonProperty("agents")
     private Object agents;
     @JsonProperty("children")
-    private Object children;
+    private List<PersonAgent> children = null;
     @JsonProperty("education")
     private List<Education> education = null;
     @JsonProperty("citizenship")
@@ -309,12 +309,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("documents")
-    public Object getDocuments() {
+    public List<PersonDocument> getDocuments() {
         return documents;
     }
 
     @JsonProperty("documents")
-    public void setDocuments(Object documents) {
+    public void setDocuments(List<PersonDocument> documents) {
         this.documents = documents;
     }
 
@@ -369,12 +369,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("children")
-    public Object getChildren() {
+    public List<PersonAgent> getChildren() {
         return children;
     }
 
     @JsonProperty("children")
-    public void setChildren(Object children) {
+    public void setChildren(List<PersonAgent> children) {
         this.children = children;
     }
 

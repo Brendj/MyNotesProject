@@ -14,21 +14,21 @@
                 <param name="sequence_name">cf_dul_detail_id</param>
             </generator>
         </id>
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
-                     not-null="true" update="false"/>
+        <property name="idMkDocument" column="idmkdocument" type="long" not-null="true"/>
+        <property name="IdOfClient" column="IdOfClient" type="long" not-null="true"/>
         <property name="documentTypeId" column="document_type_id" type="long" not-null="false"/>
         <property name="series" column="series" type="string" length="64" not-null="false"/>
         <property name="number" column="number" type="string" length="64" not-null="true"/>
         <property name="subdivisionCode" column="subdivision_code" type="string" length="64" not-null="false"/>
         <property name="issuer" column="issuer" type="string" length="64" not-null="false"/>
-        <property name="issued" column="issued" type="string" length="64" not-null="false"/>
-        <property name="expiration" column="expiration" type="string" length="64" not-null="false"/>
+        <property name="issued" column="issued" type="ru.axetta.ecafe.processor.core.persistence.DateType" length="64" not-null="false"/>
+        <property name="expiration" column="expiration" type="ru.axetta.ecafe.processor.core.persistence.DateType" length="64" not-null="false"/>
         <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" />
         <property name="deleteState" column="deletestate" type="java.lang.Boolean"/>
-        <many-to-one name="dulGuide" class="ru.axetta.ecafe.processor.core.persistence.DulGuide" column="document_type_id" lazy="false" not-null="true"
+        <many-to-one name="dulGuide" class="ru.axetta.ecafe.processor.core.persistence.DulGuide" column="document_type_id" lazy="false" not-null="false"
                      update="false" insert="false"/>
     </class>
 </hibernate-mapping>

@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentSaveException;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -58,6 +60,7 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -125,8 +128,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeItemsV2")
     public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
-            @WebParam(name = "nameFilter") String nameFilter) {
+                                                                @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+                                                                @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkRequestValidity(idOfOrg);
         } catch (FrontControllerException fce) {
@@ -154,8 +157,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeEmployeeItemsV2")
     public List<RegistryChangeItemV2> loadRegistryChangeEmployeeItemsV2(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
-            @WebParam(name = "nameFilter") String nameFilter) {
+                                                                        @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+                                                                        @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkRequestValidity(idOfOrg);
         } catch (FrontControllerException fce) {
@@ -174,8 +177,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeItemsInternal")
     public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
-            @WebParam(name = "nameFilter") String nameFilter) {
+                                                                    @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+                                                                    @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {
@@ -203,8 +206,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeItemsInternalV2")
     public List<RegistryChangeItemV2> loadRegistryChangeItemsInternalV2(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
-            @WebParam(name = "nameFilter") String nameFilter) {
+                                                                        @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+                                                                        @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {
@@ -333,20 +336,17 @@ public class FrontController extends HttpServlet {
                 clientsMobileHistory.setOrg(org);
             }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-        }
-        else
-        {
+        } else {
             clientsMobileHistory.setShowing("АРМ");
         }
-        if (guidStaff != null)
-        {
+        if (guidStaff != null) {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
-		MessageContext mc = wsContext.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItem (front)");
-		clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+        clientGuardianHistory.setWebAdress(req.getRemoteAddr());
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegistryChangeItem(changesList, operation, fullNameValidation, clientsMobileHistory, clientGuardianHistory);
     }
@@ -376,19 +376,16 @@ public class FrontController extends HttpServlet {
                 clientsMobileHistory.setOrg(org);
             }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-        }
-        else
-        {
+        } else {
             clientsMobileHistory.setShowing("АРМ");
         }
-        if (guidStaff != null)
-        {
+        if (guidStaff != null) {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
-		        //
+        //
         MessageContext mc = wsContext.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод proceedRegitryChangeItemInternal (front)");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
@@ -420,19 +417,16 @@ public class FrontController extends HttpServlet {
                 clientsMobileHistory.setOrg(org);
             }
             clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-        }
-        else
-        {
+        } else {
             clientsMobileHistory.setShowing("АРМ");
         }
-        if (guidStaff != null)
-        {
+        if (guidStaff != null) {
             clientsMobileHistory.setStaffguid(guidStaff);
         }
         clientsMobileHistory.setStaffguid(guidStaff);
-		//
+        //
         MessageContext mc = wsContext.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
         clientGuardianHistory.setReason("Веб метод proceedRegitryChangeEmployeeItem (front)");
         clientGuardianHistory.setWebAdress(req.getRemoteAddr());
@@ -519,8 +513,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "addRegistryChangeError")
     public String addRegistryChangeError(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "error") String error,
-            @WebParam(name = "errorDetails") String errorDetails) {
+                                         @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "error") String error,
+                                         @WebParam(name = "errorDetails") String errorDetails) {
         try {
             checkRequestValidity(idOfOrg);
         } catch (FrontControllerException fce) {
@@ -533,8 +527,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "addRegistryChangeErrorInternal")
     public String addRegistryChangeErrorInternal(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "error") String error,
-            @WebParam(name = "errorDetails") String errorDetails) {
+                                                 @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "error") String error,
+                                                 @WebParam(name = "errorDetails") String errorDetails) {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {
@@ -547,7 +541,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "commentRegistryChangeError")
     public String commentRegistryChangeError(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
-            @WebParam(name = "comment") String comment, @WebParam(name = "author") String author) {
+                                             @WebParam(name = "comment") String comment, @WebParam(name = "author") String author) {
         RegistryChangeError e = null;
         if (RuntimeContext.RegistryType.isMsk()) {
             e = RuntimeContext.getAppContext()
@@ -617,9 +611,9 @@ public class FrontController extends HttpServlet {
     /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */
     @WebMethod(operationName = "checkVisitorByCard")
     public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
+                                          @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         checkRequestValidity(idOfOrg);
@@ -635,11 +629,11 @@ public class FrontController extends HttpServlet {
              * выбрасывать исключение с сообщением «Карта уже зарегистрирована как постоянная» *
              * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
             Card c = null;
-            if(longCardNo == null) {
+            if (longCardNo == null) {
                 c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             } else {
                 c = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
-                if(c == null){
+                if (c == null) {
                     c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 }
             }
@@ -649,7 +643,7 @@ public class FrontController extends HttpServlet {
             }
 
             CardTemp ct = null;
-            if(longCardNo == null) {
+            if (longCardNo == null) {
                 ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
             } else {
                 ct = DAOUtils.findCardTempByLongCardNo(persistenceSession, longCardNo);
@@ -705,10 +699,10 @@ public class FrontController extends HttpServlet {
     /* возвращающий последнюю операцию по врем. карте */
     @WebMethod(operationName = "getLastTempCardOperation")
     public TempCardOperationItem getLastTempCardOperation(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
+                                                          @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         Session persistenceSession = null;
@@ -737,10 +731,10 @@ public class FrontController extends HttpServlet {
     /* Выполняет регистрацию временной карты системы customerType=0 */
     @WebMethod(operationName = "registerTempCard")
     public void registerTempCard(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "cardPrintedNo") String cardPrintedNo,  @WebParam(name = "longCardNo") Long longCardNo)
+                                 @WebParam(name = "cardPrintedNo") String cardPrintedNo, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         ///
@@ -756,7 +750,7 @@ public class FrontController extends HttpServlet {
     /* Метод возвращает номер, напечатанный на новой карте, по номеру чипа карты */
     @WebMethod(operationName = "getCardPrintedNoByCardNo")
     public CardPrintedNoItem getCardPrintedNoByCardNo(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
+                                                      @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         try {
             CardManager.NewCardItem newCardItem = RuntimeContext.getInstance().getCardManager()
@@ -780,7 +774,7 @@ public class FrontController extends HttpServlet {
      * */
     @WebMethod(operationName = "getGuardiansAndChildsByCard")
     public List<GuardianAndChildItem> getGuardiansAndChildsByCard(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
+                                                                  @WebParam(name = "cardNo") Long cardNo) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         List<GuardianAndChildItem> result = new ArrayList<GuardianAndChildItem>();
         Session persistenceSession = null;
@@ -875,7 +869,7 @@ public class FrontController extends HttpServlet {
     /* Создание заявок на посещение */
     @WebMethod(operationName = "createMigrateRequests")
     public void createMigrateRequests(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "rqs") List<MigrateRequest> rqs) throws FrontControllerException {
+                                      @WebParam(name = "rqs") List<MigrateRequest> rqs) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Date date = new Date();
         Date after5Seconds = CalendarUtils.addSeconds(date, 5);
@@ -957,7 +951,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerVisitor")
     public Long registerVisitor(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
+                                @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1056,11 +1050,11 @@ public class FrontController extends HttpServlet {
     /* Выполняет регистрацию врем. карты посетителя customerType=1. */
     @WebMethod(operationName = "registerVisitorTempCard")
     public void registerVisitorTempCard(@WebParam(name = "orgId") Long idOfOrg,
-            @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "longCardNo") Long longCardNo)
+                                        @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo,
+                                        @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         Session persistenceSession = null;
@@ -1076,11 +1070,11 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Посетитель не зарегистрирован");
             }
             Card card = null;
-            if(longCardNo == null) {
+            if (longCardNo == null) {
                 card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             } else {
                 card = DAOUtils.findCardByLongCardNo(persistenceSession, longCardNo);
-                if(card == null){
+                if (card == null) {
                     card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 }
             }
@@ -1099,7 +1093,7 @@ public class FrontController extends HttpServlet {
             }
 
             CardTemp cardTemp = null;
-            if(longCardNo == null) {
+            if (longCardNo == null) {
                 cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
             } else {
                 cardTemp = DAOUtils.findCardTempByLongCardNo(persistenceSession, cardNo);
@@ -1156,11 +1150,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerCard")
     public Long registerCard(@WebParam(name = "orgId") Long orgId, @WebParam(name = "clientId") Long clientId,
-            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") Long cardPrintedNo,
-            @WebParam(name = "cardType") int cardType, @WebParam(name = "issuedTime") Date issuedTime,
-            @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
+                             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") Long cardPrintedNo,
+                             @WebParam(name = "cardType") int cardType, @WebParam(name = "issuedTime") Date issuedTime,
+                             @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(orgId);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         ///
@@ -1176,11 +1170,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "changeCardOwner")
     public void changeCardOwner(@WebParam(name = "orgId") Long orgId, @WebParam(name = "newOwnerId") Long newOwnerId,
-            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
-            @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo)
+                                @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
+                                @WebParam(name = "validTime") Date validTime, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         checkRequestValidity(orgId);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         ///
@@ -1350,13 +1344,10 @@ public class FrontController extends HttpServlet {
                         clientsMobileHistory.setOrg(org);
                     }
                     clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-                }
-                else
-                {
+                } else {
                     clientsMobileHistory.setShowing("АРМ");
                 }
-                if (guidStaff != null)
-                {
+                if (guidStaff != null) {
                     clientsMobileHistory.setStaffguid(guidStaff);
                 }
                 long idOfClient = ClientManager
@@ -1381,8 +1372,8 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerClients")
     public List<RegisterClientResult> registerClients(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "clientDescList") List<ClientDesc> clientDescList,
-            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
+                                                      @WebParam(name = "clientDescList") List<ClientDesc> clientDescList,
+                                                      @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
             throws FrontControllerException {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
@@ -1628,7 +1619,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "generateLinkingToken")
     public String generateLinkingToken(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "idOfClient") Long idOfClient) throws Exception {
+                                       @WebParam(name = "idOfClient") Long idOfClient) throws Exception {
         checkRequestValidity(orgId);
 
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
@@ -1690,13 +1681,13 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerCardWithoutClient")
     public CardResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
-            @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
-            @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
-            @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
-            @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister,
-            @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
+                                                      @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
+                                                      @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
+                                                      @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
+                                                      @WebParam(name = "isLongUid") boolean isLongUid, @WebParam(name = "forceRegister") Integer forceRegister,
+                                                      @WebParam(name = "longCardNo") Long longCardNo) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         logger.info(String.format(
@@ -1789,7 +1780,7 @@ public class FrontController extends HttpServlet {
         } catch (CardResponseItem.LongCardNoNotSpecified e) {
             logger.error("LongCardNoNotSpecified: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_LONG_CARDNO_MATCH_ORG, e.getMessage());
-        } catch(NoUniqueCardNoException e) {
+        } catch (NoUniqueCardNoException e) {
             logger.error("NoUniqueCardNoException: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE, CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
@@ -1888,7 +1879,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "getExternalEvents")
     public ExternalEventItems getExternalEvents(@WebParam(name = "orgId") long idOfOrg,
-            @WebParam(name = "version") long version) throws FrontControllerException {
+                                                @WebParam(name = "version") long version) throws FrontControllerException {
         ExternalEventItems result = new ExternalEventItems();
         ManualEvents manualEvents = new ManualEvents();
         manualEvents.setEnterEventsManual(getEnterEventsManual(idOfOrg));
@@ -1936,8 +1927,8 @@ public class FrontController extends HttpServlet {
     }
 
     public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group,
-            @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
+                                                    @WebParam(name = "mode") int mode, @WebParam(name = "group") String group,
+                                                    @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
         try {
             if (mode == 1) {
                 //Обнуление часов, минут, секунд
@@ -1962,7 +1953,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod
     public List<SimpleEnterEventItem> getEnterEvents(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "groupName") String groupName, @WebParam(name = "requestDate") long requestDate)
+                                                     @WebParam(name = "groupName") String groupName, @WebParam(name = "requestDate") long requestDate)
             throws FrontControllerException {
         try {
             Date beginDate = CalendarUtils.truncateToDayOfMonth(new Date(requestDate));
@@ -1983,7 +1974,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod
     public String getCardSignVerifyKey(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "cardSignCertNum") int cardSignCertNum, @WebParam(name = "signType") Integer signType)
+                                       @WebParam(name = "cardSignCertNum") int cardSignCertNum, @WebParam(name = "signType") Integer signType)
             throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
         Session session = null;
@@ -2108,7 +2099,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "proceedClientPhotoChanges")
     public void proceedClientPhotoChanges(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "results") List<ClientPhotoChangeResult> results) throws FrontControllerException {
+                                          @WebParam(name = "results") List<ClientPhotoChangeResult> results) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2225,7 +2216,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "getBalancesForPayPlan")
     public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList) throws FrontControllerException {
+                                                            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList) throws FrontControllerException {
         checkRequestValidityExtended(orgId);
         PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
         Session session = null;
@@ -2260,10 +2251,10 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,
-            @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
+                                            @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
-        if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
+        if (longCardNo != null && longCardNo.equals(-1L)) { // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
         ResponseItem responseItem = new ResponseItem();
@@ -2294,7 +2285,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "findClient")
     public List<FindClientResult> findClient(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "findClientFieldList") FindClientField findClientField) throws FrontControllerException {
+                                             @WebParam(name = "findClientFieldList") FindClientField findClientField) throws FrontControllerException {
         checkRequestValidity(orgId);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2398,7 +2389,7 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "orgId") Long orgId,
             @WebParam(name = "guardianDescList") GuardianDesc guardianDescList,
             @WebParam(name = "guidStaff") String guidStaff
-            ) throws FrontControllerException {
+    ) throws FrontControllerException {
         checkRequestValidity(orgId);
 
         String firstName = FrontControllerProcessor
@@ -2584,7 +2575,7 @@ public class FrontController extends HttpServlet {
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
             //
             MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setOrg(org);
             clientGuardianHistory.setReason("Веб метод registerGuardian (front)");
@@ -2622,7 +2613,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "registerGuardianMigrantRequest")
     public ResponseItem registerGuardianMigrantRequest(@WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList) throws FrontControllerException {
+                                                       @WebParam(name = "guardianDescList") GuardianDesc guardianDescList) throws FrontControllerException {
         checkRequestValidity(orgId);
 
         ResponseItem result = new ResponseItem();
@@ -2719,7 +2710,7 @@ public class FrontController extends HttpServlet {
             if (existingRef == null) {
                 //
                 MessageContext mc = wsContext.getMessageContext();
-                HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+                HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
                 ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setOrg(org);
                 clientGuardianHistory.setReason("Веб метод registerGuardianMigrantRequest (front)");
@@ -2768,10 +2759,10 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            for(CardInfoItem item : info.getItems()){
+            for (CardInfoItem item : info.getItems()) {
                 Card c = (Card) persistenceSession.get(Card.class, item.getProcessingCardId());
 
-                if (c == null){
+                if (c == null) {
                     logger.warn(
                             String.format("Card CardNo: %d LongCardId: %d not found",
                                     item.getCardNo(), item.getLongCardId())
@@ -2792,7 +2783,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
 
             persistenceSession.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error in updateCardFieldsRequest", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
@@ -2801,4 +2792,211 @@ public class FrontController extends HttpServlet {
         }
         return result;
     }
+
+    @WebMethod(operationName = "createDocumentForClient")
+    public DocumentResponse createDocumentForClient(
+            @WebParam(name = "documentItem") DocumentItem documentItem) {
+
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Long idOfDocument;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
+
+            if (client == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            if (documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+            DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
+            idOfDocument = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in createDocumentForClient", e);
+            if (e instanceof MeshDocumentSaveException) {
+                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
+                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
+            } else {
+                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                        e.getMessage());
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new DocumentResponse(idOfDocument);
+    }
+
+    @WebMethod(operationName = "updateDocumentForClient")
+    public DocumentResponse updateDocumentForClient(
+            @WebParam(name = "documentItem") DocumentItem documentItem) {
+
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+            if (persistenceSession.load(DulDetail.class, documentItem.getIdDocument()) == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
+                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+            }
+            DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
+            if (dulDetail.getId() == null)
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
+            dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in updateDocumentForClient", e);
+            if (e instanceof MeshDocumentSaveException) {
+                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
+                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
+            } else {
+                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                        e.getMessage());
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+    }
+
+    @WebMethod(operationName = "deleteDocumentForClient")
+    public DocumentResponse deleteDocumentForClient(
+            @WebParam(name = "idDocument") Long idDocument) {
+
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (idDocument == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+            DulDetail dulDetail = persistenceSession.get(DulDetail.class, idDocument);
+            if (dulDetail == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
+                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+            }
+            dulDetail.setDeleteState(true);
+            dulDetail.setLastUpdate(new Date());
+            Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
+            dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in deleteDocumentForClient", e);
+            if (e instanceof MeshDocumentSaveException) {
+                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
+                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
+            } else {
+                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                        e.getMessage());
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+    }
+
+    @WebMethod(operationName = "getDocumentForClient")
+    public DocumentResponse getDocumentForClient(
+            @WebParam(name = "idOfClient") Long idOfClient) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        DocumentResponse documentResponse;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (idOfClient == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+            Client client = persistenceSession.get(Client.class, idOfClient);
+            if (client == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            List<DulDetail> dulDetails = new ArrayList<>();
+            if (client.getDulDetail() != null) {
+                dulDetails = client.getDulDetail().stream().filter(d -> !d.getDeleteState()).collect(Collectors.toList());
+            }
+            if (client.getDulDetail() == null || dulDetails.isEmpty()) {
+                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
+                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+            }
+            List<DocumentItem> documentItems = new ArrayList<>();
+            dulDetails.forEach(dulDetail -> {
+                DocumentItem documentItem = new DocumentItem();
+                documentItem.setIdDocument(dulDetail.getId());
+                documentItem.setDocumentTypeId(dulDetail.getDocumentTypeId());
+                documentItem.setSeries(dulDetail.getSeries());
+                documentItem.setNumber(dulDetail.getNumber());
+                documentItem.setSubdivisionCode(dulDetail.getSubdivisionCode());
+                documentItem.setIssuer(dulDetail.getIssuer());
+                documentItem.setIssued(dulDetail.getIssued());
+                documentItem.setExpiration(dulDetail.getExpiration());
+                documentItems.add(documentItem);
+            });
+            documentResponse = new DocumentResponse(documentItems);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in getDocumentForClient", e);
+            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL, e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return documentResponse;
+    }
+
+    private DulDetail fillingDulDetail(Session session, DocumentItem documentItem) {
+        DulDetail dulDetail;
+        Date currentDate = new Date();
+        if (documentItem.getIdDocument() == null) {
+            dulDetail = new DulDetail();
+            dulDetail.setCreateDate(currentDate);
+            dulDetail.setDeleteState(false);
+        } else
+            dulDetail = session.get(DulDetail.class, documentItem.getIdDocument());
+        if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L)
+            dulDetail.setIdOfClient(documentItem.getIdOfClient());
+        dulDetail.setDocumentTypeId(documentItem.getDocumentTypeId());
+        dulDetail.setSeries(documentItem.getSeries());
+        dulDetail.setNumber(documentItem.getNumber());
+        dulDetail.setSubdivisionCode(documentItem.getSubdivisionCode());
+        dulDetail.setIssuer(documentItem.getIssuer());
+        dulDetail.setIssued(documentItem.getIssued());
+        dulDetail.setExpiration(documentItem.getExpiration());
+        dulDetail.setLastUpdate(currentDate);
+        return dulDetail;
+    }
+
 }

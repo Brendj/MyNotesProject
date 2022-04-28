@@ -1434,7 +1434,6 @@ public class GoodRequestsNewReportService {
         public DateFormat getYearDateFormat(){
             return new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
         }
-
     }
 
     public static class TotalItem {

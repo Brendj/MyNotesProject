@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.hibernate.type.TrueFalseType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
@@ -663,6 +664,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
 
+        if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
+            if(this.san == null || this.san.isEmpty()) {
+                throw new Exception("Поле СНИЛС обязательное для заполнения");
+            }
+            ClientManager.validateSan(persistenceSession, this.san, null);
+        }
+        client.setSan(this.san);
+
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
         persistenceSession.update(client);
@@ -679,15 +688,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         clean();
 
-        Client createdClient =  persistenceSession.load(Client.class, client.getIdOfClient());
-
         for (DulDetail dul: this.dulDetail)
-            dul.setClient(client);
-
+            dul.setIdOfClient(client.getIdOfClient());
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, createdClient.getIdOfClient());
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
 
-        return createdClient;
+        return client;
     }
 
     private void clean() {

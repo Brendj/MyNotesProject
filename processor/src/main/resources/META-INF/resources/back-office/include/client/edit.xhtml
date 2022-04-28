@@ -248,18 +248,22 @@
                     <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
                 </rich:column>
 
-                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
                     <f:facet name="header">
-                        <h:outputText escape="true" value="Когда выдан"/>
+                        <h:outputText escape="true" styleClass="" value="Когда выдан"/>
                     </f:facet>
-                    <h:inputText value="#{dul.issued}" maxlength="64" styleClass="input-text"/>
+                    <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
                 </rich:column>
 
-                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Дата истечения срока действия"/>
                     </f:facet>
-                    <h:inputText value="#{dul.expiration}" maxlength="64" styleClass="input-text"/>
+                    <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">

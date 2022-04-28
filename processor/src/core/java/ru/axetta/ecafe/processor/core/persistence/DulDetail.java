@@ -1,27 +1,26 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import java.util.Date;
 import java.util.Objects;
 
 public class DulDetail {
     private Long id;
-    private Client client;
+    private Long idMkDocument;
+    private Long idOfClient;
     private Long documentTypeId;
     private String series;
     private String number;
     private String subdivisionCode;
     private String issuer;
-    private String issued;
-    private String expiration;
+    private Date issued;
+    private Date expiration;
     private Date createDate;
     private Date lastUpdate;
     private Boolean deleteState;
     private DulGuide dulGuide;
 
-    public DulDetail(Client client, Long documentTypeId, DulGuide dulGuide) {
-        this.client = client;
+    public DulDetail(Long idOfClient, Long documentTypeId, DulGuide dulGuide) {
+        this.idOfClient = idOfClient;
         this.documentTypeId = documentTypeId;
         this.dulGuide = dulGuide;
     }
@@ -36,11 +35,19 @@ public class DulDetail {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DulDetail dulDetail = (DulDetail) o;
-        return Objects.equals(id, dulDetail.id) && Objects.equals(documentTypeId, dulDetail.documentTypeId)
+        return Objects.equals(id, dulDetail.id) && Objects.equals(idMkDocument, dulDetail.idMkDocument)
+                && Objects.equals(documentTypeId, dulDetail.documentTypeId)
                 && Objects.equals(series, dulDetail.series) && Objects.equals(number, dulDetail.number)
-                && Objects.equals(subdivisionCode, dulDetail.subdivisionCode) && Objects.equals(issuer, dulDetail.issuer)
-                && Objects.equals(issued, dulDetail.issued) && Objects.equals(expiration, dulDetail.expiration)
+                && Objects.equals(subdivisionCode, dulDetail.subdivisionCode)
+                && Objects.equals(issuer, dulDetail.issuer) && Objects.equals(issued, dulDetail.issued)
+                && Objects.equals(expiration, dulDetail.expiration)
                 && Objects.equals(deleteState, dulDetail.deleteState);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, idMkDocument, documentTypeId, series, number, subdivisionCode, issuer,
+                issued, expiration, deleteState);
     }
 
     public DulDetail() {
@@ -70,20 +77,20 @@ public class DulDetail {
         this.lastUpdate = lastUpdate;
     }
 
-    public String getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(String expiration) {
-        this.expiration = expiration;
-    }
-
-    public String getIssued() {
+    public Date getIssued() {
         return issued;
     }
 
-    public void setIssued(String issued) {
+    public void setIssued(Date issued) {
         this.issued = issued;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 
     public String getIssuer() {
@@ -126,12 +133,12 @@ public class DulDetail {
         this.documentTypeId = documentTypeId;
     }
 
-    public Client getClient() {
-        return client;
+    public Long getIdOfClient() {
+        return idOfClient;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 
     public Long getId() {
@@ -148,5 +155,13 @@ public class DulDetail {
 
     public void setDulGuide(DulGuide dulGuide) {
         this.dulGuide = dulGuide;
+    }
+
+    public Long getIdMkDocument() {
+        return idMkDocument;
+    }
+
+    public void setIdMkDocument(Long idMkDocument) {
+        this.idMkDocument = idMkDocument;
     }
 }
