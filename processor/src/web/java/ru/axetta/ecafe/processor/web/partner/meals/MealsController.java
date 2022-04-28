@@ -649,8 +649,14 @@ public class MealsController extends Application {
         //Расскидываем по классам
         PersonBuffetMenu personBuffetMenu = new PersonBuffetMenu();
         personBuffetMenu.setBuffetIsOpen(true);
-        personBuffetMenu.setBuffetOpenAt(getBuffetOpenTime());
-        personBuffetMenu.buffetCloseTime(getBuffetCloseTime());
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        try {
+            personBuffetMenu.setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+            personBuffetMenu.buffetCloseTime(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
+        } catch (Exception e)
+        {
+            logger.error("Ошибка при форматировании времени работы буфета", e);
+        }
         Integer corCount = 0;
         for (WtDish wtDish : wtDishes) {
             if (have_prohobition(wtDish, null, null, prohibitionMenus))
