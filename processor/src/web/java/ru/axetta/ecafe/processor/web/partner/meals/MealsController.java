@@ -79,7 +79,7 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
-        DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         try {
             Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
             Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
@@ -88,8 +88,8 @@ public class MealsController extends Application {
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-                orderErrorInfo.getDetails().setBuffetOpenAt(getBuffetOpenTime());
-                orderErrorInfo.getDetails().setBuffetCloseAt(getBuffetCloseTime());
+                orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+                orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
                 return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         } catch (Exception e) {
@@ -144,6 +144,15 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
+
+        //Проверяем параллель клиента
+        if (!new ClientParallel().verifyParallelForClient(client))
+        {
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+        }
+        
         if (!client.getFoodboxAvailability()) {
             logger.error("У клиента не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
@@ -214,8 +223,10 @@ public class MealsController extends Application {
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
-            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + TIME_ALIVE)) + "Z");
-            currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(new Date()) + "Z");
+            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
+                    CalendarUtils.convertdateInUTC(new Date(new Date().getTime() + TIME_ALIVE))) + "Z");
+            currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(
+                    CalendarUtils.convertdateInUTC(new Date())) + "Z");
             currentFoodboxOrderInfo.setBalance(client.getBalance());
             currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
@@ -632,8 +643,14 @@ public class MealsController extends Application {
         //Расскидываем по классам
         PersonBuffetMenu personBuffetMenu = new PersonBuffetMenu();
         personBuffetMenu.setBuffetIsOpen(true);
-        personBuffetMenu.setBuffetOpenAt(getBuffetOpenTime());
-        personBuffetMenu.buffetCloseTime(getBuffetCloseTime());
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        try {
+            personBuffetMenu.setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+            personBuffetMenu.buffetCloseTime(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
+        } catch (Exception e)
+        {
+            logger.error("Ошибка при форматировании времени работы буфета", e);
+        }
         Integer corCount = 0;
         for (WtDish wtDish : wtDishes) {
             if (have_prohobition(wtDish, null, null, prohibitionMenus))
@@ -965,8 +982,8 @@ public class MealsController extends Application {
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         else
@@ -979,11 +996,12 @@ public class MealsController extends Application {
 
     private FoodboxOrderInfo convertData(FoodBoxPreorder foodBoxPreorder) {
         FoodboxOrderInfo foodboxOrderInfo = new FoodboxOrderInfo();
-        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000)) + "Z");
+        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
+                CalendarUtils.convertdateInUTC(new Date(foodBoxPreorder.getCreateDate().getTime() + TIME_ALIVE))) + "Z");
         if (foodBoxPreorder.getState() != null) {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
-        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(foodBoxPreorder.getCreateDate()) + "Z");
+        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(CalendarUtils.convertdateInUTC(foodBoxPreorder.getCreateDate())) + "Z");
         foodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
         Long sum = 0L;
         for (FoodBoxPreorderDish foodBoxPreorderDish : DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder)) {
