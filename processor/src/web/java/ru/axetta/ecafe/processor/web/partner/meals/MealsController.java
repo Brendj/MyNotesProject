@@ -965,8 +965,8 @@ public class MealsController extends Application {
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         else
@@ -979,11 +979,12 @@ public class MealsController extends Application {
 
     private FoodboxOrderInfo convertData(FoodBoxPreorder foodBoxPreorder) {
         FoodboxOrderInfo foodboxOrderInfo = new FoodboxOrderInfo();
-        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000)) + "Z");
+        foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
+                CalendarUtils.convertdateInUTC(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000))) + "Z");
         if (foodBoxPreorder.getState() != null) {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
-        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(foodBoxPreorder.getCreateDate()) + "Z");
+        foodboxOrderInfo.setCreatedAt(simpleDateFormat.format(CalendarUtils.convertdateInUTC(foodBoxPreorder.getCreateDate())) + "Z");
         foodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
         Long sum = 0L;
         for (FoodBoxPreorderDish foodBoxPreorderDish : DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder)) {
