@@ -5764,4 +5764,13 @@ public class DAOUtils {
         query.setParameter("defaultSupplier", defaultSupplier);
         return query.list();
     }
+
+    @SuppressWarnings("unchecked")
+    public static List<GroupNamesToOrgs> findMiddleGroupNamesToOrgByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("isMiddleGroup", true));
+        return (List<GroupNamesToOrgs>) criteria.list();
+    }
+
 }
