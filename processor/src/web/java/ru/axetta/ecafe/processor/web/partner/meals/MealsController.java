@@ -79,7 +79,7 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
-        DateFormat format = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         try {
             Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
             Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
@@ -88,8 +88,8 @@ public class MealsController extends Application {
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-                orderErrorInfo.getDetails().setBuffetOpenAt(getBuffetOpenTime());
-                orderErrorInfo.getDetails().setBuffetCloseAt(getBuffetCloseTime());
+                orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+                orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
                 return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         } catch (Exception e) {
