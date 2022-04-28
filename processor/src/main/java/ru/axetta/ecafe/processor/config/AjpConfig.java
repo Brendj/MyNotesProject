@@ -12,11 +12,14 @@ public class AjpConfig {
     @Value("${ajp.port}")
     int ajpPort;
 
+    @Value("${server.http.port}")
+    int httpPort;
+
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
         return server -> {
             if (server instanceof TomcatServletWebServerFactory) {
-                ((TomcatServletWebServerFactory) server).addAdditionalTomcatConnectors(redirectConnector());
+                ((TomcatServletWebServerFactory) server).addAdditionalTomcatConnectors(redirectConnector(), httpConnector());
             }
         };
     }
@@ -25,6 +28,15 @@ public class AjpConfig {
         Connector connector = new Connector("AJP/1.3");
         connector.setScheme("http");
         connector.setPort(ajpPort);
+        connector.setSecure(false);
+        connector.setAllowTrace(false);
+        return connector;
+    }
+
+    private Connector httpConnector() {
+        Connector connector = new Connector("HTTP/1.1");
+        connector.setScheme("http");
+        connector.setPort(httpPort);
         connector.setSecure(false);
         connector.setAllowTrace(false);
         return connector;
