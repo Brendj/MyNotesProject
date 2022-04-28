@@ -144,6 +144,15 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
+
+        //Проверяем параллель клиента
+        if (!new ClientParallel().verifyParallelForClient(client))
+        {
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+        }
+        
         if (!client.getFoodboxAvailability()) {
             logger.error("У клиента не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
