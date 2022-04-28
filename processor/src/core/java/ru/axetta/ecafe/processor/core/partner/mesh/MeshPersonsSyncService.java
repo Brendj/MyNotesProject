@@ -57,7 +57,7 @@ public class MeshPersonsSyncService {
 
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    private MeshRestClient meshRestClient;
+    protected MeshRestClient meshRestClient;
 
     protected MeshPersonsSyncService() {
         String serviceAddress;
