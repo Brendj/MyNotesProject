@@ -229,8 +229,10 @@ public class MealsController extends Application {
             persistenceSession.persist(foodBoxPreorder);
             currentFoodboxOrderInfo.setFoodboxOrderId(foodBoxPreorder.getIdFoodBoxPreorder());
             currentFoodboxOrderInfo.setStatus(FoodBoxStateTypeEnum.NEW.getDescription());
-            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(new Date(new Date().getTime() + TIME_ALIVE)) + "Z");
-            currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(new Date()) + "Z");
+            currentFoodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
+                    CalendarUtils.convertdateInUTC(new Date(new Date().getTime() + TIME_ALIVE)) + "Z"));
+            currentFoodboxOrderInfo.setCreatedAt(simpleDateFormat.format(
+                    CalendarUtils.convertdateInUTC(new Date())) + "Z");
             currentFoodboxOrderInfo.setBalance(client.getBalance());
             currentFoodboxOrderInfo.setBalanceLimit(client.getExpenditureLimit());
             Long priceAll = 0L;
@@ -995,7 +997,7 @@ public class MealsController extends Application {
     private FoodboxOrderInfo convertData(FoodBoxPreorder foodBoxPreorder) {
         FoodboxOrderInfo foodboxOrderInfo = new FoodboxOrderInfo();
         foodboxOrderInfo.setExpiredAt(simpleDateFormat.format(
-                CalendarUtils.convertdateInUTC(new Date(foodBoxPreorder.getCreateDate().getTime() + 7200000))) + "Z");
+                CalendarUtils.convertdateInUTC(new Date(foodBoxPreorder.getCreateDate().getTime() + TIME_ALIVE))) + "Z");
         if (foodBoxPreorder.getState() != null) {
             foodboxOrderInfo.setStatus(foodBoxPreorder.getState().getDescription());
         }
