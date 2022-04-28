@@ -965,11 +965,13 @@ public class MealsController extends Application {
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(clientDataMain).build();
+            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
+            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         else
         {
-            logger.error("Клиент входит в параллель");
+            logger.info("Клиент входит в параллель");
             return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
         }
     }
