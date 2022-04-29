@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentSaveException;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import sun.security.provider.X509Factory;
 
@@ -2965,6 +2967,23 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return documentResponse;
+    }
+
+    @WebMethod(operationName = "searchMeshPerson")
+    public PersonListResponse searchMeshPerson(
+            @WebParam(name = "firstname") String firstName,
+            @WebParam(name = "patronymic") String patronymic,
+            @WebParam(name = "lastname") String lastName,
+            @WebParam(name = "genderId") Integer genderId,
+            @WebParam(name = "birthDate") Date birthDate,
+            @WebParam(name = "snils") String snils,
+            @WebParam(name = "mobile") String mobile,
+            @WebParam(name = "email") String email) {
+        return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+    }
+
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 
     private DulDetail fillingDulDetail(Session session, DocumentItem documentItem) {

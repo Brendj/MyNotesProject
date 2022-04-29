@@ -32,6 +32,10 @@ public class MeshGuardianConverter {
         return new PersonResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
+    public PersonListResponse toPersonListDTO(ErrorResponse errorResponse) {
+        return new PersonListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
+    }
+
     public DocumentResponse toDTO(PersonDocument personDocument) throws ParseException {
         return new DocumentResponse(personDocument);
     }

@@ -86,7 +86,7 @@ public class ResponsePersons {
     @JsonProperty("documents")
     private List<PersonDocument> documents = null;
     @JsonProperty("contacts")
-    private Object contacts;
+    private List<Contact> contacts = null;
     @JsonProperty("preventions")
     private Object preventions;
     @JsonProperty("categories")
@@ -319,12 +319,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("contacts")
-    public Object getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 
     @JsonProperty("contacts")
-    public void setContacts(Object contacts) {
+    public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
     }
 

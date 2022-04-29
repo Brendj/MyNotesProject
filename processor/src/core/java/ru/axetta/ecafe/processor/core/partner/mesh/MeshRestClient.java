@@ -108,6 +108,15 @@ public class MeshRestClient {
         return executeRequest(httpMethod, url);
     }
 
+    public MeshResponseWithStatusCode executeGetMethod(String relativeUrl, String parameters) throws Exception {
+        URL url = new URL(getServiceAddress() + relativeUrl + parameters);
+        logger.info("Execute GET request to MESH REST: " + url);
+        GetMethod httpMethod = new GetMethod(url.getPath());
+        httpMethod.setRequestHeader("X-Api-Key", getApiKey());
+        httpMethod.setQueryString(parameters);
+        return executeRequestWithErrorProcess(httpMethod, url);
+    }
+
     public MeshResponseWithStatusCode executePostMethod(String relativeUrl, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + relativeUrl);
         logger.info("Execute POST request to MESH REST: " + url);
