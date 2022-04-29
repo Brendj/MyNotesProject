@@ -81,13 +81,22 @@ public class MealsController extends Application {
         }
         if (!validateTime())
         {
-            logger.error("Заказ пришел на время закрытия буфета");
-            OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-            orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
-            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-            orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
-            orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
-            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+            try {
+                logger.error("Заказ пришел на время закрытия буфета");
+                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
+                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
+                orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+                orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
+            } catch (Exception e)
+            {
+                logger.error("Ошибка при получении парсинге времени работы Фудбокса", e);
+                result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+                result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
+                return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
+            }
+
         }
 
         if (contractIdStr.isEmpty()) {
