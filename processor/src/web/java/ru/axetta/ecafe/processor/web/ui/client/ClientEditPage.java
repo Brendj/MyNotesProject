@@ -1206,15 +1206,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
-
         if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
             if(this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
+        }
+        if(this.san != null && !this.san.isEmpty()) {
+            this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
         }
         client.setSan(this.san);
-
         resetNewFlags();
         client.setOrg(org);
         client.setGender(this.gender);
