@@ -1213,6 +1213,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
         }
+        this.san = this.san.replaceAll("[\\D]", "");
         client.setSan(this.san);
 
         resetNewFlags();

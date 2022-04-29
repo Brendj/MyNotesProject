@@ -669,6 +669,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             ClientManager.validateSan(persistenceSession, this.san, null);
         }
+        this.san = this.san.replaceAll("[\\D]", "");
         client.setSan(this.san);
 
         client.setSpecialMenu(this.specialMenu);
