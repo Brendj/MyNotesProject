@@ -54,6 +54,7 @@ public class MealsController extends Application {
 
     public static final Integer MAX_COUNT = 40;//Максимальное количество блюд для возвращения в методе
     protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    private static final DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat((DATE_FORMAT));
 
     @POST
@@ -78,23 +79,16 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
-        Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
-        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
-        try {
-            Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
-            Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
-            if (!getBuffetOpenFlag() || (createTime < (startOpen.getTime()) || createTime > (closeEnd.getTime() - TIME_ALIVE))) {
-                logger.error("Заказ пришел на время закрытия буфета");
-                OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
-                orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
-                orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
-                orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
-                orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
-            }
-        } catch (Exception e) {
+        if (!validateTime())
+        {
+            logger.error("Заказ пришел на время закрытия буфета");
+            OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
+            orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_TIME.getCode());
+            orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
+            orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
+            orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
+            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
-
 
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
@@ -648,8 +642,7 @@ public class MealsController extends Application {
         //
         //Расскидываем по классам
         PersonBuffetMenu personBuffetMenu = new PersonBuffetMenu();
-        personBuffetMenu.setBuffetIsOpen(true);
-        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        personBuffetMenu.setBuffetIsOpen(validateTime());
         try {
             personBuffetMenu.setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
             personBuffetMenu.buffetCloseTime(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
@@ -1063,6 +1056,21 @@ public class MealsController extends Application {
         {
             return false;
         }
+    }
+
+    private Boolean validateTime()
+    {
+        Long createTime = new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime();
+        try {
+            Date startOpen = CalendarUtils.convertdateInLocal(format.parse(getBuffetOpenTime()));
+            Date closeEnd = CalendarUtils.convertdateInLocal(format.parse(getBuffetCloseTime()));
+            if (createTime < (startOpen.getTime()) || createTime > (closeEnd.getTime() - TIME_ALIVE)) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private static Integer getHealthTime() {
