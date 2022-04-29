@@ -662,16 +662,16 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-
         if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
             if(this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
+        }
+        if(this.san != null && !this.san.isEmpty()) {
+            this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, null);
         }
-        this.san = this.san.replaceAll("[\\D]", "");
         client.setSan(this.san);
-
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.update(client);
