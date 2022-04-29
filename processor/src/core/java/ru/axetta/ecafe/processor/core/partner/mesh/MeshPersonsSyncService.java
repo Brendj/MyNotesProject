@@ -4,25 +4,25 @@
 
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
-import org.hibernate.*;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -143,6 +143,7 @@ public class MeshPersonsSyncService {
 
     protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms){
         Transaction transaction = null;
+        Date now = new Date();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             session.setFlushMode(FlushMode.COMMIT);
@@ -152,20 +153,19 @@ public class MeshPersonsSyncService {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 personguid = person.getPersonId();
                 Date birthdate = df.parse(person.getBirthdate());
-                Education education = findEducation(person);
+                Education education = findEducation(person, trainingForms);
                 if (education == null) {
                     Query query = session.createQuery("update MeshSyncPerson m" +
                             " set m.lastupdateRest = :lastupdateRest, m.deletestate = :deletestate" +
                             " where m.personguid = :personguid");
-                    query.setParameter("lastupdateRest", new Date());
+                    query.setParameter("lastupdateRest", now);
                     query.setParameter("deletestate", true);
                     query.setParameter("personguid", personguid);
                     query.executeUpdate();
                     return;
                 }
                 Date endTraining = df.parse(education.getTrainingEndAt());
-                boolean deleted = false;
-                if (endTraining.before(new Date())) deleted = true;
+                boolean deleted = endTraining.before(now);
                 String classname = null;
                 Integer parallelid = null;
                 Integer educationstageid = null;
@@ -200,10 +200,10 @@ public class MeshPersonsSyncService {
                     if (meshClass == null) {
                         meshClass = new MeshClass(class_.getId(), classuid);
                     }
-                    meshClass.setLastUpdate(new Date());
-                    meshClass.setName(classname);
+                    meshClass.setLastUpdate(now);
+                    meshClass.setName(class_.getName());
                     meshClass.setParallelId(parallelid);
-                    meshClass.setEducationStageId(educationstageid);
+                    meshClass.setEducationStageId(class_.getEducationStageId());
                     meshClass.setOrganizationId(organizationid);
                     session.saveOrUpdate(meshClass);
                 }
@@ -223,7 +223,7 @@ public class MeshPersonsSyncService {
                 meshSyncPerson.setPatronymic(patronymic);
                 meshSyncPerson.setEducationstageid(educationstageid);
                 meshSyncPerson.setGuidnsi(guidnsi);
-                meshSyncPerson.setLastupdateRest(new Date());
+                meshSyncPerson.setLastupdateRest(now);
                 meshSyncPerson.setDeletestate(deleted);
                 meshSyncPerson.setInvaliddata(false);
                 meshSyncPerson.setMeshClass(meshClass);
@@ -265,8 +265,11 @@ public class MeshPersonsSyncService {
                     return true;
                 }
             });
-            Collections.sort(educations);
+            if(educations.isEmpty()){
+                return null;
+            }
 
+            Collections.sort(educations);
             if (educations.size() > 1) {
                for(Education e : educations){
                    if(!Education.ACCEPTABLE_EDUCATIONS.contains(e.getServiceTypeId())){
@@ -286,6 +289,8 @@ public class MeshPersonsSyncService {
                        result = e;
                    }
                }
+            } else {
+                result = educations.get(0);
             }
 
             return result;
@@ -297,6 +302,9 @@ public class MeshPersonsSyncService {
 
     protected Category findCategory(ResponsePersons person) {
         try {
+            if(CollectionUtils.isEmpty(person.getCategories())){
+                return null;
+            }
             Collections.sort(person.getCategories());
             for (int i = person.getCategories().size() - 1; i > -1; i--) {
                 if (person.getCategories().get(i).getCategoryId() == Category.PROPER_ID)
@@ -304,7 +312,7 @@ public class MeshPersonsSyncService {
             }
             return null;
         } catch (Exception e) {
-            logger.error("Can not find education from person with guid " + person.getPersonId());
+            logger.error("Can not find category from person with guid " + person.getPersonId());
             return null;
         }
     }
