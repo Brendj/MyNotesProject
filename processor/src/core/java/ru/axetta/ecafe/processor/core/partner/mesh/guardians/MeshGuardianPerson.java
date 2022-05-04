@@ -24,6 +24,7 @@ public class MeshGuardianPerson {
     private String mobile;
     private String email;
     private Integer degree;
+    private Integer validationStateId;
 
     public MeshGuardianPerson() {
 
@@ -42,6 +43,7 @@ public class MeshGuardianPerson {
             this.email = getContact(similarPerson.getPerson().getContacts(), MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
         }
         this.degree = similarPerson.getDegree();
+        this.validationStateId = similarPerson.getPerson().getValidationStateId();
     }
 
     private String getContact(List<Contact> contacts, Integer typeId) {
@@ -154,5 +156,13 @@ public class MeshGuardianPerson {
 
     public void setDegree(Integer degree) {
         this.degree = degree;
+    }
+
+    public Integer getValidationStateId() {
+        return validationStateId;
+    }
+
+    public void setValidationStateId(Integer validationStateId) {
+        this.validationStateId = validationStateId;
     }
 }

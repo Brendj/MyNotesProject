@@ -1,5 +1,9 @@
 package ru.axetta.ecafe.processor.core.partner.mesh;
 
+import org.apache.commons.httpclient.params.DefaultHttpParams;
+import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpParams;
+import org.apache.http.params.BasicHttpParams;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -19,10 +23,18 @@ public class MeshRestClient {
     private static final Logger logger = LoggerFactory.getLogger(MeshRestClient.class);
     private final String serviceAddress;
     private final String apiKey;
+    private final Integer connectionTimeout;
 
     public MeshRestClient(String serviceAddress, String apiKey){
         this.serviceAddress = serviceAddress;
         this.apiKey = apiKey;
+        this.connectionTimeout = Integer.valueOf(MeshPersonsSyncService.CONNECTION_TIMEOUT_DEFAULT);
+    }
+
+    public MeshRestClient(String serviceAddress, String apiKey, Integer connectionTimeout){
+        this.serviceAddress = serviceAddress;
+        this.apiKey = apiKey;
+        this.connectionTimeout = connectionTimeout;
     }
 
     public String getServiceAddress() {
@@ -155,7 +167,9 @@ public class MeshRestClient {
     }
 
     private HttpClient getHttpClient(URL url) {
-        HttpClient httpClient = new HttpClient();
+        HttpClientParams httpParams = new HttpClientParams();
+        httpParams.setParameter("http.connection.timeout", connectionTimeout);
+        HttpClient httpClient = new HttpClient(httpParams);
         if (url.getProtocol().equals("https")) {
             httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
                     new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), url.getPort()));

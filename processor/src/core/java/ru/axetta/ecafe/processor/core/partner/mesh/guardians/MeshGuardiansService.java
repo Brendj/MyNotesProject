@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -41,6 +42,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Integer PASSPORT_TYPE_ID = 15;
     public static final String MK_ERROR = "Ошибка в МЭШ Контингент: %s";
     public static final Integer CONTACT_MOBILE_TYPE_ID = 1;
+    //todo проверить что CONTACT_EMAIL_TYPE_ID = 2
     public static final Integer CONTACT_EMAIL_TYPE_ID = 2;
 
 
@@ -80,19 +82,32 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPerson(Client child, Client guardian) {
+    public PersonResponse createPerson(String firstName,
+                                       String patronymic,
+                                       String lastName,
+                                       Integer genderId,
+                                       Date birthDate,
+                                       String snils,
+                                       String mobile,
+                                       String email,
+                                       String сhildMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonAgent personAgent = buildPersonAgent(guardian);
+            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
             String json = objectMapper.writeValueAsString(personAgent);
-            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(child.getMeshGUID()), json);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(сhildMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
-                return new PersonResponse(getMeshGuardianConverter().toDTO(personResult)).okResponse();
+                return new PersonResponse(personResult.getPersonId()).okResponse();
+            } else if (result.getCode() >= 500) {
+                return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toPersonDTO(errorResponse);
             }
+        } catch (ConnectTimeoutException te) {
+            logger.error("Connection timeout in createPerson: ", te);
+            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in createPerson: ", e);
             return new PersonResponse().internalErrorResponse();
@@ -171,14 +186,24 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return personDocument;
     }
 
-    private PersonAgent buildPersonAgent(Client guardian) throws Exception {
+    private PersonAgent buildPersonAgent(String firstName,
+                                         String patronymic,
+                                         String lastName,
+                                         Integer genderId,
+                                         Date birthDate,
+                                         String snils,
+                                         String mobile,
+                                         String email) throws Exception {
         PersonAgent personAgent = new PersonAgent();
         personAgent.setAgentTypeId(GUARDIAN_DEFAULT_TYPE);
-        if (StringUtils.isEmpty(guardian.getMeshGUID())) {
+        personAgent.setId(0);
+        personAgent.setPersonId(PERSON_ID_STUB);
+        personAgent.setAgentPerson(buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email));
+        /*if (StringUtils.isEmpty(guardian.getMeshGUID())) {
             personAgent.setAgentPerson(buildResponsePerson(guardian));
         } else {
             personAgent.setAgentPersonId(guardian.getMeshGUID());
-        }
+        }*/
 
         return personAgent;
     }
@@ -299,11 +324,4 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         if (isppGender == 0) return 2; else return 1;
     }
 
-    public void createPerson() {
-
-    }
-
-    public void createGuardianship() {
-
-    }
 }

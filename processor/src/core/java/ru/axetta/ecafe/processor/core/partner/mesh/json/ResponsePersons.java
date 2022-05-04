@@ -66,7 +66,7 @@ public class ResponsePersons {
     @JsonProperty("citizenship_id")
     private Integer citizenshipId;
     @JsonProperty("validation_state_id")
-    private Object validationStateId;
+    private Integer validationStateId;
     @JsonProperty("validated_at")
     private Object validatedAt;
     @JsonProperty("actual_from")
@@ -219,12 +219,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("validation_state_id")
-    public Object getValidationStateId() {
+    public Integer getValidationStateId() {
         return validationStateId;
     }
 
     @JsonProperty("validation_state_id")
-    public void setValidationStateId(Object validationStateId) {
+    public void setValidationStateId(Integer validationStateId) {
         this.validationStateId = validationStateId;
     }
 
