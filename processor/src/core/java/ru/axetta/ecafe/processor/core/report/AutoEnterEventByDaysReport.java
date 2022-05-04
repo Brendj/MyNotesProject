@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import com.google.common.collect.Lists;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -443,26 +444,31 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 return new JRBeanCollectionDataSource(Arrays.asList(emptyItem));
             }
 
-            Criteria reportCrit = session.createCriteria(EnterEvent.class);
-            reportCrit.createAlias("client", "c", JoinType.INNER_JOIN);
-            reportCrit.createAlias("c.clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-            reportCrit.add(Restrictions.in("org.idOfOrg", ids));
-            reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
-            reportCrit.add(Restrictions.in("client.idOfClient", map.keySet()));
-            reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
-            if (!groupList.isEmpty()) {
-                reportCrit.add(Restrictions.in("cg.groupName", groupList));
+            List<Long> clientIds = new ArrayList<>(map.keySet());
+            List<List<Long>> partitionedClientIds = Lists.partition(clientIds, 30000);
+            List list = new ArrayList<>();
+            for (List<Long> partitionClientIds: partitionedClientIds) {
+                Criteria reportCrit = session.createCriteria(EnterEvent.class);
+                reportCrit.createAlias("client", "c", JoinType.INNER_JOIN);
+                reportCrit.createAlias("c.clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+                reportCrit.add(Restrictions.in("org.idOfOrg", ids));
+                reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
+                reportCrit.add(Restrictions.in("client.idOfClient", partitionClientIds));
+                reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
+                if (!groupList.isEmpty()) {
+                    reportCrit.add(Restrictions.in("cg.groupName", groupList));
+                }
+                reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
+                        .add(Projections.sqlGroupProjection("({alias}.evtDateTime/24/3600/1000)*24*3600*1000 as eventDay",
+                                "{alias}.evtDateTime", new String[]{"eventDay"}, new Type[]{new LongType()}))
+                        .add(Projections
+                                .sqlGroupProjection("CASE WHEN (passdirection in (0,6)) then 0 else 1 end as passtext",
+                                        "{alias}.passdirection", new String[]{"passtext"}, new Type[]{new IntegerType()}))
+                        .add(Projections.sqlGroupProjection(
+                                "(case when {alias}.passDirection in (0,6) then min({alias}.evtDateTime) else max({alias}.evtDateTime) end) as eventDateTime",
+                                "{alias}.passDirection", new String[]{"eventDateTime"}, new Type[]{new LongType()})));
+                list.addAll(reportCrit.list());
             }
-            reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
-                    .add(Projections.sqlGroupProjection("({alias}.evtDateTime/24/3600/1000)*24*3600*1000 as eventDay",
-                            "{alias}.evtDateTime", new String[]{"eventDay"}, new Type[]{new LongType()}))
-                    .add(Projections
-                            .sqlGroupProjection("CASE WHEN (passdirection in (0,6)) then 0 else 1 end as passtext",
-                                    "{alias}.passdirection", new String[]{"passtext"}, new Type[]{new IntegerType()}))
-                    .add(Projections.sqlGroupProjection(
-                            "(case when {alias}.passDirection in (0,6) then min({alias}.evtDateTime) else max({alias}.evtDateTime) end) as eventDateTime",
-                            "{alias}.passDirection", new String[]{"eventDateTime"}, new Type[]{new LongType()})));
-            List list = reportCrit.list();
             for (Object obj : list) {
                 Object[] row = (Object[]) obj;
                 Long day = Long.valueOf(row[1].toString());
