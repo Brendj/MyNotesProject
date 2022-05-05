@@ -992,13 +992,14 @@ public class MealsController extends Application {
         }
         ClientData clientData = new ClientData();
         clientData.getClientId().setContractId(client.getContractId());
-        clientData.getClientId().setStaffId(0L);
-        clientData.getClientId().setPersonId(UUID.fromString(client.getMeshGUID()));
+        clientData.getClientId().setStaffId(null);
+        clientData.getClientId().setPersonId(null);
         if (client.getOrg() != null)
         {
             clientData.getOrganization().setAddress(client.getOrg().getShortAddress());
             clientData.getOrganization().setName(client.getOrg().getShortNameInfoService());
-            clientData.getOrganization().setName(client.getOrg().getType().toString());
+            if (client.getOrg().getType() != null)
+                clientData.getOrganization().setType(client.getOrg().getType().toString());
         }
         clientData.setFoodboxAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
         clientData.setBalance(client.getBalance());
