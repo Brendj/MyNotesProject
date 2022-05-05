@@ -81,6 +81,59 @@
         </a4j:commandButton>
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Обучающиеся" rendered="#{mainPage.clientCreatePage.isParentGroup()}"
+                  styleClass="output-text"/>
+    <rich:dataTable id="studentTable" value="#{mainPage.clientCreatePage.studentItems}"
+                    rendered="#{mainPage.clientCreatePage.isParentGroup()}"
+                    var="student"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column,
+                    center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                    center-aligned-column"
+                    footerClass="data-table-footer-center">
+        <rich:column headerClass="column-header" >
+            <f:facet name="header">
+                <h:outputText escape="true" value="ФИО"/>
+            </f:facet>
+            <h:outputText escape="true" value="#{student.name}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата рождения"/>
+            </f:facet>
+            <h:outputText value="#{student.birthDate}" converter="dateConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Класс"/>
+            </f:facet>
+            <h:outputText value="#{student.className}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Организация"/>
+            </f:facet>
+            <h:outputText value="#{student.orgShortName}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Удалить" escape="true"/>
+            </f:facet>
+            <a4j:commandLink styleClass="command-link" action="#{mainPage.clientCreatePage.removeStudentItem}"
+                             render="studentTable">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                <f:setPropertyActionListener value="#{student}"
+                                             target="#{mainPage.clientCreatePage.currentStudentItem}"/>
+            </a4j:commandLink>
+        </rich:column>
+        <f:facet name="footer">
+            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
+                               render="modalClientSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                               styleClass="command-link">
+            </a4j:commandButton>
+        </f:facet>
+    </rich:dataTable>
+
     <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.limit}" maxlength="20" converter="copeckSumConverter"
                  styleClass="input-text" />
@@ -152,7 +205,9 @@
     <h:outputText escape="true" value="Документы" styleClass="output-text"/>
     <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientCreatePage.dulDetail}"
                     var="dul"
-                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column,
+                    center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                    center-aligned-column"
                     footerClass="data-table-footer-center">
         <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
             <f:facet name="header">
