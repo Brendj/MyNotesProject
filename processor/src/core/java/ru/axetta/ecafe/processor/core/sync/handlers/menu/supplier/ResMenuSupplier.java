@@ -405,10 +405,21 @@ public class ResMenuSupplier implements AbstractToElement {
             orgs.appendChild(elem);
         }
 
+        Element invisibleDishes = document.createElement("InvisibleDishes");
+        for (WtMenuInvisibleDish invisibleDish : menu.getWtMenuInvisibleDishes()) {
+            if(invisibleDish.getDeleteState() == 0) {
+                Element elem = document.createElement("IDI");
+                XMLUtils.setAttributeIfNotNull(elem, "DishId", invisibleDish.getIdOfDish());
+                XMLUtils.setAttributeIfNotNull(elem, "MenuId", invisibleDish.getIdOfMenu());
+                XMLUtils.setAttributeIfNotNull(elem, "OrgId", invisibleDish.getIdOfOrg());
+                invisibleDishes.appendChild(elem);
+            }
+        }
+
         element.appendChild(prop);
         element.appendChild(dishes);
         element.appendChild(orgs);
-
+        element.appendChild(invisibleDishes);
         return element;
     }
 
@@ -481,6 +492,15 @@ public class ResMenuSupplier implements AbstractToElement {
             Element elem = document.createElement("ORI");
             XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
             XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
+            boolean isInvisible = false;
+            for (WtComplexInvisible complexInvisible : complex.getWtComplexesInvisible()){
+                if(complexInvisible.getIdOfOrg().equals(item.getIdOfOrg())){
+                    if(complexInvisible.getDeleteState() == 0) {
+                        isInvisible = true;
+                    }
+                }
+            }
+            XMLUtils.setAttributeIfNotNull(elem, "Invisible", isInvisible);
             orgs.appendChild(elem);
         }
 
