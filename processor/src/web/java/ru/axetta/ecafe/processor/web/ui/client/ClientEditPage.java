@@ -1140,14 +1140,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
         }
 
-        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
                     idOfClient));
             addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
-        }
+        } else if(isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
+
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
@@ -1499,6 +1501,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return false;
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
+    }
+
+    public Boolean isParentGroup() {
+        if (this.idOfClientGroup != null)
+            return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+        return false;
     }
 
 }

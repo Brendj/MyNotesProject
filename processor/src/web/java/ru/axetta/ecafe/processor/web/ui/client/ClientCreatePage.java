@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import org.hibernate.type.TrueFalseType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -28,6 +29,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClient;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -38,6 +41,7 @@ import java.util.*;
 public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
+        ClientSelectPage.CompleteHandler,
         DulSelectPage.CompleteHandler {
 
     public Long getBalanceToNotify() {
@@ -51,6 +55,21 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     @Override
     public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
         this.dulDetail.add(new DulDetail(dulGuide.getDocumentTypeId(), dulGuide));
+    }
+
+    @Override
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if (null != idOfClient) {
+            Client client = (Client) session.load(Client.class, idOfClient);
+            if (typeAddClient == null)
+                return;
+            if (typeAddClient.equals("ward")) {
+                clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
+                        ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
+                        DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
+                        ClientGuardianRepresentType.UNKNOWN, false));
+            }
+        }
     }
 
     public static class OrgItem {
@@ -227,6 +246,34 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String ageTypeGroup;
     private Boolean specialMenu;
     private List<DulDetail> dulDetail = new ArrayList<>();
+    private ClientGuardianItem currentClientWard;
+    private List<ClientGuardianItem> clientWardItems = new ArrayList<>();
+    private String typeAddClient;
+
+    public String getTypeAddClient() {
+        return typeAddClient;
+    }
+
+    public void setTypeAddClient(String typeAddClient) {
+        this.typeAddClient = typeAddClient;
+    }
+
+    public List<ClientGuardianItem> getClientWardItems() {
+        return clientWardItems;
+    }
+
+    public void setClientWardItems(List<ClientGuardianItem> clientWardItems) {
+        this.clientWardItems = clientWardItems;
+    }
+
+    public ClientGuardianItem getCurrentClientWard() {
+        return currentClientWard;
+    }
+
+    public void setCurrentClientWard(ClientGuardianItem currentClientWard) {
+        this.currentClientWard = currentClientWard;
+    }
+
     public String getFax() {
         return fax;
     }
@@ -236,7 +283,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     }
 
     /* Является ли данный тип льгот как "Льгота по категорям" если да то TRUE, False в противном случает */
-    public Boolean getDiscountModeIsCategory(){
+    public Boolean getDiscountModeIsCategory() {
         return discountMode == Client.DISCOUNT_MODE_BY_CATEGORY;
     }
 
@@ -404,6 +451,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     public void setNotifyViaSMS(Boolean notifyViaSMS) {
         this.notifyViaSMS = notifyViaSMS;
     }
+
     public Boolean getNotifyViaPUSH() {
         return notifyViaPUSH;
     }
@@ -532,8 +580,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         payForSMS = 1;
         this.selectItemList = new LinkedList<SelectItem>();
-        for (Integer i=0;i<Client.DISCOUNT_MODE_NAMES.length; i++){
-            this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
+        for (Integer i = 0; i < Client.DISCOUNT_MODE_NAMES.length; i++) {
+            this.selectItemList.add(new SelectItem(i, Client.DISCOUNT_MODE_NAMES[i]));
         }
         this.discountMode = Client.DISCOUNT_MODE_NONE;
         this.limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
@@ -560,23 +608,23 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        if((this.org.getIdOfOrg() == null && idOfOrg != null) ||
-           (this.org.getIdOfOrg() != null && idOfOrg == null) ||
-           (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
-                this.clientGroupName = "";
-                this.idOfClientGroup = null;
+        if ((this.org.getIdOfOrg() == null && idOfOrg != null) ||
+                (this.org.getIdOfOrg() != null && idOfOrg == null) ||
+                (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
+            this.clientGroupName = "";
+            this.idOfClientGroup = null;
         }
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
             this.org = new OrgItem(org);
-            if (org.getCardLimit()!=null && org.getCardLimit()!=0) {
+            if (org.getCardLimit() != null && org.getCardLimit() != 0) {
                 this.limit = org.getCardLimit();
             }
         }
     }
 
     public Object changeClientCategory() {
-        if(this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY){
+        if (this.discountMode != Client.DISCOUNT_MODE_BY_CATEGORY) {
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             filter = "Не выбрано";
         }
@@ -585,8 +633,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
 
     public Client createClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory) throws Exception {
-        RuntimeContext runtimeContext  = RuntimeContext.getInstance();
-        if(this.org.getIdOfOrg() == null) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        if (this.org.getIdOfOrg() == null) {
             throw new IllegalArgumentException();
         }
         if (StringUtils.isEmpty(this.person.surname) || StringUtils.isEmpty(this.person.firstName)) {
@@ -623,14 +671,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setBirthDate(this.birthDate);
         client.setGender(this.gender);
         client.setAgeTypeGroup(this.ageTypeGroup);
-        if (this.externalId==null || this.externalId==0) client.setExternalId(null);
+        if (this.externalId == null || this.externalId == 0) client.setExternalId(null);
         else client.setExternalId(this.externalId);
-        if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
+        if (this.clientGUID == null || this.clientGUID.isEmpty()) client.setClientGUID(null);
         else client.setClientGUID(this.clientGUID);
         client.setBalanceToNotify(this.balanceToNotify);
 
-        if(null != discountMode) client.setDiscountMode(discountMode);
-        if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){
+        if (null != discountMode) client.setDiscountMode(discountMode);
+        if (discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size() == 0) {
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
 
@@ -643,31 +691,31 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 clientCategories = clientCategories + categoryDiscount.getIdOfCategoryDiscount() + ",";
             }                            */
 
-        if(!idOfCategoryList.isEmpty()){
+        if (!idOfCategoryList.isEmpty()) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
-            for (Object object: categoryCriteria.list()){
+            for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 client.getCategories().add(categoryDiscount);
             }
         }
 
-        if(idOfClientGroup != null) {
+        if (idOfClientGroup != null) {
             client.setIdOfClientGroup(idOfClientGroup);
         } else {
             ClientGroup group = DAOUtils.findClientGroup(persistenceSession,
                     new CompositeIdOfClientGroup(this.org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS.getValue()));
-            if(group == null) {
+            if (group == null) {
                 DAOUtils.createClientGroup(persistenceSession, this.org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS);
             }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-        if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
-            if(this.san == null || this.san.isEmpty()) {
+        if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+            if (this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
         }
-        if(this.san != null && !this.san.isEmpty()) {
+        if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, null);
         }
@@ -675,24 +723,32 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.update(client);
-        if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
+        if (autoContractId)
+            RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
-        ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
+        ClientMigration clientMigration = new ClientMigration(client, org, this.contractTime);
         persistenceSession.save(clientMigration);
 
-        if(client.getClientGroup() != null) {
+        if (client.getClientGroup() != null) {
             ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, client.getIdOfClientGroup(),
                     ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-        clean();
 
-        for (DulDetail dul: this.dulDetail)
+        for (DulDetail dul : this.dulDetail)
             dul.setIdOfClient(client.getIdOfClient());
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
 
+        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    client.getIdOfClient()));
+            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
+        } else if (isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
+
+        clean();
         return client;
     }
 
@@ -721,12 +777,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.notifyViaPUSH = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS);
         this.payForSMS = 1;
         this.discountMode = Client.DISCOUNT_MODE_NONE;
-        for (Integer i=0;i<Client.DISCOUNT_MODE_NAMES.length; i++){
-            this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
+        for (Integer i = 0; i < Client.DISCOUNT_MODE_NAMES.length; i++) {
+            this.selectItemList.add(new SelectItem(i, Client.DISCOUNT_MODE_NAMES[i]));
         }
         this.filter = "Не выбрано";
         this.idOfCategoryList = new ArrayList<Long>();
-        this.categoryDiscountSet=new HashSet<CategoryDiscount>();
+        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         this.san = null;
         this.externalId = null;
         this.clientGUID = null;
@@ -735,11 +791,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.ageTypeGroup = null;
         this.remarks = null;
         this.specialMenu = false;
+        this.clientWardItems = new ArrayList<>();
     }
 
     private String filter = "Не выбрано";
     private List<Long> idOfCategoryList = new ArrayList<Long>();
-    private Set<CategoryDiscount> categoryDiscountSet=new HashSet<CategoryDiscount>();
+    private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
 
     public String getFilter() {
         return filter;
@@ -767,20 +824,41 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
         //To change body of implemented methods use File | Settings | File Templates.
-        if(null != categoryMap) {
+        if (null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
-            if(categoryMap.isEmpty()){
+            if (categoryMap.isEmpty()) {
                 filter = "Не выбрано";
             } else {
-                filter="";
-                for(Long idOfCategory: categoryMap.keySet()){
+                filter = "";
+                for (Long idOfCategory : categoryMap.keySet()) {
                     idOfCategoryList.add(idOfCategory);
-                    filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
+                    filter = filter.concat(categoryMap.get(idOfCategory) + "; ");
                 }
-                filter = filter.substring(0,filter.length()-1);
+                filter = filter.substring(0, filter.length() - 1);
             }
 
         }
     }
 
+    public SelectItem[] getRelations() {
+        SelectItem[] result = new SelectItem[ClientGuardianRelationType.values().length + 1];
+        result[0] = new SelectItem(-1, "");
+        int i = 0;
+        for (ClientGuardianRelationType relType : ClientGuardianRelationType.values()) {
+            result[i + 1] = new SelectItem(relType.getCode(), relType.getDescription());
+            i++;
+        }
+        return result;
+    }
+
+    public Object removeClientWard() {
+        clientWardItems.remove(currentClientWard);
+        return null;
+    }
+
+    public Boolean isParentGroup() {
+        if (this.idOfClientGroup != null)
+            return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+        return false;
+    }
 }
