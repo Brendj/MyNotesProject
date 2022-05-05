@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu;
@@ -32,15 +33,21 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.apache.jasper.Constants.DEFAULT_BUFFER_SIZE;
+
 @Path(value = "")
 @Controller
-@ApplicationPath("/ispp/meals/")
+@ApplicationPath("/ispp/meals/v1/")
 public class MealsController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(MealsController.class);
@@ -57,12 +64,42 @@ public class MealsController extends Application {
     private static final DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat((DATE_FORMAT));
 
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Path(value = "contract.yaml")
+    public Response getFile() throws IOException {
+        File file = File.createTempFile("prefix-", "-suffix");
+        copyResourceToFile("swagger/foodbox.yaml", file);
+        return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Disposition", "attachment; filename=contract.yaml" )
+                .build();
+    }
+
+    private void copyResourceToFile(String fileName, File file)
+    {
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream(fileName);
+            // append = false
+            try (FileOutputStream outputStream = new FileOutputStream(file, false)) {
+                int read;
+                byte[] bytes = new byte[DEFAULT_BUFFER_SIZE];
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+            }
+        } catch (Exception e)
+        {
+            logger.error("Ошибка при формировании файла foodbox.yaml");
+        }
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
     @Transactional
-    public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, FoodboxOrder foodboxOrder) {
+    public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, List<FoodboxOrder> foodboxOrders) {
         Result result = new Result();
         String contractIdStr = "";
         Map<String, String> params = parseParams(request);
@@ -242,7 +279,7 @@ public class MealsController extends Application {
             boolean havegoodDish = false;
             Integer countDish = 0;
             boolean toMaxCount = false;
-            for (OrderDish orderDish : foodboxOrder.getDishes()) {
+            for (OrderDish orderDish : foodboxOrders.get(0).getDishes()) {
                 //Проверки
                 try {
                     WtDish wtDish = daoReadonlyService.getWtDishById(orderDish.getDishId());
@@ -384,7 +421,9 @@ public class MealsController extends Application {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return Response.status(HttpURLConnection.HTTP_CREATED).entity(currentFoodboxOrderInfo).build();
+        List<CurrentFoodboxOrderInfo> currentFoodboxOrderInfos = new ArrayList<>();
+        currentFoodboxOrderInfos.add(currentFoodboxOrderInfo);
+        return Response.status(HttpURLConnection.HTTP_CREATED).entity(currentFoodboxOrderInfos).build();
     }
 
     @GET
@@ -476,14 +515,11 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
-        HistoryFoodboxOrderInfo historyFoodboxOrderInfo = new HistoryFoodboxOrderInfo();
         try {
             List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getFoodBoxPreorderByForClient(client, from, to);
             List<FoodboxOrderInfo> foodboxOrderInfos = new ArrayList<>();
-            Long sum = 0L;
             for (FoodBoxPreorder foodBoxPreorder : foodBoxPreorders) {
                 FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
-                sum += 1L;
                 foodboxOrderInfos.add(foodboxOrderInfo);
             }
             if (sortDesc)
@@ -491,9 +527,7 @@ public class MealsController extends Application {
             else
                 Collections.reverse(foodboxOrderInfos);
 
-            historyFoodboxOrderInfo.getInfo().addAll(foodboxOrderInfos);
-            historyFoodboxOrderInfo.setOrders(sum);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(historyFoodboxOrderInfo).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfos).build();
         } catch (Exception e) {
             logger.error("Ошибка при получении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
@@ -527,7 +561,6 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
-        HistoryFoodboxOrderInfo historyFoodboxOrderInfo = new HistoryFoodboxOrderInfo();
         try {
             FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(isppIdFoodbox);
             if (foodBoxPreorder == null) {
@@ -537,9 +570,9 @@ public class MealsController extends Application {
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
             }
             FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
-            historyFoodboxOrderInfo.getInfo().add(foodboxOrderInfo);
-            historyFoodboxOrderInfo.setOrders(1L);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(historyFoodboxOrderInfo).build();
+            List<FoodboxOrderInfo> foodboxOrderInfos = new ArrayList<>();
+            foodboxOrderInfos.add(foodboxOrderInfo);
+            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfos).build();
         } catch (Exception e) {
             logger.error("Ошибка при получении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
@@ -780,7 +813,9 @@ public class MealsController extends Application {
             if (corCount == MAX_COUNT)
                 break;
         }
-        return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenu).build();
+        List<PersonBuffetMenu> personBuffetMenus = new ArrayList<>();
+        personBuffetMenus.add(personBuffetMenu);
+        return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenus).build();
     }
 
     @PUT
@@ -810,22 +845,7 @@ public class MealsController extends Application {
                 continue;
             }
         }
-//        Enumeration<String> headerNames = request.getHeaderNames();
-//        if (headerNames != null) {
-//            while (headerNames.hasMoreElements()) {
-//                String header = headerNames.nextElement();
-//                if (header.toLowerCase().equals("contractid"))
-//                {
-//                    contractIdStr = request.getHeader(header);
-//                    continue;
-//                }
-//                if (header.toLowerCase().equals("foodboxavailability"))
-//                {
-//                    foodBoxAvailableStr = request.getHeader(header);
-//                    continue;
-//                }
-//            }
-//        }
+
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
@@ -914,7 +934,7 @@ public class MealsController extends Application {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "client")
+    @Path(value = "clients")
     @Transactional
     public Response getFoodboxAvailability(@Context HttpServletRequest request) {
         Result result = new Result();
@@ -933,17 +953,6 @@ public class MealsController extends Application {
                 continue;
             }
         }
-//        Enumeration<String> headerNames = request.getHeaderNames();
-//        if (headerNames != null) {
-//            while (headerNames.hasMoreElements()) {
-//                String header = headerNames.nextElement();
-//                if (header.toLowerCase().equals("contractid"))
-//                {
-//                    contractIdStr = request.getHeader(header);
-//                    continue;
-//                }
-//            }
-//        }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
@@ -982,10 +991,20 @@ public class MealsController extends Application {
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         ClientData clientData = new ClientData();
+        clientData.getClientId().setContractId(client.getContractId());
+        clientData.getClientId().setStaffId(0L);
+        clientData.getClientId().setPersonId(UUID.fromString(client.getMeshGUID()));
+        if (client.getOrg() != null)
+        {
+            clientData.getOrganization().setAddress(client.getOrg().getShortAddress());
+            clientData.getOrganization().setName(client.getOrg().getShortNameInfoService());
+            clientData.getOrganization().setName(client.getOrg().getType().toString());
+        }
+        clientData.setFoodboxAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
+        clientData.setBalance(client.getBalance());
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
-        ClientDataMain clientDataMain = new ClientDataMain();
-        clientDataMain.setClientData(clientData);
+
         //Проверяем, что параллель клиента доступна для заказа фудбокса
         if (!new ClientParallel().verifyParallelForClient(client))
         {
@@ -997,7 +1016,9 @@ public class MealsController extends Application {
         else
         {
             logger.info("Клиент входит в параллель");
-            return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataMain).build();
+            List<ClientData> clientDataList = new ArrayList<>();
+            clientDataList.add(clientData);
+            return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataList).build();
         }
     }
 

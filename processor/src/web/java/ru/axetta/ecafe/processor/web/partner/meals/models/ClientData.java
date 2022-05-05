@@ -35,6 +35,8 @@ public class ClientData {
      * @return clientId
      **/
     public ClientId getClientId() {
+        if (clientId == null)
+            clientId = new ClientId();
         return clientId;
     }
     public void setClientId(ClientId clientId) {
@@ -52,6 +54,8 @@ public class ClientData {
      * @return organization
      **/
     public Organization getOrganization() {
+        if (organization == null)
+            organization = new Organization();
         return organization;
     }
     public void setOrganization(Organization organization) {
