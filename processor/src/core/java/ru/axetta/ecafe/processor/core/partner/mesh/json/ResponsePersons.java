@@ -66,7 +66,7 @@ public class ResponsePersons {
     @JsonProperty("citizenship_id")
     private Integer citizenshipId;
     @JsonProperty("validation_state_id")
-    private Object validationStateId;
+    private Integer validationStateId;
     @JsonProperty("validated_at")
     private Object validatedAt;
     @JsonProperty("actual_from")
@@ -86,7 +86,7 @@ public class ResponsePersons {
     @JsonProperty("documents")
     private List<PersonDocument> documents = null;
     @JsonProperty("contacts")
-    private Object contacts;
+    private List<Contact> contacts = null;
     @JsonProperty("preventions")
     private Object preventions;
     @JsonProperty("categories")
@@ -219,12 +219,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("validation_state_id")
-    public Object getValidationStateId() {
+    public Integer getValidationStateId() {
         return validationStateId;
     }
 
     @JsonProperty("validation_state_id")
-    public void setValidationStateId(Object validationStateId) {
+    public void setValidationStateId(Integer validationStateId) {
         this.validationStateId = validationStateId;
     }
 
@@ -319,12 +319,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("contacts")
-    public Object getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 
     @JsonProperty("contacts")
-    public void setContacts(Object contacts) {
+    public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
     }
 
