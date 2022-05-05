@@ -7,8 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import org.hibernate.type.TrueFalseType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
-import ru.axetta.ecafe.processor.core.client.items.StudentItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -27,11 +25,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.context.FacesContext;
-import javax.faces.el.MethodBinding;
 import javax.faces.model.SelectItem;
 import java.util.*;
-
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClient;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,8 +38,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClien
 public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
-        DulSelectPage.CompleteHandler,
-        ClientSelectPage.CompleteHandler {
+        DulSelectPage.CompleteHandler {
 
     public Long getBalanceToNotify() {
         return balanceToNotify;
@@ -57,19 +51,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     @Override
     public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
         this.dulDetail.add(new DulDetail(dulGuide.getDocumentTypeId(), dulGuide));
-    }
-
-    @Override
-    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
-        if (null != idOfClient) {
-            Client client = session.get(Client.class, idOfClient);
-            studentItems.add(new StudentItem(client));
-
-            clientStudentItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
-                    ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                    DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                    ClientGuardianRepresentType.IN_LAW, false));
-        }
     }
 
     public static class OrgItem {
@@ -246,10 +227,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String ageTypeGroup;
     private Boolean specialMenu;
     private List<DulDetail> dulDetail = new ArrayList<>();
-    private List<StudentItem> studentItems = new ArrayList<>();
-    private List<ClientGuardianItem> clientStudentItems = new ArrayList<>();
-    private StudentItem currentStudentItem;
-
     public String getFax() {
         return fax;
     }
@@ -543,30 +520,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.dulDetail = dulDetail;
     }
 
-    public List<StudentItem> getStudentItems() {
-        return studentItems;
-    }
-
-    public void setStudentItems(List<StudentItem> studentItems) {
-        this.studentItems = studentItems;
-    }
-
-    public List<ClientGuardianItem> getClientStudentItems() {
-        return clientStudentItems;
-    }
-
-    public void setClientStudentItems(List<ClientGuardianItem> clientStudentItems) {
-        this.clientStudentItems = clientStudentItems;
-    }
-
-    public StudentItem getCurrentStudentItem() {
-        return currentStudentItem;
-    }
-
-    public void setCurrentStudentItem(StudentItem currentStudentItem) {
-        this.currentStudentItem = currentStudentItem;
-    }
-
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -584,8 +537,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         this.discountMode = Client.DISCOUNT_MODE_NONE;
         this.limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
-
-
         // Категории скидок
         /*
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
@@ -711,7 +662,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-        if(idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
+        if(idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())){
             if(this.san == null || this.san.isEmpty()) {
                 throw new Exception("Поле СНИЛС обязательное для заполнения");
             }
@@ -735,18 +686,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-
-        if (clientStudentItems != null && !clientStudentItems.isEmpty()) {
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
-                    client.getIdOfClient()));
-            addWardsByClient(persistenceSession, client.getIdOfClient(), clientStudentItems, clientGuardianHistory);
-        }
+        clean();
 
         for (DulDetail dul: this.dulDetail)
             dul.setIdOfClient(client.getIdOfClient());
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
-        clean();
+
         return client;
     }
 
@@ -789,8 +735,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.ageTypeGroup = null;
         this.remarks = null;
         this.specialMenu = false;
-        this.studentItems = new ArrayList<>();
-        this.clientStudentItems = new ArrayList<>();
     }
 
     private String filter = "Не выбрано";
@@ -837,19 +781,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
 
         }
-    }
-
-    public Object removeStudentItem() {
-        studentItems.remove(currentStudentItem);
-        clientStudentItems.removeIf(clientStudentItem -> clientStudentItem.getIdOfClient()
-                .equals(currentStudentItem.getIdOfClient()));
-        return null;
-    }
-
-    public Boolean isParentGroup() {
-        if (this.idOfClientGroup != null)
-            return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        return false;
     }
 
 }

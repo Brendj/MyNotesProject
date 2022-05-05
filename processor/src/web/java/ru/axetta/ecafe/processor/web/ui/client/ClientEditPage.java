@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
-import ru.axetta.ecafe.processor.core.client.items.StudentItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -343,10 +342,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean userOP;
     private List<DulDetail> dulDetail = new ArrayList<>();
     private Date currentDate;
-    private List<StudentItem> studentItems = new ArrayList<>();
-    private List<ClientGuardianItem> clientStudentItems = new ArrayList<>();
-    private List<ClientGuardianItem> removeClientStudentItems = new ArrayList<>();
-    private StudentItem currentStudentItem;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -727,38 +722,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.currentDate = currentDate;
     }
 
-    public List<StudentItem> getStudentItems() {
-        return studentItems;
-    }
-
-    public void setStudentItems(List<StudentItem> studentItems) {
-        this.studentItems = studentItems;
-    }
-
-    public List<ClientGuardianItem> getClientStudentItems() {
-        return clientStudentItems;
-    }
-
-    public void setClientStudentItems(List<ClientGuardianItem> clientStudentItems) {
-        this.clientStudentItems = clientStudentItems;
-    }
-
-    public StudentItem getCurrentStudentItem() {
-        return currentStudentItem;
-    }
-
-    public void setCurrentStudentItem(StudentItem currentStudentItem) {
-        this.currentStudentItem = currentStudentItem;
-    }
-
-    public List<ClientGuardianItem> getRemoveClientStudentItems() {
-        return removeClientStudentItems;
-    }
-
-    public void setRemoveClientStudentItems(List<ClientGuardianItem> removeClientStudentItems) {
-        this.removeClientStudentItems = removeClientStudentItems;
-    }
-
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         idOfCategoryList.clear();
@@ -796,10 +759,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
-        this.clientStudentItems = loadWardsByClient(session, idOfClient, true);
-        this.studentItems = clientStudentItems
-                .stream().map(c -> new StudentItem(session.get(Client.class, c.getIdOfClient())))
-                .collect(Collectors.toList());
         this.changePassword = false;
         this.dulDetail = client.getDulDetail()
                 .stream().filter(d -> d.getDeleteState() == null
@@ -903,15 +862,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
                             ClientGuardianRepresentType.UNKNOWN, false));
-            }
-            if (typeAddClient.equals("student")) {
-                if (!wardExists(idOfClient)) {
-                    clientStudentItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
-                            ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                            ClientGuardianRepresentType.IN_LAW, false));
-                    studentItems.add(new StudentItem(client));
-                }
             }
         }
     }
@@ -1205,24 +1155,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
                     idOfClient));
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
-        }
-
-        if (clientStudentItems != null && !clientStudentItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
-                    client.getIdOfClient()));
-            addWardsByClient(persistenceSession, client.getIdOfClient(), clientStudentItems, clientGuardianHistory);
-        }
-
-        if (removeClientStudentItems != null && !removeClientStudentItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
-                    client.getIdOfClient()));
-            removeWardsByClient(persistenceSession, client.getIdOfClient(), removeClientStudentItems, clientGuardianHistory);
         }
 
         if (isReplaceOrg) {
@@ -1567,24 +1499,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return false;
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
-    }
-
-    public Object removeStudentItem() {
-        studentItems.remove(currentStudentItem);
-        for(ClientGuardianItem clientStudentItem: clientStudentItems){
-            if(clientStudentItem.getIdOfClient().equals(currentStudentItem.getIdOfClient())){
-                removeClientStudentItems.add(clientStudentItem);
-                clientStudentItems.remove(clientStudentItem);
-                break;
-            }
-        }
-        return null;
-    }
-
-    public Boolean isParentGroup() {
-        if (this.idOfClientGroup != null)
-            return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        return false;
     }
 
 }
