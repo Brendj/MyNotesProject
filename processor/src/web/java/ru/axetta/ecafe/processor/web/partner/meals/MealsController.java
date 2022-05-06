@@ -1109,7 +1109,7 @@ public class MealsController extends Application {
             if (client.getOrg().getType() != null)
                 clientData.getOrganization().setType(client.getOrg().getType().toString());
         }
-        clientData.setFoodboxAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
+        clientData.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
         clientData.setBalance(client.getBalance());
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
