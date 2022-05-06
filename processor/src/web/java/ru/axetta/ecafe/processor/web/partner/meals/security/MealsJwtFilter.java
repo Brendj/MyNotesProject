@@ -19,6 +19,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -53,7 +55,9 @@ public class MealsJwtFilter extends OncePerRequestFilter {
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(servletResponse.getOutputStream(), result);
+            List<Result> results = new ArrayList<>();
+            results.add(result);
+            objectMapper.writeValue(servletResponse.getOutputStream(), results);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
