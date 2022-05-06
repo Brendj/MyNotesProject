@@ -3451,7 +3451,7 @@ public class DAOUtils {
     public static long nextVersionByPreorderComplex(Session session) {
         long version = 0L;
         Query query = session
-                .createSQLQuery("select e.version from cf_preorder_complex as e order by e.version desc limit 1");
+                .createSQLQuery("select nextval('cf_preorder_complex_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;
