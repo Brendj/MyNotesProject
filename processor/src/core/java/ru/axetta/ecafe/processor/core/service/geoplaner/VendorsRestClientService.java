@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service.geoplaner;
 
+import org.apache.commons.httpclient.params.HttpClientParams;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SmartWatchVendor;
 
@@ -24,6 +25,7 @@ public class VendorsRestClientService {
 
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
+    private static final int CONNECTION_TIMEOUT = 5000;
 
     public Integer sendPost(GeoplanerEventInfo event, EventType type, SmartWatchVendor vendor) throws Exception {
         String endPointAddress = getAddress(type, vendor);
@@ -31,7 +33,9 @@ public class VendorsRestClientService {
             logger.error("The address is null when trying to send an event packet: " + event.getClass());
             return null;
         }
-        HttpClient httpClient = new HttpClient();
+        HttpClientParams httpParams = new HttpClientParams();
+        httpParams.setParameter("http.connection.timeout", CONNECTION_TIMEOUT);
+        HttpClient httpClient = new HttpClient(httpParams);
         PostMethod method = new PostMethod(endPointAddress);
         method.addRequestHeader("Content-Type", "application/json");
 
