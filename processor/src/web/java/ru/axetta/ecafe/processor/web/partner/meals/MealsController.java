@@ -891,9 +891,9 @@ public class MealsController extends Application {
             if (corCount == MAX_COUNT)
                 break;
         }
-        List<PersonBuffetMenu> personBuffetMenus = new ArrayList<>();
-        personBuffetMenus.add(personBuffetMenu);
-        return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenus).build();
+//        List<PersonBuffetMenu> personBuffetMenus = new ArrayList<>();
+//        personBuffetMenus.add(personBuffetMenu);
+        return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenu).build();
     }
 
     @PUT
