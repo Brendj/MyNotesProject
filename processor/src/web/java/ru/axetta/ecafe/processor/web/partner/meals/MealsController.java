@@ -99,7 +99,7 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
     @Transactional
-    public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, List<FoodboxOrder> foodboxOrders) {
+    public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, FoodboxOrder foodboxOrders) {
         Result result = new Result();
         String contractIdStr = "";
         Map<String, String> params = parseParams(request);
@@ -305,7 +305,7 @@ public class MealsController extends Application {
             boolean havegoodDish = false;
             Integer countDish = 0;
             boolean toMaxCount = false;
-            for (OrderDish orderDish : foodboxOrders.get(0).getDishes()) {
+            for (OrderDish orderDish : foodboxOrders.getDishes()) {
                 //Проверки
                 try {
                     WtDish wtDish = daoReadonlyService.getWtDishById(orderDish.getDishId());
