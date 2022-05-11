@@ -461,9 +461,9 @@ public class MealsController extends Application {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        List<CurrentFoodboxOrderInfo> currentFoodboxOrderInfos = new ArrayList<>();
-        currentFoodboxOrderInfos.add(currentFoodboxOrderInfo);
-        return Response.status(HttpURLConnection.HTTP_CREATED).entity(currentFoodboxOrderInfos).build();
+//        List<CurrentFoodboxOrderInfo> currentFoodboxOrderInfos = new ArrayList<>();
+//        currentFoodboxOrderInfos.add(currentFoodboxOrderInfo);
+        return Response.status(HttpURLConnection.HTTP_CREATED).entity(currentFoodboxOrderInfo).build();
     }
 
     @GET
@@ -630,9 +630,9 @@ public class MealsController extends Application {
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
             }
             FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
-            List<FoodboxOrderInfo> foodboxOrderInfos = new ArrayList<>();
-            foodboxOrderInfos.add(foodboxOrderInfo);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfos).build();
+//            List<FoodboxOrderInfo> foodboxOrderInfos = new ArrayList<>();
+//            foodboxOrderInfos.add(foodboxOrderInfo);
+            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfo).build();
         } catch (Exception e) {
             logger.error("Ошибка при получении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
@@ -1109,7 +1109,7 @@ public class MealsController extends Application {
             if (client.getOrg().getType() != null)
                 clientData.getOrganization().setType(client.getOrg().getType().toString());
         }
-        clientData.setFoodboxAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
+        clientData.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(client.getIdOfClient(), null));
         clientData.setBalance(client.getBalance());
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
