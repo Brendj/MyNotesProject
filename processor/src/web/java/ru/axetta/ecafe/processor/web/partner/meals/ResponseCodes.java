@@ -9,16 +9,16 @@ import java.util.Map;
 
 public enum ResponseCodes {
     RC_OK(0L, "ОК"),
-    RC_INTERNAL_ERROR(100L, "ошибка сервера"),
-    RC_WRONG_KEY(120L, "Не удалось идентифицировать пользователя"),
-    RC_WRONG_REQUST(130L, "Не все обязательные поля заполнены"),
+    RC_INTERNAL_ERROR(100L, "Внутренняя ошибка сервера, сбой"),
+    RC_WRONG_KEY(120L, "Для доступа к запрашиваемому ресурсу требуется аутентификация"),
+    RC_WRONG_REQUST(130L, "Не хватает обязательных параметров, неправильное значение параметров или другая ошибка, связанная с формулировкой запроса"),
     RC_WRONG_DATE(210L, "Неверная дата и время операции"),
-    RC_NOT_FOUND_AVAILABLE_CLIENT (140L, "У клиента не включен функционал"),
+    RC_NOT_FOUND_AVAILABLE_CLIENT (140L, "Клиент не уполномочен совершать операции с запрошенным ресурсом"),
     RC_NOT_FOUND_CLIENT(150L, "Клиент не найден"),
-    RC_NOT_FOUND_ORG(160L, "У организации не включен функционал"),
+    RC_NOT_FOUND_ORG(160L, "Клиент не уполномочен совершать операции с запрошенным ресурсом"),
     RC_NOT_FOUND_FOODBOX(170L, "Заявка не найдена"),
     RC_FOUND_FOODBOX(180L, "Заявка с данных идентификатором уже зарегистрирована"),
-    RC_NOT_FOUND_AVAILABLE_PARALLEL (190L, "Параллель клиента недоступна для фудбокса");
+    RC_NOT_FOUND_AVAILABLE_PARALLEL (190L, "Клиент не уполномочен совершать операции с запрошенным ресурсом");
 
     private final Long code;
     private final String description;

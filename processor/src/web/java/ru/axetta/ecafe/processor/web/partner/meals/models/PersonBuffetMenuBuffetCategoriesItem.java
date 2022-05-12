@@ -17,7 +17,9 @@ import java.util.Objects;
 public class PersonBuffetMenuBuffetCategoriesItem {
     private Long id = null;
     private String name = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem> subcategories = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Dish> dishes = null;
     public PersonBuffetMenuBuffetCategoriesItem id(Long id) {
         this.id = id;

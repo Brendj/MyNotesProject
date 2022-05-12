@@ -99,7 +99,7 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
     @Transactional
-    public Response createNewFoodBoxPreorder(@Context HttpServletRequest request, FoodboxOrder foodboxOrders) {
+    public Response addPersonFoodboxOrder(@Context HttpServletRequest request, FoodboxOrder foodboxOrders) {
         Result result = new Result();
         String contractIdStr = "";
         Map<String, String> params = parseParams(request);
@@ -114,9 +114,7 @@ public class MealsController extends Application {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         if (!validateTime())
         {
@@ -127,9 +125,7 @@ public class MealsController extends Application {
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_TIME.toString());
                 orderErrorInfo.getDetails().setBuffetOpenAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetOpenTime()))));
                 orderErrorInfo.getDetails().setBuffetCloseAt(format.format(CalendarUtils.convertdateInUTC(format.parse(getBuffetCloseTime()))));
-                List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                orderErrorInfos.add(orderErrorInfo);
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             } catch (Exception e)
             {
                 logger.error("Ошибка при получении парсинге времени работы Фудбокса", e);
@@ -146,9 +142,7 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -157,9 +151,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         String xrequestStr = "";
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -176,9 +168,7 @@ public class MealsController extends Application {
             logger.error("Отсутствует x-request-id");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -186,9 +176,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -202,9 +190,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
 
         //Проверяем параллель клиента
@@ -212,27 +198,21 @@ public class MealsController extends Application {
         {
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
 
         if (!client.getFoodboxAvailability()) {
             logger.error("У клиента не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(xrequestStr);
         if (foodBoxPreorderDB != null) {
             logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", xrequestStr));
             result.setCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
             result.setDescription(ResponseCodes.RC_FOUND_FOODBOX.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getActiveFoodBoxPreorderForClient(client);
         if (foodBoxPreorders != null && !foodBoxPreorders.isEmpty()) {
@@ -241,9 +221,7 @@ public class MealsController extends Application {
             orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_HAVE_PREORDER.getCode());
             orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_HAVE_PREORDER.toString());
             orderErrorInfo.getDetails().setFoodboxOrderId(foodBoxPreorders.get(0).getIdFoodBoxPreorder());
-            List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-            orderErrorInfos.add(orderErrorInfo);
-            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+            return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
         }
         Long availableMoney = 0L;
         if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
@@ -257,9 +235,7 @@ public class MealsController extends Application {
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
                 orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
-                List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                orderErrorInfos.add(orderErrorInfo);
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
         }
         Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
@@ -356,9 +332,7 @@ public class MealsController extends Application {
                     logger.error("Ошибка при сохранении заказа для Фудбокса", e);
                     result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
                     result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
-                    List<Result> results = new ArrayList<>();
-                    results.add(result);
-                    return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(results).build();
+                    return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
                 }
                 if (toMaxCount)
                 {
@@ -396,18 +370,14 @@ public class MealsController extends Application {
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_DISH_COUNT.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_DISH_COUNT.toString());
                 orderErrorInfo.getDetails().setAmount(countDish.longValue());
-                List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                orderErrorInfos.add(orderErrorInfo);
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             if (!havegoodDish) {
                 logger.error(String.format("Все блюда из заказа не доступны foodBoxid: %s", xrequestStr));
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NO_DISH.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NO_DISH.toString());
-                List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                orderErrorInfos.add(orderErrorInfo);
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             foodBoxPreorder.setOrderPrice(priceAll);
             persistenceSession.merge(foodBoxPreorder);
@@ -419,9 +389,7 @@ public class MealsController extends Application {
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_NOMONEY.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_NOMONEY.toString());
                     orderErrorInfo.getDetails().setBalance(client.getBalance());
-                    List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                    orderErrorInfos.add(orderErrorInfo);
-                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
             if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
@@ -431,9 +399,7 @@ public class MealsController extends Application {
                     orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_LIMIT.getCode());
                     orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_LIMIT.toString());
                     orderErrorInfo.getDetails().setBalanceLimit(client.getExpenditureLimit());
-                    List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                    orderErrorInfos.add(orderErrorInfo);
-                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                    return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
                 }
             }
             //Есди количество свободных ячеек не позволяет создавать новый заказ
@@ -442,9 +408,7 @@ public class MealsController extends Application {
                 OrderErrorInfo orderErrorInfo = new OrderErrorInfo();
                 orderErrorInfo.setCode(ResponseCodesError.RC_ERROR_CELL.getCode());
                 orderErrorInfo.setInformation(ResponseCodesError.RC_ERROR_CELL.toString());
-                List<OrderErrorInfo> orderErrorInfos = new ArrayList<>();
-                orderErrorInfos.add(orderErrorInfo);
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfos).build();
+                return Response.status(HTTP_UNPROCESSABLE_ENTITY).entity(orderErrorInfo).build();
             }
             persistenceTransaction.commit();
             //Добавляем заказ для отслеживания
@@ -454,15 +418,11 @@ public class MealsController extends Application {
             logger.error("Ошибка при сохранении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-//        List<CurrentFoodboxOrderInfo> currentFoodboxOrderInfos = new ArrayList<>();
-//        currentFoodboxOrderInfos.add(currentFoodboxOrderInfo);
         return Response.status(HttpURLConnection.HTTP_CREATED).entity(currentFoodboxOrderInfo).build();
     }
 
@@ -471,16 +431,14 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
     @Transactional
-    public Response getInfoFoodBoxPreorder(@Context HttpServletRequest request) {
+    public Response getPersonFoodboxOrders(@Context HttpServletRequest request) {
         Result result = new Result();
         //Контроль безопасности
         if (!validateAccess()) {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         String fromStr = "";
@@ -519,9 +477,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contract %s", contractIdStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         try {
             from = simpleDateFormat.parse(fromStr);
@@ -529,9 +485,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат from %s", fromStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         try {
             to = simpleDateFormat.parse(toStr);
@@ -539,9 +493,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат to %s", toStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         try {
             if (!sortStr.isEmpty()) {
@@ -552,9 +504,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат sort %s", sortStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = null;
@@ -563,9 +513,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         try {
             List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getFoodBoxPreorderByForClient(client, from, to);
@@ -584,9 +532,7 @@ public class MealsController extends Application {
             logger.error("Ошибка при получении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
         }
     }
 
@@ -596,27 +542,23 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox/{foodboxOrderId}")
     @Transactional
-    public Response getInfoFoodBoxPreorder(@Context HttpServletRequest request, @PathParam("foodboxOrderId") String foodboxOrderId) {
+    public Response getPersonFoodboxOrder(@Context HttpServletRequest request, @PathParam("foodboxOrderId") String foodboxOrderId) {
         Result result = new Result();
         //Контроль безопасности
         if (!validateAccess()) {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         Long isppIdFoodbox;
         try {
             isppIdFoodbox = Long.parseLong(foodboxOrderId);
         } catch (Exception e) {
-            logger.error(String.format("Неверный формат isppIdFoodbox %s", foodboxOrderId), e);
+            logger.error(String.format("Неверный формат foodboxOrderId %s", foodboxOrderId), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         try {
@@ -625,9 +567,7 @@ public class MealsController extends Application {
                 logger.error(String.format("Не найден заказ с id %s", isppIdFoodbox));
                 result.setCode(ResponseCodes.RC_NOT_FOUND_FOODBOX.getCode().toString());
                 result.setDescription(ResponseCodes.RC_NOT_FOUND_FOODBOX.toString());
-                List<Result> results = new ArrayList<>();
-                results.add(result);
-                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
             }
             FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
 //            List<FoodboxOrderInfo> foodboxOrderInfos = new ArrayList<>();
@@ -637,9 +577,7 @@ public class MealsController extends Application {
             logger.error("Ошибка при получении заказа для Фудбокса", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
         }
     }
 
@@ -648,20 +586,18 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "menu/buffet")
     @Transactional
-    public Response getInfoFoodBoxMenu(@Context HttpServletRequest request) {
+    public Response getPersonBuffetMenu(@Context HttpServletRequest request) {
         Result result = new Result();
         //Контроль безопасности
         if (!validateAccess()) {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         String onDateStr = "";
-        Date onDate = null;
+        Date onDate = new Date();
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
@@ -685,17 +621,13 @@ public class MealsController extends Application {
             logger.error("Неверный формат onDate");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         if (contractIdStr.isEmpty()) {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -704,9 +636,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -714,9 +644,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -730,26 +658,20 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         //Проверяем параллель клиента
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         if (!client.getFoodboxAvailability()) {
             logger.error("У клиента не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), onDate);
@@ -888,11 +810,9 @@ public class MealsController extends Application {
             }
             //Тупая обрезка всего, что больше порога (меня заставили)
             corCount++;
-            if (corCount == MAX_COUNT)
+            if (corCount.equals(MAX_COUNT))
                 break;
         }
-//        List<PersonBuffetMenu> personBuffetMenus = new ArrayList<>();
-//        personBuffetMenus.add(personBuffetMenu);
         return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenu).build();
     }
 
@@ -901,16 +821,14 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "clients/foodboxAllowed")
     @Transactional
-    public Response setFoodboxAvailability(@Context HttpServletRequest request) {
+    public Response setPersonFoodboxAllowed(@Context HttpServletRequest request) {
         Result result = new Result();
         //Контроль безопасности
         if (!validateAccess()) {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         String foodBoxAvailableStr = "";
@@ -930,18 +848,14 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
 
         if (foodBoxAvailableStr.isEmpty()) {
             logger.error("Отсутствует foodBoxAvailable");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -950,9 +864,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -960,18 +872,14 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         if (!new ClientParallel().verifyParallelForClient(client))
         {
             logger.error("Клиент не входит в параллель");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -985,9 +893,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         Boolean foodBoxAvailable = true;
         try {
@@ -996,9 +902,7 @@ public class MealsController extends Application {
             logger.error("Неверный формат foodBoxAvailable");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -1015,18 +919,14 @@ public class MealsController extends Application {
             logger.error("Ошибка при сохранении флага для клиента", e);
             result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
         result.setCode(ResponseCodes.RC_OK.getCode().toString());
         result.setDescription(ResponseCodes.RC_OK.toString());
-        List<Result> results = new ArrayList<>();
-        results.add(result);
-        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(results).build();
+        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).entity(result).build();
     }
 
     @GET
@@ -1034,16 +934,14 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "clients")
     @Transactional
-    public Response getFoodboxAvailability(@Context HttpServletRequest request) {
+    public Response getClientData(@Context HttpServletRequest request) {
         Result result = new Result();
         //Контроль безопасности
         if (!validateAccess()) {
             logger.error("Не удалось авторизовать пользователя");
             result.setCode(ResponseCodes.RC_WRONG_KEY.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_KEY.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(result).build();
         }
         String contractIdStr = "";
         Map<String, String> params = parseParams(request);
@@ -1057,9 +955,7 @@ public class MealsController extends Application {
             logger.error("Отсутствует contractId");
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Long contractId;
         try {
@@ -1068,9 +964,7 @@ public class MealsController extends Application {
             logger.error(String.format("Неверный формат contractId %s", contractIdStr), e);
             result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
             result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         Client client = daoReadonlyService.getClientByContractId(contractId);
@@ -1078,9 +972,7 @@ public class MealsController extends Application {
             logger.error("Клиент не найден");
             result.setCode(ResponseCodes.RC_NOT_FOUND_CLIENT.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
         Boolean errorOrg = false;
         try {
@@ -1094,9 +986,7 @@ public class MealsController extends Application {
             logger.error("У организации не включен функционал фудбокса");
             result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         ClientData clientData = new ClientData();
         clientData.getClientId().setContractId(client.getContractId());
@@ -1120,16 +1010,12 @@ public class MealsController extends Application {
             logger.error("Клиент не входит в параллель");
             result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
             result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            List<Result> results = new ArrayList<>();
-            results.add(result);
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(results).build();
+            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
         }
         else
         {
             logger.info("Клиент входит в параллель");
-            List<ClientData> clientDataList = new ArrayList<>();
-            clientDataList.add(clientData);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(clientDataList).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
         }
     }
 

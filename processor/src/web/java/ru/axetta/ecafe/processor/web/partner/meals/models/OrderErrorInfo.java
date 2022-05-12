@@ -16,7 +16,8 @@ import java.util.Objects;
 @XmlType(name = "OrderErrorInfo")
 public class OrderErrorInfo {
     private Long code = null;
-    private String information = null;
+    private String description = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ErrorDetail details = new ErrorDetail();
     public OrderErrorInfo code(Long code) {
         this.code = code;
@@ -36,7 +37,7 @@ public class OrderErrorInfo {
         this.code = code;
     }
     public OrderErrorInfo information(String information) {
-        this.information = information;
+        this.description = information;
         return this;
     }
 
@@ -47,10 +48,10 @@ public class OrderErrorInfo {
      * @return information
      **/
     public String getInformation() {
-        return information;
+        return description;
     }
     public void setInformation(String information) {
-        this.information = information;
+        this.description = information;
     }
 
     /**

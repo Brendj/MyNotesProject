@@ -16,7 +16,6 @@ public class ClientData {
     private Organization organization = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean preorderAllowed = null;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long balance = null;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean foodboxAllowed = null;
