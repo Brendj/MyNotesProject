@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.partner.meals;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Result {
     private String code;
     private String description;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Object> details = new ArrayList<>();
 
     public Result(String code, String description) {
