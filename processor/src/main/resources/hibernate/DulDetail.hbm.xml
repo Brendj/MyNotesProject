@@ -15,7 +15,7 @@
             </generator>
         </id>
         <property name="idMkDocument" column="idmkdocument" type="long" not-null="true"/>
-        <property name="IdOfClient" column="IdOfClient" type="long" not-null="true"/>
+        <property name="idOfClient" column="IdOfClient" type="long" not-null="true"/>
         <property name="documentTypeId" column="document_type_id" type="long" not-null="false"/>
         <property name="series" column="series" type="string" length="64" not-null="false"/>
         <property name="number" column="number" type="string" length="64" not-null="true"/>

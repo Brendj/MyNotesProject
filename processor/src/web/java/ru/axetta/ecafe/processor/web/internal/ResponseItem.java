@@ -39,6 +39,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_LONG_CARDNO_MATCH_ORG = 470;
     public static final int ERROR_LONG_CARDNO_NOT_UNIQUE = 480;
     public static final int ERROR_MESH_DOCUMENT_NOT_SAVE = 490;
+    public static final int ERROR_DOCUMENT_EXISTS = 491;
     public static final int ERROR_DOCUMENT_NOT_FOUND = 500;
 
     public static final String OK_MESSAGE = "Ok.";

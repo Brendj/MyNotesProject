@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentSaveException;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import sun.security.provider.X509Factory;
 
@@ -2818,6 +2815,8 @@ public class FrontController extends HttpServlet {
             if (e instanceof MeshDocumentSaveException) {
                 return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
                         DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
+            } else if (e instanceof DocumentExistsException) {
+                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
             } else {
                 return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
                         e.getMessage());
