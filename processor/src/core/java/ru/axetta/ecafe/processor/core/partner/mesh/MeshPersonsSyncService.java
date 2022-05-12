@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.Class;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -278,12 +279,15 @@ public class MeshPersonsSyncService {
                    if(e.getServiceTypeId().equals(2)){ //"Образование"
                        MeshTrainingForm form = trainingForms.get(e.getEducationFormId());
                        if(form == null){
-                           return e;
+                           result = e;
+                           break;
                        } else if(Education.OUT_OF_ORG_TRAINING_FORM.contains(form.getId())){
                            e.setSetHomeStudy(true);
-                           return e;
+                           result = e;
+                           break;
                        } else {
-                           return e;
+                           result = e;
+                           break;
                        }
                    } else if(Education.OUT_OF_ORG_EDUCATIONS.contains(e.getServiceTypeId())){
                        result = e;
@@ -291,6 +295,10 @@ public class MeshPersonsSyncService {
                }
             } else {
                 result = educations.get(0);
+            }
+
+            if(result != null && DAOService.getInstance().orgNotExistsByNsiId(result.getOrganizationId())){
+                return null;
             }
 
             return result;

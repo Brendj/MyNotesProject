@@ -1289,5 +1289,15 @@ public class DAOService {
         q.setParameter("oldID", cardSign.getIdOfCardSign());
         q.executeUpdate();
     }
+
+    public boolean orgNotExistsByNsiId(Integer organizationId) {
+        if(organizationId == null){
+            return true;
+        }
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_orgs WHERE organizationidfromnsi = :organizationId");
+        q.setParameter("organizationId", organizationId);
+
+        return HibernateUtils.getDbLong(q.getSingleResult()) == 0;
+    }
 }
 
