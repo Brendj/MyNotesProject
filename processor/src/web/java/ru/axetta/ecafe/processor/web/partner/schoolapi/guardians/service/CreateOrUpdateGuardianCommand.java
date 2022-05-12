@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.schoolapi.guardians.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -40,7 +41,7 @@ public class CreateOrUpdateGuardianCommand {
         try {
             session = this.runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            Long newGuardianVersion = DAOUtils.nextVersionBySpecialDate(session);
+            Long newGuardianVersion = ClientManager.generateNewClientGuardianVersion(session);
 
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.ARM);
