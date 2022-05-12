@@ -10,6 +10,10 @@ public class PersonListResponse extends MeshGuardianResponse {
         super();
     }
 
+    public PersonListResponse(Integer code, String message) {
+        super(code, message);
+    }
+
     public PersonListResponse(List<MeshGuardianPerson> response) {
         this.setResponse(response);
     }

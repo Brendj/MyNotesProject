@@ -83,3 +83,5 @@ where passportseries is not null
   and passportseries != ''
   and passportnumber is not null
   and passportnumber != '';
+
+update cf_clients set san = replace(replace(san, ' ', '' ), '-', '' ) where san is not null and san != '';

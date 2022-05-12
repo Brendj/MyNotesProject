@@ -24,12 +24,12 @@ public class MeshGuardianConverter {
         return new MeshGuardianPerson(similarPerson);
     }
 
-    public MeshGuardianPerson toDTO(PersonAgent personAgent) throws Exception {
-        return new MeshGuardianPerson(personAgent);
-    }
-
     public PersonResponse toPersonDTO(ErrorResponse errorResponse) {
         return new PersonResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
+    }
+
+    public PersonListResponse toPersonListDTO(ErrorResponse errorResponse) {
+        return new PersonListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
     public DocumentResponse toDTO(PersonDocument personDocument) throws ParseException {

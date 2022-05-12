@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.MeshResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 
+import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,8 @@ public class DulDetailService {
     }
 
     public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+        if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
+            throw new DocumentExistsException("У клиента уже есть документ этого типа");
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
@@ -62,6 +65,7 @@ public class DulDetailService {
     }
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+        if (documentExists(session, client, dulDetail.getDocumentTypeId(), null)) throw new DocumentExistsException("У клиента уже есть документ этого типа");
         if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
@@ -77,6 +81,19 @@ public class DulDetailService {
             checkError(documentResponse);
         }
         session.merge(dulDetail);
+    }
+
+    private boolean documentExists(Session session, Client client, Long documentTypeId, Long id) {
+        String query_str = "select d.id from DulDetail d where d.idOfClient = :idOfClient " +
+                "and d.documentTypeId = :documentTypeId and d.deleteState = false";
+        if (id != null) query_str += " and d.id <>:id";
+        Query query = session.createQuery(query_str);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("documentTypeId", documentTypeId);
+        if (id != null) {
+            query.setParameter("id", id);
+        }
+        return query.getResultList().size() > 0;
     }
 
     private boolean isChange(Set<DulDetail> originDulDetails, DulDetail dulDetail) {
