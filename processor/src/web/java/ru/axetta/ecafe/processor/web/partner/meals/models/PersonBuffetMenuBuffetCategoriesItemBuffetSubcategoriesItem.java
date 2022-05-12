@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +12,7 @@ import java.util.Objects;
 public class PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem {
     private Long id = null;
     private String name = null;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Dish> dishes = null;
     public PersonBuffetMenuBuffetCategoriesItemBuffetSubcategoriesItem id(Long id) {
         this.id = id;
