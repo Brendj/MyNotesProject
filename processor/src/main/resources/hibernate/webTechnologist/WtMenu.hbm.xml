@@ -63,6 +63,13 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu"/>
         </set>
 
+        <set name="wtMenuInvisibleDishes" lazy="false">
+            <key>
+                <column name="idOfMenu"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuInvisibleDish"/>
+        </set>
+
         <set name="orgs" lazy="true" table="cf_wt_menu_org">
             <key column="idOfMenu"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
