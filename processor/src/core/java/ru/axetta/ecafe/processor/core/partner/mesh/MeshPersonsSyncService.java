@@ -163,6 +163,9 @@ public class MeshPersonsSyncService {
                     query.setParameter("deletestate", true);
                     query.setParameter("personguid", personguid);
                     query.executeUpdate();
+
+                    transaction.commit();
+                    transaction = null;
                     return;
                 }
                 Date endTraining = df.parse(education.getTrainingEndAt());

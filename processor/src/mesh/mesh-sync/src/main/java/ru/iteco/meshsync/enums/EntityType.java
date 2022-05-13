@@ -29,7 +29,7 @@ public enum EntityType {
             return null;
         }
         for(EntityType t : EntityType.values()){
-            if(t.name().toLowerCase().equals(entityName)){
+            if(t.getEntityName().equals(entityName)){
                 return t;
             }
         }
