@@ -152,7 +152,6 @@ public class OptionPage extends BasicWorkspacePage {
     private String photoSyncExpressions;
     private String libSyncExpressions;
     private Integer periodOfExtensionCards;
-    private String nsiVersion;
     private String cardAutoBlockCron;
     private String cardAutoBlockNode;
     private Integer cardAutoBlockDays;
@@ -855,12 +854,6 @@ public class OptionPage extends BasicWorkspacePage {
         return items;
     }
 
-    public SelectItem[] getNsiVersions() {
-        SelectItem[] items = new SelectItem[2];
-        items[0] = new SelectItem(Option.NSI2, Option.NSI2);
-        items[1] = new SelectItem(Option.NSI3, Option.NSI3);
-        return items;
-    }
 
     public Boolean getNotifyByPushNewClients() {
         return NotifyByPushNewClients;
@@ -1014,7 +1007,6 @@ public class OptionPage extends BasicWorkspacePage {
        menuSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_MENU_SYNC_EXPRESSION);
        photoSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_PHOTO_SYNC_EXPRESSION);
        libSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_LIB_SYNC_EXPRESSION);
-        nsiVersion = runtimeContext.getOptionValueString(Option.OPTION_NSI_VERSION);
 
         periodOfExtensionCards = runtimeContext.getOptionValueInt(Option.OPTION_PERIOD_OF_EXTENSION_CARDS);
 
@@ -1265,7 +1257,6 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_LIB_SYNC_EXPRESSION, libSyncExpressions);
 
             runtimeContext.setOptionValue(Option.OPTION_PERIOD_OF_EXTENSION_CARDS, periodOfExtensionCards);
-            runtimeContext.setOptionValue(Option.OPTION_NSI_VERSION, nsiVersion);
 
             runtimeContext.setOptionValue(Option.OPTION_CARD_AUTOBLOCK, cardAutoBlockCron);
             runtimeContext.setOptionValue(Option.OPTION_CARD_AUTOBLOCK_NODE, cardAutoBlockNode);
@@ -1414,14 +1405,6 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setPeriodOfExtensionCards(Integer periodOfExtensionCards) {
         this.periodOfExtensionCards = periodOfExtensionCards;
-    }
-
-    public String getNsiVersion() {
-        return nsiVersion;
-    }
-
-    public void setNsiVersion(String nsiVersion) {
-        this.nsiVersion = nsiVersion;
     }
 
     public Integer getSimultaneousSyncThreads() {

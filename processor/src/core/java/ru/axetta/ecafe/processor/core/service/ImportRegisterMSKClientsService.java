@@ -1629,22 +1629,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public ClientMskNSIService getNSIService() {
-        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
-            case Option.NSI3 :
-                //Не смотрим на настройку из MODE_PROPERTY. Pабота с файлом НСИ-3 по екис ид
-                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3ServiceKafkaWrapper", ImportRegisterNSI3ServiceKafkaWrapper.class);
-        }
-        String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
-        if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {
-            //забор клиентов из таблиц симметрика
-            return RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class);
-        } else if (mode.equals(ImportRegisterFileService.MODE_FILE)) {
-            //клиенты из файла НСИ-2
-            return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
-        } else {
-            //запросы в апи НСИ-1
-            return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
-        }
+        return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3ServiceKafkaWrapper", ImportRegisterNSI3ServiceKafkaWrapper.class);
     }
 
     @Override
@@ -1653,8 +1638,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             boolean manualCheckout) throws Exception {
         if (!DAOReadonlyService.getInstance().isSverkaEnabled()) {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
-        } else if(!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)
-                && !ImportRegisterNSI3ServiceKafkaWrapper.workWithKafka()){
+        } else if(!ImportRegisterNSI3ServiceKafkaWrapper.workWithKafka()){
             throw new ServiceTemporaryUnavailableException("Set wrong data source");
         }
         /*Убираем ограничение на выполнение сверки не чаще, чем раз в час

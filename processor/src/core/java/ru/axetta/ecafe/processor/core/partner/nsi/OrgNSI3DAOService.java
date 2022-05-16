@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
@@ -28,7 +29,7 @@ import java.util.List;
  */
 @Component("OrgNSI3DAOService")
 @Scope("singleton")
-public class OrgNSI3DAOService extends OrgSymmetricDAOService {
+public class OrgNSI3DAOService extends OrgMskNSIService {
     private static final Logger logger = LoggerFactory.getLogger(OrgNSI3DAOService.class);
 
     @PersistenceContext(unitName = "reportsPU")
@@ -132,8 +133,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
         return result;
     }
 
-    @Override
-    protected ImportRegisterOrgsService.OrgInfo getInfoWithAddToResult(List<ImportRegisterOrgsService.OrgInfo> result, Object[] row) {
+    private ImportRegisterOrgsService.OrgInfo getInfoWithAddToResult(List<ImportRegisterOrgsService.OrgInfo> result, Object[] row) {
         for (ImportRegisterOrgsService.OrgInfo info : result) {
             if (row[22] != null && (((BigInteger) row[22]).longValue() == (info.getGlobalId()))) {
                 return info;
@@ -144,4 +144,33 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
         return info;
     }
 
+    private void fillInfoWithItem(ImportRegisterOrgsService.OrgInfo item, ImportRegisterOrgsService.OrgInfo info, Long additionalId,
+                                    String directorFullName, String ogrn, String region) {
+        info.setOrganizationType(OrganizationType.SCHOOL);
+        info.setAddress(item.getAddress());
+        info.setShortName(item.getShortName());
+        info.setOfficialName(item.getOfficialName());
+        info.setCity(item.getCity());
+        info.setGuid(item.getGuid());
+        info.setInn(item.getInn());
+        info.setUnom(item.getUnom());
+        info.setUnad(item.getUnad());
+        info.setAdditionalId(additionalId);
+        info.setUniqueAddressId(item.getUniqueAddressId());
+        info.setDirectorFullName(directorFullName);
+        info.setOGRN(ogrn);
+        info.setMainBuilding(false);
+        info.setDirector(item.getDirector());
+        info.setEkisId(item.getEkisId());
+        info.setEgissoId(item.getEgissoId());
+        info.setShortAddress(item.getShortAddress());
+        info.setMunicipalDistrict(item.getMunicipalDistrict());
+        info.setRegion(region);
+        info.setFounder(item.getFounder());
+        info.setSubordination(item.getSubordination());
+        info.setGlobalId(item.getGlobalId());
+        if (info.getOrgInfos().size() == 0) {
+            info.setOrgInfos(new ArrayList<ImportRegisterOrgsService.OrgInfo>());
+        }
+    }
 }
