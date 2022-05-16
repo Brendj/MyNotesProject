@@ -1666,9 +1666,6 @@ public class RuntimeContext implements ApplicationContextAware {
             return false;
     }
 
-    public boolean isNSI3() {
-        return getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3);
-    }
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }

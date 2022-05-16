@@ -55,9 +55,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public NSIOrgsRegistrySynchPage() {
         super();
         orgModifyChangeItems.clear();
-        if (!RuntimeContext.getInstance().isNSI3()) {
-            orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
-        }
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_NSI_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EKIS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EGISSO_ID, "", ""));
@@ -463,10 +460,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         return orgForEdit;
     }
 
-    public boolean nsi3() {
-        return RuntimeContext.getInstance().isNSI3();
-    }
-
     public void setOrgForEdit(WebItem orgForEdit) {
         this.orgForEdit = orgForEdit;
     }
@@ -476,10 +469,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return orgModifyChangeItems;
         }
         for (OrgModifyChangeItem item : orgModifyChangeItems) {
-            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_GUID) && !RuntimeContext.getInstance().isNSI3()) {
-                item.setOldValue(orgForEdit.getGuidFrom());
-                item.setNewValue(orgForEdit.getGuidReestr());
-            }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_NSI_ID)) {
                 item.setOldValue(orgForEdit.getGlobalIdFromNullSafe());
                 item.setNewValue(orgForEdit.getGlobalIdReestrNullSafe());

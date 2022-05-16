@@ -398,16 +398,7 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             return;
         }
         try {
-            String mode = RuntimeContext.getInstance().getPropertiesValue(MODE_PROPERTY, null);
-            if (mode.equals(MODE_FILE)) {
-                RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class)
-                        .loadNSIFile();
-            }
-            if (mode.equals(MODE_SYMMETRIC)) {
-                RuntimeContext.getAppContext()
-                        .getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class)
-                        .loadClientsFromSymmetric();
-            }
+            RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class).loadNSIFile();
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load NSI file: ", e);

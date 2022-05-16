@@ -241,12 +241,6 @@
                                                                  target="#{NSIOrgsRegistrySynchPage.orgForEdit}"/>
                                 </a4j:commandButton>
                             </rich:column>
-                            <rich:column rendered="#{!NSIOrgsRegistrySynchPage.nsi3()}">
-                                <f:facet name="header">
-                                    <h:outputText value="Guid"/>
-                                </f:facet>
-                                <h:outputText value="#{org.guid}" escape="false"/>
-                            </rich:column>
                             <rich:column>
                                 <f:facet name="header">
                                     <h:outputText value="Ид НСИ-3"/>
