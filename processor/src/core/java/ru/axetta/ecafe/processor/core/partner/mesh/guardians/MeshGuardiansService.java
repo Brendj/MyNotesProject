@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import javax.jws.WebParam;
 import java.net.URLEncoder;
@@ -82,7 +83,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPerson(String firstName,
+    public PersonResponse createPerson(Long idOfOrg,
+                                       String firstName,
                                        String patronymic,
                                        String lastName,
                                        Integer genderId,
@@ -90,14 +92,18 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        String snils,
                                        String mobile,
                                        String email,
-                                       String сhildMeshGuid) {
+                                       String сhildMeshGuid,
+                                       List<DulDetail> dulDetails,
+                                       Integer agentTypeId) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
+                    email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(сhildMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
+                //Создаем клиента
                 return new PersonResponse(personResult.getPersonId()).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
@@ -193,12 +199,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                          Date birthDate,
                                          String snils,
                                          String mobile,
-                                         String email) throws Exception {
+                                         String email,
+                                         List<DulDetail> dulDetails,
+                                         Integer agentTypeId) throws Exception {
         PersonAgent personAgent = new PersonAgent();
-        personAgent.setAgentTypeId(GUARDIAN_DEFAULT_TYPE);
+        personAgent.setAgentTypeId(agentTypeId);
         personAgent.setId(0);
         personAgent.setPersonId(PERSON_ID_STUB);
-        personAgent.setAgentPerson(buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email));
+        personAgent.setAgentPerson(buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails));
         /*if (StringUtils.isEmpty(guardian.getMeshGUID())) {
             personAgent.setAgentPerson(buildResponsePerson(guardian));
         } else {
@@ -228,7 +236,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                 Date birthDate,
                                                 String snils,
                                                 String mobile,
-                                                String email) throws Exception {
+                                                String email,
+                                                List<DulDetail> dulDetails) throws Exception {
         ResponsePersons person = new ResponsePersons();
         person.setId(0);
         person.setPersonId(PERSON_ID_STUB);
@@ -248,6 +257,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
             person.setContacts(contacts);
         }
+        if (!CollectionUtils.isEmpty(dulDetails)) {
+            List<PersonDocument> documents = new ArrayList<>();
+            for (DulDetail dulDetail : dulDetails) {
+                documents.add(buildPersonDocument(dulDetail));
+            }
+            person.setDocuments(documents);
+        }
+
         return person;
     }
 
@@ -289,7 +306,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                String snils,
                                                String mobile,
                                                String email) throws Exception {
-        ResponsePersons person = buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+        ResponsePersons person = buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(person);

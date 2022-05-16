@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
+import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.Base64;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -23,10 +25,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
-import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -2983,7 +2981,8 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "createMeshPerson")
-    public PersonResponse createMeshPerson(@WebParam(name = "firstname") String firstName,
+    public PersonResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
+                                           @WebParam(name = "firstname") String firstName,
                                            @WebParam(name = "patronymic") String patronymic,
                                            @WebParam(name = "lastname") String lastName,
                                            @WebParam(name = "genderId") Integer genderId,
@@ -2991,8 +2990,32 @@ public class FrontController extends HttpServlet {
                                            @WebParam(name = "snils") String snils,
                                            @WebParam(name = "mobile") String mobile,
                                            @WebParam(name = "email") String email,
-                                           @WebParam(name = "сhildMeshGuid") String сhildMeshGuid) {
-        return getMeshGuardiansService().createPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, сhildMeshGuid);
+                                           @WebParam(name = "сhildMeshGuid") String сhildMeshGuid,
+                                           @WebParam(name = "documents") List<DocumentItem> documents,
+                                           @WebParam(name = "agentTypeId") Integer agentTypeId,
+                                           @WebParam(name = "relation") Integer relation,
+                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent) {
+        List<DulDetail> dulDetails = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(documents)) {
+            for (DocumentItem item : documents) {
+                dulDetails.add(getDulDetailFromDocumentItem(item));
+            }
+        }
+
+        return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+                mobile, email, сhildMeshGuid, dulDetails, agentTypeId);
+    }
+
+    private DulDetail getDulDetailFromDocumentItem(DocumentItem item) {
+        DulDetail dulDetail = new DulDetail();
+        dulDetail.setDocumentTypeId(item.getDocumentTypeId());
+        dulDetail.setSeries(item.getSeries());
+        dulDetail.setNumber(item.getNumber());
+        dulDetail.setSubdivisionCode(item.getSubdivisionCode());
+        dulDetail.setIssuer(item.getIssuer());
+        dulDetail.setIssued(item.getIssued());
+        dulDetail.setExpiration(item.getExpiration());
+        return dulDetail;
     }
 
     private MeshGuardiansService getMeshGuardiansService() {
