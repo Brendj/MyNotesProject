@@ -206,7 +206,9 @@ public class MeshPersonsSyncService {
                     }
                     meshClass.setLastUpdate(now);
                     meshClass.setName(class_.getName());
-                    meshClass.setParallelId(parallelid);
+                    if(parallelid != null) {
+                        meshClass.setParallelId(parallelid);
+                    }
                     meshClass.setEducationStageId(class_.getEducationStageId());
                     meshClass.setOrganizationId(organizationid);
                     session.saveOrUpdate(meshClass);
