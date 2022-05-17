@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -99,22 +100,26 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         String query_string = reportProperties.getProperty(ConsolidatedSellingReportBuilder.SHOW_ALL_ORGS).equals("0") ?
                 "select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
                 + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder, "
-                + "org.organizationtype "
+                + "org.organizationtype, dr.idofgroupitem "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder and pl.idoforg = o.idoforg "
+                //+ "left join cf_wt_dish d on od.idofdish = d.idofdish "
+                + "left join cf_wt_dish_groupitem_relationships dr on dr.idofdish = od.idofdish "
                 + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org_condition
                 + "order by org.idoforg"
                 :
                 "select org.idoforg, org.shortnameinfoservice, org.district, org.address, query.rprice, query.qty, "
-                + "query.menuorigin, query.menutype, query.ispreorder, org.organizationtype "
+                + "query.menuorigin, query.menutype, query.ispreorder, org.organizationtype, query.idofgroupitem "
                 + " from cf_orgs org left join " + " ("
-                + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder "
+                + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.preorderguid is not NULL as ispreorder, "
+                + " dr.idofgroupitem "
                 + " from cf_orgs org2 join cf_orders o on org2.idoforg = o.idoforg "
                 + " join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + " left join cf_preorder_linkod pl on pl.idoforder = o.idoforder and pl.idoforg = o.idoforg "
+                + " left join cf_wt_dish_groupitem_relationships dr on dr.idofdish = od.idofdish "
                 + " where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + "and (pl.idofpreorderlinkod is null or (pl.idofpreorderlinkod is not NULL and pl.preorderguid is not NULL)) "
                 + org2_condition
@@ -135,6 +140,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         Integer menuOrigin = null;
         Integer menuType = null;
         Boolean isPreorder = null;
+        Long idOfGroupItem = null;
         for (Object o : res ) {
             Object[] row = (Object[]) o;
             Long idOfOrg = ((BigInteger) row[0]).longValue();
@@ -149,15 +155,16 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
                 menuOrigin = (Integer) row[6];
                 menuType = (Integer) row[7];
                 isPreorder = (Boolean) row[8];
+                idOfGroupItem = HibernateUtils.getDbLong(row[10]);
             }
             ConsolidatedSellingReportItem item = getReportItemByIdOfOrg(result_list, idOfOrg);
             if (item == null) {
                 item = new ConsolidatedSellingReportItem(idOfOrg, shortNameInfoService, district, address, number, orgType);
                 number++;
-                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
+                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder, idOfGroupItem);
                 result_list.add(item);
             } else {
-                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
+                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder, idOfGroupItem);
             }
         }
 
@@ -165,14 +172,14 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
     }
 
     private void addValues(ConsolidatedSellingReportItem item, Long rprice, Integer qty, Integer menuOrigin,
-            Integer menuType, Boolean isPreorder) {
+            Integer menuType, Boolean isPreorder, Long idOfGroupItem) {
         if (isPreorder) {
             item.addPreorderFood(rprice * qty);
         } else if ((menuType >= 50) && (menuType <= 99) && (rprice > 0)) {
             item.addComplexFood(rprice * qty);
-        } else if (menuOrigin.equals(OrderDetail.PRODUCT_COMMERCIAL) && menuType.equals(0)) {
+        } else if (idOfGroupItem != null && idOfGroupItem.equals(4L)) {
             item.addPayFood(rprice * qty);
-        } else if (menuType.equals(0) && !menuOrigin.equals(OrderDetail.PRODUCT_VENDING) && !menuOrigin.equals(OrderDetail.PRODUCT_COMMERCIAL)) {
+        } else if (idOfGroupItem != null && idOfGroupItem.equals(3L)) {
             item.addBufferFood(rprice * qty);
         }
     }
