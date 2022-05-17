@@ -280,7 +280,10 @@ public class MeshPersonsSyncService {
                for(Education e : educations){
                    if(!Education.ACCEPTABLE_EDUCATIONS.contains(e.getServiceTypeId())){
                        continue;
+                   } else if(Education.NOT_PROCESS_SERVICE_TYPES.contains(e.getServiceTypeId())){
+                       continue;
                    }
+
                    if(e.getServiceTypeId().equals(2)){ //"Образование"
                        MeshTrainingForm form = trainingForms.get(e.getEducationFormId());
                        if(form == null){
@@ -302,8 +305,12 @@ public class MeshPersonsSyncService {
                 result = educations.get(0);
             }
 
-            if(result != null && DAOService.getInstance().orgNotExistsByNsiId(result.getOrganizationId())){
-                return null;
+            if(result != null) {
+                if (Education.NOT_PROCESS_SERVICE_TYPES.contains(result.getServiceTypeId())) {
+                    return null;
+                } else if (DAOService.getInstance().orgNotExistsByNsiId(result.getOrganizationId())) {
+                    return null;
+                }
             }
 
             return result;

@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class Education implements Comparable<Education> {
     public static final List<Integer> ACCEPTABLE_EDUCATIONS = Arrays.asList(2, 3, 4);
     public static final List<Integer> OUT_OF_ORG_EDUCATIONS = Arrays.asList(3, 4);
     public static final List<Integer> OUT_OF_ORG_TRAINING_FORM = Arrays.asList(4,5,6,7);
+    public static final List<Integer> NOT_PROCESS_SERVICE_TYPES = Arrays.asList(1, 5);
 
     @JsonProperty("id")
     private Integer id;
