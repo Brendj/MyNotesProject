@@ -6,16 +6,22 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.DulDetail;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import javax.jws.WebParam;
 import java.net.URLEncoder;
@@ -24,6 +30,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 @DependsOn("runtimeContext")
@@ -82,7 +89,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPerson(String firstName,
+    public PersonResponse createPerson(Long idOfOrg,
+                                       String firstName,
                                        String patronymic,
                                        String lastName,
                                        Integer genderId,
@@ -90,15 +98,22 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        String snils,
                                        String mobile,
                                        String email,
-                                       String сhildMeshGuid) {
+                                       String сhildMeshGuid,
+                                       List<DulDetail> dulDetails,
+                                       Integer agentTypeId,
+                                       Integer relation,
+                                       Integer typeOfLegalRepresent) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
+                    email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(сhildMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
-                return new PersonResponse(personResult.getPersonId()).okResponse();
+                createGuadianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
+                        genderId, birthDate, snils, mobile, сhildMeshGuid, dulDetails, relation, typeOfLegalRepresent);
+                return new PersonResponse(personResult.getAgentPersonId()).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
@@ -111,6 +126,57 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (Exception e) {
             logger.error("Error in createPerson: ", e);
             return new PersonResponse().internalErrorResponse();
+        }
+    }
+
+    private void createGuadianInternal(Long idOfOrg, String personId, String firstName,
+                                       String patronymic, String lastName,
+                                       Integer genderId, Date birthDate, String snils,
+                                       String mobile, String сhildMeshGuid,
+                                       List<DulDetail> dulDetails, Integer relation,
+                                       Integer typeOfLegalRepresent) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Org org = session.load(Org.class, idOfOrg);
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("soap метод createMeshPerson");
+            clientsMobileHistory.setShowing("АРМ");
+            String remark = String.format("Создано в АРМ %s", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+            Client guardian = ClientManager
+                    .createGuardianTransactionFree(session, firstName, StringUtils.defaultIfEmpty(patronymic, ""), lastName, mobile, remark, genderId,
+                            org, ClientCreatedFromType.ARM, "", null, null, null,
+                            null, null, clientsMobileHistory);
+            guardian.setMeshGUID(personId);
+            guardian.setSan(snils);
+            guardian.setBirthDate(birthDate);
+            if (!CollectionUtils.isEmpty(dulDetails)) {
+                guardian.setDulDetail(new HashSet<>(dulDetails));
+            }
+            session.update(guardian);
+
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("soap метод createMeshPerson");
+            clientGuardianHistory.setGuardian(mobile);
+            String description = null;
+            if (relation != null) {
+                description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
+            }
+            Client client = DAOUtils.findClientByMeshGuid(session, сhildMeshGuid);
+            ClientGuardian clientGuardian = ClientManager
+                    .createClientGuardianInfoTransactionFree(session, guardian, description, false,
+                            client.getIdOfClient(), ClientCreatedFromType.MPGU, typeOfLegalRepresent, clientGuardianHistory);
+            session.flush();
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in createGuadianInternal: ", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
@@ -180,9 +246,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         personDocument.setNumber(dulDetail.getNumber());
         personDocument.setSeries(dulDetail.getSeries());
         personDocument.setSubdivisionCode(dulDetail.getSubdivisionCode());
-        personDocument.setIssued(formatter.format(dulDetail.getIssued()));
+        if (dulDetail.getIssued() != null) {
+            personDocument.setIssued(formatter.format(dulDetail.getIssued()));
+        }
         personDocument.setIssuer(dulDetail.getIssuer());
-        personDocument.setExpiration(formatter.format(dulDetail.getExpiration()));
+        if (dulDetail.getExpiration() != null) {
+            personDocument.setExpiration(formatter.format(dulDetail.getExpiration()));
+        }
         return personDocument;
     }
 
@@ -193,12 +263,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                          Date birthDate,
                                          String snils,
                                          String mobile,
-                                         String email) throws Exception {
+                                         String email,
+                                         List<DulDetail> dulDetails,
+                                         Integer agentTypeId) throws Exception {
         PersonAgent personAgent = new PersonAgent();
-        personAgent.setAgentTypeId(GUARDIAN_DEFAULT_TYPE);
+        personAgent.setAgentTypeId(agentTypeId);
         personAgent.setId(0);
         personAgent.setPersonId(PERSON_ID_STUB);
-        personAgent.setAgentPerson(buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email));
+        personAgent.setAgentPerson(buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails));
         /*if (StringUtils.isEmpty(guardian.getMeshGUID())) {
             personAgent.setAgentPerson(buildResponsePerson(guardian));
         } else {
@@ -228,7 +300,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                 Date birthDate,
                                                 String snils,
                                                 String mobile,
-                                                String email) throws Exception {
+                                                String email,
+                                                List<DulDetail> dulDetails) throws Exception {
         ResponsePersons person = new ResponsePersons();
         person.setId(0);
         person.setPersonId(PERSON_ID_STUB);
@@ -248,6 +321,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
             person.setContacts(contacts);
         }
+        if (!CollectionUtils.isEmpty(dulDetails)) {
+            List<PersonDocument> documents = new ArrayList<>();
+            for (DulDetail dulDetail : dulDetails) {
+                documents.add(buildPersonDocument(dulDetail));
+            }
+            person.setDocuments(documents);
+        }
+
         return person;
     }
 
@@ -289,7 +370,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                String snils,
                                                String mobile,
                                                String email) throws Exception {
-        ResponsePersons person = buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+        ResponsePersons person = buildResponsePerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(person);

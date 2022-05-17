@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.internal;
 import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
+import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.Base64;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -24,10 +26,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
-import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -2988,12 +2986,20 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "birthDate") Date birthDate,
             @WebParam(name = "snils") String snils,
             @WebParam(name = "mobile") String mobile,
-            @WebParam(name = "email") String email) {
+            @WebParam(name = "email") String email) throws FrontControllerException {
+        checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils);
         return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
     }
 
+    private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
+                                       Date birthDate, String snils) throws FrontControllerException {
+        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+                || birthDate == null || StringUtils.isEmpty(snils)) throw new FrontControllerException("Не заполнены обязательные параметры");
+    }
+
     @WebMethod(operationName = "createMeshPerson")
-    public PersonResponse createMeshPerson(@WebParam(name = "firstname") String firstName,
+    public PersonResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
+                                           @WebParam(name = "firstname") String firstName,
                                            @WebParam(name = "patronymic") String patronymic,
                                            @WebParam(name = "lastname") String lastName,
                                            @WebParam(name = "genderId") Integer genderId,
@@ -3001,8 +3007,42 @@ public class FrontController extends HttpServlet {
                                            @WebParam(name = "snils") String snils,
                                            @WebParam(name = "mobile") String mobile,
                                            @WebParam(name = "email") String email,
-                                           @WebParam(name = "сhildMeshGuid") String сhildMeshGuid) {
-        return getMeshGuardiansService().createPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, сhildMeshGuid);
+                                           @WebParam(name = "childMeshGuid") String childMeshGuid,
+                                           @WebParam(name = "documents") List<DocumentItem> documents,
+                                           @WebParam(name = "agentTypeId") Integer agentTypeId,
+                                           @WebParam(name = "relation") Integer relation,
+                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent) throws FrontControllerException {
+        checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
+                relation, typeOfLegalRepresent);
+        List<DulDetail> dulDetails = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(documents)) {
+            for (DocumentItem item : documents) {
+                dulDetails.add(getDulDetailFromDocumentItem(item));
+            }
+        }
+
+        return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+                mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
+    }
+
+    private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
+                                                 Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
+                                                 Integer relation, Integer typeOfLegalRepresent) throws FrontControllerException {
+        if (idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+            || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
+            || relation == null || typeOfLegalRepresent == null) throw new FrontControllerException("Не заполнены обязательные параметры");
+    }
+
+    private DulDetail getDulDetailFromDocumentItem(DocumentItem item) {
+        DulDetail dulDetail = new DulDetail();
+        dulDetail.setDocumentTypeId(item.getDocumentTypeId());
+        dulDetail.setSeries(item.getSeries());
+        dulDetail.setNumber(item.getNumber());
+        dulDetail.setSubdivisionCode(item.getSubdivisionCode());
+        dulDetail.setIssuer(item.getIssuer());
+        dulDetail.setIssued(item.getIssued());
+        dulDetail.setExpiration(item.getExpiration());
+        return dulDetail;
     }
 
     private MeshGuardiansService getMeshGuardiansService() {

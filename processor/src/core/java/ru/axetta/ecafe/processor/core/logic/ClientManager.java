@@ -1147,14 +1147,16 @@ public class ClientManager {
         logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         session.update(clientGuardianToSave);
 
-        DulDetail dulDetail = new DulDetail();
-        dulDetail.setNumber(passportNumber);
-        dulDetail.setSeries(passportSeries);
-        dulDetail.setIdOfClient(clientGuardianToSave.getIdOfClient());
-        dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+        if (!StringUtils.isEmpty(passportNumber) && !StringUtils.isEmpty(passportSeries)) {
+            DulDetail dulDetail = new DulDetail();
+            dulDetail.setNumber(passportNumber);
+            dulDetail.setSeries(passportSeries);
+            dulDetail.setIdOfClient(clientGuardianToSave.getIdOfClient());
+            dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+            RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                    .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+        }
 
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
