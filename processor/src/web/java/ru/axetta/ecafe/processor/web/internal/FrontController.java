@@ -2976,8 +2976,15 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "birthDate") Date birthDate,
             @WebParam(name = "snils") String snils,
             @WebParam(name = "mobile") String mobile,
-            @WebParam(name = "email") String email) {
+            @WebParam(name = "email") String email) throws FrontControllerException {
+        checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils);
         return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+    }
+
+    private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
+                                       Date birthDate, String snils) throws FrontControllerException {
+        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+                || birthDate == null || StringUtils.isEmpty(snils)) throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
     @WebMethod(operationName = "createMeshPerson")
@@ -2990,11 +2997,13 @@ public class FrontController extends HttpServlet {
                                            @WebParam(name = "snils") String snils,
                                            @WebParam(name = "mobile") String mobile,
                                            @WebParam(name = "email") String email,
-                                           @WebParam(name = "сhildMeshGuid") String сhildMeshGuid,
+                                           @WebParam(name = "childMeshGuid") String childMeshGuid,
                                            @WebParam(name = "documents") List<DocumentItem> documents,
                                            @WebParam(name = "agentTypeId") Integer agentTypeId,
                                            @WebParam(name = "relation") Integer relation,
-                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent) {
+                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent) throws FrontControllerException {
+        checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
+                relation, typeOfLegalRepresent);
         List<DulDetail> dulDetails = new ArrayList<>();
         if (!CollectionUtils.isEmpty(documents)) {
             for (DocumentItem item : documents) {
@@ -3003,7 +3012,15 @@ public class FrontController extends HttpServlet {
         }
 
         return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                mobile, email, сhildMeshGuid, dulDetails, agentTypeId);
+                mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
+    }
+
+    private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
+                                                 Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
+                                                 Integer relation, Integer typeOfLegalRepresent) throws FrontControllerException {
+        if (idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+            || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
+            || relation == null || typeOfLegalRepresent == null) throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
     private DulDetail getDulDetailFromDocumentItem(DocumentItem item) {
