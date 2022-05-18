@@ -30,6 +30,12 @@ public enum ClientGuardianRoleType {
         this.description = description;
     }
 
+    public static ClientGuardianRoleType fromInteger(Integer value){
+        if (value == null)
+            return null;
+        return map.get(value);
+    }
+
     @Override
     public String toString() {
         return description;

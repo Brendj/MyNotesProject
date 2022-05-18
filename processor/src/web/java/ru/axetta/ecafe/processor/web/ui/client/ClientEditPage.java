@@ -854,14 +854,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                            ClientGuardianRepresentType.UNKNOWN, false));
+                            ClientGuardianRepresentType.UNKNOWN, false, null));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                            ClientGuardianRepresentType.UNKNOWN, false));
+                            ClientGuardianRepresentType.UNKNOWN, false, null));
             }
         }
     }
@@ -1483,6 +1483,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             i++;
         }
 
+        return result;
+    }
+
+    public SelectItem[] getRoles() {
+        SelectItem[] result = new SelectItem[ClientGuardianRoleType.values().length + 1];
+        result[0] = new SelectItem(-1, "");
+        int i = 0;
+        for (ClientGuardianRoleType roleType : ClientGuardianRoleType.values()) {
+            result[i + 1] = new SelectItem(roleType.getCode(), roleType.getDescription());
+            i++;
+        }
         return result;
     }
 

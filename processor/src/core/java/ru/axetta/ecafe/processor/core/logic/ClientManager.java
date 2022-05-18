@@ -1610,7 +1610,7 @@ public class ClientManager {
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
-                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName));
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName, clientGuardian.getRoleType()));
             }
         }
         return guardianItems;
@@ -1696,7 +1696,7 @@ public class ClientManager {
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
-                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName));
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName, clientWard.getRoleType()));
             }
         }
         return wardItems;
@@ -1993,14 +1993,15 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
                                            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-                                           ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType, ClientGuardianHistory clientGuardianHistory) {
+                                           ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType,
+                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -2013,6 +2014,7 @@ public class ClientManager {
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -2039,6 +2041,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -2190,7 +2193,7 @@ public class ClientManager {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
         }
     }
 

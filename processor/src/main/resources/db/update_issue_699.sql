@@ -6,7 +6,7 @@ CREATE TABLE CF_Dul_Guide
     CONSTRAINT CF_Dul_Guide_pk PRIMARY KEY (Document_type_id)
 );
 
-COMMENT ON TABLE CF_Dul_Guide IS 'Справочника ДУЛ';
+COMMENT ON TABLE CF_Dul_Guide IS 'Справочник ДУЛ';
 COMMENT ON COLUMN CF_Dul_Guide.Document_type_id IS 'Код типа ДУЛ';
 COMMENT ON COLUMN CF_Dul_Guide.Name IS 'Наименование';
 
@@ -85,3 +85,6 @@ where passportseries is not null
   and passportnumber != '';
 
 update cf_clients set san = replace(replace(san, ' ', '' ), '-', '' ) where san is not null and san != '';
+
+ALTER TABLE cf_client_guardian ADD COLUMN IdOfRole INT4;
+COMMENT ON COLUMN cf_client_guardian.IdOfRole IS 'Вид представительства из МК (1 = "Родитель", 2 = "Опекун", 3 = "Попечитель", 4 = "Представитель органа опеки и попечительства", 5 = "Доверенный представитель")';

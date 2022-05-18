@@ -173,6 +173,13 @@
                                    disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
+            <h:panelGrid rendered="#{mainPage.clientCreatePage.isParentGroup()}" styleClass="borderless-grid"
+                         columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
+                <h:selectOneMenu value="#{clientWard.role}" styleClass="input-text">
+                    <f:selectItems value="#{mainPage.clientCreatePage.roles}"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

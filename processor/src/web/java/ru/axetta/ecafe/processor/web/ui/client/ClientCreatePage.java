@@ -67,7 +67,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                         ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                         DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                        ClientGuardianRepresentType.UNKNOWN, false));
+                        ClientGuardianRepresentType.UNKNOWN, false, null));
             }
         }
     }
@@ -860,5 +860,16 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (this.idOfClientGroup != null)
             return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
         return false;
+    }
+
+    public SelectItem[] getRoles() {
+        SelectItem[] result = new SelectItem[ClientGuardianRoleType.values().length + 1];
+        result[0] = new SelectItem(-1, "");
+        int i = 0;
+        for (ClientGuardianRoleType roleType : ClientGuardianRoleType.values()) {
+            result[i + 1] = new SelectItem(roleType.getCode(), roleType.getDescription());
+            i++;
+        }
+        return result;
     }
 }

@@ -466,6 +466,13 @@
                             <f:selectItems value="#{mainPage.clientEditPage.relations}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
+                    <h:panelGrid rendered="#{mainPage.clientEditPage.isParentGroup()}" styleClass="borderless-grid"
+                                 columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.role}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.roles}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <f:facet name="header">
