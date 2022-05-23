@@ -3010,7 +3010,9 @@ public class FrontController extends HttpServlet {
                 dulDetails.add(getDulDetailFromDocumentItem(item));
             }
         }
-
+        if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
+            throw new FrontController.FrontControllerException("Указанный снилс уже существует в системе");
+        }
         return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
                 mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
     }
