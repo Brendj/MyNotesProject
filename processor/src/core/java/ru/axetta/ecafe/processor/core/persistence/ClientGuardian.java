@@ -137,9 +137,23 @@ public class ClientGuardian {
         this.setVersion(version);
         this.setLastUpdate(new Date());
         if (enableSpecialNotification) {
-            getNotificationSettings().add(new ClientGuardianNotificationSetting(this,
-                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
+            ClientGuardianNotificationSetting notificationSetting = new ClientGuardianNotificationSetting(this,
+                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue());
+            if(!isNotifyExist(this.notificationSettings, notificationSetting))
+                this.notificationSettings.add(notificationSetting);
         }
+    }
+
+    private boolean isNotifyExist(Set<ClientGuardianNotificationSetting> notificationSet,
+                                  ClientGuardianNotificationSetting notificationSetting){
+        for (ClientGuardianNotificationSetting notify : notificationSet) {
+            if (notify.getNotifyType().equals(notificationSetting.getNotifyType())
+                    && notify.getClientGuardian().getIdOfClientGuardian()
+                    .equals(notificationSetting.getClientGuardian().idOfClientGuardian)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Boolean isDisabled() {
