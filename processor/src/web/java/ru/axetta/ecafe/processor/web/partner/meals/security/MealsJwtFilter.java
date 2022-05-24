@@ -45,6 +45,7 @@ public class MealsJwtFilter extends OncePerRequestFilter {
             {
                 customUserDetails = new MealsUserDetails("test");
             }
+
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (MealsInvalidToken e) {
