@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.web.ui.guardianservice;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,13 +22,16 @@ public class CGItem implements Comparable {
     private Long guardianLastUpdate;
     private Boolean deletedState;
     private Boolean disabled;
+    private Long guardianOrg;
+    private Long clientOrg;
 
     public static final List<Long> GROUPS = Arrays.asList(1100000000L, 1100000010L, 1100000050L, 1100000020L,
             1100000030L, 1100000100L, 1100000110L);
 
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
                   boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
-                  Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState, Integer disabled) {
+                  Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState, Integer disabled,
+                  Long guardianOrg, Long clientOrg) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio.toLowerCase().replaceAll("ё", "е");
@@ -43,6 +47,15 @@ public class CGItem implements Comparable {
         this.guardianLastUpdate = guardianLastUpdate;
         this.deletedState = deletedState;
         this.disabled = disabled == 1 ? true : false;
+        this.guardianOrg = guardianOrg;
+        this.clientOrg = clientOrg;
+    }
+
+    public boolean isSotrudnik() {
+        return guardianOrg.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
     }
 
     @Override
@@ -208,5 +221,21 @@ public class CGItem implements Comparable {
 
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public Long getGuardianOrg() {
+        return guardianOrg;
+    }
+
+    public void setGuardianOrg(Long guardianOrg) {
+        this.guardianOrg = guardianOrg;
+    }
+
+    public Long getClientOrg() {
+        return clientOrg;
+    }
+
+    public void setClientOrg(Long clientOrg) {
+        this.clientOrg = clientOrg;
     }
 }
