@@ -2610,4 +2610,64 @@ public class ClientManager {
             return true;
         } else return sum > 101 && (sum % 101 == checkSum || (sum % 101 == 100 && checkSum == 0));
     }
+
+    public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
+                                                               String patronymic, String mobile, String snils) {
+        Long idOfClientGroup = 1000000000L;
+        String q = "select c from Client c where c.idOfClientGroup > :idOfClientGroup ";
+        boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
+
+        if(!fioIsEmpty)
+            q += " and ( ";
+
+        if (lastName != null) {
+            q += " (upper(c.person.surname) = :lastName) ";
+        }
+        if (firstName != null) {
+            if (lastName != null)
+                q+= " and ";
+            q += " (upper(c.person.firstName) = :firstName) ";
+        }
+        if (patronymic != null) {
+            if (lastName != null || firstName != null)
+                q+= " and ";
+            q += " (upper(c.person.secondName) = :patronymic) ";
+        }
+
+        if(!fioIsEmpty)
+            q += ")";
+
+        if (mobile != null || snils != null){
+            q += fioIsEmpty ? " and " : " or ";
+        }
+
+        if (mobile != null) {
+            q += " c.mobile = :mobile ";
+        }
+        if (snils != null) {
+            q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
+        }
+
+        Query query = session.createQuery(q);
+
+        query.setParameter("idOfClientGroup", idOfClientGroup);
+
+        if (firstName != null) {
+            query.setParameter("firstName", StringUtils.upperCase(firstName));
+        }
+        if (lastName != null) {
+            query.setParameter("lastName", StringUtils.upperCase(lastName));
+        }
+        if (patronymic != null) {
+            query.setParameter("patronymic", StringUtils.upperCase(patronymic));
+        }
+        if (mobile != null) {
+            query.setParameter("mobile", mobile);
+        }
+        if (snils != null) {
+            query.setParameter("snils", snils);
+        }
+
+        return query.list();
+    }
 }

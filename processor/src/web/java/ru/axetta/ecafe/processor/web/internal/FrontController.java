@@ -2817,7 +2817,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
             } else {
                 return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        e.getMessage());
+                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2861,7 +2861,7 @@ public class FrontController extends HttpServlet {
                         DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
             } else {
                 return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        e.getMessage());
+                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2903,7 +2903,7 @@ public class FrontController extends HttpServlet {
                         DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
             } else {
                 return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        e.getMessage());
+                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2959,7 +2959,7 @@ public class FrontController extends HttpServlet {
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in getDocumentForClient", e);
-            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL, e.getMessage());
+            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL, DocumentResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3015,6 +3015,48 @@ public class FrontController extends HttpServlet {
         }
         return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
                 mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
+    }
+
+    @WebMethod(operationName = "getGuardians")
+    public GuardianResponse getGuardians(
+            @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "lastName") String lastName,
+            @WebParam(name = "patronymic") String patronymic,
+            @WebParam(name = "mobile") String mobile,
+            @WebParam(name = "snils") String snils) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        GuardianResponse guardianResponse;
+
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (lastName == null && snils == null && mobile == null)
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+
+            List<Client> clients = ClientManager
+                    .findGuardianByNameOrMobileOrSun(persistenceSession, firstName, lastName, patronymic, mobile, snils);
+
+            if (clients.isEmpty())
+                return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
+                        GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+
+            guardianResponse = new GuardianResponse(clients);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in getGuardians", e);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return guardianResponse;
     }
 
     private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
