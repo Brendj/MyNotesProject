@@ -720,6 +720,7 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             for (Long idOfOrg : idOfOrgList) {
                 if (processedOrgs.contains(idOfOrg)) continue;
                 List<Long> friendlyOrgs = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+                if (friendlyOrgs.size() == 0) friendlyOrgs.add(idOfOrg);
                 res = loadMeshGuidsForGuardiansFileByOrg(session, friendlyOrgs, nextVersion);
                 logger.info(String.format("Updated %s client records", res));
                 result += res;
