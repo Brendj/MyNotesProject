@@ -670,17 +670,17 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             Query temp_doubles_query =
                     session.createNativeQuery("select cast(count(t.idofclient) as bigint) as amount, guid " +
                             "from temp_guids t join cf_clients c on t.idofclient = c.idofclient " +
-                            "where c.idofclientgroup not in (1100000060, 1100000070) " +
                             "group by guid having count(t.idofclient) > 1 order by 1 desc");
             List list = temp_doubles_query.getResultList();
             String doubleGuidList = "";
+            StringBuilder sb = new StringBuilder();
+            logger.info("Begin process double guids");
             if (list.size() > 0) {
                 for (Object o : list) {
                     Object[] row = (Object[]) o;
-                    logger.info(String.format("Double guids: %s - %d", (String)row[1], HibernateUtils.getDbLong(row[0])));
-                    doubleGuidList += (String)row[1] + ",";
+                    sb.append((String)row[1] + ",");
                 }
-                doubleGuidList = doubleGuidList.substring(0, doubleGuidList.length()-1);
+                doubleGuidList = sb.toString().substring(0, sb.toString().length()-1);
             }
             Query temp_guids_filter = session.createNativeQuery("create temp table temp_double_guids (guid character varying(36)) on commit drop");
             temp_guids_filter.executeUpdate();
@@ -689,25 +689,39 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                         "select unnest(string_to_array('%s', ','))", doubleGuidList));
                 temp_guids_filter.executeUpdate();
             }
+            logger.info("End process double guids");
 
             //отсеиваем существующие в БД гуиды
+            logger.info("Start process existing guids");
             Query exist_guids_query = session.createNativeQuery("select t.idofclient, t.guid " +
                     "from temp_guids t join cf_clients c on t.guid = c.meshguid");
             List list2 = exist_guids_query.getResultList();
             String existingGuids = "";
-            if (list2.size() > 0) {
-                for (Object o : list2) {
-                    Object[] row = (Object[]) o;
-                    logger.info(String.format("Existing guids: %s - idofclient = %d", (String) row[1], HibernateUtils.getDbLong(row[0])));
-                    existingGuids += (String) row[1] + ",";
+            StringBuilder sb2 = new StringBuilder();
+            int counter = 0;
+            for (Object o : list2) {
+                Object[] row = (Object[]) o;
+                sb2.append((String) row[1] + ",");
+                counter++;
+                if (counter % 5000 == 0) {
+                    existingGuids = sb2.toString().substring(0, sb2.toString().length()-1);
+                    if (existingGuids.length() > 0) {
+                        exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                                "select unnest(string_to_array('%s', ','))", existingGuids));
+                        exist_guids_query.executeUpdate();
+                    }
+                    sb2 = new StringBuilder();
                 }
-                existingGuids = existingGuids.substring(0, existingGuids.length()-1);
             }
-            if (existingGuids.length() > 0) {
-                exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
-                        "select unnest(string_to_array('%s', ','))", existingGuids));
-                exist_guids_query.executeUpdate();
+            if (sb2.capacity() > 0) {
+                existingGuids = sb2.toString().substring(0, sb2.toString().length() - 1);
+                if (existingGuids.length() > 0) {
+                    exist_guids_query = session.createNativeQuery(String.format("insert into temp_double_guids(guid) " +
+                            "select unnest(string_to_array('%s', ','))", existingGuids));
+                    exist_guids_query.executeUpdate();
+                }
             }
+            logger.info("End process existing guids");
 
             Set<Long> processedOrgs = new HashSet<>();
             int result = 0;
