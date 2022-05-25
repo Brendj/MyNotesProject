@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core;
 
+import com.google.common.base.Splitter;
+import org.springframework.beans.factory.annotation.Value;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -246,7 +248,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final Object INSTANCE_LOCK = new Object();
 
     private String instanceName;
-    private int roleNode = NODE_ROLE_MAIN;
+    private int nodeRole = NODE_ROLE_MAIN;
     private String nodeName;
     // Application wide executor service
     private ExecutorService executorService;
@@ -361,6 +363,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private String[] methodsInfoService;
 
     private SettingsConfig settingsConfig;
+
+    @Value("${processing.node}")
+    private String nodeInfo;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
@@ -679,16 +684,26 @@ public class RuntimeContext implements ApplicationContextAware {
                     String role = buf.readLine();
                     nodeName = buf.readLine();
                     if (role.equalsIgnoreCase("main")) {
-                        roleNode = NODE_ROLE_MAIN;
+                        nodeRole = NODE_ROLE_MAIN;
                     } else if (role.equalsIgnoreCase("processor")) {
-                        roleNode = NODE_ROLE_PROCESSOR;
+                        nodeRole = NODE_ROLE_PROCESSOR;
                     } else {
                         throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
                     }
                     logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
                 } catch (FileNotFoundException x) {
-                    nodeName = "UNKNOWN";
-                    roleNode = NODE_ROLE_PROCESSOR;
+                    Map<String, String> node = Splitter.on(";")
+                            .withKeyValueSeparator(":")
+                            .split(nodeInfo);
+                    nodeName = node.get("name");
+                    if (node.get("role").equalsIgnoreCase("main")) {
+                        nodeRole = NODE_ROLE_MAIN;
+                    } else if (node.get("role").equalsIgnoreCase("processor")) {
+                        nodeRole = NODE_ROLE_PROCESSOR;
+                    } else {
+                        throw new Exception("Unknown node role: " + node.get("role") + " (valid: main, processor)");
+                    }
+                    logger.info("CLUSTER NODE ROLE: " + nodeRole + "; NAME: " + nodeName);
                 } catch (Exception e) {
                     logger.error("Failed to load node info", e);
                     throw e;
@@ -1946,7 +1961,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public boolean isMainNode() {
-        return roleNode == NODE_ROLE_MAIN;
+        return nodeRole == NODE_ROLE_MAIN;
     }
 
     public RegularPaymentSubscriptionService getRegularPaymentSubscriptionService() {
