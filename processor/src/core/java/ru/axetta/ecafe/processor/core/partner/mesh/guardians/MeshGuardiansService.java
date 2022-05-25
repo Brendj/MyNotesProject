@@ -26,10 +26,7 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @DependsOn("runtimeContext")
 @Component("meshGuardiansService")
@@ -134,12 +131,16 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                              String patronymic, String lastName,
                              Integer genderId, Date birthDate, String snils) {
         try {
+            PersonListResponse personListResponse = searchPerson(firstName,  patronymic, lastName,
+                    genderId, birthDate, snils, null, null);
+            if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty())
+                return new PersonResponse().internalErrorResponse("Клиент не найдет в мк");
+            Integer id = personListResponse.getResponse().get(0).getId();
             ObjectMapper objectMapper = new ObjectMapper();
             ResponsePersons request = buildResponsePerson(personId, firstName, patronymic, lastName, genderId,
                     birthDate, snils, null, null, null);
             String json = objectMapper.writeValueAsString(request);
-            Long versionId = 0L; //todo откуда получаем версию для запроса?
-            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangePersonUrl(versionId), json);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangePersonUrl(id.longValue()), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 ResponsePersons response = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
                 return new PersonResponse().okResponse();
@@ -254,8 +255,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public DocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, dulDetail.getIdMkDocument()));
-
+            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
+            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument));
             if (result.getCode() == HttpStatus.SC_OK) {
                 return new DocumentResponse().okResponse();
             } else {
@@ -268,12 +269,32 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
+    private Long findIdMkDocument(String meshGuid, DulDetail dulDetail) {
+        PersonListResponse personListResponse = searchPersonByMeshGuid(meshGuid);
+        if(personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty()){
+            throw new NullPointerException("Не найден клиент по \"meshGuid\"");
+        }
+        if(personListResponse.getResponse().get(0).getPersonDocuments() == null ||
+                personListResponse.getResponse().get(0).getPersonDocuments().isEmpty()){
+            throw new NullPointerException("Не найден документ у клиента");
+        }
+         PersonDocument personDocument = personListResponse.getResponse().get(0).getPersonDocuments()
+                 .stream().filter(d -> dulDetail.getDocumentTypeId().equals(d.getDocumentTypeId().longValue()) &&
+                         dulDetail.getNumber().equals(d.getNumber()))
+                 .findFirst().orElse(null);
+        if(personDocument == null){
+            throw new NullPointerException("Не найден документ у клиента");
+        }
+        return personDocument.getDocumentTypeId().longValue();
+    }
+
     public DocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonDocument parameter = buildPersonDocument(dulDetail);
             String json = objectMapper.writeValueAsString(parameter);
-            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, dulDetail.getIdMkDocument()), json);
+            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument), json);
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
@@ -479,6 +500,28 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private Integer getGender(Integer isppGender) throws MeshGuardianNotEnoughClientDataException {
         if (isppGender == null) throw new MeshGuardianNotEnoughClientDataException("Client gender is null");
         if (isppGender == 0) return 2; else return 1;
+    }
+
+    public PersonListResponse searchPersonByMeshGuid(String meshGuid) {
+        try {
+            String parameters = String.format("?person=%s&expand=%s&limit=%s", meshGuid, PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CHANGE_URL, parameters);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                TypeFactory typeFactory = objectMapper.getTypeFactory();
+                CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
+                List<SimilarPerson> similarPersons = objectMapper.readValue(result.getResponse(), collectionType);
+                return new PersonListResponse(getMeshGuardianConverter().toDTO(similarPersons)).okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toPersonListDTO(errorResponse);
+            }
+        } catch (MeshGuardianNotEnoughClientDataException e) {
+            return new PersonListResponse().notEnoughClientDataResponse(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error in searchDocumentsByMeshGuid: ", e);
+            return new PersonListResponse().internalErrorResponse();
+        }
     }
 
 }

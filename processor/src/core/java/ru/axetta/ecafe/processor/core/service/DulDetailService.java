@@ -57,7 +57,7 @@ public class DulDetailService {
     public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
             throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
+        if(ClientManager.isClientGuardian(client)) {
             DocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
         }
@@ -66,7 +66,7 @@ public class DulDetailService {
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         if (documentExists(session, client, dulDetail.getDocumentTypeId(), null)) throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
+        if(ClientManager.isClientGuardian(client)) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
             dulDetail.setIdMkDocument(documentResponse.getId());
@@ -76,7 +76,7 @@ public class DulDetailService {
     }
 
     public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if(ClientManager.isClientGuardian(session, client.getIdOfClient())) {
+        if(ClientManager.isClientGuardian(client)) {
             DocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
         }

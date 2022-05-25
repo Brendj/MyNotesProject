@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Contact;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
@@ -25,6 +26,9 @@ public class MeshGuardianPerson {
     private String email;
     private Integer degree;
     private Integer validationStateId;
+    private Integer id;
+
+    private List<PersonDocument> personDocuments;
 
     public MeshGuardianPerson() {
 
@@ -44,6 +48,8 @@ public class MeshGuardianPerson {
         }
         this.degree = similarPerson.getDegree();
         this.validationStateId = similarPerson.getPerson().getValidationStateId();
+        this.id = similarPerson.getPerson().getId();
+        this.personDocuments = similarPerson.getPerson().getDocuments();
     }
 
     private String getContact(List<Contact> contacts, Integer typeId) {
@@ -164,5 +170,21 @@ public class MeshGuardianPerson {
 
     public void setValidationStateId(Integer validationStateId) {
         this.validationStateId = validationStateId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public List<PersonDocument> getPersonDocuments() {
+        return personDocuments;
+    }
+
+    public void setPersonDocuments(List<PersonDocument> personDocuments) {
+        this.personDocuments = personDocuments;
     }
 }
