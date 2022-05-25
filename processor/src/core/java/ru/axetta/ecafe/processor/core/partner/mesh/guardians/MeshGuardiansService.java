@@ -131,8 +131,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                              String patronymic, String lastName,
                              Integer genderId, Date birthDate, String snils) {
         try {
-            PersonListResponse personListResponse = searchPerson(firstName,  patronymic, lastName,
-                    genderId, birthDate, snils, null, null);
+            PersonListResponse personListResponse = searchPersonByMeshGuid(personId);
             if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty())
                 return new PersonResponse().internalErrorResponse("Клиент не найдет в мк");
             Integer id = personListResponse.getResponse().get(0).getId();
