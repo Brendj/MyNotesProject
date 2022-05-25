@@ -678,37 +678,30 @@ public class RuntimeContext implements ApplicationContextAware {
             if (System.getProperty(NODE_INFO_FILE)!=null) {
                 nodeRoleFile = System.getProperty(NODE_INFO_FILE);
             }
-            if (nodeRoleFile != null) {
-                try {
+
+            String role = "processor";
+            try {
+                if(nodeRoleFile != null) {
                     BufferedReader buf = new BufferedReader(new FileReader(nodeRoleFile));
-                    String role = buf.readLine();
+                    role = buf.readLine();
                     nodeName = buf.readLine();
-                    if (role.equalsIgnoreCase("main")) {
-                        nodeRole = NODE_ROLE_MAIN;
-                    } else if (role.equalsIgnoreCase("processor")) {
-                        nodeRole = NODE_ROLE_PROCESSOR;
-                    } else {
-                        throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
-                    }
-                    logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
-                } catch (FileNotFoundException x) {
-                    Map<String, String> node = Splitter.on(";")
-                            .withKeyValueSeparator(":")
-                            .split(nodeInfo);
-                    nodeName = node.get("name");
-                    if (node.get("role").equalsIgnoreCase("main")) {
-                        nodeRole = NODE_ROLE_MAIN;
-                    } else if (node.get("role").equalsIgnoreCase("processor")) {
-                        nodeRole = NODE_ROLE_PROCESSOR;
-                    } else {
-                        throw new Exception("Unknown node role: " + node.get("role") + " (valid: main, processor)");
-                    }
-                    logger.info("CLUSTER NODE ROLE: " + nodeRole + "; NAME: " + nodeName);
-                } catch (Exception e) {
-                    logger.error("Failed to load node info", e);
-                    throw e;
                 }
+                else throw new FileNotFoundException();
+            } catch (FileNotFoundException x){
+                Map<String, String> node = Splitter.on(";")
+                        .withKeyValueSeparator(":")
+                        .split(nodeInfo);
+                role = node.get("role");
+                nodeName = node.get("name");
             }
+            if (role.equalsIgnoreCase("main")) {
+                nodeRole = NODE_ROLE_MAIN;
+            } else if (role.equalsIgnoreCase("processor")) {
+                nodeRole = NODE_ROLE_PROCESSOR;
+            } else {
+                throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
+            }
+            logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
 
             if (!isTestRunning()) {
 
