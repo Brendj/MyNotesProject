@@ -154,7 +154,7 @@ public class MeshRestClient {
 
     public MeshResponseWithStatusCode executePutMethod(String relativeUrl, String parameters) throws Exception {
         URL url = new URL(getServiceAddress() + relativeUrl);
-        logger.info("Execute POST request to MESH REST: " + url);
+        logger.info("Execute PUT request to MESH REST: " + url);
         PutMethod httpMethod = new PutMethod(url.getPath());
         httpMethod.setRequestHeader("X-Api-Key", getApiKey());
         StringRequestEntity requestEntity = new StringRequestEntity(

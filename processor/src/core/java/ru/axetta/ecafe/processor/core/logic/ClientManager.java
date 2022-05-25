@@ -1610,7 +1610,7 @@ public class ClientManager {
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
-                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName));
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName, clientGuardian.getRoleType()));
             }
         }
         return guardianItems;
@@ -1712,7 +1712,7 @@ public class ClientManager {
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
-                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName));
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName, clientWard.getRoleType()));
             }
         }
         return wardItems;
@@ -2009,14 +2009,15 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
                                            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-                                           ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType, ClientGuardianHistory clientGuardianHistory) {
+                                           ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType,
+                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -2029,6 +2030,7 @@ public class ClientManager {
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -2055,6 +2057,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -2206,7 +2209,7 @@ public class ClientManager {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
         }
     }
 
@@ -2572,12 +2575,9 @@ public class ClientManager {
         q.executeUpdate();
     }
 
-    public static boolean isClientGuardian(Session session, Long idOfClient) {
-        Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
-        criteria.add(Restrictions.ne("deletedState", true));
-        criteria.add(Restrictions.eq("disabled", false));
-        return !criteria.list().isEmpty();
+    //todo уточнить как найти представителя
+    public static boolean isClientGuardian(Client client) {
+        return client.getIdOfClientGroup() > 1000000000L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2622,5 +2622,65 @@ public class ClientManager {
         } else if ((sum == 100 || sum == 101) && checkSum == 0) {
             return true;
         } else return sum > 101 && (sum % 101 == checkSum || (sum % 101 == 100 && checkSum == 0));
+    }
+
+    public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
+                                                               String patronymic, String mobile, String snils) {
+        Long idOfClientGroup = 1000000000L;
+        String q = "select c from Client c where c.idOfClientGroup > :idOfClientGroup ";
+        boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
+
+        if(!fioIsEmpty)
+            q += " and ( ";
+
+        if (lastName != null) {
+            q += " (upper(c.person.surname) = :lastName) ";
+        }
+        if (firstName != null) {
+            if (lastName != null)
+                q+= " and ";
+            q += " (upper(c.person.firstName) = :firstName) ";
+        }
+        if (patronymic != null) {
+            if (lastName != null || firstName != null)
+                q+= " and ";
+            q += " (upper(c.person.secondName) = :patronymic) ";
+        }
+
+        if(!fioIsEmpty)
+            q += ")";
+
+        if (mobile != null || snils != null){
+            q += fioIsEmpty ? " and " : " or ";
+        }
+
+        if (mobile != null) {
+            q += " c.mobile = :mobile ";
+        }
+        if (snils != null) {
+            q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
+        }
+
+        Query query = session.createQuery(q);
+
+        query.setParameter("idOfClientGroup", idOfClientGroup);
+
+        if (firstName != null) {
+            query.setParameter("firstName", StringUtils.upperCase(firstName));
+        }
+        if (lastName != null) {
+            query.setParameter("lastName", StringUtils.upperCase(lastName));
+        }
+        if (patronymic != null) {
+            query.setParameter("patronymic", StringUtils.upperCase(patronymic));
+        }
+        if (mobile != null) {
+            query.setParameter("mobile", mobile);
+        }
+        if (snils != null) {
+            query.setParameter("snils", snils);
+        }
+
+        return query.list();
     }
 }
