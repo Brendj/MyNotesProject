@@ -208,10 +208,10 @@ public class GuardianDoublesService {
             }
             for (CGItem item : deleteGuardianList) {
                 if (item.equals(aliveGuardian) && !allCGDeleted) continue;
-                if (item.isSotrudnik()) {
+                /*if (item.isSotrudnik()) {
                     logger.info("Guardian id = " + item.getIdOfGuardin() +  " is sotrudnik. Skipped.");
                     continue;
-                }
+                }*/
                 if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
@@ -254,33 +254,85 @@ public class GuardianDoublesService {
         }
         if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
 
-        Date date = new Date();
-        Date after5Seconds = CalendarUtils.addSeconds(date, 5);
-        String resolConfirmed = "Заявка создана для дубля учетной записи представителя";
         Date startDate = new Date();
         Date endDate = CalendarUtils.parseDate("31.12.2099");
 
         Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
 
-        String requestNumber = null;
+        Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
+        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", client);
+        query.setParameter("org", orgVisit);
+        query.setParameter("date", new Date());
+        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
 
-        Client client = (Client) session.load(Client.class, item.getIdOfGuardin());
-
-        Client clientResol = null;
         Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
+
+        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
+        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
+
+        Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
+        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", deletedClient);
+        query.setParameter("date", new Date());
+        List<Migrant> list = query.getResultList();
+        for (Migrant migrant : list) {
+            Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
+                    "where h.migrant=:migrant order by h.resolutionDateTime desc");
+            query2.setParameter("migrant", migrant);
+            query2.setMaxResults(1);
+            List<VisitReqResolutionHist> res = query2.getResultList();
+            if(res.size() > 0 && res.get(0).getResolution().equals(1)){
+                createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
+                        migrant.getVisitStartDate(), migrant.getVisitEndDate());
+                logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
+                        migrant.getOrgVisit().getIdOfOrg()));
+
+                deleteMigrateRequest(session, migrant);
+            }
+        }
+    }
+
+    private void deleteMigrateRequest(Session session, Migrant migrant) {
+        Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, migrant.getOrgRegistry().getIdOfOrg());
+        migrant.setSyncState(Migrant.CLOSED);
+        CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+        VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+                VisitReqResolutionHist.RES_CANCELED, new Date(),
+                MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+        nextId--;
+        CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
+        VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
+                VisitReqResolutionHist.RES_CANCELED, new Date(),
+                MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+        session.update(migrant);
+        session.save(hist1);
+        session.save(hist2);
+        session.flush();
+    }
+
+    private void createMigrateRequestForClient(Session session, Client client, long idOfOrgRegistry, Org orgVisit,
+                                               Date startDate, Date endDate) {
+        Date date = new Date();
+        Date after5Seconds = CalendarUtils.addSeconds(date, 5);
+        String resolConfirmed = "Заявка создана для дубля учетной записи представителя";
 
         Long idOfProcessorMigrantRequest = MigrantsUtils
                 .nextIdOfProcessorMigrantRequest(session, idOfOrgRegistry);
         CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
                 idOfOrgRegistry);
-        if (requestNumber == null) {
-            requestNumber = MigrateRequest
-                    .formRequestNumber(client.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(),
-                            idOfProcessorMigrantRequest, date);
-        }
+        String requestNumber = MigrateRequest
+                .formRequestNumber(client.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(),
+                        idOfProcessorMigrantRequest, date);
         Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
                 requestNumber, client, orgVisit, startDate, endDate,
-                Migrant.SYNCHRONIZED);
+                Migrant.NOT_SYNCHRONIZED);
 
         Long idOfResol = MigrantsUtils
                 .nextIdOfProcessorMigrantResolutions(session, idOfOrgRegistry);
@@ -288,7 +340,7 @@ public class GuardianDoublesService {
                 migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgRegistry);
         VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist,
                 client.getOrg(), VisitReqResolutionHist.RES_CREATED, date,
-                MigrantsUtils.getResolutionString(VisitReqResolutionHist.RES_CREATED), clientResol, null,
+                MigrantsUtils.getResolutionString(VisitReqResolutionHist.RES_CREATED), null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED,
                 VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
 
