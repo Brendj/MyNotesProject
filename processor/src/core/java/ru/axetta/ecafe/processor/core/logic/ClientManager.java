@@ -2663,21 +2663,4 @@ public class ClientManager {
         return query.list();
     }
 
-    public static void changeClientByMeshGuid(Session session, String meshGuid, String lastName, String firstName,
-                                              String patronymic, Date birthDate, String snils, Integer genderId) throws Exception {
-
-        Criteria cr = session.createCriteria(Client.class);
-        cr.add(Restrictions.eq("meshGUID", meshGuid));
-        Client client = (Client) cr.uniqueResult();
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-
-        client.setClientRegistryVersion(clientRegistryVersion);
-        client.getPerson().setSurname(lastName);
-        client.getPerson().setFirstName(firstName);
-        client.getPerson().setSecondName(patronymic);
-        client.setSan(snils);
-        client.setGender(genderId);
-        client.setBirthDate(birthDate);
-        session.update(client);
-    }
 }

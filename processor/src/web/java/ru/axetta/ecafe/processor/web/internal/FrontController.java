@@ -3061,7 +3061,7 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "changeGuardians")
     public GuardianResponse changeGuardians(
-            @WebParam(name = "meshGuid") String meshGuid,
+            @WebParam(name = "idOfClient") Long idOfClient,
             @WebParam(name = "lastName") String lastName,
             @WebParam(name = "firstName") String firstName,
             @WebParam(name = "patronymic") String patronymic,
@@ -3075,19 +3075,30 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (meshGuid == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
+            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
 
-            ClientManager.changeClientByMeshGuid(persistenceSession, meshGuid, lastName, firstName, patronymic, birthDate, snils, genderId);
+            Client client = persistenceSession.get(Client.class, idOfClient);
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
 
-            PersonResponse personResponse = getMeshGuardiansService().changePerson(meshGuid, firstName, patronymic, lastName, genderId, birthDate, snils);
+            client.setClientRegistryVersion(clientRegistryVersion);
+            client.getPerson().setSurname(lastName);
+            client.getPerson().setFirstName(firstName);
+            client.getPerson().setSecondName(patronymic);
+            client.setSan(snils);
+            client.setGender(genderId);
+            client.setBirthDate(birthDate);
+            persistenceSession.update(client);
 
-            if (!personResponse.getCode().equals(GuardianResponse.OK)) {
-                logger.error(personResponse.getMessage());
-                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            if (client.getMeshGUID() != null) {
+                PersonResponse personResponse = getMeshGuardiansService()
+                        .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
+                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
+                    logger.error(personResponse.getMessage());
+                    return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                }
             }
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
