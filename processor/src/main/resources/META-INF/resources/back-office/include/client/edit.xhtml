@@ -98,6 +98,8 @@
                     <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}"/>
                 </a4j:commandButton>
             </h:panelGroup>
+            <h:outputText escape="true" value="Подгруппа" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientEditPage.middleGroup}" maxlength="128" styleClass="input-text"/>
 
             <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text"/>
             <h:inputText value="#{mainPage.clientEditPage.ageTypeGroup}" maxlength="128" styleClass="input-text"/>

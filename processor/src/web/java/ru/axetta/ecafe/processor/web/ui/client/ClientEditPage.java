@@ -345,6 +345,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
+    private String middleGroup;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -707,6 +708,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setSpecialMenu(Boolean specialMenu) {
         this.specialMenu = specialMenu;
+    }
+
+    public String getMiddleGroup() {
+        return middleGroup;
+    }
+
+    public void setMiddleGroup(String middleGroup) {
+        this.middleGroup = middleGroup;
     }
 
     public void fill(Session session, Long idOfClient) throws Exception {
@@ -1201,6 +1210,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPassportNumber(this.passportNumber);
         client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
+        if(middleGroup != null && !middleGroup.isEmpty())
+            createMiddleGroup(persistenceSession, this.org.idOfOrg, this.clientGroupName, this.middleGroup);
+        client.setMiddleGroup(this.middleGroup);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
@@ -1212,6 +1224,36 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private void createMiddleGroup(Session session, Long idOfOrg, String groupName, String middleGroupName) throws Exception {
+        List<GroupNamesToOrgs> groupNamesToOrgList = DAOUtils.findMiddleGroupNamesToOrgByIdOfOrg(session, idOfOrg);
+
+        if (groupNamesToOrgList.stream().anyMatch(g -> g.getGroupName().equals(middleGroupName)
+                && !g.getParentGroupName().equals(groupName))){
+            throw new Exception("Подгруппа уже существует в другой группе данной организации");
+        }
+
+        if (groupNamesToOrgList.stream().anyMatch(g -> g.getGroupName().equals(middleGroupName)
+                && g.getParentGroupName().equals(groupName))){
+            return;
+        }
+        Org org = session.get(Org.class, idOfOrg);
+        Org mainBuildingOrg = org.getFriendlyOrg().stream().filter(Org::getMainBuilding).findAny().orElse(null);
+
+        if(mainBuildingOrg == null) {
+            throw new Exception(String.format("Не найден главный корпус у организации с id = %s", idOfOrg));
+        }
+
+        GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+        groupNamesToOrgs.setIdOfOrg(idOfOrg);
+        groupNamesToOrgs.setIdOfMainOrg(mainBuildingOrg.getIdOfOrg());
+        groupNamesToOrgs.setMainBuilding(1);
+        groupNamesToOrgs.setVersion(DAOUtils.nextVersionByGroupNameToOrg(session));
+        groupNamesToOrgs.setGroupName(middleGroupName);
+        groupNamesToOrgs.setParentGroupName(groupName);
+        groupNamesToOrgs.setIsMiddleGroup(true);
+        session.save(groupNamesToOrgs);
     }
 
     public void deletePDClient() throws Exception {
@@ -1360,6 +1402,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
+        this.middleGroup = client.getMiddleGroup();
     }
 
     public String getIdOfCategoryListString() {
