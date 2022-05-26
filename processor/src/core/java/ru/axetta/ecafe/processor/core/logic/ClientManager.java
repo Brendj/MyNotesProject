@@ -2614,9 +2614,9 @@ public class ClientManager {
         String q = "select c from Client c where c.idOfClientGroup > :idOfClientGroup ";
         boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
 
-        if(!fioIsEmpty)
+        if(!fioIsEmpty) {
             q += " and ( ";
-
+        }
         if (lastName != null) {
             q += " (upper(c.person.surname) = :lastName) ";
         }
@@ -2630,23 +2630,19 @@ public class ClientManager {
                 q+= " and ";
             q += " (upper(c.person.secondName) = :patronymic) ";
         }
-
-        if(!fioIsEmpty)
+        if(!fioIsEmpty) {
             q += ")";
-
+        }
         if (mobile != null || snils != null){
             q += fioIsEmpty ? " and " : " or ";
         }
-
         if (mobile != null) {
             q += " c.mobile = :mobile ";
         }
         if (snils != null) {
             q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
         }
-
         Query query = session.createQuery(q);
-
         query.setParameter("idOfClientGroup", idOfClientGroup);
 
         if (firstName != null) {
@@ -2664,7 +2660,24 @@ public class ClientManager {
         if (snils != null) {
             query.setParameter("snils", snils);
         }
-
         return query.list();
+    }
+
+    public static void changeClientByMeshGuid(Session session, String meshGuid, String lastName, String firstName,
+                                              String patronymic, Date birthDate, String snils, Integer genderId) throws Exception {
+
+        Criteria cr = session.createCriteria(Client.class);
+        cr.add(Restrictions.eq("meshGUID", meshGuid));
+        Client client = (Client) cr.uniqueResult();
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+
+        client.setClientRegistryVersion(clientRegistryVersion);
+        client.getPerson().setSurname(lastName);
+        client.getPerson().setFirstName(firstName);
+        client.getPerson().setSecondName(patronymic);
+        client.setSan(snils);
+        client.setGender(genderId);
+        client.setBirthDate(birthDate);
+        session.update(client);
     }
 }

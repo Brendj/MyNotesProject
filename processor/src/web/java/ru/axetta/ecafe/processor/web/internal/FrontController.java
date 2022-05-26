@@ -3059,6 +3059,48 @@ public class FrontController extends HttpServlet {
         return guardianResponse;
     }
 
+    @WebMethod(operationName = "changeGuardians")
+    public GuardianResponse changeGuardians(
+            @WebParam(name = "meshGuid") String meshGuid,
+            @WebParam(name = "lastName") String lastName,
+            @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "patronymic") String patronymic,
+            @WebParam(name = "birthDate") Date birthDate,
+            @WebParam(name = "snils") String snils,
+            @WebParam(name = "genderId") Integer genderId) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (meshGuid == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+
+            ClientManager.changeClientByMeshGuid(persistenceSession, meshGuid, lastName, firstName, patronymic, birthDate, snils, genderId);
+
+            PersonResponse personResponse = getMeshGuardiansService().changePerson(meshGuid, firstName, patronymic, lastName, genderId, birthDate, snils);
+
+            if (!personResponse.getCode().equals(GuardianResponse.OK)) {
+                logger.error(personResponse.getMessage());
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in changeGuardians", e);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
+    }
+
     private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                  Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
                                                  Integer relation, Integer typeOfLegalRepresent) throws FrontControllerException {

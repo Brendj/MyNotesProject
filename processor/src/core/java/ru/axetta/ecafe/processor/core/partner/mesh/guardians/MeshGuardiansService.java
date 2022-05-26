@@ -132,8 +132,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                              Integer genderId, Date birthDate, String snils) {
         try {
             PersonListResponse personListResponse = searchPersonByMeshGuid(personId);
-            if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty())
-                return new PersonResponse().internalErrorResponse("Клиент не найдет в мк");
+            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
             Integer id = personListResponse.getResponse().get(0).getId();
             ObjectMapper objectMapper = new ObjectMapper();
             ResponsePersons request = buildResponsePerson(personId, firstName, patronymic, lastName, genderId,
