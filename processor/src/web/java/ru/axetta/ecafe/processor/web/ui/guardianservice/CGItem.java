@@ -60,19 +60,32 @@ public class CGItem implements Comparable {
                 || guardianOrg.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
     }
 
+    private int getPriority(CGItem item) {
+        int priority = 0;
+        if (item.getIdOfClientGroup() == GROUP_PARENTS) {
+            if (!item.getDeletedState()) priority = 1;
+        } else {
+            if (item.getBalance() > 0 || item.getCardno() != null) {
+                priority = 2;
+            }
+        }
+        return priority;
+    }
+
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof CGItem)) {
             return 1;
         }
         CGItem item = (CGItem) o;
-        int priorityThis = 0;
-        int priorityItem = 0;
-        if (this.idOfClientGroup == GROUP_PARENTS) {
-            if (!this.deletedState) priorityThis = 1;
-        } else {
-            
+        int priorityThis = getPriority(this);
+        int priorityItem = getPriority(item);
+        if (priorityThis > priorityItem) {
+            return -1;
+        } else if (priorityThis < priorityItem) {
+            return 1;
         }
+
 
         /*if (!this.deletedState && item.getDeletedState()) return -1;
         if (this.deletedState && !item.getDeletedState()) return 1;
