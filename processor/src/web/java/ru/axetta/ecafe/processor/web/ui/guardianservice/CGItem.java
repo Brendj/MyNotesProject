@@ -28,6 +28,8 @@ public class CGItem implements Comparable {
     public static final List<Long> GROUPS = Arrays.asList(1100000000L, 1100000010L, 1100000050L, 1100000020L,
             1100000030L, 1100000100L, 1100000110L);
 
+    public static final Long GROUP_PARENTS = 1100000030L;
+
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
                   boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
                   Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState, Integer disabled,
@@ -64,7 +66,15 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
-        if (!this.deletedState && item.getDeletedState()) return -1;
+        int priorityThis = 0;
+        int priorityItem = 0;
+        if (this.idOfClientGroup == GROUP_PARENTS) {
+            if (!this.deletedState) priorityThis = 1;
+        } else {
+            
+        }
+
+        /*if (!this.deletedState && item.getDeletedState()) return -1;
         if (this.deletedState && !item.getDeletedState()) return 1;
         int indexThis = GROUPS.indexOf(this.idOfClientGroup);
         int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
@@ -87,7 +97,7 @@ public class CGItem implements Comparable {
             return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
         } else {
             return res;
-        }
+        }*/
     }
 
     @Override
