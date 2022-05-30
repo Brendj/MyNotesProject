@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.ezd;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CryptoSign;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
@@ -295,7 +296,7 @@ public class EzdController extends Application {
                             String complexname = requestsEzdMenuView.getComplexname();
                             goodComplex = false;
                             try {
-                                clas = extractDigits(curGroupName);
+                                clas = new ClientParallel().extractDigits(curGroupName);
                             } catch (NumberFormatException e) //т.е. в названии группы нет чисел
                             {
                                 clas = 0;
@@ -388,7 +389,7 @@ public class EzdController extends Application {
                                     if (date1.getTime() > startDate.getTime() && date1.getTime() < endDate.getTime()) {
                                         goodComplex = false;
                                         try {
-                                            clas = extractDigits(curGroupName);
+                                            clas = new ClientParallel().extractDigits(curGroupName);
                                         } catch (NumberFormatException e) //т.е. в названии группы нет чисел
                                         {
                                             clas = 0;
@@ -515,19 +516,6 @@ public class EzdController extends Application {
         }
         //Если элемент по таким данным не найден
         return null;
-    }
-
-    public Integer extractDigits(String src) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < src.length(); i++) {
-            char c = src.charAt(i);
-            if (Character.isDigit(c)) {
-                builder.append(c);
-            } else {
-                return Integer.valueOf(builder.toString());
-            }
-        }
-        return Integer.valueOf(builder.toString());
     }
 
     @POST

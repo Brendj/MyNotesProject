@@ -937,7 +937,7 @@ public class ClientManager {
 
             client.setCreatedFrom(ClientCreatedFromType.values()[fieldConfig.getValueInt(FieldId.CREATED_FROM)]);
             client.setUpdateTime(new Date());
-
+            ClientParallel.addFoodBoxModifire(client);
             logger.debug("save client");
             persistenceSession.saveOrUpdate(client);
             Long idOfClient = client.getIdOfClient();
@@ -1639,6 +1639,22 @@ public class ClientManager {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             boolean result = getAllowedPreorderByClient(session, idOfClient, idOfGuardian);
+            transaction.commit();
+            transaction = null;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public static boolean getAllowedPreorderByClient(Long idOfClient, Long idOfGuardian) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Boolean result = getAllowedPreorderByClient(session, idOfClient, idOfGuardian);
             transaction.commit();
             transaction = null;
             return result;

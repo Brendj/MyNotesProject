@@ -25,5 +25,11 @@
         <many-to-one name="client" column="idOfClient" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      update="false"
                      fetch="join"/>
+        <many-to-one name="wtDish" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish"
+                     column="idofdish"/>
+        <many-to-one name="wtCategory" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory"
+                     column="idofcategory"/>
+        <many-to-one name="wtCategoryItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem"
+                     column="idofcategoryitem"/>
     </class>
 </hibernate-mapping>

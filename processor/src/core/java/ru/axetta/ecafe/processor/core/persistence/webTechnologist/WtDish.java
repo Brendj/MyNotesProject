@@ -62,6 +62,10 @@ public class WtDish {
     @Column(name = "guid")
     private String guid;
 
+    @ManyToOne
+    @JoinColumn(name = "idofcategory")
+    private WtCategory wtCategory;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idOfAgeGroupItem")
     @Fetch(value = FetchMode.JOIN)
@@ -354,5 +358,13 @@ public class WtDish {
     @Override
     public int hashCode() {
         return idOfDish.hashCode();
+    }
+
+    public WtCategory getWtCategory() {
+        return wtCategory;
+    }
+
+    public void setWtCategory(WtCategory wtCategory) {
+        this.wtCategory = wtCategory;
     }
 }

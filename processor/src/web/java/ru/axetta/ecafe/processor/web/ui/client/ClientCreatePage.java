@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -647,7 +648,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
 
         client.setSpecialMenu(this.specialMenu);
-
+        ClientParallel.addFoodBoxModifire(client);
         persistenceSession.update(client);
         if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
 
