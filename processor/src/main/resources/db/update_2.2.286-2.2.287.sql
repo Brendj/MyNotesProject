@@ -1,3 +1,8 @@
+-- Пакет обновлений v 287
+
+CREATE SEQUENCE cf_preorder_complex_version_seq;
+select setval('cf_preorder_complex_version_seq', (select coalesce(max(version), 0) + 1 from cf_preorder_complex));
+
 CREATE SEQUENCE public.cf_foodbox_preorders_id_seq
     INCREMENT BY 1
     MINVALUE 1
@@ -129,7 +134,6 @@ ALTER TABLE public.cf_clients ADD foodboxAvailability bool NULL;
 COMMENT ON COLUMN public.cf_clients.foodboxAvailability IS 'Признак доступности использования фудбокса для ученика (задается представителем)';
 
 
----------------------------732
 CREATE SEQUENCE public.cf_foodbox_org_parallel_seq
     INCREMENT BY 1
     MINVALUE 1
@@ -164,7 +168,9 @@ VALUES (3,10);
 INSERT INTO public.cf_foodbox_parallel_type (idtype,"parallel")
 VALUES (4,11);
 
-----------------------------------------
+
 ALTER TABLE public.cf_clients ADD foodboxavailabilityguardian bool NULL;
 COMMENT ON COLUMN public.cf_clients.foodboxavailabilityguardian IS 'Флаг того, что значение фудбокса установлено представителем';
 
+
+--! ФИНАЛИЗИРОВАН 30.05.2022, НЕ МЕНЯТЬ
