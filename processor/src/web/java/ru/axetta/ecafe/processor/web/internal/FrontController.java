@@ -3126,6 +3126,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
             @WebParam(name = "idOfOrg") Long idOfOrg) {
 
+        //todo для чего idOfOrg?
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3137,6 +3139,14 @@ public class FrontController extends HttpServlet {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+
+            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
+
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            }
+
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
 
             Criteria criteria = persistenceSession.createCriteria(Client.class);
