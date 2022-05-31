@@ -36,7 +36,8 @@ public class GuardianResponse extends ResponseItem {
         List<GuardianItem> guardianItems = new ArrayList<>();
         clients.forEach(c -> {
             GuardianItem guardianItem = new GuardianItem();
-            guardianItem.setAddress(c.getOrg().getAddress());
+            guardianItem.setIdOfOrg(c.getOrg().getIdOfOrg());
+            guardianItem.setAddressOrg(c.getOrg().getAddress());
             guardianItem.setFirstName(c.getPerson().getFirstName());
             guardianItem.setLastName(c.getPerson().getSurname());
             guardianItem.setPatronymic(c.getPerson().getSecondName());
@@ -44,7 +45,7 @@ public class GuardianResponse extends ResponseItem {
             guardianItem.setSnils(c.getSan());
             guardianItem.setIdOfClient(c.getIdOfClient());
             guardianItem.setGroupName(c.getClientGroup().getGroupName());
-            guardianItem.setIdOfClientGroup(BigInteger.valueOf(c.getIdOfClientGroup()));
+            guardianItem.setIdOfClientGroup(c.getIdOfClientGroup());
             guardianItems.add(guardianItem);
         });
         return guardianItems;
