@@ -46,6 +46,7 @@ public class GuardianResponse extends ResponseItem {
             guardianItem.setIdOfClient(c.getIdOfClient());
             guardianItem.setGroupName(c.getClientGroup().getGroupName());
             guardianItem.setIdOfClientGroup(c.getIdOfClientGroup());
+            guardianItem.setMeshGuid(c.getMeshGUID());
             guardianItems.add(guardianItem);
         });
         return guardianItems;

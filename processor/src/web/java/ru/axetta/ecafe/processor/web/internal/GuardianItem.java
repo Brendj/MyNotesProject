@@ -17,6 +17,7 @@ public class GuardianItem {
     private String addressOrg;
     private Long idOfClientGroup;
     private String groupName;
+    private String meshGuid;
 
     public GuardianItem() {
     }
@@ -99,5 +100,13 @@ public class GuardianItem {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getMeshGuid() {
+        return meshGuid;
+    }
+
+    public void setMeshGuid(String meshGuid) {
+        this.meshGuid = meshGuid;
     }
 }
