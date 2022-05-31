@@ -93,7 +93,12 @@ public class CGItem implements Comparable {
         if (this.cardno != null && item.getCardno() != null) {
             int cardRes = -cardLastUpdate.compareTo(item.getCardLastUpdate());
             if (cardRes == 0) {
-                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                int q = -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                if (q == 0) {
+                    return balance.compareTo(item.getBalance());
+                } else {
+                    return q;
+                }
             } else {
                 return cardRes;
             }
@@ -101,13 +106,14 @@ public class CGItem implements Comparable {
             if (this.balance != 0 && item.getBalance() == 0) return -1;
             if (this.balance == 0 && item.getBalance() != 0) return 1;
             if (this.balance != 0 && item.getBalance() != 0) {
-                long diff = this.balance - item.getBalance();
-                if (diff > 0) return -1;
-                if (diff < 0) return 1; else {
+                int e = -balance.compareTo(item.getBalance());
+                if (e == 0) {
                     return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                } else {
+                    return e;
                 }
             } else {
-
+                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
             }
         }
     }
@@ -132,15 +138,15 @@ public class CGItem implements Comparable {
             }
             if (priorityItem == 0) {
                 if (item.getIdOfClientGroup() == GROUP_PARENTS && this.idOfClientGroup != GROUP_PARENTS) {
-                    return -1;
-                } else (item.getIdOfClientGroup() != GROUP_PARENTS && this.idOfClientGroup == GROUP_PARENTS) {
                     return 1;
+                } else if (item.getIdOfClientGroup() != GROUP_PARENTS && this.idOfClientGroup == GROUP_PARENTS) {
+                    return -1;
+                } else {
+                    return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
                 }
             }
             //оба активные сотрудники
-
-
-
+            return compareInsideEmployee(item);
         } else {
             if (priorityThis > priorityItem) return -1; else return 1;
         }

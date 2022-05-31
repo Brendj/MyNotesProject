@@ -228,7 +228,9 @@ public class GuardianDoublesService {
                         aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
                 logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
             }
-            if (priorityCard != null && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))) {
+            if (priorityCard != null
+                    && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))
+                    && cardSameGroup(aliveGuardian, priorityCard)) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                         card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
@@ -244,6 +246,12 @@ public class GuardianDoublesService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean cardSameGroup(CGItem item, CGCardItem cardItem) {
+        if (item.getIdOfClientGroup() == CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() == CGItem.GROUP_PARENTS) return true;
+        if (item.getIdOfClientGroup() != CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() != CGItem.GROUP_PARENTS) return true;
+        return false;
     }
 
     private void createMigrants(Session session, CGItem aliveGuardian, CGItem item, Map<Long, List<Long>> friendlyOrgs) throws Exception {
