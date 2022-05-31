@@ -2630,9 +2630,9 @@ public class ClientManager {
         String q = "select c from Client c where c.idOfClientGroup > :idOfClientGroup ";
         boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
 
-        if(!fioIsEmpty)
+        if(!fioIsEmpty) {
             q += " and ( ";
-
+        }
         if (lastName != null) {
             q += " (upper(c.person.surname) = :lastName) ";
         }
@@ -2646,23 +2646,19 @@ public class ClientManager {
                 q+= " and ";
             q += " (upper(c.person.secondName) = :patronymic) ";
         }
-
-        if(!fioIsEmpty)
+        if(!fioIsEmpty) {
             q += ")";
-
+        }
         if (mobile != null || snils != null){
             q += fioIsEmpty ? " and " : " or ";
         }
-
         if (mobile != null) {
             q += " c.mobile = :mobile ";
         }
         if (snils != null) {
             q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
         }
-
         Query query = session.createQuery(q);
-
         query.setParameter("idOfClientGroup", idOfClientGroup);
 
         if (firstName != null) {
@@ -2680,7 +2676,7 @@ public class ClientManager {
         if (snils != null) {
             query.setParameter("snils", snils);
         }
-
         return query.list();
     }
+
 }

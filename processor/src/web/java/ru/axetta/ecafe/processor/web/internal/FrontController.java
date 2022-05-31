@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.core.utils.Base64;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -60,6 +62,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.addGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.getClient;
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyFreeDocumentParams;
@@ -2994,7 +2998,8 @@ public class FrontController extends HttpServlet {
     private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
                                        Date birthDate, String snils) throws FrontControllerException {
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || StringUtils.isEmpty(snils)) throw new FrontControllerException("Не заполнены обязательные параметры");
+                || birthDate == null || StringUtils.isEmpty(snils))
+            throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
     @WebMethod(operationName = "createMeshPerson")
@@ -3069,12 +3074,129 @@ public class FrontController extends HttpServlet {
         return guardianResponse;
     }
 
+    @WebMethod(operationName = "changeGuardians")
+    public GuardianResponse changeGuardians(
+            @WebParam(name = "idOfClient") Long idOfClient,
+            @WebParam(name = "lastName") String lastName,
+            @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "patronymic") String patronymic,
+            @WebParam(name = "birthDate") Date birthDate,
+            @WebParam(name = "snils") String snils,
+            @WebParam(name = "genderId") Integer genderId) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+
+            Client client = persistenceSession.get(Client.class, idOfClient);
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
+            client.setClientRegistryVersion(clientRegistryVersion);
+            client.getPerson().setSurname(lastName);
+            client.getPerson().setFirstName(firstName);
+            client.getPerson().setSecondName(patronymic);
+            client.setSan(snils);
+            client.setGender(genderId);
+            client.setBirthDate(birthDate);
+            persistenceSession.update(client);
+
+            if (client.getMeshGUID() != null) {
+                PersonResponse personResponse = getMeshGuardiansService()
+                        .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
+                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
+                    logger.error(personResponse.getMessage());
+                    return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                }
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in changeGuardians", e);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
+    }
+
+    @WebMethod(operationName = "addGuardianToClient")
+    public GuardianResponse addGuardianToClient(
+            @WebParam(name = "meshGuid") String meshGuid,
+            @WebParam(name = "childMeshGuid") String childMeshGuid,
+            @WebParam(name = "agentTypeId") Integer agentTypeId,
+            @WebParam(name = "relation") Integer relation,
+            @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
+            @WebParam(name = "idOfOrg") Long idOfOrg) {
+
+        //todo для чего idOfOrg?
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
+                    || typeOfLegalRepresent == null || idOfOrg == null) {
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
+            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
+
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            }
+
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+
+            Criteria criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("meshGUID", meshGuid));
+            Client guardian = (Client) criteria.uniqueResult();
+
+            criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
+            Client child = (Client) criteria.uniqueResult();
+
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason("Создана связка арм методом \"addGuardianToClient\"");
+
+            ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
+                    true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
+                    ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
+                    ClientGuardianRoleType.fromInteger(agentTypeId));
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in addGuardianToClient", e);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
+    }
+
     private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                  Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
                                                  Integer relation, Integer typeOfLegalRepresent) throws FrontControllerException {
         if (idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-            || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
-            || relation == null || typeOfLegalRepresent == null) throw new FrontControllerException("Не заполнены обязательные параметры");
+                || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
+                || relation == null || typeOfLegalRepresent == null)
+            throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
     private DulDetail getDulDetailFromDocumentItem(DocumentItem item) {

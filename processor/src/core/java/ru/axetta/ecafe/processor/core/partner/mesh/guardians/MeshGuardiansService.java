@@ -96,7 +96,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        String snils,
                                        String mobile,
                                        String email,
-                                       String сhildMeshGuid,
+                                       String childMeshGuid,
                                        List<DulDetail> dulDetails,
                                        Integer agentTypeId,
                                        Integer relation,
@@ -106,11 +106,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
                     email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
-            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(сhildMeshGuid), json);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
                 createGuardianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
-                        genderId, birthDate, snils, mobile, сhildMeshGuid, dulDetails, relation, typeOfLegalRepresent, agentTypeId);
+                        genderId, birthDate, snils, mobile, childMeshGuid, dulDetails, relation, typeOfLegalRepresent, agentTypeId);
                 return new PersonResponse(personResult.getAgentPersonId()).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
@@ -131,10 +131,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                              String patronymic, String lastName,
                              Integer genderId, Date birthDate, String snils) {
         try {
-            PersonListResponse personListResponse = searchPerson(firstName,  patronymic, lastName,
-                    genderId, birthDate, snils, null, null);
-            if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty())
-                return new PersonResponse().internalErrorResponse("Клиент не найдет в мк");
+            PersonListResponse personListResponse = searchPersonByMeshGuid(personId);
+            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
             Integer id = personListResponse.getResponse().get(0).getId();
             ObjectMapper objectMapper = new ObjectMapper();
             ResponsePersons request = buildResponsePerson(personId, firstName, patronymic, lastName, genderId,
@@ -521,6 +520,36 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (Exception e) {
             logger.error("Error in searchDocumentsByMeshGuid: ", e);
             return new PersonListResponse().internalErrorResponse();
+        }
+    }
+
+    public PersonResponse addGuardianToClient(String meshGuid, String childMeshGuid, Integer agentTypeId) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            PersonAgent personAgent = new PersonAgent();
+            personAgent.setAgentTypeId(agentTypeId);
+            personAgent.setId(0);
+            personAgent.setPersonId(childMeshGuid);
+            personAgent.setAgentPersonId(meshGuid);
+
+            String json = objectMapper.writeValueAsString(personAgent);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
+                return new PersonResponse(personResult.getAgentPersonId()).okResponse();
+            } else if (result.getCode() >= 500) {
+                return new PersonResponse().internalErrorResponse("" + result.getCode());
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+            }
+        } catch (ConnectTimeoutException te) {
+            logger.error("Connection timeout in addGuardianToClient: ", te);
+            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+        } catch (Exception e) {
+            logger.error("Error in addGuardianToClient: ", e);
+            return new PersonResponse().internalErrorResponse();
         }
     }
 

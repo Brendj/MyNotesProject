@@ -13,8 +13,9 @@ public class GuardianItem {
     private String patronymic;
     private String snils;
     private String mobile;
-    private String address;
-    private BigInteger idOfClientGroup;
+    private Long idOfOrg;
+    private String addressOrg;
+    private Long idOfClientGroup;
     private String groupName;
 
     public GuardianItem() {
@@ -68,19 +69,27 @@ public class GuardianItem {
         this.mobile = mobile;
     }
 
-    public String getAddress() {
-        return address;
+    public Long getIdOfOrg() {
+        return idOfOrg;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
-    public BigInteger getIdOfClientGroup() {
+    public String getAddressOrg() {
+        return addressOrg;
+    }
+
+    public void setAddressOrg(String addressOrg) {
+        this.addressOrg = addressOrg;
+    }
+
+    public Long getIdOfClientGroup() {
         return idOfClientGroup;
     }
 
-    public void setIdOfClientGroup(BigInteger idOfClientGroup) {
+    public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
     }
 
