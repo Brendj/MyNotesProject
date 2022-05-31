@@ -998,6 +998,11 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
         printMessage("Операция обработки дублей представителей по выбранным организациям выполнена");
     }
 
+    public void runDeleteDoubleGuardiansAllOrgs() {
+        RuntimeContext.getAppContext().getBean(GuardianDoublesService.class).processDeleteDoubleGuardiansForAllOrgs();
+        printMessage("Операция обработки дублей представителей по всем организациям выполнена");
+    }
+
     public void runUpdateSpbCardUids() throws Exception {
         try {
             List<Long> orgs = getOrgsForCardsUpdate();

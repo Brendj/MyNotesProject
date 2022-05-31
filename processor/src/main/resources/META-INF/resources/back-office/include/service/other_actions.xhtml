@@ -315,47 +315,55 @@
                         <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsRemoveDupFilter}}"/>
                     </h:panelGroup>
 
-                    <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
-                                       action="#{otherActionsPage.runDeleteDoubleGuardians()}"
-                                       id="deleteDoubleGuardians"
-                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
-                </h:panelGrid>
-            </rich:panel>
-            <rich:panel id="loadMeshGuidsForGuardiansPanel">
-                <h:panelGrid columns="2">
-                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
-                                  styleClass="output-text"/><br/>
-                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
-                    <h:panelGroup>
-                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectLoadMeshPage()}"
-                                           render="modalOrgListSelectorPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                           styleClass="command-link" style="width: 25px;">
-                            <f:setPropertyActionListener value="2" target="#{otherActionsPage.selectOrgType}"/>
-                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
-                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-                        </a4j:commandButton>
-                        <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.orgItemsLoadMeshFilter}}"/>
-                    </h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
-                    <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
-                                     addLabel="Добавить..."
-                                     clearAllLabel="Очистить"
-                                     uploadLabel="Загрузить"
-                                     doneLabel="Готово"
-                                     fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
-                                     listHeight="100">
-                        <f:facet name="label">
-                            <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
-                        </f:facet>
-                        <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
-                        <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
-                    </rich:fileUpload>
-                    <h:outputText escape="true" value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
-                                  styleClass="report-error-output-text" rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
-                </h:panelGrid>
-            </rich:panel>
-        </h:panelGrid>
+                        <a4j:commandButton value="Запустить удаление дублей по выбранным ОО"
+                                           action="#{otherActionsPage.runDeleteDoubleGuardians()}"
+                                           id="deleteDoubleGuardians"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+
+                        <a4j:commandButton value="Запустить удаление дублей по всем ОО"
+                                           action="#{otherActionsPage.runDeleteDoubleGuardiansAllOrgs()}"
+                                           id="deleteDoubleGuardiansAllOrgs"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    </h:panelGrid>
+                </rich:panel>
+                <rich:panel id="loadMeshGuidsForGuardiansPanel">
+                    <h:panelGrid columns="2">
+                        <h:outputText escape="true" value="Загрузка mesh гуидов представителей"
+                                      styleClass="output-text"/><br/>
+                        <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectLoadMeshPage()}"
+                                               render="modalOrgListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="2" target="#{otherActionsPage.selectOrgType}"/>
+                                <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true"
+                                          value=" {#{otherActionsPage.orgItemsLoadMeshFilter}}"/>
+                        </h:panelGroup>
+                        <h:outputText styleClass="output-text" escape="true" value="Выбрать файл:"/><br/>
+                        <rich:fileUpload id="loadMeshGuidsForGuardians" styleClass="upload"
+                                         addLabel="Добавить..."
+                                         clearAllLabel="Очистить"
+                                         uploadLabel="Загрузить"
+                                         doneLabel="Готово"
+                                         fileUploadListener="#{otherActionsPage.loadMeshGuidsForGuardians}"
+                                         listHeight="100">
+                            <f:facet name="label">
+                                <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]"/>
+                            </f:facet>
+                            <a4j:ajax event="uploadcomplete" render="loadMeshGuidsForGuardiansPanel"/>
+                            <a4j:ajax event="clear" render="loadMeshGuidsForGuardiansPanel"/>
+                        </rich:fileUpload>
+                        <h:outputText escape="true"
+                                      value="Загрузка mesh гуидов представителей выполнена. Обновлено #{otherActionsPage.processedMeshGuids} клиентов"
+                                      styleClass="report-error-output-text"
+                                      rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
+                    </h:panelGrid>
+                </rich:panel>
+            </h:panelGrid>
 
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
             <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"

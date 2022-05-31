@@ -15,7 +15,11 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.internal.FrontController;
+import ru.axetta.ecafe.processor.web.internal.front.items.MigrateRequest;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import javax.faces.context.FacesContext;
@@ -45,13 +49,27 @@ public class GuardianDoublesService {
         logger.info("End process one org. Id=" + idOfOrg);
     }
 
-    private List<CGItem> getCGItems(long idOfOrg) {
+    public void processDeleteDoubleGuardiansForAllOrgs() {
+        logger.info("Start process all orgs");
+        processedCG.clear();
+        List<CGItem> items = getCGItems(null);
+        Map<String, List<CGItem>> map = getCGItemsMap(items);
+        for (Map.Entry me : map.entrySet()) {
+            String fio = (String) me.getKey();
+            List<CGItem> children = (List)me.getValue();
+            processOneClient(fio, children);
+        }
+        logger.info("End process all orgs.");
+    }
+
+    private List<CGItem> getCGItems(Long idOfOrg) {
         Session session = null;
         Transaction transaction = null;
         List<CGItem> result = new LinkedList<>();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
+            String orgCondition = (idOfOrg == null) ? "" : "g.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) and ";
             String query_str = "select c.idofclient, cg.idofguardian, pg.surname, pg.firstname, " +
                     "pg.secondname, g.mobile, ca.cardno, ca.state, c.idoforg as clientOrg, g.idoforg as guardianOrg, " +
                     "cg.idofclientguardian, ca.lastupdate, g.balance, g.idofclientgroup, g.lastupdate as guardianLU, " +
@@ -60,12 +78,14 @@ public class GuardianDoublesService {
                     "join cf_clients g on g.idofclient = cg.idofguardian " +
                     "join cf_persons pg on pg.idofperson = g.idofperson " +
                     "left join cf_cards ca on ca.idofclient = g.idofclient and ca.state in (0, 4) and ca.lifestate = 1 and ca.validdate > :card_date " +
-                    "where g.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) " +
-                    "and g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
+                    "where " + orgCondition +
+                    "g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
                     "and g.idofclientgroup not in (:group_leaving, :group_deleted) " +
                     "order by c.idofclient";
             Query query = session.createNativeQuery(query_str);
-            query.setParameter("idOfOrg", idOfOrg);
+            if (idOfOrg != null) {
+                query.setParameter("idOfOrg", idOfOrg);
+            }
             query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("group_leaving", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
@@ -88,7 +108,9 @@ public class GuardianDoublesService {
                         HibernateUtils.getDbLong(row[13]),
                         HibernateUtils.getDbLong(row[14]),
                         (Boolean)row[15],
-                        HibernateUtils.getDbInt(row[16]));
+                        HibernateUtils.getDbInt(row[16]),
+                        HibernateUtils.getDbLong(row[9]),
+                        HibernateUtils.getDbLong(row[8]));
                 result.add(item);
             }
             transaction.commit();
@@ -143,10 +165,10 @@ public class GuardianDoublesService {
         for (CGItem item : processList) {
             log_message += String.format("\nFIO: %s, idOfClient: %s, idOfGuardian: %s, cardNo: %s, guardianClientGroup: %s, " +
                     "guardianBalance: %s, guardianLastUpdate: %s, cardLastUpdate: %s, clientGuardianDeletedState: %s, " +
-                    "clientGuardianDisabled: %s",
+                    "clientGuardianDisabled: %s, guardianIdOfOrg: %s, clientIdOfOrg: %s",
                     item.getFioPlusMobile(), item.getIdOfClient(),
                     item.getIdOfGuardin(), item.getCardno(), item.getIdOfClientGroup(), item.getBalance(), item.getGuardianLastUpdate(),
-                    item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled());
+                    item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled(), item.getGuardianOrg(), item.getClientOrg() );
             if (item.getCardno() != null) {
                 cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
                         item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
@@ -160,13 +182,15 @@ public class GuardianDoublesService {
         Collections.sort(processList);
         logger.info(String.format("Priority client id: %s, Priority card: %s", processList.get(0).getIdOfGuardin(),
                 priorityCard == null ? "null" : priorityCard.getIdOfCard()));
-        deleteGuardians(processList.get(0), processList, priorityCard);
+        Map<Long, List<Long>> friendlyOrgs = new HashMap<>();
+        deleteGuardians(processList.get(0), processList, priorityCard, friendlyOrgs);
         for (CGItem item : processList) {
             processedCG.add(item.getIdOfClientGuardian());
         }
     }
 
-    private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard) {
+    private void deleteGuardians(CGItem aliveGuardian, List<CGItem> deleteGuardianList, CGCardItem priorityCard,
+                                 Map<Long, List<Long>> friendlyOrgs) {
         if (allTheSameGuardian(deleteGuardianList)) return;
         boolean allCGDeleted = getAllCGDeleted(deleteGuardianList);
         Map<Long, Boolean> cgDisabled = getCGDisabledMap(deleteGuardianList);
@@ -184,6 +208,10 @@ public class GuardianDoublesService {
             }
             for (CGItem item : deleteGuardianList) {
                 if (item.equals(aliveGuardian) && !allCGDeleted) continue;
+                /*if (item.isSotrudnik()) {
+                    logger.info("Guardian id = " + item.getIdOfGuardin() +  " is sotrudnik. Skipped.");
+                    continue;
+                }*/
                 if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
@@ -192,7 +220,7 @@ public class GuardianDoublesService {
                 }
                 //Set<ClientGuardianNotificationSetting> notificationSettings
                 deleteGuardian(session, aliveGuardian, item, version, cgDisabled);
-
+                createMigrants(session, aliveGuardian, item, friendlyOrgs);
             }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
                 Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
@@ -200,7 +228,9 @@ public class GuardianDoublesService {
                         aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
                 logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
             }
-            if (priorityCard != null && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))) {
+            if (priorityCard != null
+                    && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))
+                    && cardSameGroup(aliveGuardian, priorityCard)) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                         card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
@@ -216,6 +246,124 @@ public class GuardianDoublesService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean cardSameGroup(CGItem item, CGCardItem cardItem) {
+        if (item.getIdOfClientGroup() == CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() == CGItem.GROUP_PARENTS) return true;
+        if (item.getIdOfClientGroup() != CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() != CGItem.GROUP_PARENTS) return true;
+        return false;
+    }
+
+    private void createMigrants(Session session, CGItem aliveGuardian, CGItem item, Map<Long, List<Long>> friendlyOrgs) throws Exception {
+        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
+        if (clientOrgs == null) {
+            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
+            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
+        }
+        if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
+
+        Date startDate = new Date();
+        Date endDate = CalendarUtils.parseDate("31.12.2099");
+
+        Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
+
+        Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
+        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", client);
+        query.setParameter("org", orgVisit);
+        query.setParameter("date", new Date());
+        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
+
+        Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
+
+        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
+        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
+
+        Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
+        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", deletedClient);
+        query.setParameter("date", new Date());
+        List<Migrant> list = query.getResultList();
+        for (Migrant migrant : list) {
+            Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
+                    "where h.migrant=:migrant order by h.resolutionDateTime desc");
+            query2.setParameter("migrant", migrant);
+            query2.setMaxResults(1);
+            List<VisitReqResolutionHist> res = query2.getResultList();
+            if(res.size() > 0 && res.get(0).getResolution().equals(1)){
+                createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
+                        migrant.getVisitStartDate(), migrant.getVisitEndDate());
+                logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
+                        migrant.getOrgVisit().getIdOfOrg()));
+
+                deleteMigrateRequest(session, migrant);
+            }
+        }
+    }
+
+    private void deleteMigrateRequest(Session session, Migrant migrant) {
+        Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, migrant.getOrgRegistry().getIdOfOrg());
+        migrant.setSyncState(Migrant.CLOSED);
+        CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+        VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+                VisitReqResolutionHist.RES_CANCELED, new Date(),
+                MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+        nextId--;
+        CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
+        VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
+                VisitReqResolutionHist.RES_CANCELED, new Date(),
+                MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+        session.update(migrant);
+        session.save(hist1);
+        session.save(hist2);
+        session.flush();
+    }
+
+    private void createMigrateRequestForClient(Session session, Client client, long idOfOrgRegistry, Org orgVisit,
+                                               Date startDate, Date endDate) {
+        Date date = new Date();
+        Date after5Seconds = CalendarUtils.addSeconds(date, 5);
+        String resolConfirmed = "Заявка создана для дубля учетной записи представителя";
+
+        Long idOfProcessorMigrantRequest = MigrantsUtils
+                .nextIdOfProcessorMigrantRequest(session, idOfOrgRegistry);
+        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                idOfOrgRegistry);
+        String requestNumber = MigrateRequest
+                .formRequestNumber(client.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(),
+                        idOfProcessorMigrantRequest, date);
+        Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
+                requestNumber, client, orgVisit, startDate, endDate,
+                Migrant.NOT_SYNCHRONIZED);
+
+        Long idOfResol = MigrantsUtils
+                .nextIdOfProcessorMigrantResolutions(session, idOfOrgRegistry);
+        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
+                migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgRegistry);
+        VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist,
+                client.getOrg(), VisitReqResolutionHist.RES_CREATED, date,
+                MigrantsUtils.getResolutionString(VisitReqResolutionHist.RES_CREATED), null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+
+        Long idOfResol1 =
+                MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, orgVisit.getIdOfOrg()) - 1;
+        CompositeIdOfVisitReqResolutionHist comIdOfHist1 = new CompositeIdOfVisitReqResolutionHist(
+                idOfResol1, migrant.getCompositeIdOfMigrant().getIdOfRequest(), orgVisit.getIdOfOrg());
+        VisitReqResolutionHist visitReqResolutionHist1 = new VisitReqResolutionHist(comIdOfHist1,
+                client.getOrg(), VisitReqResolutionHist.RES_CONFIRMED, after5Seconds, resolConfirmed, null,
+                null, VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+        session.save(migrant);
+        session.save(visitReqResolutionHist);
+        session.save(visitReqResolutionHist1);
+        session.flush();
     }
 
     private boolean allTheSameGuardian(List<CGItem> list) {
