@@ -672,6 +672,9 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.officialPersonSecondName);
         session.save(officialPerson);
 
+        if (StringUtils.isEmpty(this.shortNameInfoService)) {
+            throw new Exception("Не указано краткое наименование");
+        }
         if(DAOUtils.findOrgByShortname(session, getShortName()) != null) {
             throw new Exception("\"Наименование ОО для поставщика\" уже существует");
         }
