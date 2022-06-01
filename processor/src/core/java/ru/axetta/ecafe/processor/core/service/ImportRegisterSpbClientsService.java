@@ -275,7 +275,7 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
-                                    change.getGroupName());
+                                    change.getGroupName(), false);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         clientGroupProcess(session, dbClient, groupNamesToOrgs);

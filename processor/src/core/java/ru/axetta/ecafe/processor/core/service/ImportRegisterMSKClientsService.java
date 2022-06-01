@@ -1428,7 +1428,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
-                                    change.getGroupName());
+                                    change.getGroupName(), false);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         clientGroupProcess(session, dbClient, groupNamesToOrgs);
@@ -1514,7 +1514,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         try {
             Org org = (Org) session.get(Org.class, idofOrg);
             GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                    .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), groupName);
+                    .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), groupName, false);
             if (groupNamesToOrgs == null) {
                 Long version = DAOUtils.nextVersionByGroupNameToOrg(session);
                 DAOUtils.createGroupNamesToOrg(session, org, version, groupName);

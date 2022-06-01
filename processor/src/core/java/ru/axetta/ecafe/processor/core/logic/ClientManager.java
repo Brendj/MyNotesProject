@@ -452,7 +452,7 @@ public class ClientManager {
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(persistenceSession, client.getOrg().getIdOfOrg(),
-                                    clientGroupName);
+                                    clientGroupName, false);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
@@ -852,7 +852,7 @@ public class ClientManager {
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(persistenceSession, idOfOrg,
-                                    clientGroupName);
+                                    clientGroupName, false);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);

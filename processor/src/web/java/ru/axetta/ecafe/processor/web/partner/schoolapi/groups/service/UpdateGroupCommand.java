@@ -102,7 +102,7 @@ class UpdateGroupCommand {
 
         ClientGroup foundNewGroup;
         try {
-            foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, bindingOrg, clientGroup.getGroupName());
+            foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgCase(session, bindingOrg, clientGroup.getGroupName());
         } catch (Exception e) {
             throw new WebApplicationException(e.getMessage());
         }
@@ -135,7 +135,7 @@ class UpdateGroupCommand {
         Org org = clientGroup.getOrg();
         Long idOfMainOrg = getMainBuildingOrgId(org);
         GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), clientGroup.getGroupName());
+                .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), clientGroup.getGroupName(), true);
         if (groupNamesToOrgs == null) {
             groupNamesToOrgs = new GroupNamesToOrgs(idOfMainOrg, request.getBindingOrgId(), 1,
                     clientGroup.getGroupName(), version, null, false);
