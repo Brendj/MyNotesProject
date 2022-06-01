@@ -80,15 +80,18 @@ public class GuardianDoublesService {
                     "left join cf_cards ca on ca.idofclient = g.idofclient and ca.state in (0, 4) and ca.lifestate = 1 and ca.validdate > :card_date " +
                     "where " + orgCondition +
                     "g.idofclientgroup >= :group_employees and g.mobile is not null and g.mobile <> '' " +
-                    "and g.idofclientgroup not in (:group_leaving, :group_deleted) " +
+                    "and g.idofclientgroup in (:group1, :group2, :group3, :group4, :group5) " +
                     "order by c.idofclient";
             Query query = session.createNativeQuery(query_str);
             if (idOfOrg != null) {
                 query.setParameter("idOfOrg", idOfOrg);
             }
             query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("group_leaving", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+            query.setParameter("group1", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("group2", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("group3", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("group4", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("group5", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
             query.setParameter("card_date", (new Date()).getTime());
             List list = query.getResultList();
             for (Object o : list) {
@@ -222,6 +225,9 @@ public class GuardianDoublesService {
                 deleteGuardian(session, aliveGuardian, item, version, cgDisabled);
                 createMigrants(session, aliveGuardian, item, friendlyOrgs);
             }
+            if (inactiveEmployee(aliveGuardian)) {
+                deleteInactiveEmployee(session, aliveGuardian);
+            }
             if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
                 Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
                 RuntimeContext.getAppContext().getBean(CardService.class).block(aliveGuardian.getCardno(), g.getOrg().getIdOfOrg(),
@@ -246,6 +252,11 @@ public class GuardianDoublesService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean inactiveEmployee(CGItem item) {
+        if (item.getIdOfClientGroup() != CGItem.GROUP_PARENTS && item.getBalance() == 0 && item.getCardno() == null) return true;
+        else return false;
     }
 
     private boolean cardSameGroup(CGItem item, CGCardItem cardItem) {
@@ -408,6 +419,25 @@ public class GuardianDoublesService {
         return true;
     }*/
 
+    private void deleteInactiveEmployee(Session session, CGItem aliveGuardian) throws Exception {
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason(HISTORY_LABEL);
+
+        Client client = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
+        if (!client.isDeletedOrLeaving()) {
+            ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+            client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
+            session.update(client);
+            logger.info(String.format("Deleted client id = %s", client.getIdOfClient()));
+        }
+        session.flush();
+    }
+
     private void deleteGuardian(Session session, CGItem aliveGuardian, CGItem deletedGuardian, Long version,
                                 Map<Long, Boolean> mapDisabled) throws Exception {
         ClientGuardian clientGuardian = getClientGuardianByCGItem(session, deletedGuardian); //связки у удаляемого представителя
@@ -449,6 +479,7 @@ public class GuardianDoublesService {
                     ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
                             .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
             session.update(client);
             logger.info(String.format("Deleted client id = %s", client.getIdOfClient()));
         }
