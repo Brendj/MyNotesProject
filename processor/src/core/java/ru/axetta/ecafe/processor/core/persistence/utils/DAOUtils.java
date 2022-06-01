@@ -758,6 +758,30 @@ public class DAOUtils {
         return null;
     }
 
+    /**
+     * производит выборку Группы клиента по номеру организации и имени группы
+     * не игнорируя регистр имени группы
+     *
+     * @param persistenceSession ссылка на сессию
+     * @param idOfOrg            идентификатор организации
+     * @param groupName          имя группы
+     * @return null если таблица пуста, сущность ClientGroup
+     * @since 2012-03-06
+     */
+    public static ClientGroup findClientGroupByGroupNameAndIdOfOrgCase(Session persistenceSession, Long idOfOrg,
+                                                                   String groupName) throws Exception {
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        List<ClientGroup> list = clientGroupCriteria.add(Restrictions
+                        .and(Restrictions.eq("groupName", groupName), Restrictions.eq("org.idOfOrg", idOfOrg)))
+                .list();
+        if (list.isEmpty()) {
+            return null;
+        } else
+        {
+            return list.get(0);
+        }
+    }
+
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(Session persistenceSession,
             Long idOfOrg, String groupName) throws Exception {
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
@@ -3792,7 +3816,7 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(Session session, Long idOfOrg,
-            String groupName) {
+            String groupName, Boolean groupNameReg) {
 
         Org o = (Org) session.load(Org.class, idOfOrg);
 
@@ -3808,10 +3832,18 @@ public class DAOUtils {
             idOfMainOrg = o.getIdOfOrg();
         }
 
-        Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
-                + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+        Query query;
+        if (groupNameReg) {
+            query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
+                    + " AND REPLACE(groupName, ' ', '') LIKE REPLACE(:groupName, ' ', '')");
+            query.setParameter("groupName", groupName);
+        }
+        else {
+            query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
+                    + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+            query.setParameter("groupName", groupName.toLowerCase());
+        }
         query.setParameter("idOfMainOrg", idOfMainOrg);
-        query.setParameter("groupName", groupName.toLowerCase());
 
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;
