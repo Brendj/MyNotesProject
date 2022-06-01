@@ -3792,7 +3792,7 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(Session session, Long idOfOrg,
-            String groupName) {
+            String groupName, Boolean groupNameReg) {
 
         Org o = (Org) session.load(Org.class, idOfOrg);
 
@@ -3811,7 +3811,10 @@ public class DAOUtils {
         Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
                 + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
         query.setParameter("idOfMainOrg", idOfMainOrg);
-        query.setParameter("groupName", groupName.toLowerCase());
+        if (groupNameReg)
+            query.setParameter("groupName", groupName);
+        else
+            query.setParameter("groupName", groupName.toLowerCase());
 
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;

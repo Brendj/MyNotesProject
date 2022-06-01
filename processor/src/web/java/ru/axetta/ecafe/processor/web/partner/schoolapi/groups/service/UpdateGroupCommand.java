@@ -135,7 +135,7 @@ class UpdateGroupCommand {
         Org org = clientGroup.getOrg();
         Long idOfMainOrg = getMainBuildingOrgId(org);
         GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), clientGroup.getGroupName());
+                .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), clientGroup.getGroupName(), true);
         if (groupNamesToOrgs == null) {
             groupNamesToOrgs = new GroupNamesToOrgs(idOfMainOrg, request.getBindingOrgId(), 1,
                     clientGroup.getGroupName(), version, null, false);
