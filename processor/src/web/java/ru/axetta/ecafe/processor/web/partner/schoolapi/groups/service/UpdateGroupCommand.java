@@ -102,7 +102,7 @@ class UpdateGroupCommand {
 
         ClientGroup foundNewGroup;
         try {
-            foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, bindingOrg, clientGroup.getGroupName());
+            foundNewGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgCase(session, bindingOrg, clientGroup.getGroupName());
         } catch (Exception e) {
             throw new WebApplicationException(e.getMessage());
         }
