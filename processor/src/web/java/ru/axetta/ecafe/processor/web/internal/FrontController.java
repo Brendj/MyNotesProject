@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import org.aspectj.weaver.ast.Or;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
@@ -3147,10 +3148,11 @@ public class FrontController extends HttpServlet {
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
             Client child = (Client) criteria.uniqueResult();
 
+            MessageContext mc = wsContext.getMessageContext();
+            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason("Создана связка арм методом \"addGuardianToClient\"");
+            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
             ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
@@ -3202,10 +3204,11 @@ public class FrontController extends HttpServlet {
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
             Client child = (Client) criteria.uniqueResult();
 
+            MessageContext mc = wsContext.getMessageContext();
+            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
+            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
 

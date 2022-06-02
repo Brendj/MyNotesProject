@@ -2,6 +2,8 @@ package ru.axetta.ecafe.processor.core.service;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class DulDetailService {
 
     private final MeshGuardiansService meshGuardiansService = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public void validateAndSaveDulDetails(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
@@ -104,8 +107,10 @@ public class DulDetailService {
     }
 
     private void checkError(DocumentResponse documentResponse) throws Exception {
-        if (documentResponse.getCode() != 0)
+        if (documentResponse.getCode() != 0) {
+            logger.error(String.format("%s: %s", documentResponse.getCode(), documentResponse.getMessage()));
             throw new MeshDocumentSaveException(documentResponse.getMessage());
+        }
     }
 
     //todo на переходный период (пока толстый клиент не доработался)

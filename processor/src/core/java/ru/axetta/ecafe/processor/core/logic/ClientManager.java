@@ -2611,7 +2611,7 @@ public class ClientManager {
     public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
                                                                String patronymic, String mobile, String snils) {
         Long idOfClientGroup = 1000000000L;
-        String q = "select c from Client c where c.idOfClientGroup > :idOfClientGroup ";
+        String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
         boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
 
         if(!fioIsEmpty) {
