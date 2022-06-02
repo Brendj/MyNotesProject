@@ -62,7 +62,7 @@ public class CGItem implements Comparable {
 
     private int getPriority(CGItem item) {
         int priority = 0;
-        if (item.getIdOfClientGroup() == GROUP_PARENTS) {
+        if (item.getIdOfClientGroup().equals(GROUP_PARENTS)) {
             if (!item.getDeletedState()) priority = 1;
         } else {
             if (item.getBalance() > 0 || item.getCardno() != null) {
@@ -137,9 +137,9 @@ public class CGItem implements Comparable {
                 return compareInsideOneGroup(item);
             }
             if (priorityItem == 0) {
-                if (item.getIdOfClientGroup() == GROUP_PARENTS && this.idOfClientGroup != GROUP_PARENTS) {
+                if (item.getIdOfClientGroup().equals(GROUP_PARENTS) && !this.idOfClientGroup.equals(GROUP_PARENTS)) {
                     return 1;
-                } else if (item.getIdOfClientGroup() != GROUP_PARENTS && this.idOfClientGroup == GROUP_PARENTS) {
+                } else if (!item.getIdOfClientGroup().equals(GROUP_PARENTS) && this.idOfClientGroup.equals(GROUP_PARENTS)) {
                     return -1;
                 } else {
                     return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
