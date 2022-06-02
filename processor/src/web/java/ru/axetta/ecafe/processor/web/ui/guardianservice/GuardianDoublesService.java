@@ -255,13 +255,13 @@ public class GuardianDoublesService {
     }
 
     private boolean inactiveEmployee(CGItem item) {
-        if (item.getIdOfClientGroup() != CGItem.GROUP_PARENTS && item.getBalance() == 0 && item.getCardno() == null) return true;
+        if (!item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS) && item.getBalance() == 0 && item.getCardno() == null) return true;
         else return false;
     }
 
     private boolean cardSameGroup(CGItem item, CGCardItem cardItem) {
-        if (item.getIdOfClientGroup() == CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() == CGItem.GROUP_PARENTS) return true;
-        if (item.getIdOfClientGroup() != CGItem.GROUP_PARENTS && cardItem.getIdOfClientGroup() != CGItem.GROUP_PARENTS) return true;
+        if (item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS) && cardItem.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) return true;
+        if (!item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS) && !cardItem.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) return true;
         return false;
     }
 
