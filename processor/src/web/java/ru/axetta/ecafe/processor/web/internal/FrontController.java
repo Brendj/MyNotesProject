@@ -62,8 +62,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.addGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.getClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyFreeDocumentParams;
@@ -3150,15 +3149,6 @@ public class FrontController extends HttpServlet {
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
 
-            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
-
-            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
-                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
-            }
-
-            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
-
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", meshGuid));
             Client guardian = (Client) criteria.uniqueResult();
@@ -3172,16 +3162,78 @@ public class FrontController extends HttpServlet {
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason("Создана связка арм методом \"addGuardianToClient\"");
 
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
             ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
                     true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
                     ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
                     ClientGuardianRoleType.fromInteger(agentTypeId));
+
+            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
+
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in addGuardianToClient", e);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
+    }
+
+    @WebMethod(operationName = "deleteGuardianToClient")
+    public GuardianResponse deleteGuardianToClient(
+            @WebParam(name = "agentMeshGuid") String agentMeshGuid,
+            @WebParam(name = "childMeshGuid") String childMeshGuid) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (agentMeshGuid == null || childMeshGuid == null) {
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
+            Criteria criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("meshGUID", agentMeshGuid));
+            Client guardian = (Client) criteria.uniqueResult();
+
+            criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
+            Client child = (Client) criteria.uniqueResult();
+
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
+
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+
+            ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
+                    newGuardiansVersions, clientGuardianHistory);
+
+            PersonResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
+
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                logger.error(String.format("Error in deleteGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+        } catch (Exception e) {
+            logger.error("Error in deleteGuardianToClient", e);
             return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
