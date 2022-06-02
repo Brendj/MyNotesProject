@@ -174,7 +174,7 @@ public class GuardianDoublesService {
                     item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled(), item.getGuardianOrg(), item.getClientOrg() );
             if (item.getCardno() != null) {
                 cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
-                        item.getIdOfClientGroup(), item.getGuardianLastUpdate()));
+                        item.getIdOfClientGroup(), item.getGuardianLastUpdate(), item.getGuardianOrg()));
             }
         }
         logger.info(log_message);
@@ -236,7 +236,7 @@ public class GuardianDoublesService {
             }
             if (priorityCard != null
                     && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))
-                    && cardSameGroup(aliveGuardian, priorityCard)) {
+                    && cardSameGroup(aliveGuardian, priorityCard) && oneOrg(session, aliveGuardian, priorityCard, friendlyOrgs)) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                         card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
@@ -252,6 +252,15 @@ public class GuardianDoublesService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean oneOrg(Session session, CGItem aliveGuardian, CGCardItem item, Map<Long, List<Long>> friendlyOrgs) {
+        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
+        if (clientOrgs == null) {
+            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
+            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
+        }
+        return (clientOrgs.contains(item.getCardOrg())); //клиент и представитель в одном юр.лице
     }
 
     private boolean inactiveEmployee(CGItem item) {
