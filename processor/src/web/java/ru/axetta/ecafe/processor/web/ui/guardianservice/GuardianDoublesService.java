@@ -228,14 +228,16 @@ public class GuardianDoublesService {
             if (inactiveEmployee(aliveGuardian)) {
                 deleteInactiveEmployee(session, aliveGuardian);
             }
-            if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
-                Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
-                RuntimeContext.getAppContext().getBean(CardService.class).block(aliveGuardian.getCardno(), g.getOrg().getIdOfOrg(),
-                        aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
-                logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
+            if (priorityCard != null && aliveGuardian.getCardno() != null && !priorityCard.getCardLastUpdate().equals(aliveGuardian.getCardLastUpdate())) {
+                if (priorityCard != null && aliveGuardian.getCardno() != null && !aliveGuardianCardIsAlive) {
+                    Client g = DAOUtils.findClient(session, aliveGuardian.getIdOfGuardin());
+                    RuntimeContext.getAppContext().getBean(CardService.class).block(aliveGuardian.getCardno(), g.getOrg().getIdOfOrg(),
+                            aliveGuardian.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
+                    logger.info(String.format("Blocked card with cardno = %s", aliveGuardian.getCardno()));
+                }
             }
             if (priorityCard != null
-                    && (aliveGuardian.getCardno() == null || !aliveGuardian.getCardno().equals(priorityCard.getIdOfCard()))
+                    && (aliveGuardian.getCardno() == null || (!aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) && !priorityCard.getCardLastUpdate().equals(aliveGuardian.getCardLastUpdate()))
                     && cardSameGroup(aliveGuardian, priorityCard) && oneOrg(session, aliveGuardian, priorityCard, friendlyOrgs)) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
