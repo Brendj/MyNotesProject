@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core;
 
-import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Value;
 import ru.axetta.ecafe.processor.core.card.CardManager;
