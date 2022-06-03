@@ -88,7 +88,7 @@ public class CGItem implements Comparable {
     }
 
     private int compareInsideEmployee(CGItem item) {
-        if (this.cardno != null && item.getCardno() != null) {
+        if (this.cardno != null && item.getCardno() != null && ((this.balance == 0 && item.getBalance() == 0) || this.balance != 0 && item.getBalance() != 0)) {
             int cardRes = -cardLastUpdate.compareTo(item.getCardLastUpdate());
             if (cardRes == 0) {
                 int q = -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
@@ -100,7 +100,7 @@ public class CGItem implements Comparable {
             } else {
                 return cardRes;
             }
-        } else if (this.cardno == null && item.getCardno() == null) {
+        } else if (this.cardno == null && item.getCardno() == null && ((this.balance == 0 && item.getBalance() == 0) || (this.balance != 0 && item.getBalance() != 0))) {
             if (this.balance != 0 && item.getBalance() != 0) {
                 int e = -balance.compareTo(item.getBalance());
                 if (e == 0) {
@@ -114,7 +114,11 @@ public class CGItem implements Comparable {
         } else if ((this.balance == 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() == null)
                    || (this.balance != 0 && this.cardno == null && item.getBalance() == 0 && item.getCardno() != null)
                    || (this.balance != 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() == null)
-                   || (this.balance != 0 && this.cardno != null && item.getBalance() == 0 && item.getCardno() != null)) {
+                   || (this.balance != 0 && this.cardno != null && item.getBalance() == 0 && item.getCardno() != null)
+                   || (this.balance != 0 && this.cardno == null && item.getBalance() != 0 && item.getCardno() != null)
+                   || (this.balance == 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() != null)
+                   || (this.balance == 0 && this.cardno != null && item.getBalance() == 0 && item.getCardno() != null)
+                   || (this.balance != 0 && this.cardno == null && item.getBalance() != 0 && item.getCardno() == null)) {
             int r = -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
             if (r == 0) {
                 if (this.cardno != null && item.getCardno() == null) return -1;
