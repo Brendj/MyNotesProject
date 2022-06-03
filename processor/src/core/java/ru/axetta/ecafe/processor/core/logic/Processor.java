@@ -2213,7 +2213,7 @@ public class Processor implements SyncProcessor {
                 ClientsMobileHistory clientsMobileHistory =
                         new ClientsMobileHistory("РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РїРѕ СЃРµРєС†РёСЏРј (ConstructedSections)");
                 clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
-                clientsMobileHistory.setShowing("РђР Рњ РћРћ (РёРґ." + request.getIdOfOrg() + ")");
+                clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
 				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
                 clientGuardianHistory.setWebAdress(request.getRemoteAddr());
@@ -3532,7 +3532,7 @@ public class Processor implements SyncProcessor {
             ClientsMobileHistory clientsMobileHistory =
                     new ClientsMobileHistory("РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ С‚РёРїР° GetClientParams (СЃРёРЅС…СЂР° РєР»РёРµРЅС‚РѕРІ)");
             clientsMobileHistory.setOrg(getOrgReference(persistenceSessionFactory.openSession(), request.getIdOfOrg()));
-            clientsMobileHistory.setShowing("РђР Рњ РћРћ (РёРґ." + request.getIdOfOrg() + ")");
+            clientsMobileHistory.setShowing("АРМ ОО (ид." + request.getIdOfOrg() + ")");
 			ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setIdOfPacket(request.getIdOfPacket());
             clientGuardianHistory.setWebAdress(request.getRemoteAddr());
