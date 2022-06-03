@@ -185,10 +185,6 @@ public class RuntimeContext implements ApplicationContextAware {
         this.useQueueForAllSyncs = useQueueForAllSyncs;
     }
 
-    public CardBlockPeriodConfig getCardBlockPeriodConfig() {
-        return cardBlockPeriodConfig;
-    }
-
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -313,7 +309,6 @@ public class RuntimeContext implements ApplicationContextAware {
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
-    private CardBlockPeriodConfig cardBlockPeriodConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
     private static SessionFactory sessionFactory;

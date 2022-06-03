@@ -5798,14 +5798,22 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         return (Contragent) query.uniqueResult();
     }
-	
+
 	public static List<Long> findOrgByContragent(Session session, Contragent defaultSupplier) {
         Query query = session.createQuery("SELECT org.idOfOrg FROM Org org where org.defaultSupplier = :defaultSupplier");
         query.setParameter("defaultSupplier", defaultSupplier);
         return query.list();
     }
 
-    public static boolean updateClientsByOrgFoodBox (Session session, boolean foodboxavailability,
+    @SuppressWarnings("unchecked")
+    public static List<GroupNamesToOrgs> findMiddleGroupNamesToOrgByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("isMiddleGroup", true));
+        return (List<GroupNamesToOrgs>) criteria.list();
+    }
+
+	public static boolean updateClientsByOrgFoodBox (Session session, boolean foodboxavailability,
                                                  Integer foodboxavailabilityguardianInt, List<Integer> parallels,
                                                  Long idOfOrg) {
         try {
@@ -5867,5 +5875,4 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("isMiddleGroup", true));
         return (List<GroupNamesToOrgs>) criteria.list();
     }
-
 }

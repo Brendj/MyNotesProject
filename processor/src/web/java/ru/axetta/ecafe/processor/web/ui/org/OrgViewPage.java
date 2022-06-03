@@ -129,8 +129,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Boolean useMealSchedule;
     private Boolean newСashierMode;
-
-    public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
+	    public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
         return foodBoxParallelUIS;
     }
 

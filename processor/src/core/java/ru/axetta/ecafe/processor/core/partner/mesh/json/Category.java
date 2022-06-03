@@ -26,7 +26,7 @@ import java.util.Map;
     "created_at",
     "updated_at"
 })
-public class Category implements Comparable {
+public class Category implements Comparable<Category> {
 
     @JsonProperty("id")
     private Integer id;
@@ -57,21 +57,6 @@ public class Category implements Comparable {
 
     public boolean empty(String valueActualFrom) {
         return StringUtils.isEmpty(valueActualFrom) || valueActualFrom.equalsIgnoreCase("null");
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof Category)) {
-            return 1;
-        }
-
-        Category item = (Category) o;
-        if (item.getCategoryId() != PROPER_ID) return 1;
-
-        if (empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 0;
-        if (!empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 1;
-        if (empty(this.getCreatedAt()) && !empty(item.getCreatedAt())) return -1;
-        return this.getCreatedAt().compareTo(item.getCreatedAt());
     }
 
     @JsonProperty("id")
@@ -184,4 +169,13 @@ public class Category implements Comparable {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public int compareTo(Category c) {
+        if (c.getCategoryId() != PROPER_ID) return 1;
+
+        if (empty(this.getCreatedAt()) && empty(c.getCreatedAt())) return 0;
+        if (!empty(this.getCreatedAt()) && empty(c.getCreatedAt())) return 1;
+        if (empty(this.getCreatedAt()) && !empty(c.getCreatedAt())) return -1;
+        return this.getCreatedAt().compareTo(c.getCreatedAt());
+    }
 }
