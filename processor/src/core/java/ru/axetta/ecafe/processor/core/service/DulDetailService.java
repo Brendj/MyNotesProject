@@ -68,7 +68,8 @@ public class DulDetailService {
     }
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (documentExists(session, client, dulDetail.getDocumentTypeId(), null)) throw new DocumentExistsException("У клиента уже есть документ этого типа");
+        if (documentExists(session, client, dulDetail.getDocumentTypeId(), null))
+            throw new DocumentExistsException("У клиента уже есть документ этого типа");
         if(ClientManager.isClientGuardian(client)) {
             DocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);

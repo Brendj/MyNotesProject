@@ -29,6 +29,7 @@ public class ClientGuardianItem {
     private Boolean allowedPreorders;
     private Integer representativeType;
     private Integer role;
+    private String meshGuid;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -62,6 +63,7 @@ public class ClientGuardianItem {
         this.informedSpecialMenu = informedSpecialMenu;
         this.representativeType = representativeType == null ? ClientGuardianRepresentType.UNKNOWN.getCode() : representativeType.getCode();
         this.allowedPreorders = allowedPreorders;
+        this.meshGuid = client.getMeshGUID();
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
@@ -210,6 +212,14 @@ public class ClientGuardianItem {
 
     public void setRole(Integer role) {
         this.role = role;
+    }
+
+    public String getMeshGuid() {
+        return meshGuid;
+    }
+
+    public void setMeshGuid(String meshGuid) {
+        this.meshGuid = meshGuid;
     }
 
     public String getRoleStr() {
