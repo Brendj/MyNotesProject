@@ -61,7 +61,7 @@ public class SecurityConfiguration {
     }
 
 
-    @Order(2)
+    @Order(3)
     @Configuration
     public static class WebConfiguration extends WebSecurityConfigurerAdapter {
         @Autowired
@@ -136,7 +136,7 @@ public class SecurityConfiguration {
         }
     }
 
-    @Order(3)
+    @Order(2)
     @Configuration
     public static class MealsRestConfiguration extends WebSecurityConfigurerAdapter {
         @Autowired
