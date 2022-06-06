@@ -77,7 +77,7 @@
                                          styleClass="input-text" style="width: 175px;"
                                          disabled="#{orgSyncSettingReportPage.modalContentTypeEnable()}">
                             <f:selectItems value="#{orgSyncSettingReportPage.modalListOfContentType}"/>
-                            <a4j:ajax event="change" action="#{orgSyncSettingReportPage.buildEditedItem()}"
+                            <a4j:ajax event="change" listener="#{orgSyncSettingReportPage.buildEditedItem()}"
                                          render="OrgSyncSettingEditPanelGrid"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
