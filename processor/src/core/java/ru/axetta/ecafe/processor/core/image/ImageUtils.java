@@ -417,7 +417,7 @@ public class ImageUtils {
             throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Максимальный размер %s х %s пикселей.", ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
         }
         if (image.getHeight() < ClientPhotoConfig.MIN_HEIGHT || image.getWidth() < ClientPhotoConfig.MIN_WIDTH) {
-            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Минимальный размер %s х %s пикселей.", ClientPhotoConfig.MAX_WIDTH, ClientPhotoConfig.MAX_HEIGHT));
+            throw new IllegalPhotoSizeException(String.format("Недопустимый размер изображения. Минимальный размер %s х %s пикселей.", ClientPhotoConfig.MIN_WIDTH, ClientPhotoConfig.MIN_HEIGHT));
         }
         double whratio = ((double) image.getHeight()) / ((double) image.getWidth());
         if (whratio > ClientPhotoConfig.MAX_H_W_RATIO || whratio < ClientPhotoConfig.MIN_H_W_RATIO) {
