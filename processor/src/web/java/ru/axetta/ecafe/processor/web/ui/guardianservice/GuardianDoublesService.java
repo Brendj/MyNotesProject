@@ -277,33 +277,11 @@ public class GuardianDoublesService {
     }
 
     private void createMigrants(Session session, CGItem aliveGuardian, CGItem item, Map<Long, List<Long>> friendlyOrgs) throws Exception {
-        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
-        if (clientOrgs == null) {
-            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
-            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
-        }
-        if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
-
-        Date startDate = new Date();
-        Date endDate = CalendarUtils.parseDate("31.12.2099");
-
-        Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
-
         Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
-        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
-                "and m.visitEndDate > :date");
-        query.setParameter("client", client);
-        query.setParameter("org", orgVisit);
-        query.setParameter("date", new Date());
-        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
-
         Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
-
-        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
-        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
-
         Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
-        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
+
+        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
                 "and m.visitEndDate > :date");
         query.setParameter("client", deletedClient);
         query.setParameter("date", new Date());
@@ -323,6 +301,28 @@ public class GuardianDoublesService {
                 deleteMigrateRequest(session, migrant);
             }
         }
+
+        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
+        if (clientOrgs == null) {
+            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
+            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
+        }
+        if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
+
+        Date startDate = new Date();
+        Date endDate = CalendarUtils.parseDate("31.12.2099");
+
+        Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
+
+        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", client);
+        query.setParameter("org", orgVisit);
+        query.setParameter("date", new Date());
+        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
+
+        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
+        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
     }
 
     private void deleteMigrateRequest(Session session, Migrant migrant) {
