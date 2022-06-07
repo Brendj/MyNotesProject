@@ -281,18 +281,25 @@ public class GuardianDoublesService {
         Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
         Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
 
+        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
+        if (clientOrgs == null) {
+            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
+            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
+        }
+
         Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
                 "and m.visitEndDate > :date");
         query.setParameter("client", deletedClient);
         query.setParameter("date", new Date());
         List<Migrant> list = query.getResultList();
         for (Migrant migrant : list) {
+            if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
             Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
                     "where h.migrant=:migrant order by h.resolutionDateTime desc");
             query2.setParameter("migrant", migrant);
             query2.setMaxResults(1);
             List<VisitReqResolutionHist> res = query2.getResultList();
-            if(res.size() > 0 && res.get(0).getResolution().equals(1)){
+            if (res.size() > 0 && res.get(0).getResolution().equals(1)) {
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
@@ -302,11 +309,6 @@ public class GuardianDoublesService {
             }
         }
 
-        List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
-        if (clientOrgs == null) {
-            clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
-            friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
-        }
         if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
 
         Date startDate = new Date();
