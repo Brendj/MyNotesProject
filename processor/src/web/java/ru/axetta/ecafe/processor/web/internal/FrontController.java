@@ -2985,7 +2985,7 @@ public class FrontController extends HttpServlet {
     private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
                                        Date birthDate, String snils) throws FrontControllerException {
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || StringUtils.isEmpty(snils))
+                || birthDate == null)
             throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 

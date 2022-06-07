@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
@@ -584,5 +585,22 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             logger.error("Error in deleteGuardianToClient: ", e);
             return new PersonResponse().internalErrorResponse();
         }
+    }
+
+    public PersonResponse createPersonAndAddClient(Long idOfOrg, String firstName, String secondName, String surname, Integer gender,
+                                         Date birthDate, String san, String mobile, String email,
+                                         List<ClientGuardianItem> clientWardItems) {
+
+        PersonResponse personResponse = createPerson(idOfOrg, firstName, secondName, surname, gender, birthDate, san,
+                mobile, email, clientWardItems.get(0).getMeshGuid(), null, clientWardItems.get(0).getRole(),
+                clientWardItems.get(0).getRelation(), clientWardItems.get(0).getRepresentativeType());
+
+        if (personResponse.getCode().equals(MeshGuardianResponse.OK_CODE) && clientWardItems.size() > 1){
+            for (int i = 1; i < clientWardItems.size(); i++) {
+                addGuardianToClient(personResponse.getMeshGuid(),
+                        clientWardItems.get(i).getMeshGuid(), clientWardItems.get(i).getRole());
+            }
+        }
+        return personResponse;
     }
 }
