@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -723,6 +725,21 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
+
+        //todo раскомментировать для теста задач по представителям
+//        if (ClientManager.isClientGuardian(client)) {
+//            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+//                    .createPersonAndAddClient(client.getOrg().getIdOfOrg(), person.getFirstName(),
+//                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+//                            client.getSan(), client.getMobile(), client.getEmail(), clientWardItems);
+//
+//            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+//                client.setMeshGUID(personResponse.getMeshGuid());
+//            else
+//                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+//
+//        }
+
         persistenceSession.update(client);
         if (autoContractId)
             RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
@@ -748,6 +765,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
+
+
 
         clean();
         return client;
