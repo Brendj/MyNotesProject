@@ -277,44 +277,29 @@ public class GuardianDoublesService {
     }
 
     private void createMigrants(Session session, CGItem aliveGuardian, CGItem item, Map<Long, List<Long>> friendlyOrgs) throws Exception {
+        Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
+        Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
+        Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
+
         List<Long> clientOrgs = friendlyOrgs.get(aliveGuardian.getGuardianOrg());
         if (clientOrgs == null) {
             clientOrgs = DAOUtils.findFriendlyOrgIds(session, aliveGuardian.getGuardianOrg());
             friendlyOrgs.put(aliveGuardian.getGuardianOrg(), clientOrgs);
         }
-        if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
 
-        Date startDate = new Date();
-        Date endDate = CalendarUtils.parseDate("31.12.2099");
-
-        Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
-
-        Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
-        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
-                "and m.visitEndDate > :date");
-        query.setParameter("client", client);
-        query.setParameter("org", orgVisit);
-        query.setParameter("date", new Date());
-        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
-
-        Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
-
-        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
-        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
-
-        Client deletedClient = (Client) session.load(Client.class, item.getIdOfGuardin());
-        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
+        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
                 "and m.visitEndDate > :date");
         query.setParameter("client", deletedClient);
         query.setParameter("date", new Date());
         List<Migrant> list = query.getResultList();
         for (Migrant migrant : list) {
+            if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
             Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
                     "where h.migrant=:migrant order by h.resolutionDateTime desc");
             query2.setParameter("migrant", migrant);
             query2.setMaxResults(1);
             List<VisitReqResolutionHist> res = query2.getResultList();
-            if(res.size() > 0 && res.get(0).getResolution().equals(1)){
+            if (res.size() > 0 && res.get(0).getResolution().equals(1)) {
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
@@ -323,6 +308,23 @@ public class GuardianDoublesService {
                 deleteMigrateRequest(session, migrant);
             }
         }
+
+        if (clientOrgs.contains(item.getGuardianOrg())) return; //клиент и представитель в одном юр.лице
+
+        Date startDate = new Date();
+        Date endDate = CalendarUtils.parseDate("31.12.2099");
+
+        Org orgVisit = (Org) session.load(Org.class, item.getGuardianOrg());
+
+        query = session.createQuery("select m from Migrant m where m.clientMigrate = :client and m.orgVisit = :org " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", client);
+        query.setParameter("org", orgVisit);
+        query.setParameter("date", new Date());
+        if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
+
+        createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
+        logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
     }
 
     private void deleteMigrateRequest(Session session, Migrant migrant) {
