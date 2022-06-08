@@ -1605,7 +1605,7 @@ public class ClientManager {
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
         for (ClientGuardian clientGuardian : results) {
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
-            if (cl != null) {
+            if (cl != null && !cl.isDeletedOrLeaving()) {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
