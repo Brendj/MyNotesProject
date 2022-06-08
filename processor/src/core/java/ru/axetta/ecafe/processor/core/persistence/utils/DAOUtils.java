@@ -620,6 +620,15 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoAndWithoutLongCardNo(Session persistenceSession, Long cardNo) {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.isNull("longCardNo"));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
+    }
+
     public static Card findCardByLongCardNoWithUniqueCheck(Session persistenceSession, Long longCardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("longCardNo", longCardNo));

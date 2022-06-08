@@ -1726,8 +1726,27 @@ public class FrontController extends HttpServlet {
                         throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                     }
                 } else {
+                    //Идет регистрация 7-байтной карты
+                    //Вначале проверяем на дубли среди старых карт (у них не было longCardNo)
+                    Card cardNullLong = DAOUtils.findCardByCardNoAndWithoutLongCardNo(persistenceSession, cardNo);
+                    if (cardNullLong != null)
+                    {
+                        if (cardNullLong.getIsLongUid() == null || cardNullLong.getIsLongUid())
+                        {
+                            //в этом случае карта также считается 7-байтной
+                            // (т.е. она зарегистрирована ДО внедрения longCardNo, но флаг isLongUid выставлен)
+                            if (cardPrintedNo == cardNullLong.getCardPrintedNo())
+                            {
+                                //Если у найденной карты и регистрируемой одинаковый cardPrintedNo, то это дубль
+                                exCard = cardNullLong;
+
+                            }
+                        }
+                    }
+                    //Проверяем для новых карт (у них есть longCardNo)
                     exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
-                    if (exCard != null) {
+                    //Если дубль найден, то идет проверка на принудительную регистрацию
+                    if (exCard != null && (forceRegister == null || forceRegister != 1)) {
                         throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
                     }
                 }
