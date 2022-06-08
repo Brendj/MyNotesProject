@@ -364,7 +364,7 @@ public class GuardianDoublesService {
                         idOfProcessorMigrantRequest, date);
         Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
                 requestNumber, client, orgVisit, startDate, endDate,
-                Migrant.NOT_SYNCHRONIZED);
+                Migrant.SYNCHRONIZED);
 
         Long idOfResol = MigrantsUtils
                 .nextIdOfProcessorMigrantResolutions(session, idOfOrgRegistry);
