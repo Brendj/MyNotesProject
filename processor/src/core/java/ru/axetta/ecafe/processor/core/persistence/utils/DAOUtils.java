@@ -629,6 +629,27 @@ public class DAOUtils {
         return (list.size() == 0) ? null : list.get(0);
     }
 
+    public static boolean findCardByshortLongCardNoWithUniqueCheck(Session persistenceSession, Long shortlongCardNo,
+                                                                Long cardPrintedNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", shortlongCardNo));
+        criteria.add(Restrictions.isNull("longCardNo"));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        List<Card> list = criteria.list();
+        for (Card card: list)
+        {
+            if (card.getIsLongUid() == null || card.getIsLongUid())
+            {
+                if (card.getCardPrintedNo() != null && cardPrintedNo != null) {
+                    if (card.getCardPrintedNo().equals(cardPrintedNo)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static Card findCardByCardNoExtended(Session session, Long cardNo, Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
         if (cardNo == null) return null;
         try {

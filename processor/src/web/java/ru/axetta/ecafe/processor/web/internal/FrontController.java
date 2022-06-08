@@ -1736,6 +1736,13 @@ public class FrontController extends HttpServlet {
                         throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                     }
                 } else {
+                    /////
+                    if (DAOUtils.findCardByshortLongCardNoWithUniqueCheck(persistenceSession,
+                            (longCardNo<<32)>>32, cardPrintedNo))
+                    {
+                        if ()
+                    }
+                    /////
                     exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
                     if (exCard != null) {
                         throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
