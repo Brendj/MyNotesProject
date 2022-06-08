@@ -620,6 +620,15 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoAndWithoutLongCardNo(Session persistenceSession, Long cardNo) {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.isNull("longCardNo"));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
+    }
+
     public static Card findCardByLongCardNoWithUniqueCheck(Session persistenceSession, Long longCardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("longCardNo", longCardNo));
@@ -627,27 +636,6 @@ public class DAOUtils {
         List<Card> list = criteria.list();
         if (list.size() > 1) throw new NoUniqueCardNoException(String.format("Не уникальный номер карты %s", longCardNo));
         return (list.size() == 0) ? null : list.get(0);
-    }
-
-    public static boolean findCardByshortLongCardNoWithUniqueCheck(Session persistenceSession, Long shortlongCardNo,
-                                                                Long cardPrintedNo) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(Card.class);
-        criteria.add(Restrictions.eq("cardNo", shortlongCardNo));
-        criteria.add(Restrictions.isNull("longCardNo"));
-        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
-        List<Card> list = criteria.list();
-        for (Card card: list)
-        {
-            if (card.getIsLongUid() == null || card.getIsLongUid())
-            {
-                if (card.getCardPrintedNo() != null && cardPrintedNo != null) {
-                    if (card.getCardPrintedNo().equals(cardPrintedNo)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     public static Card findCardByCardNoExtended(Session session, Long cardNo, Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
