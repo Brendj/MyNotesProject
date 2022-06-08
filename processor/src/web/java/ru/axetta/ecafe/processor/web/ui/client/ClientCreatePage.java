@@ -727,17 +727,20 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         ClientParallel.addFoodBoxModifire(client);
 
         //todo раскомментировать для теста задач по представителям
-//        if (ClientManager.isClientGuardian(client)) {
+//        if (isParentGroup()) {
 //            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
-//                    .createPersonAndAddClient(client.getOrg().getIdOfOrg(), person.getFirstName(),
+//                    .createPerson(person.getFirstName(),
 //                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-//                            client.getSan(), client.getMobile(), client.getEmail(), clientWardItems);
-//
+//                            client.getSan(), client.getMobile(), client.getEmail());
 //            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
 //                client.setMeshGUID(personResponse.getMeshGuid());
 //            else
 //                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
 //
+//            for (ClientGuardianItem clientWardItem : clientWardItems) {
+//                RuntimeContext.getAppContext().getBean(MeshGuardiansService.class).addGuardianToClient(client.getMeshGUID(),
+//                        clientWardItem.getMeshGuid(), clientWardItem.getRole());
+//            }
 //        }
 
         persistenceSession.update(client);
