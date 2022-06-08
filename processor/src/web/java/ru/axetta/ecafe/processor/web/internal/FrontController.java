@@ -4,13 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import org.aspectj.weaver.ast.Or;
-import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -62,7 +59,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyFreeDocumentParams;
@@ -3018,7 +3014,7 @@ public class FrontController extends HttpServlet {
         if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
             throw new FrontController.FrontControllerException("Указанный снилс уже существует в системе");
         }
-        return getMeshGuardiansService().createPerson(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+        return getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
                 mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
     }
 

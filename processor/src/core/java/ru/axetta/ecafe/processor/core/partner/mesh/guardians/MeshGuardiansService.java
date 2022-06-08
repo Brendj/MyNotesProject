@@ -34,7 +34,8 @@ import java.util.*;
 public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshGuardiansService.class);
     private static final String PERSONS_LIKE_URL = "/persons/like";
-    private static final String PERSONS_CREATE_URL = "/persons/%s/agents";
+    private static final String PERSONS_WITH_EDUCATION_CREATE_URL = "/persons/%s/agents";
+    private static final String PERSONS_CREATE_URL = "/persons";
     private static final String PERSONS_CHANGE_URL = "/persons/%s";
     private static final String PERSONS_DELETE_URL = "/persons/%s/agents/%s";
     private static final String DOCUMENT_CREATE_URL = "/persons/%s/documents";
@@ -89,20 +90,20 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPerson(Long idOfOrg,
-                                       String firstName,
-                                       String patronymic,
-                                       String lastName,
-                                       Integer genderId,
-                                       Date birthDate,
-                                       String snils,
-                                       String mobile,
-                                       String email,
-                                       String childMeshGuid,
-                                       List<DulDetail> dulDetails,
-                                       Integer agentTypeId,
-                                       Integer relation,
-                                       Integer typeOfLegalRepresent) {
+    public PersonResponse createPersonWithEducation(Long idOfOrg,
+                                                    String firstName,
+                                                    String patronymic,
+                                                    String lastName,
+                                                    Integer genderId,
+                                                    Date birthDate,
+                                                    String snils,
+                                                    String mobile,
+                                                    String email,
+                                                    String childMeshGuid,
+                                                    List<DulDetail> dulDetails,
+                                                    Integer agentTypeId,
+                                                    Integer relation,
+                                                    Integer typeOfLegalRepresent) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
@@ -121,10 +122,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 return getMeshGuardianConverter().toPersonDTO(errorResponse);
             }
         } catch (ConnectTimeoutException te) {
-            logger.error("Connection timeout in createPerson: ", te);
+            logger.error("Connection timeout in createPersonWithEducation: ", te);
             return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
-            logger.error("Error in createPerson: ", e);
+            logger.error("Error in createPersonWithEducation: ", e);
             return new PersonResponse().internalErrorResponse();
         }
     }
@@ -163,7 +164,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private void createGuardianInternal(Long idOfOrg, String personId, String firstName,
                                         String patronymic, String lastName,
                                         Integer genderId, Date birthDate, String snils,
-                                        String mobile, String сhildMeshGuid,
+                                        String mobile, String childMeshGuid,
                                         List<DulDetail> dulDetails, Integer relation,
                                         Integer typeOfLegalRepresent, Integer agentTypeId) throws Exception {
         Session session = null;
@@ -195,7 +196,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             if (relation != null) {
                 description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
             }
-            Client client = DAOUtils.findClientByMeshGuid(session, сhildMeshGuid);
+            Client client = DAOUtils.findClientByMeshGuid(session, childMeshGuid);
             ClientGuardian clientGuardian = ClientManager
                     .createClientGuardianInfoTransactionFree(session, guardian, description, false,
                             client.getIdOfClient(), ClientCreatedFromType.MPGU, typeOfLegalRepresent, clientGuardianHistory);
@@ -370,7 +371,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     private String buildCreatePersonUrl(String meshGuid) {
-        return String.format(PERSONS_CREATE_URL, meshGuid);
+        return String.format(PERSONS_WITH_EDUCATION_CREATE_URL, meshGuid);
     }
 
     private String buildChangePersonUrl(Long id) {
@@ -422,7 +423,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
             person.setContacts(contacts);
         }
-        if (!CollectionUtils.isEmpty(dulDetails)) {
+        if (dulDetails != null && !CollectionUtils.isEmpty(dulDetails)) {
             List<PersonDocument> documents = new ArrayList<>();
             for (DulDetail dulDetail : dulDetails) {
                 documents.add(buildPersonDocument(dulDetail));
@@ -587,20 +588,34 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPersonAndAddClient(Long idOfOrg, String firstName, String secondName, String surname, Integer gender,
-                                         Date birthDate, String san, String mobile, String email,
-                                         List<ClientGuardianItem> clientWardItems) {
-
-        PersonResponse personResponse = createPerson(idOfOrg, firstName, secondName, surname, gender, birthDate, san,
-                mobile, email, clientWardItems.get(0).getMeshGuid(), null, clientWardItems.get(0).getRole(),
-                clientWardItems.get(0).getRelation(), clientWardItems.get(0).getRepresentativeType());
-
-        if (personResponse.getCode().equals(MeshGuardianResponse.OK_CODE) && clientWardItems.size() > 1){
-            for (int i = 1; i < clientWardItems.size(); i++) {
-                addGuardianToClient(personResponse.getMeshGuid(),
-                        clientWardItems.get(i).getMeshGuid(), clientWardItems.get(i).getRole());
+    public PersonResponse createPerson(String firstName,
+                                       String patronymic,
+                                       String lastName,
+                                       Integer genderId,
+                                       Date birthDate,
+                                       String snils,
+                                       String mobile,
+                                       String email) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
+            String json = objectMapper.writeValueAsString(responsePersons);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(PERSONS_CREATE_URL, json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                ResponsePersons personResult = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                return new PersonResponse(personResult.getPersonId()).okResponse();
+            } else if (result.getCode() >= 500) {
+                return new PersonResponse().internalErrorResponse("" + result.getCode());
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toPersonDTO(errorResponse);
             }
+        } catch (ConnectTimeoutException te) {
+            logger.error("Connection timeout in createPerson: ", te);
+            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+        } catch (Exception e) {
+            logger.error("Error in createPerson: ", e);
+            return new PersonResponse().internalErrorResponse();
         }
-        return personResponse;
     }
 }
