@@ -2613,9 +2613,11 @@ public class ClientManager {
             for (int s = 0; s < 9; s++) {
                 if (number.charAt(i) == number.charAt(s))
                     repeatCount++;
+                else
+                    repeatCount = 0;
+                if (repeatCount == 3)
+                    return false;
             }
-            if (repeatCount > 3)
-                return false;
         }
 
         if (sum < 100 && sum == checkSum) {
