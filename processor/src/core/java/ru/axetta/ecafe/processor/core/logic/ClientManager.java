@@ -2583,13 +2583,13 @@ public class ClientManager {
 
     public static boolean checkSanNumber(String san) {
         String number = san.replaceAll("[\\D]", "");
-        int checkSum = Integer.parseInt(number.substring(number.length() - 2));
-        int sum = 0;
-
         if (number.length() != 11)
             return false;
         if (Integer.parseInt(number.substring(0, 9)) <= 1001998)
             return false;
+
+        int checkSum = Integer.parseInt(number.substring(number.length() - 2));
+        int sum = 0;
 
         for (int i = 0; i < 9; i++) {
             int repeatCount = 0;
@@ -2601,6 +2601,7 @@ public class ClientManager {
             if (repeatCount > 3)
                 return false;
         }
+
         if (sum < 100 && sum == checkSum) {
             return true;
         } else if ((sum == 100 || sum == 101) && checkSum == 0) {
