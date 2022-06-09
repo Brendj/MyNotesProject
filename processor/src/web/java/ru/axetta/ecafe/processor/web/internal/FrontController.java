@@ -1689,8 +1689,9 @@ public class FrontController extends HttpServlet {
         }
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, "
-                        + "cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s, longCardNo=%s",
-                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid, longCardNo));
+                        + "cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s, forceRegister=%s, longCardNo=%s",
+                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid, forceRegister,
+                longCardNo));
         CardService cardService = CardService.getInstance();
         if (!(type >= 0 && type < Card.TYPE_NAMES.length)) {
             return new CardResponseItem(CardResponseItem.ERROR_INVALID_TYPE,
