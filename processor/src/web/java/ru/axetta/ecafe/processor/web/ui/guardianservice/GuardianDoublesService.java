@@ -293,19 +293,20 @@ public class GuardianDoublesService {
         query.setParameter("date", new Date());
         List<Migrant> list = query.getResultList();
         for (Migrant migrant : list) {
-            if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
             Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
                     "where h.migrant=:migrant order by h.resolutionDateTime desc");
             query2.setParameter("migrant", migrant);
             query2.setMaxResults(1);
             List<VisitReqResolutionHist> res = query2.getResultList();
             if (res.size() > 0 && res.get(0).getResolution().equals(1)) {
+                deleteMigrateRequest(session, migrant);
+                logger.info(String.format("Deleted migrant idOfClient=%s for org=%s", migrant.getClientMigrate().getIdOfClient(),
+                        migrant.getOrgVisit().getIdOfOrg()));
+                if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
                         migrant.getOrgVisit().getIdOfOrg()));
-
-                deleteMigrateRequest(session, migrant);
             }
         }
 
