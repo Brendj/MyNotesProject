@@ -303,6 +303,7 @@ public class GuardianDoublesService {
                 logger.info(String.format("Deleted migrant idOfClient=%s for org=%s", migrant.getClientMigrate().getIdOfClient(),
                         migrant.getOrgVisit().getIdOfOrg()));
                 if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
+                if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg())) continue;
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
@@ -324,8 +325,24 @@ public class GuardianDoublesService {
         query.setParameter("date", new Date());
         if (query.getResultList().size() > 0) return; //уже есть заявка на этого клиента в эту оргу
 
+        if (!haveChildrenInOrgVisit(session, aliveGuardian, orgVisit.getIdOfOrg())) return;
+
         createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
         logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
+    }
+
+    private boolean haveChildrenInOrgVisit(Session session, CGItem aliveGuardian, Long orgVisit) {
+        Query query = session.createNativeQuery("select c.idoforg from cf_client_guardian cg join cf_clients c on cg.idofchildren = c.idofclient " +
+                "where cg.idofguardian = :guardian and cg.deletedstate = false");
+        query.setParameter("guardian", aliveGuardian.getIdOfGuardin());
+        List orgList = query.getResultList();
+        for (Object o : orgList) {
+            Long id = HibernateUtils.getDbLong(o);
+            if (id.equals(orgVisit)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void deleteMigrateRequest(Session session, Migrant migrant) {
@@ -337,7 +354,7 @@ public class GuardianDoublesService {
                 VisitReqResolutionHist.RES_CANCELED, new Date(),
                 MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
-        nextId--;
+        nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, migrant.getOrgRegistry().getIdOfOrg());
         CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
                 migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
         VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
