@@ -205,6 +205,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return okuApiKey;
     }
 
+    public String getInternalRestApiKey(){
+        return internalRestApiKey;
+    }
+
     public String getFrontControllerApiKey() {
         return frontControllerApiKey;
     }
@@ -241,6 +245,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
     private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String INTERNAL_API_KEY = PROCESSOR_PARAM_BASE + ".rest.internal.apikey";
     private static final String FRONT_CONTROLLER_API_KEY = PROCESSOR_PARAM_BASE + ".frontController.api.key";
     private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
@@ -301,6 +306,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private String geoplanerApiKey;
 
     private String okuApiKey;
+    private String internalRestApiKey;
     private String extendCardServiceApiKey;
     private String frontControllerApiKey;
 
@@ -731,6 +737,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
             this.okuApiKey = properties.getProperty(OKU_API_KEY);
+            this.internalRestApiKey = properties.getProperty(INTERNAL_API_KEY);
             this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
 
             this.frontControllerApiKey = properties.getProperty(FRONT_CONTROLLER_API_KEY);

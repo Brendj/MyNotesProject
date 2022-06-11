@@ -8,7 +8,7 @@ import ru.iteco.client.ApiClient;
 import ru.iteco.client.api.*;
 
 @Configuration
-public class RestClientConfig {
+public class RestMeshClientConfig {
     private static ApiClient apiClient;
 
     @Value(value = "${client.targeturl}")
