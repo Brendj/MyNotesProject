@@ -1,5 +1,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+
 import java.util.Date;
 
 /**
@@ -18,6 +22,9 @@ public class ProhibitionMenu {
     private Date updateDate;
     private Long version;
     private Boolean deletedState;
+    private WtDish wtDish;
+    private WtCategory wtCategory;
+    private WtCategoryItem wtCategoryItem;
 
     public ProhibitionMenu(Long idOfProhibitions, Client client, String filterText,
           ProhibitionFilterType prohibitionFilterType, Date createDate, Date updateDate, Boolean deletedState) {
@@ -95,5 +102,29 @@ public class ProhibitionMenu {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public WtDish getWtDish() {
+        return wtDish;
+    }
+
+    public void setWtDish(WtDish wtDish) {
+        this.wtDish = wtDish;
+    }
+
+    public WtCategory getWtCategory() {
+        return wtCategory;
+    }
+
+    public void setWtCategory(WtCategory wtCategory) {
+        this.wtCategory = wtCategory;
+    }
+
+    public WtCategoryItem getWtCategoryItem() {
+        return wtCategoryItem;
+    }
+
+    public void setWtCategoryItem(WtCategoryItem wtCategoryItem) {
+        this.wtCategoryItem = wtCategoryItem;
     }
 }

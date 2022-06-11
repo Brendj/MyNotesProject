@@ -14,10 +14,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.axetta.ecafe.processor.beans.authentication.provider.ProcessingJaasAuthenticationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
+import ru.axetta.ecafe.processor.web.partner.meals.security.MealsJwtFilter;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationManager;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtConfigurer;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
@@ -76,7 +78,7 @@ public class SecurityConfiguration {
     }*/
 
 
-    @Order(2)
+    @Order(3)
     @Configuration
     public static class WebConfiguration extends WebSecurityConfigurerAdapter {
         @Autowired
@@ -148,6 +150,29 @@ public class SecurityConfiguration {
                                                                       .build();
 
             return new InMemoryUserDetailsManager(user);
+        }
+    }
+
+    @Order(2)
+    @Configuration
+    public static class MealsRestConfiguration extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private MealsJwtFilter mealsJwtFilter;
+
+        @Override
+        protected void configure(HttpSecurity security) throws Exception {
+            security
+                    .antMatcher("/ispp/meals/**")
+                    .cors()
+                    .and()
+                    .httpBasic().disable()
+                    .csrf().disable()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .authorizeRequests()
+                    .anyRequest().authenticated()
+                    .and()
+                    .addFilterBefore(mealsJwtFilter, UsernamePasswordAuthenticationFilter.class);
         }
     }
 }

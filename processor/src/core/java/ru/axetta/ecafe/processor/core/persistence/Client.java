@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
@@ -148,6 +149,8 @@ public class Client {
     private SmartWatchVendor vendor;
     private String iacRegId;
     private Boolean multiCardMode;
+    private Boolean foodboxAvailability;
+    private Boolean foodboxavailabilityguardian;
 
     private String parallel;
 
@@ -1291,5 +1294,25 @@ public class Client {
 
     public void setClearedSsoid(Boolean clearedSsoid) {
         this.clearedSsoid = clearedSsoid;
+    }
+
+    public Boolean getFoodboxAvailability() {
+        if (foodboxAvailability == null)
+            foodboxAvailability = false;
+        return foodboxAvailability;
+    }
+
+    public void setFoodboxAvailability(Boolean foodboxAvailability) {
+        this.foodboxAvailability = foodboxAvailability;
+    }
+
+    public Boolean getFoodboxavailabilityguardian() {
+        if (foodboxavailabilityguardian == null)
+            foodboxavailabilityguardian = false;
+        return foodboxavailabilityguardian;
+    }
+
+    public void setFoodboxavailabilityguardian(Boolean foodboxavailabilityguardian) {
+        this.foodboxavailabilityguardian = foodboxavailabilityguardian;
     }
 }

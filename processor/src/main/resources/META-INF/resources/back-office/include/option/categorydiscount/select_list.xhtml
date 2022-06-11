@@ -48,6 +48,7 @@
                                         onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
                             <rich:column headerClass="column-header">
                                 <h:selectBooleanCheckbox value="#{item.selected}">
+                                    <a4j:ajax event="change"/>
                                 </h:selectBooleanCheckbox>
                             </rich:column>
                             <rich:column headerClass="column-header">

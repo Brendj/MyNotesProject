@@ -14,8 +14,12 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItemItem;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
@@ -45,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -1309,6 +1314,40 @@ public class DAOReadonlyService {
         return entityManager.createQuery("select menu.orgs from WtMenu menu where menu = :menu")
                 .setParameter("menu", wtMenu)
                 .getResultList();
+    }
+
+    public List<WtDish> getWtDishesByOrgandDate(Org org, Date date) {
+        Query query = entityManager.createNativeQuery("SELECT distinct d.idofdish, m.begindate, m.enddate FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE (m.idoforggroup in (select og.idoforggroup from cf_wt_org_groups og "
+                + "join cf_wt_org_group_relations ogr on og.idoforggroup = ogr.idoforggroup where ogr.idoforg = :idOfOrg) "
+                + "OR m.idofmenu in (select idofmenu from cf_wt_menu_org mo where mo.idoforg = :idOfOrg))"
+                + "and mgr.deletestate = 0 and d.idofdish is not null " +
+                "  and d.idofdish in (select cfa.idofdish from cf_foodbox_available cfa where " +
+                " cfa.availableqty > 0 and cfa.idoforg = :idOfOrg)");
+        query.setParameter("idOfOrg", org.getIdOfOrg());
+        List list = query.getResultList();
+        List<WtDish> dishes = new ArrayList<>();
+        if (date != null) {
+            for (Object o : list) {
+                Object[] row = (Object[]) o;
+                Long startDate = ((Timestamp) row[1]).getTime();
+                Long endDate = ((Timestamp) row[2]).getTime();
+                if (date.getTime() >= startDate && date.getTime() <= endDate)
+                    dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+            }
+        }
+        else
+        {
+            for (Object o : list) {
+                Object[] row = (Object[]) o;
+                dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+            }
+        }
+        return dishes;
     }
 
     public List<WtMenu> getMenuByWtMenuGroup(WtMenuGroup wtMenuGroup) {
@@ -3270,6 +3309,276 @@ public class DAOReadonlyService {
             q.setParameter("uid", uid);
             return (MeshClass) q.getSingleResult();
         } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public List<FoodBoxPreorderAvailable> getFoodBoxPreorderAvailable(Org org){
+        try {
+            Query q = entityManager.createQuery("SELECT c FROM FoodBoxPreorderAvailable AS c WHERE c.org = :org");
+            q.setParameter("org", org);
+            return (List<FoodBoxPreorderAvailable>) q.getResultList();
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    public Long getMaxVersionOfFoodBoxPreorder(){
+        try {
+            Query q = entityManager.createQuery("SELECT MAX(c.version) FROM FoodBoxPreorder AS c");
+            Long maxV = (Long) q.getSingleResult();
+            if (maxV == null)
+                maxV = 0L;
+            return maxV;
+        } catch (NoResultException e){
+            return 0L;
+        }
+    }
+
+    public Set<FoodBoxPreorder> getFoodBoxPreordersFromVersion(Long version, Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.version > :version "
+                    + "AND fb.org = :org");
+            query.setParameter("version", version);
+            query.setParameter("org", org);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return new HashSet<>(foodBoxPreorders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Integer getFoodBoxPreordersUnallocated(Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.org = :org and (fb.posted = 0)");
+            query.setParameter("org", org);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public FoodBoxPreorder getFoodBoxPreorderByExternalId(String externalId) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.idFoodBoxExternal = :idFoodBoxExternal ");
+            query.setParameter("idFoodBoxExternal", externalId);
+            return (FoodBoxPreorder)query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<FoodBoxPreorder> getActiveFoodBoxPreorderForClient(Client client) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.state between :new and :loaded");
+            query.setParameter("client", client);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<FoodBoxPreorder> getActiveFoodBoxPreorder() {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.state between :new and :loaded");
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Long getUsedMoneyFoodBoxPreorderForClient(Client client, Date startDate, Date endDate) {
+        try {
+            Query query = entityManager.createQuery("SELECT sum(fb.orderPrice) from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.state between :new and :execute and fb.createDate between :startDate and :endDate");
+            query.setParameter("client", client);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("execute", FoodBoxStateTypeEnum.EXECUTED);
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+            Object res = query.getSingleResult();
+            if (res==null)
+                return 0L;
+            return (Long)res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+
+    public Map<Long,Integer> getDishesCountActiveFoodBoxPreorderForOrg(Org org) {
+        try {
+            Map<Long,Integer> countDish = new HashMap<>();
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.org = :org "
+                    + "and fb.state between :new and :loaded");
+            query.setParameter("org", org);
+            query.setParameter("new", FoodBoxStateTypeEnum.NEW);
+            query.setParameter("loaded", FoodBoxStateTypeEnum.LOADED);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
+            {
+                Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+                for (FoodBoxPreorderDish foodBoxPreorderDish: foodBoxPreorderDishes)
+                {
+                    if (foodBoxPreorderDish.getQty() == null)
+                        foodBoxPreorderDish.setQty(1);
+                    Integer val = countDish.get(foodBoxPreorderDish.getIdOfDish());
+                    if (val == null)
+                    {
+                        countDish.put(foodBoxPreorderDish.getIdOfDish(), foodBoxPreorderDish.getQty());
+                    }
+                    else
+                    {
+                        countDish.put(foodBoxPreorderDish.getIdOfDish(), val + foodBoxPreorderDish.getQty());
+                    }
+                }
+            }
+            return countDish;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<FoodBoxPreorder> getFoodBoxPreorderByForClient(Client client, Date from, Date to) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.client = :client "
+                    + "and fb.createDate between :from and :to");
+            query.setParameter("client", client);
+            query.setParameter("from", from);
+            query.setParameter("to", to);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Set<FoodBoxPreorderDish> getFoodBoxPreordersDishes(FoodBoxPreorder foodBoxPreorder) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbd from FoodBoxPreorderDish fbd "
+                    + "where fbd.foodBoxPreorder = :foodBoxPreorder ");
+            query.setParameter("foodBoxPreorder", foodBoxPreorder);
+            List<FoodBoxPreorderDish> foodBoxPreorderDishes = query.getResultList();
+            return new HashSet<>(foodBoxPreorderDishes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public FoodBoxPreorderNew getFoodBoxPreorders(Long version, Org org)
+    {
+        Set<FoodBoxPreorder> foodBoxPreorders = DAOReadonlyService.getInstance().getFoodBoxPreordersFromVersion(version, org);
+        FoodBoxPreorderNew foodBoxPreorderNew = new FoodBoxPreorderNew();
+        for (FoodBoxPreorder foodBoxPreorder: foodBoxPreorders)
+        {
+            if (!(foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))) {
+                FoodBoxPreorderNewItem foodBoxPreorderNewItem = new FoodBoxPreorderNewItem(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getState(), foodBoxPreorder.getClient().getIdOfClient(), foodBoxPreorder.getCreateDate(), foodBoxPreorder.getVersion());
+                Set<FoodBoxPreorderDish> foodBoxPreorderDishes = DAOReadonlyService.getInstance().getFoodBoxPreordersDishes(foodBoxPreorder);
+                for (FoodBoxPreorderDish foodBoxPreorderDish : foodBoxPreorderDishes) {
+                    FoodBoxPreorderNewItemItem foodBoxPreorderNewItemItem = new FoodBoxPreorderNewItemItem();
+                    foodBoxPreorderNewItemItem.setIdOfDish(foodBoxPreorderDish.getIdOfDish());
+                    foodBoxPreorderNewItemItem.setPrice(foodBoxPreorderDish.getPrice());
+                    foodBoxPreorderNewItemItem.setQty(foodBoxPreorderDish.getQty());
+                    foodBoxPreorderNewItem.getItems().add(foodBoxPreorderNewItemItem);
+                }
+                foodBoxPreorderNew.getItems().add(foodBoxPreorderNewItem);
+            }
+        }
+        return foodBoxPreorderNew;
+    }
+
+    public FoodBoxPreorder findFoodBoxPreorderById(long idOfFoodBoxPreorder) {
+        return entityManager.find(FoodBoxPreorder.class, idOfFoodBoxPreorder);
+    }
+
+    public Set<FoodBoxCells> getFoodBoxCellsByOrg(Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbc from FoodBoxCells fbc "
+                    + "where fbc.org = :org ");
+            query.setParameter("org", org);
+            List<FoodBoxCells> foodBoxCells = query.getResultList();
+            return new HashSet<>(foodBoxCells);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public FoodBoxCells getFoodBoxCellsByOrgAndFoodBoxId(Org org, Long foodBoxId) {
+        try {
+            Query query = entityManager.createQuery("SELECT fbc from FoodBoxCells fbc "
+                    + "where fbc.org = :org and fbc.fbId = :foodBoxId");
+            query.setParameter("org", org);
+            query.setParameter("foodBoxId", foodBoxId.intValue());
+            FoodBoxCells foodBoxCells = (FoodBoxCells)query.getSingleResult();
+            return foodBoxCells;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /* Подсчет истраченного количества денег за период для клиента (для Фудбокса)*/
+    @SuppressWarnings("unchecked")
+    public Long getSumForOrdersbyClientOnPeriod(Long idOfClient, Date startDate, Date endDate) {
+        Query query = entityManager.createNativeQuery("select sum(cforder.rsum) from cf_orders cforder" +
+                " where cforder.state=0 and cforder.createddate between :startDate and :endDate and" +
+                " cforder.idofclient=:idOfClient and" +
+                " cforder.ordertype in (0,1) ");
+        query.setParameter("idOfClient",idOfClient);
+        query.setParameter("startDate",startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        Object res = query.getSingleResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigDecimal) res).longValue();
+        }
+    }
+
+    public List<ProhibitionMenu> findProhibitionMenuByClientId(Client client) {
+        try {
+            Query query = entityManager.createQuery("SELECT prhb from ProhibitionMenu prhb "
+                    + "where prhb.client = :client and prhb.deletedState = false");
+            query.setParameter("client", client);
+            return (List<ProhibitionMenu>) query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<FoodBoxParallelType> getParallelsType() {
+        try {
+            Query query = entityManager.createQuery("SELECT type from FoodBoxParallelType type");
+            return (List<FoodBoxParallelType>) query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

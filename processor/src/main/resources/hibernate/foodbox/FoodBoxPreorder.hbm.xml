@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder" table="cf_foodbox_preorders">
+        <id name="idFoodBoxPreorder" column="id" type="long">
+            <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+                <param name="optimizer">pooled-lo</param>
+                <param name="increment_size">1</param>
+                <param name="sequence_name">cf_foodbox_preorders_id_seq</param>
+            </generator>
+        </id>
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient"
+                     not-null="true" update="false"/>
+        <property name="initialDateTime" column="initialdatetime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="error" column="error" type="string"/>
+        <property name="idOfFoodBox" column="idoffoodbox" type="long"/>
+        <property name="cellNumber" column="cellnumber" type="int"/>
+        <property name="idOfOrder" column="idoforder" type="long"/>
+        <property name="cancelReason" column="cancelreason" type="int"/>
+        <property name="version" column="version" type="long"/>
+        <property name="createDate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="updateDate" column="updatedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
+                     not-null="true" update="false"/>
+        <property name="idFoodBoxExternal" column="idFoodBoxExternal" type="string"/>
+        <property name="orderPrice" column="orderprice" type="long"/>
+        <property name="posted" column="posted" type="int"/>
+    </class>
+</hibernate-mapping>

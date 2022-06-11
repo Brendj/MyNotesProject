@@ -197,7 +197,6 @@ public class ResMenuSupplier implements AbstractToElement {
         element.appendChild(menusElem);
         element.appendChild(complexesElem);
         element.appendChild(excludeDaysElem);
-
         return element;
     }
 
