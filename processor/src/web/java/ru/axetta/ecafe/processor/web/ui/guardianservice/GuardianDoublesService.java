@@ -174,7 +174,8 @@ public class GuardianDoublesService {
                     item.getCardLastUpdate(), item.getDeletedState(), item.getDisabled(), item.getGuardianOrg(), item.getClientOrg() );
             if (item.getCardno() != null) {
                 cardItems.add(new CGCardItem(item.getCardno(), item.getIdOfGuardin(), item.getCardLastUpdate(),
-                        item.getIdOfClientGroup(), item.getGuardianLastUpdate(), item.getGuardianOrg()));
+                        item.getIdOfClientGroup(), item.getGuardianLastUpdate(), item.getGuardianOrg(), item.getBalance(),
+                        item.getDeletedState()));
             }
         }
         logger.info(log_message);
