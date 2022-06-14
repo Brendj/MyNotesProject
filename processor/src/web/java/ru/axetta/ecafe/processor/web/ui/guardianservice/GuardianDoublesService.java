@@ -238,12 +238,13 @@ public class GuardianDoublesService {
             }
             if (priorityCard != null
                     && (aliveGuardian.getCardno() == null || (!aliveGuardian.getCardno().equals(priorityCard.getIdOfCard())) && !priorityCard.getCardLastUpdate().equals(aliveGuardian.getCardLastUpdate()))
-                    && cardSameGroup(aliveGuardian, priorityCard) && oneOrg(session, aliveGuardian, priorityCard, friendlyOrgs)) {
+                    && cardSameGroup(aliveGuardian, priorityCard)) {
                 Card card = DAOUtils.findCardByCardNo(session, priorityCard.getIdOfCard());
+                Long newIdOfOrg = oneOrg(session, aliveGuardian, priorityCard, friendlyOrgs) ? card.getOrg().getIdOfOrg() : aliveGuardian.getGuardianOrg();
                 RuntimeContext.getInstance().getCardManager().updateCardInSession(session, aliveGuardian.getIdOfGuardin(),
                         card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
-                        card.getLifeState(), HISTORY_LABEL, new Date(), card.getExternalId(), null, card.getOrg().getIdOfOrg(),
-                        "", false);
+                        card.getLifeState(), HISTORY_LABEL, new Date(), card.getExternalId(), null, newIdOfOrg,
+                        "Удаление дубликатов представителей", false);
                 logger.info(String.format("Card with cardno = %s issue to client id = %s", priorityCard.getIdOfCard(), aliveGuardian.getIdOfGuardin()));
             }
             transaction.commit();
