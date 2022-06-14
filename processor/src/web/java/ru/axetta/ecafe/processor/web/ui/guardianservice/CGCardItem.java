@@ -44,7 +44,7 @@ public class CGCardItem implements Comparable {
         int priority = 0;
         if (item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) {
             if (!item.getDeletedState()) priority = 1;
-        } else if (item.getBalance() > 0) {
+        } else {
             priority = 2;
         }
         return priority;
