@@ -1297,8 +1297,6 @@ public class Client {
     }
 
     public Boolean getFoodboxAvailability() {
-        if (foodboxAvailability == null)
-            foodboxAvailability = false;
         return foodboxAvailability;
     }
 
@@ -1307,8 +1305,6 @@ public class Client {
     }
 
     public Boolean getFoodboxavailabilityguardian() {
-        if (foodboxavailabilityguardian == null)
-            foodboxavailabilityguardian = false;
         return foodboxavailabilityguardian;
     }
 
