@@ -191,6 +191,8 @@ public class Client {
         this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
         this.gender = 1; //set default as male
+        this.foodboxAvailability = false;
+        this.foodboxavailabilityguardian = false;
 
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
