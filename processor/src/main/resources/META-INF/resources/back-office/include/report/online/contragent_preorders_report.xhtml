@@ -6,6 +6,16 @@
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <script type="text/javascript">
+        let element = document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:contragentPreordersReportPanelGridRender');
+        element.click();
+        element.hidden = true;
+    </script>
+
+    <a4j:commandLink id="contragentPreordersReportPanelGridRender" value=""
+                     render="contragentPreordersReportPanelGrid"/>
+
 <h:panelGrid>
     <h:panelGrid id="contragentPreordersReportPanelGrid" binding="#{mainPage.contragentPreordersReportPage.pageComponent}"
                  styleClass="borderless-grid">
