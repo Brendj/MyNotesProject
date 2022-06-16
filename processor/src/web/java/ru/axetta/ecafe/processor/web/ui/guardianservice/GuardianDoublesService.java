@@ -278,6 +278,16 @@ public class GuardianDoublesService {
         return false;
     }
 
+    private boolean clientSameGroup(CGItem aliveGuardian, CGItem deletedGuardian) {
+        if (aliveGuardian.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS) && deletedGuardian.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) return true;
+        if (!aliveGuardian.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS) && !deletedGuardian.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) return true;
+        return false;
+    }
+
+    private boolean isParent(CGItem item) {
+        return item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS);
+    }
+
     private void createMigrants(Session session, CGItem aliveGuardian, CGItem item, Map<Long, List<Long>> friendlyOrgs) throws Exception {
         Client client = (Client) session.load(Client.class, aliveGuardian.getIdOfGuardin());
         Long idOfOrgRegistry = aliveGuardian.getGuardianOrg();
@@ -305,7 +315,9 @@ public class GuardianDoublesService {
                 logger.info(String.format("Deleted migrant idOfClient=%s for org=%s", migrant.getClientMigrate().getIdOfClient(),
                         migrant.getOrgVisit().getIdOfOrg()));
                 if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
-                if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg())) continue;
+                if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg()) && isParent(aliveGuardian)) continue;
+                if (!haveMirgantInOrg(session, client, migrant.getOrgVisit().getIdOfOrg())) continue;
+                if (!clientSameGroup(aliveGuardian, item)) continue;
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
@@ -331,6 +343,25 @@ public class GuardianDoublesService {
 
         createMigrateRequestForClient(session, client, idOfOrgRegistry, orgVisit, startDate, endDate);
         logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(), orgVisit.getIdOfOrg()));
+    }
+
+    private boolean haveMirgantInOrg(Session session, Client client, Long orgVisit) {
+        Query query = session.createQuery("select m from Migrant m where m.clientMigrate = :client " +
+                "and m.visitEndDate > :date");
+        query.setParameter("client", client);
+        query.setParameter("date", new Date());
+        List<Migrant> list = query.getResultList();
+        for (Migrant migrant : list) {
+            Query query2 = session.createQuery("select h from VisitReqResolutionHist h " +
+                    "where h.migrant=:migrant order by h.resolutionDateTime desc");
+            query2.setParameter("migrant", migrant);
+            query2.setMaxResults(1);
+            List<VisitReqResolutionHist> res = query2.getResultList();
+            if (res.size() > 0 && res.get(0).getResolution().equals(1)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean haveChildrenInOrgVisit(Session session, CGItem aliveGuardian, Long orgVisit) {
