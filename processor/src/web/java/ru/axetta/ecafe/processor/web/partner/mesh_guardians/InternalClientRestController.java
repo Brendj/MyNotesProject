@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ClientInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ErrorMsg;
+import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.GuardianRelationInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.IDAOEntity;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +46,9 @@ public class InternalClientRestController extends Application {
         } catch (NoResultException e) {
             log.error("Unable to find organizations", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
+        } catch (Exception e){
+            log.error("Internal Error: ", e);
+            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
 
@@ -101,15 +105,18 @@ public class InternalClientRestController extends Application {
         } catch (NoResultException e) {
             log.error("Unable to find organizations", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
+        } catch (Exception e){
+            log.error("Internal Error: ", e);
+            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
 
     @POST
     @Path("guardians")
-    public Response processGuardiaRelations(){
+    public Response processGuardiaRelations(@RequestBody GuardianRelationInfo guardianRelationInfo){
         try {
             //checkParameter("guardianMeshGuid", personGuid);
-
+            service.processRelation(guardianRelationInfo);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
@@ -118,6 +125,9 @@ public class InternalClientRestController extends Application {
         } catch (NoResultException e) {
             log.error("Unable to find organizations", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
+        } catch (Exception e){
+            log.error("Internal Error: ", e);
+            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
 

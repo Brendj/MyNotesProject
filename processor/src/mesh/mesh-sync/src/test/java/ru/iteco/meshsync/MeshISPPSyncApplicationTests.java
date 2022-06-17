@@ -3,7 +3,7 @@ package ru.iteco.meshsync;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.iteco.client.api.PersonApi;
-import ru.iteco.meshsync.config.RestClientConfig;
+import ru.iteco.meshsync.config.RestMeshClientConfig;
 import ru.iteco.meshsync.kafka.dto.EntityChangeEventDTO;
 
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 
 @JsonTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RestClientConfig.class)
+@ContextConfiguration(classes = RestMeshClientConfig.class)
 class MeshISPPSyncApplicationTests {
     private static final Logger log = LoggerFactory.getLogger(MeshISPPSyncApplicationTests.class);
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");

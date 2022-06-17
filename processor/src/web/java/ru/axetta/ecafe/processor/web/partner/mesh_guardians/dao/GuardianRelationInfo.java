@@ -1,26 +1,11 @@
-package ru.iteco.meshsync.mesh.service.logic.dto;
+package ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao;
 
-import ru.iteco.client.model.PersonAgent;
-
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GuardianRelationDTO implements Serializable {
+public class GuardianRelationInfo  implements IDAOEntity {
     private String childrenPersonGuid;
     private List<String> guardianPersonGuids = new LinkedList<>();
-
-    public static GuardianRelationDTO build(String childrenPersonGuid, List<PersonAgent> guardians) {
-        GuardianRelationDTO dto = new GuardianRelationDTO();
-
-        dto.childrenPersonGuid = childrenPersonGuid;
-
-        for(PersonAgent g : guardians){
-            dto.guardianPersonGuids.add(g.getPersonId().toString());
-        }
-
-        return dto;
-    }
 
     public String getChildrenPersonGuid() {
         return childrenPersonGuid;

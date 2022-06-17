@@ -458,9 +458,8 @@ public class MeshService {
                 try {
                     PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getPersonId().toString(), GUARDIAN_EXPAND);
                     internalGuardianService.createClientGuardian(personGUID, guardInfo);
-                } catch (ApiException e) {
-                    log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
-                            a.getPersonId(), e.getCode(), e.getResponseBody()));
+                } catch (Exception e) {
+                    log.error("Exception> when try create guardian as client ISPP, personID: " + a.getPersonId(), e);
                 }
             }
         }

@@ -25,7 +25,7 @@ public class ClientRestDTO implements Serializable {
     private String san;
     private String childrenPersonGUID;
 
-    public static ClientRestDTO build(PersonInfo info, String childrenPersonId) throws Exception {
+    public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
         dto.personGUID = info.getPersonId().toString();
         dto.firstname = info.getFirstname();
@@ -33,6 +33,12 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = df.parse(info.getBirthdate().toString());
+
+        return dto;
+    }
+
+    public static ClientRestDTO build(PersonInfo info, String childrenPersonId) throws Exception {
+        ClientRestDTO dto = build(info);
         dto.childrenPersonGUID = childrenPersonId;
 
         return dto;

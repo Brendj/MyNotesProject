@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.iteco.client.model.PersonAgent;
 import ru.iteco.client.model.PersonInfo;
 import ru.iteco.meshsync.mesh.service.logic.dto.ClientRestDTO;
+import ru.iteco.meshsync.mesh.service.logic.dto.GuardianRelationDTO;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -67,15 +68,39 @@ public class InternalGuardianService {
         }
     }
 
-    public void updateClient(PersonInfo info) {
+    public void updateClient(PersonInfo info) throws Exception {
+        ClientRestDTO dto = ClientRestDTO.build(info);
 
+        HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
+        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.PUT,
+                request, Void.class);
 
+        if(!response.getStatusCode().equals(HttpStatus.OK)){
+            throw new RestClientException("ИС ПП вернул ошибку!");
+        }
     }
 
-    public void createClientGuardian(String childrenPersonId, PersonInfo guardInfo) {
+    public void createClientGuardian(String childrenPersonId, PersonInfo info) throws Exception {
+        ClientRestDTO dto = ClientRestDTO.build(info, childrenPersonId);
 
+        HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
+        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.POST,
+                request, Void.class);
+
+        if(!response.getStatusCode().equals(HttpStatus.OK)){
+            throw new RestClientException("ИС ПП вернул ошибку!");
+        }
     }
 
     public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
+        GuardianRelationDTO dto = GuardianRelationDTO.build(personGUID, agents);
+
+        HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);
+        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/guardians", HttpMethod.POST,
+                request, Void.class);
+
+        if(!response.getStatusCode().equals(HttpStatus.OK)){
+            throw new RestClientException("ИС ПП вернул ошибку!");
+        }
     }
 }
