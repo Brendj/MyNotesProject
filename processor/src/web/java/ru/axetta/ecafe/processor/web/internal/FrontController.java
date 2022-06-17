@@ -1747,10 +1747,10 @@ public class FrontController extends HttpServlet {
                         //Проверяем для новых карт (у них есть longCardNo)
                         exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
                     }
-                    //Если дубль найден, то идет проверка на принудительную регистрацию
-                    if (exCard != null && (forceRegister == null || forceRegister != 1)) {
-                        throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
-                    }
+//                    //Если дубль найден, то идет проверка на принудительную регистрацию
+//                    if (exCard != null && (forceRegister == null || forceRegister != 1)) {
+//                        throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
+//                    }
                 }
             }
             if (null == exCard) {
