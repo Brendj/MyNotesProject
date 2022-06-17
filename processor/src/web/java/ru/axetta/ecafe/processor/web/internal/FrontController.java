@@ -2976,15 +2976,20 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "birthDate") Date birthDate,
             @WebParam(name = "snils") String snils,
             @WebParam(name = "mobile") String mobile,
-            @WebParam(name = "email") String email) throws FrontControllerException {
-        checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils);
-        return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email);
+            @WebParam(name = "email") String email,
+            @WebParam(name = "documents") List<DocumentItem> documents) throws FrontControllerException {
+        checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents);
+        List<DulDetail> dulDetails = new ArrayList<>();
+        for (DocumentItem item : documents) {
+            dulDetails.add(getDulDetailFromDocumentItem(item));
+        }
+        return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
     }
 
     private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
-                                       Date birthDate, String snils) throws FrontControllerException {
+                                       Date birthDate, String snils, List<DocumentItem> documents) throws FrontControllerException {
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null)
+                || birthDate == null || (snils == null && (documents == null || documents.isEmpty())))
             throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 

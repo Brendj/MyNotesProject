@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DocumentResponse extends MeshGuardianResponse {
+public class MeshDocumentResponse extends MeshGuardianResponse {
     private int documentTypeId;
     private String series;
     private String number;
@@ -19,16 +19,17 @@ public class DocumentResponse extends MeshGuardianResponse {
     private Date expiration;
     private Date createDate;
     private Date lastUpdate;
+    private int validationStateId;
 
-    public DocumentResponse() {
+    public MeshDocumentResponse() {
         super();
     }
 
-    public DocumentResponse(Integer code, String message) {
+    public MeshDocumentResponse(Integer code, String message) {
         super(code, message);
     }
 
-    public DocumentResponse(PersonDocument personDocument) throws ParseException {
+    public MeshDocumentResponse(PersonDocument personDocument) throws ParseException {
         this.setCode(OK_CODE);
         this.setMessage(OK_MESSAGE);
         this.documentTypeId = personDocument.getDocumentTypeId();
@@ -47,15 +48,17 @@ public class DocumentResponse extends MeshGuardianResponse {
         this.createDate = df2.parse(personDocument.getCreatedAt());
         if (personDocument.getUpdatedAt() != null)
             this.lastUpdate = df2.parse(personDocument.getUpdatedAt());
+        if (personDocument.getValidationStateId() != null)
+            this.validationStateId = personDocument.getValidationStateId();
     }
 
-    public DocumentResponse okResponse() {
+    public MeshDocumentResponse okResponse() {
         this.setCode(OK_CODE);
         this.setMessage(OK_MESSAGE);
         return this;
     }
 
-    public DocumentResponse internalErrorResponse() {
+    public MeshDocumentResponse internalErrorResponse() {
         this.setCode(INTERNAL_ERROR_CODE);
         this.setMessage(INTERNAL_ERROR_MESSAGE);
         return this;
@@ -155,4 +158,11 @@ public class DocumentResponse extends MeshGuardianResponse {
         this.lastUpdate = lastUpdate;
     }
 
+    public int getValidationStateId() {
+        return validationStateId;
+    }
+
+    public void setValidationStateId(int validationStateId) {
+        this.validationStateId = validationStateId;
+    }
 }

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
@@ -65,12 +64,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                            Date birthDate,
                                            String snils,
                                            String mobile,
-                                           String email) {
+                                           String email,
+                                           List<DulDetail> dulDetails) {
         try {
             //checkClientData(client);
             String parameters = String.format("?person=%s&expand=%s&limit=%s", URLEncoder
                     .encode(buildSearchPersonParameters(
-                            firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email), "UTF-8"), PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
+                            firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails), "UTF-8"), PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
             ObjectMapper objectMapper = new ObjectMapper();
             MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_LIKE_URL, parameters);
             if (result.getCode() == HttpStatus.SC_OK) {
@@ -233,11 +233,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
         } catch (Exception e) {
             logger.error("Error in createPersonContact: ", e);
-            return new DocumentResponse().internalErrorResponse();
+            return new MeshDocumentResponse().internalErrorResponse();
         }
     }
 
-    public DocumentResponse createPersonDocument(String meshGuid, DulDetail dulDetail) {
+    public MeshDocumentResponse createPersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonDocument parameter = buildPersonDocument(dulDetail);
@@ -253,24 +253,24 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
         } catch (Exception e) {
             logger.error("Error in createPersonDocument: ", e);
-            return new DocumentResponse().internalErrorResponse();
+            return new MeshDocumentResponse().internalErrorResponse();
         }
     }
 
-    public DocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
+    public MeshDocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
             MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument));
             if (result.getCode() == HttpStatus.SC_OK) {
-                return new DocumentResponse().okResponse();
+                return new MeshDocumentResponse().okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
             }
         } catch (Exception e) {
             logger.error("Error in deletePersonDocument: ", e);
-            return new DocumentResponse().internalErrorResponse();
+            return new MeshDocumentResponse().internalErrorResponse();
         }
     }
 
@@ -279,21 +279,22 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty()) {
             throw new NullPointerException("Не найден клиент по \"meshGuid\"");
         }
-        if (personListResponse.getResponse().get(0).getPersonDocuments() == null ||
-                personListResponse.getResponse().get(0).getPersonDocuments().isEmpty()) {
+        List<MeshDocumentResponse> documentResponseList = personListResponse.getResponse().get(0).getDocument();
+
+        if (documentResponseList == null || documentResponseList.isEmpty()) {
             throw new NullPointerException("Не найден документ у клиента");
         }
-        PersonDocument personDocument = personListResponse.getResponse().get(0).getPersonDocuments()
-                .stream().filter(d -> dulDetail.getDocumentTypeId().equals(d.getDocumentTypeId().longValue()) &&
+        MeshDocumentResponse document = documentResponseList
+                .stream().filter(d -> dulDetail.getDocumentTypeId().equals((long) d.getDocumentTypeId()) &&
                         dulDetail.getNumber().equals(d.getNumber()))
                 .findFirst().orElse(null);
-        if (personDocument == null) {
+        if (document == null) {
             throw new NullPointerException("Не найден документ у клиента");
         }
-        return personDocument.getDocumentTypeId().longValue();
+        return (long) document.getDocumentTypeId();
     }
 
-    public DocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
+    public MeshDocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonDocument parameter = buildPersonDocument(dulDetail);
@@ -310,7 +311,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
         } catch (Exception e) {
             logger.error("Error in modifyPersonDocument: ", e);
-            return new DocumentResponse().internalErrorResponse();
+            return new MeshDocumentResponse().internalErrorResponse();
         }
     }
 
@@ -474,8 +475,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                Date birthDate,
                                                String snils,
                                                String mobile,
-                                               String email) throws Exception {
-        ResponsePersons person = buildResponsePerson(null, firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
+                                               String email,
+                                               List<DulDetail> dulDetails) throws Exception {
+        ResponsePersons person = buildResponsePerson(null, firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(person);
