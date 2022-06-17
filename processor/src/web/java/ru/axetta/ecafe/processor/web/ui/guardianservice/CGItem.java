@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.web.ui.guardianservice;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Category;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,13 +22,18 @@ public class CGItem implements Comparable {
     private Long guardianLastUpdate;
     private Boolean deletedState;
     private Boolean disabled;
+    private Long guardianOrg;
+    private Long clientOrg;
 
     public static final List<Long> GROUPS = Arrays.asList(1100000000L, 1100000010L, 1100000050L, 1100000020L,
             1100000030L, 1100000100L, 1100000110L);
 
+    public static final Long GROUP_PARENTS = 1100000030L;
+
     public CGItem(Long idOfClient, Long idOfGuardin, String fio, String mobile, Long cardno, Integer state,
                   boolean sameOrg, Long idOfClientGuardian, Long cardLastUpdate, Long balance,
-                  Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState, Integer disabled) {
+                  Long idOfClientGroup, Long guardianLastUpdate, Boolean deletedState, Integer disabled,
+                  Long guardianOrg, Long clientOrg) {
         this.idOfClient = idOfClient;
         this.idOfGuardin = idOfGuardin;
         this.fio = fio.toLowerCase().replaceAll("ё", "е");
@@ -43,6 +49,93 @@ public class CGItem implements Comparable {
         this.guardianLastUpdate = guardianLastUpdate;
         this.deletedState = deletedState;
         this.disabled = disabled == 1 ? true : false;
+        this.guardianOrg = guardianOrg;
+        this.clientOrg = clientOrg;
+    }
+
+    public boolean isSotrudnik() {
+        return guardianOrg.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())
+                || guardianOrg.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+    }
+
+    private int getPriority(CGItem item) {
+        int priority = 0;
+        if (item.getIdOfClientGroup().equals(GROUP_PARENTS)) {
+            if (!item.getDeletedState()) priority = 1;
+        } else {
+            if (item.getBalance() > 0 || item.getCardno() != null) {
+                priority = 2;
+            }
+        }
+        return priority;
+        //return 0 если группа родители и связка удалена. или группа сотрудники и дубль не активный
+    }
+
+    private int compareInsideOneGroup(CGItem item) {
+        if (this.cardno != null && item.getCardno() == null) return -1;
+        if (this.cardno == null && item.getCardno() != null) return 1;
+        if (this.cardno != null && item.getCardno() != null) {
+            int cardRes = -cardLastUpdate.compareTo(item.getCardLastUpdate());
+            if (cardRes == 0) {
+                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+            } else {
+                return cardRes;
+            }
+        }
+        return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+    }
+
+    private int compareInsideEmployee(CGItem item) {
+        if (this.cardno != null && item.getCardno() != null && ((this.balance == 0 && item.getBalance() == 0) || this.balance != 0 && item.getBalance() != 0)) {
+            int cardRes = -cardLastUpdate.compareTo(item.getCardLastUpdate());
+            if (cardRes == 0) {
+                int q = -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                if (q == 0) {
+                    return -balance.compareTo(item.getBalance());
+                } else {
+                    return q;
+                }
+            } else {
+                return cardRes;
+            }
+        } else if (this.cardno == null && item.getCardno() == null && ((this.balance == 0 && item.getBalance() == 0) || (this.balance != 0 && item.getBalance() != 0))) {
+            if (this.balance != 0 && item.getBalance() != 0) {
+                int e = -balance.compareTo(item.getBalance());
+                if (e == 0) {
+                    return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                } else {
+                    return e;
+                }
+            } else {
+                return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+            }
+        } else if ((this.balance == 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() == null)
+                   || (this.balance != 0 && this.cardno == null && item.getBalance() == 0 && item.getCardno() != null)
+                   || (this.balance != 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() == null)
+                   || (this.balance != 0 && this.cardno != null && item.getBalance() == 0 && item.getCardno() != null)
+                   || (this.balance != 0 && this.cardno == null && item.getBalance() != 0 && item.getCardno() != null)
+                   || (this.balance == 0 && this.cardno != null && item.getBalance() != 0 && item.getCardno() != null)
+                   || (this.balance == 0 && this.cardno != null && item.getBalance() == 0 && item.getCardno() != null)
+                   || (this.balance != 0 && this.cardno == null && item.getBalance() != 0 && item.getCardno() == null)) {
+            int r = -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+            if (r == 0) {
+                if (this.cardno != null && item.getCardno() == null) return -1;
+                if (this.cardno == null && item.getCardno() != null) return 1;
+                if (this.cardno != null && item.getCardno() != null) {
+                    int t = -cardLastUpdate.compareTo(item.getCardLastUpdate());
+                    if (t == 0) {
+                        return -this.balance.compareTo(item.getBalance());
+                    } else {
+                        return t;
+                    }
+                }
+            } else {
+                return r;
+            }
+        }
+        return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
     }
 
     @Override
@@ -51,7 +144,34 @@ public class CGItem implements Comparable {
             return 1;
         }
         CGItem item = (CGItem) o;
-        if (!this.deletedState && item.getDeletedState()) return -1;
+        int priorityThis = getPriority(this);
+        int priorityItem = getPriority(item);
+        if (priorityThis > priorityItem) {
+            return -1;
+        } else if (priorityThis < priorityItem) {
+            return 1;
+        }
+        if (priorityItem == priorityThis) {
+            if (priorityItem == 1) {
+                //если оба - родители
+                return compareInsideOneGroup(item);
+            }
+            if (priorityItem == 0) {
+                if (item.getIdOfClientGroup().equals(GROUP_PARENTS) && !this.idOfClientGroup.equals(GROUP_PARENTS)) {
+                    return 1;
+                } else if (!item.getIdOfClientGroup().equals(GROUP_PARENTS) && this.idOfClientGroup.equals(GROUP_PARENTS)) {
+                    return -1;
+                } else {
+                    return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
+                }
+            }
+            //оба активные сотрудники
+            return compareInsideEmployee(item);
+        } else {
+            if (priorityThis > priorityItem) return -1; else return 1;
+        }
+
+        /*if (!this.deletedState && item.getDeletedState()) return -1;
         if (this.deletedState && !item.getDeletedState()) return 1;
         int indexThis = GROUPS.indexOf(this.idOfClientGroup);
         int indexItem = GROUPS.indexOf(item.getIdOfClientGroup());
@@ -74,7 +194,7 @@ public class CGItem implements Comparable {
             return -guardianLastUpdate.compareTo(item.getGuardianLastUpdate());
         } else {
             return res;
-        }
+        }*/
     }
 
     @Override
@@ -208,5 +328,21 @@ public class CGItem implements Comparable {
 
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public Long getGuardianOrg() {
+        return guardianOrg;
+    }
+
+    public void setGuardianOrg(Long guardianOrg) {
+        this.guardianOrg = guardianOrg;
+    }
+
+    public Long getClientOrg() {
+        return clientOrg;
+    }
+
+    public void setClientOrg(Long clientOrg) {
+        this.clientOrg = clientOrg;
     }
 }

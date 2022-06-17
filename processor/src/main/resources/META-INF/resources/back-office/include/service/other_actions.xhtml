@@ -327,6 +327,11 @@
                                            action="#{otherActionsPage.runDeleteDoubleGuardians()}"
                                            id="deleteDoubleGuardians"
                                            styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+
+                        <a4j:commandButton value="Запустить удаление дублей по всем ОО"
+                                           action="#{otherActionsPage.runDeleteDoubleGuardiansAllOrgs()}"
+                                           id="deleteDoubleGuardiansAllOrgs"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
                     </h:panelGrid>
                 </rich:panel>
                 <rich:panel id="loadMeshGuidsForGuardiansPanel">
