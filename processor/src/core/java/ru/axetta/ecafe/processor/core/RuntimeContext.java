@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core;
 
 import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Value;
+import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -184,6 +185,10 @@ public class RuntimeContext implements ApplicationContextAware {
         this.useQueueForAllSyncs = useQueueForAllSyncs;
     }
 
+    public CardBlockPeriodConfig getCardBlockPeriodConfig() {
+        return cardBlockPeriodConfig;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -308,6 +313,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
+    private CardBlockPeriodConfig cardBlockPeriodConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
     private static SessionFactory sessionFactory;
@@ -759,6 +765,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 logger.error("Failed to load std pay config: " + e);
                 criticalErrors = true;
             }
+            this.cardBlockPeriodConfig = new CardBlockPeriodConfig(properties);
             try {
                 this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
