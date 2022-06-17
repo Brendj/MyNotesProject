@@ -90,7 +90,7 @@ public class ImportMigrantsService {
                         List<Migrant> migrants = MigrantsUtils
                                 .getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
                                         request.getIdOfServiceClass());
-                        if (migrants.size() != 1) {
+                        if (migrants.size() == 0) {
                             migrant = null;
                         } else {
                             migrant = migrants.get(0);
