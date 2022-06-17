@@ -103,7 +103,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                     List<DulDetail> dulDetails,
                                                     Integer agentTypeId,
                                                     Integer relation,
-                                                    Integer typeOfLegalRepresent) {
+                                                    Integer typeOfLegalRepresent,
+                                                    Boolean informing) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
@@ -113,7 +114,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
                 createGuardianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
-                        genderId, birthDate, snils, mobile, childMeshGuid, dulDetails, relation, typeOfLegalRepresent, agentTypeId);
+                        genderId, birthDate, snils, mobile, childMeshGuid, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing);
                 return new PersonResponse(personResult.getAgentPersonId()).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
@@ -166,7 +167,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                         Integer genderId, Date birthDate, String snils,
                                         String mobile, String childMeshGuid,
                                         List<DulDetail> dulDetails, Integer relation,
-                                        Integer typeOfLegalRepresent, Integer agentTypeId) throws Exception {
+                                        Integer typeOfLegalRepresent, Integer agentTypeId,
+                                        Boolean informing) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -201,6 +203,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                     .createClientGuardianInfoTransactionFree(session, guardian, description, false,
                             client.getIdOfClient(), ClientCreatedFromType.MPGU, typeOfLegalRepresent, clientGuardianHistory);
             clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(agentTypeId));
+            clientGuardian.setDisabled(informing);
             session.update(clientGuardian);
             session.flush();
             transaction.commit();
@@ -533,13 +536,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public PersonResponse addGuardianToClient(String meshGuid, String childMeshGuid, Integer agentTypeId) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-
             PersonAgent personAgent = new PersonAgent();
             personAgent.setAgentTypeId(agentTypeId);
             personAgent.setId(0);
             personAgent.setPersonId(childMeshGuid);
             personAgent.setAgentPersonId(meshGuid);
-
             String json = objectMapper.writeValueAsString(personAgent);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {

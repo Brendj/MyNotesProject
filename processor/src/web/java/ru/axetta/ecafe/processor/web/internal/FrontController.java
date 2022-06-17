@@ -3002,9 +3002,10 @@ public class FrontController extends HttpServlet {
                                            @WebParam(name = "documents") List<DocumentItem> documents,
                                            @WebParam(name = "agentTypeId") Integer agentTypeId,
                                            @WebParam(name = "relation") Integer relation,
-                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent) throws FrontControllerException {
+                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
+                                           @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
         checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
-                relation, typeOfLegalRepresent);
+                relation, typeOfLegalRepresent, informing);
         List<DulDetail> dulDetails = new ArrayList<>();
         if (!CollectionUtils.isEmpty(documents)) {
             for (DocumentItem item : documents) {
@@ -3015,7 +3016,7 @@ public class FrontController extends HttpServlet {
             throw new FrontController.FrontControllerException("Указанный снилс уже существует в системе");
         }
         return getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent);
+                mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
     }
 
     @WebMethod(operationName = "getGuardians")
@@ -3120,7 +3121,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "agentTypeId") Integer agentTypeId,
             @WebParam(name = "relation") Integer relation,
             @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
-            @WebParam(name = "idOfOrg") Long idOfOrg) {
+            @WebParam(name = "idOfOrg") Long idOfOrg,
+            @WebParam(name = "informing") Boolean informing) {
 
         //todo для чего idOfOrg?
 
@@ -3131,7 +3133,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
-                    || typeOfLegalRepresent == null || idOfOrg == null) {
+                    || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
@@ -3154,7 +3156,7 @@ public class FrontController extends HttpServlet {
             ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
                     true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
                     ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
-                    ClientGuardianRoleType.fromInteger(agentTypeId));
+                    ClientGuardianRoleType.fromInteger(agentTypeId), informing);
 
             PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
 
@@ -3233,10 +3235,10 @@ public class FrontController extends HttpServlet {
 
     private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                  Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
-                                                 Integer relation, Integer typeOfLegalRepresent) throws FrontControllerException {
+                                                 Integer relation, Integer typeOfLegalRepresent, Boolean informing) throws FrontControllerException {
         if (idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
                 || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
-                || relation == null || typeOfLegalRepresent == null)
+                || relation == null || typeOfLegalRepresent == null || informing == null)
             throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
