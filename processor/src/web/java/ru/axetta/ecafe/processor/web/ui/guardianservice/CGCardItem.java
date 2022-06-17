@@ -8,13 +8,20 @@ public class CGCardItem implements Comparable {
     private Long cardLastUpdate;
     private Long idOfClientGroup;
     private Long guardianLastUpdate;
+    private Long cardOrg;
+    private Long balance;
+    private Boolean deletedState;
 
-    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate, Long idOfClientGroup, Long guardianLastUpdate) {
+    public CGCardItem(Long idOfCard, Long idOfClient, Long cardLastUpdate, Long idOfClientGroup, Long guardianLastUpdate,
+                      Long cardOrg, Long balance, Boolean deletedState) {
         this.idOfCard = idOfCard;
         this.idOfClient = idOfClient;
         this.cardLastUpdate = cardLastUpdate;
         this.idOfClientGroup = idOfClientGroup;
         this.guardianLastUpdate = guardianLastUpdate;
+        this.cardOrg = cardOrg;
+        this.balance = balance;
+        this.deletedState = deletedState;
     }
 
     public Long getIdOfCard() {
@@ -33,12 +40,30 @@ public class CGCardItem implements Comparable {
         this.idOfClient = idOfClient;
     }
 
+    private int getPriority(CGCardItem item) {
+        int priority = 0;
+        if (item.getIdOfClientGroup().equals(CGItem.GROUP_PARENTS)) {
+            if (!item.getDeletedState()) priority = 1;
+        } else {
+            priority = 2;
+        }
+        return priority;
+        //return 0 если группа родители и связка удалена. или группа сотрудники и дубль не активный
+    }
+
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof CGCardItem)) {
             return 1;
         }
         CGCardItem item = (CGCardItem) o;
+        int priorityThis = getPriority(this);
+        int priorityItem = getPriority(item);
+        if (priorityThis > priorityItem) {
+            return -1;
+        } else if (priorityThis < priorityItem) {
+            return 1;
+        }
         if (this.cardLastUpdate == null && item.getCardLastUpdate() == null) return 0;
         if (this.cardLastUpdate != null && item.getCardLastUpdate() == null) return -1;
         if (this.cardLastUpdate == null && item.getCardLastUpdate() != null) return 1;
@@ -98,5 +123,29 @@ public class CGCardItem implements Comparable {
 
     public void setGuardianLastUpdate(Long guardianLastUpdate) {
         this.guardianLastUpdate = guardianLastUpdate;
+    }
+
+    public Long getCardOrg() {
+        return cardOrg;
+    }
+
+    public void setCardOrg(Long cardOrg) {
+        this.cardOrg = cardOrg;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 }
