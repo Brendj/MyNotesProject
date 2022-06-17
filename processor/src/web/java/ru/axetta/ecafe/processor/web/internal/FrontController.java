@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -1773,12 +1774,11 @@ public class FrontController extends HttpServlet {
                 }
 
                 boolean secondRegisterAllowed = VersionUtils.secondRegisterAllowed(persistenceSession, idOfOrg);
-                secondRegisterAllowed = secondRegisterAllowed && Card.isServiceType(type);
 
-                if (exCard.getState() != CardState.BLOCKED.getValue() && !secondRegisterAllowed) {
+                if (exCard.getState() != CardState.BLOCKED.getValue() && !secondRegisterAllowed  && !Card.isServiceType(type)) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 } else if (!secondRegisterAllowed) {
-                    testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed);
+                    testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed, type);
                 }
                 if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1)) {
                     throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(
@@ -1843,10 +1843,9 @@ public class FrontController extends HttpServlet {
     }
 
     private void testForRegisterConditions(Session persistenceSession, Card exCard, long idOfOrg,
-            boolean secondRegisterAllowed) throws Exception {
+            boolean secondRegisterAllowed, int type) throws Exception {
         if (!secondRegisterAllowed) {
-            Integer blockPeriod = RuntimeContext.getInstance()
-                    .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
+            Integer blockPeriod = getBlockPeriodByCardType(type);
             Date now = new Date();
             if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
                 throw new CardResponseItem.CardAlreadyExist(
@@ -1862,6 +1861,17 @@ public class FrontController extends HttpServlet {
                         CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
             }
         }
+    }
+
+    private Integer getBlockPeriodByCardType(int type) {
+        CardBlockPeriodConfig cardBlockPeriodConfig = RuntimeContext.getInstance().getCardBlockPeriodConfig();
+        for (CardBlockPeriodConfig.BlockPeriodCardTypes blockPeriodCardTypes: cardBlockPeriodConfig.getList()) {
+            for (Integer cardType: blockPeriodCardTypes.getCardTypes()) {
+                if (cardType == type) return blockPeriodCardTypes.getPeriod();
+            }
+        }
+        return RuntimeContext.getInstance()
+                .getPropertiesValue(CardBlockPeriodConfig.PARAM_BASE, 180);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
