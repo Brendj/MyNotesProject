@@ -1,8 +1,8 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.Contact;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MeshGuardianPerson {
@@ -27,8 +26,7 @@ public class MeshGuardianPerson {
     private Integer degree;
     private Integer validationStateId;
     private Integer id;
-
-    private List<PersonDocument> personDocuments;
+    private List<MeshDocumentResponse> document;
 
     public MeshGuardianPerson() {
 
@@ -49,7 +47,10 @@ public class MeshGuardianPerson {
         this.degree = similarPerson.getDegree();
         this.validationStateId = similarPerson.getPerson().getValidationStateId();
         this.id = similarPerson.getPerson().getId();
-        this.personDocuments = similarPerson.getPerson().getDocuments();
+    }
+
+    private MeshGuardianConverter getMeshGuardianConverter() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardianConverter.class);
     }
 
     private String getContact(List<Contact> contacts, Integer typeId) {
@@ -180,11 +181,11 @@ public class MeshGuardianPerson {
         this.id = id;
     }
 
-    public List<PersonDocument> getPersonDocuments() {
-        return personDocuments;
+    public List<MeshDocumentResponse> getDocument() {
+        return document;
     }
 
-    public void setPersonDocuments(List<PersonDocument> personDocuments) {
-        this.personDocuments = personDocuments;
+    public void setDocument(List<MeshDocumentResponse> document) {
+        this.document = document;
     }
 }

@@ -1211,7 +1211,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 //            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
 //                    .createPerson(person.getFirstName(),
 //                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-//                            client.getSan(), client.getMobile(), client.getEmail());
+//                            client.getSan(), client.getMobile().substring(1), client.getEmail());
 //            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
 //                client.setMeshGUID(personResponse.getMeshGuid());
 //            else

@@ -2,7 +2,6 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.ErrorResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
 
@@ -15,7 +14,16 @@ public class MeshGuardianConverter {
     public List<MeshGuardianPerson> toDTO(List<SimilarPerson> similarPersons) throws Exception {
         List<MeshGuardianPerson> result = new ArrayList<>();
         for (SimilarPerson similarPerson : similarPersons) {
-            result.add(toDTO(similarPerson));
+            MeshGuardianPerson meshGuardianPerson = toDTO(similarPerson);
+//            List<PersonDocument> personDocuments = similarPerson.getPerson().getDocuments();
+//            if (personDocuments != null && !personDocuments.isEmpty()) {
+//                List<DocumentResponse> documentResponseList = new ArrayList<>();
+//                for (PersonDocument personDocument : personDocuments) {
+//                    documentResponseList.add(toDTO(personDocument));
+//                }
+//                meshGuardianPerson.setDocument(documentResponseList);
+//            }
+            result.add(meshGuardianPerson);
         }
         return result;
     }
@@ -32,11 +40,11 @@ public class MeshGuardianConverter {
         return new PersonListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
-    public DocumentResponse toDTO(PersonDocument personDocument) throws ParseException {
-        return new DocumentResponse(personDocument);
+    public MeshDocumentResponse toDTO(PersonDocument personDocument) throws ParseException {
+        return new MeshDocumentResponse(personDocument);
     }
 
-    public DocumentResponse toDTO(ErrorResponse errorResponse) {
-        return new DocumentResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
+    public MeshDocumentResponse toDTO(ErrorResponse errorResponse) {
+        return new MeshDocumentResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 }

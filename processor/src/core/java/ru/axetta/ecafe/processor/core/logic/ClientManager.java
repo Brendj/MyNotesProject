@@ -2009,7 +2009,7 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
         }
     }
 
@@ -2017,7 +2017,7 @@ public class ClientManager {
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
                                            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
                                            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType,
-                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType) {
+                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType, Boolean informing) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -2031,6 +2031,7 @@ public class ClientManager {
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
             clientGuardian.setRoleType(roleType);
+            clientGuardian.setDisabled(informing);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -2209,7 +2210,7 @@ public class ClientManager {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
         }
     }
 
