@@ -200,7 +200,7 @@ public class SMSService {
                     textMessage = textObject.toString();
                 } catch (Exception e) {
                     logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                            new Object[]{sender, phoneNumber, textObject.toString(), e});
+                            new Object[]{sender, phoneNumber, textObject.toString(), e.getMessage()});
                 }
             } else {
                 for (int i = 0; i < 3; i++) {
@@ -228,8 +228,8 @@ public class SMSService {
                             break;
                         }
                     } catch (Exception e) {
-                        logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}",
-                                new Object[]{sender, phoneNumber, textObject.toString()}, e);
+                        logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
+                                new Object[]{sender, phoneNumber, textObject.toString(), e.getMessage()});
                     }
                 }
             }
@@ -240,21 +240,19 @@ public class SMSService {
                 Long idOfSourceOrg = EventNotificationService.getSourceOrgIdFromValues(values);
                 result = registerClientSMSCharge(sendResponse.isSuccess(), client, sendResponse.getMessageId(),
                         phoneNumber, messageTargetId, messageType, textMessage, eventTime, idOfSourceOrg);
-            }
 
-            //  Добавление в список не отправленных sms
-            //if(sendResponse != null && !sendResponse.isSuccess()) {
-            boolean failureTestingMode = RuntimeContext.getInstance()
-                    .getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
-            result = result && !failureTestingMode;
-            if (!result) {
-                String serviceName = RuntimeContext.getInstance().getConfigProperties().
-                        getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
-                SMSResendingService.getInstance()
-                        .addResending(sendResponse.getMessageId(), client, phoneNumber, serviceName, messageTargetId,
-                                messageType, textObject, values, eventTime);
+                //  Добавление в список неотправленных sms
+                boolean failureTestingMode = RuntimeContext.getInstance()
+                        .getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
+                result = result && !failureTestingMode;
+                if (!result) {
+                    String serviceName = RuntimeContext.getInstance().getConfigProperties().
+                            getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
+                    SMSResendingService.getInstance()
+                            .addResending(sendResponse.getMessageId(), client, phoneNumber, serviceName, messageTargetId,
+                                    messageType, textObject, values, eventTime);
+                }
             }
-
             return result;
         }
 

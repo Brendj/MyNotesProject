@@ -102,10 +102,10 @@ public class EMPSmsServiceImpl extends ISmsService {
                         empe.getCode() < SendResponse.MIN_SUCCESS_STATUS ? empe.getCode() : -empe.getCode(),
                         String.format("E: [%s] %s", "" + empe.getCode(), empe.getError()), empe.getMessageId());
             }
+            throw empe;
         } catch (Exception e) {
             throw e;
         }
-        throw new Exception("Nor error neither success while sending EMP event");
     }
 
     @Override
