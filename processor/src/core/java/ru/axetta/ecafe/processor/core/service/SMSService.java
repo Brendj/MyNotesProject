@@ -200,7 +200,7 @@ public class SMSService {
                     textMessage = textObject.toString();
                 } catch (Exception e) {
                     logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                            new Object[]{sender, phoneNumber, textObject.toString(), e.getMessage()});
+                            new Object[]{sender, phoneNumber, textObject.toString(), e});
                 }
             } else {
                 for (int i = 0; i < 3; i++) {
@@ -229,7 +229,7 @@ public class SMSService {
                         }
                     } catch (Exception e) {
                         logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                                new Object[]{sender, phoneNumber, textObject.toString(), e.getMessage()});
+                                new Object[]{sender, phoneNumber, textObject.toString(), e});
                     }
                 }
             }
