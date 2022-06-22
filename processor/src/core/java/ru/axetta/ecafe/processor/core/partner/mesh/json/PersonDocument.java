@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.json;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -64,7 +65,7 @@ public class PersonDocument {
     @JsonProperty("expiration")
     private String expiration;
     @JsonProperty("attachments")
-    private String attachments;
+    private List<String> attachments;
     @JsonProperty("document_type")
     private DocumentType documentType;
     @JsonProperty("validation_errors")
@@ -243,12 +244,12 @@ public class PersonDocument {
     }
 
     @JsonProperty("attachments")
-    public String getAttachments() {
+    public List<String> getAttachments() {
         return attachments;
     }
 
     @JsonProperty("attachments")
-    public void setAttachments(String attachments) {
+    public void setAttachments(List<String> attachments) {
         this.attachments = attachments;
     }
 
