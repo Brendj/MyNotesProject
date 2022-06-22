@@ -216,7 +216,9 @@ public class GuardianDoublesService {
                     logger.info("Guardian id = " + item.getIdOfGuardin() +  " is sotrudnik. Skipped.");
                     continue;
                 }*/
-                if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (item.getCardno() != null && priorityCard != null
+                        && (!item.getCardno().equals(priorityCard.getIdOfCard())
+                        || (item.getCardno().equals(priorityCard.getIdOfCard()) && !cardSameGroup(aliveGuardian, priorityCard)))) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
