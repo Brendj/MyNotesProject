@@ -3,6 +3,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -22,7 +23,9 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -111,6 +114,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                     email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
+            String s = Base64.getEncoder().encodeToString(result.getResponse());
+            String f  = new String(result.getResponse(), StandardCharsets.UTF_8);
+
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
                 createGuardianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
@@ -119,8 +125,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
-                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+                return getPersonResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in createPersonWithEducation: ", te);
@@ -150,8 +155,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
-                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+                return getPersonResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in changePerson: ", te);
@@ -551,8 +555,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
-                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+                return getPersonResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in addGuardianToClient: ", te);
@@ -578,8 +581,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
-                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+                return getPersonResponse(objectMapper, result);
             }
 
         } catch (ConnectTimeoutException te) {
@@ -610,8 +612,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
-                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonDTO(errorResponse);
+                return getPersonResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in createPerson: ", te);
@@ -619,6 +620,16 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (Exception e) {
             logger.error("Error in createPerson: ", e);
             return new PersonResponse().internalErrorResponse();
+        }
+    }
+
+    private PersonResponse getPersonResponse(ObjectMapper objectMapper, MeshResponseWithStatusCode result) throws IOException {
+        try {
+            ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+            return getMeshGuardianConverter().toPersonDTO(errorResponse);
+        } catch (JsonParseException e) {
+            logger.error(e.getMessage());
+            return new PersonResponse(result.getCode(), new String(result.getResponse(), StandardCharsets.UTF_8));
         }
     }
 }

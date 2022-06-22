@@ -3012,9 +3012,10 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "documents") List<DocumentItem> documents) throws FrontControllerException {
         checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents);
         List<DulDetail> dulDetails = new ArrayList<>();
-        for (DocumentItem item : documents) {
-            dulDetails.add(getDulDetailFromDocumentItem(item));
-        }
+        if (documents != null)
+            for (DocumentItem item : documents) {
+                dulDetails.add(getDulDetailFromDocumentItem(item));
+            }
         return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
     }
 

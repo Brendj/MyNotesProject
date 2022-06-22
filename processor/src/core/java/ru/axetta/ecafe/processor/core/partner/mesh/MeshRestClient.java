@@ -171,10 +171,12 @@ public class MeshRestClient {
         httpParams.setParameter("http.connection.timeout", connectionTimeout);
         HttpClient httpClient = new HttpClient(httpParams);
         if (url.getProtocol().equals("https")) {
-            httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort(),
-                    new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), url.getPort()));
+            int port = url.getPort() == -1 ? 443 : url.getPort();
+            httpClient.getHostConfiguration().setHost(url.getHost(), port,
+                    new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), port));
         } else {
-            httpClient.getHostConfiguration().setHost(url.getHost(), url.getPort());
+            int port = url.getPort() == -1 ? 80 : url.getPort();
+            httpClient.getHostConfiguration().setHost(url.getHost(), port);
         }
         return httpClient;
     }
