@@ -15,14 +15,14 @@ public class MeshGuardianConverter {
         List<MeshGuardianPerson> result = new ArrayList<>();
         for (SimilarPerson similarPerson : similarPersons) {
             MeshGuardianPerson meshGuardianPerson = toDTO(similarPerson);
-//            List<PersonDocument> personDocuments = similarPerson.getPerson().getDocuments();
-//            if (personDocuments != null && !personDocuments.isEmpty()) {
-//                List<DocumentResponse> documentResponseList = new ArrayList<>();
-//                for (PersonDocument personDocument : personDocuments) {
-//                    documentResponseList.add(toDTO(personDocument));
-//                }
-//                meshGuardianPerson.setDocument(documentResponseList);
-//            }
+            List<PersonDocument> personDocuments = similarPerson.getPerson().getDocuments();
+            if (personDocuments != null && !personDocuments.isEmpty()) {
+                List<MeshDocumentResponse> meshDocumentResponses = new ArrayList<>();
+                for (PersonDocument personDocument : personDocuments) {
+                    meshDocumentResponses.add(toDTO(personDocument));
+                }
+                meshGuardianPerson.setDocument(meshDocumentResponses);
+            }
             result.add(meshGuardianPerson);
         }
         return result;

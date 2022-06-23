@@ -28,6 +28,8 @@ public class MeshGuardianPerson {
     private Integer id;
     private List<MeshDocumentResponse> document;
 
+    private Boolean alreadyInISPP;
+
     public MeshGuardianPerson() {
 
     }
@@ -187,5 +189,13 @@ public class MeshGuardianPerson {
 
     public void setDocument(List<MeshDocumentResponse> document) {
         this.document = document;
+    }
+
+    public Boolean getAlreadyInISPP() {
+        return alreadyInISPP;
+    }
+
+    public void setAlreadyInISPP(Boolean alreadyInISPP) {
+        this.alreadyInISPP = alreadyInISPP;
     }
 }

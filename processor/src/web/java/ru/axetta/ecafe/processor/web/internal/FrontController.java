@@ -2977,14 +2977,42 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "snils") String snils,
             @WebParam(name = "mobile") String mobile,
             @WebParam(name = "email") String email,
-            @WebParam(name = "documents") List<DocumentItem> documents) throws FrontControllerException {
-        checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents);
-        List<DulDetail> dulDetails = new ArrayList<>();
-        if (documents != null)
-            for (DocumentItem item : documents) {
-                dulDetails.add(getDulDetailFromDocumentItem(item));
+            @WebParam(name = "documents") List<DocumentItem> documents) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents);
+            List<DulDetail> dulDetails = new ArrayList<>();
+            if (documents != null)
+                for (DocumentItem item : documents) {
+                    dulDetails.add(getDulDetailFromDocumentItem(item));
+                }
+            PersonListResponse personListResponse = getMeshGuardiansService()
+                    .searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
+            if (personListResponse.getResponse() != null && !personListResponse.getResponse().isEmpty()) {
+                List<String> meshGuidList = personListResponse.getResponse()
+                        .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
+
+                Query query = persistenceSession.createQuery("select c.meshGUID from Client c "
+                        + "where meshGuid in :meshGuidList");
+                query.setParameter("meshGuidList", meshGuidList);
+                List<String> list = query.list();
+
+                personListResponse.getResponse().forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
             }
-        return getMeshGuardiansService().searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
+            return personListResponse;
+        } catch (Exception e) {
+            logger.error("Error in searchMeshPerson", e);
+            return new PersonListResponse(PersonResponse.INTERNAL_ERROR_CODE, PersonResponse.INTERNAL_ERROR_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
     private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
