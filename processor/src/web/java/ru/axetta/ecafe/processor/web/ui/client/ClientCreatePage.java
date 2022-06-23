@@ -642,6 +642,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (StringUtils.isEmpty(this.person.surname) || StringUtils.isEmpty(this.person.firstName)) {
             throw new Exception("Укажите фамилия и имя обслуживаемого лица");
         }
+        ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
             this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(this.org.getIdOfOrg());

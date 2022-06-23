@@ -951,6 +951,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientDiscountItems = Collections.emptyList();
         }
         validateExistingGuardians();
+        ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
