@@ -216,7 +216,9 @@ public class GuardianDoublesService {
                     logger.info("Guardian id = " + item.getIdOfGuardin() +  " is sotrudnik. Skipped.");
                     continue;
                 }*/
-                if (item.getCardno() != null && priorityCard != null && !item.getCardno().equals(priorityCard.getIdOfCard())) {
+                if (item.getCardno() != null && priorityCard != null
+                        && (!item.getCardno().equals(priorityCard.getIdOfCard())
+                        || (item.getCardno().equals(priorityCard.getIdOfCard()) && !cardSameGroup(aliveGuardian, priorityCard)))) {
                     Client g = DAOUtils.findClient(session, item.getIdOfGuardin());
                     RuntimeContext.getAppContext().getBean(CardService.class).block(item.getCardno(), g.getOrg().getIdOfOrg(),
                     item.getIdOfGuardin(), true, HISTORY_LABEL, CardState.BLOCKED);
@@ -315,7 +317,8 @@ public class GuardianDoublesService {
                 logger.info(String.format("Deleted migrant idOfClient=%s for org=%s", migrant.getClientMigrate().getIdOfClient(),
                         migrant.getOrgVisit().getIdOfOrg()));
                 if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
-                if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg()) && isParent(aliveGuardian)) continue;
+                if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg())
+                        && (isParent(aliveGuardian) || (!isParent(aliveGuardian) && isParent(item)))) continue;
                 if (haveMirgantInOrg(session, client, migrant.getOrgVisit().getIdOfOrg())) continue;
                 //if (!clientSameGroup(aliveGuardian, item)) continue;
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),

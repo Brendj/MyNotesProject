@@ -58,7 +58,9 @@ public class MeshPersonsSyncService {
 
     private static final String OUT_ORG_GROUP_PREFIX = "Вне";
 
-    private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    private static final ThreadLocal<SimpleDateFormat> format = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("yyyy-MM-dd"); }
+    };
 
     protected MeshRestClient meshRestClient;
 
@@ -267,7 +269,7 @@ public class MeshPersonsSyncService {
             List<Education> educations = person.getEducation();
             educations.removeIf(education -> {
                 try {
-                    return format.parse(education.getTrainingEndAt()).before(now);
+                    return format.get().parse(education.getTrainingEndAt()).before(now);
                 } catch (ParseException e) {
                     return true;
                 }

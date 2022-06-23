@@ -128,19 +128,20 @@ public class PreorderRequestsReportService extends RecoverableService {
             Date date = CalendarUtils.addHours(CalendarUtils.startOfDay(params.getDate()), 12);
             Date currentDate = CalendarUtils.startOfDayInUTC(date); // CalendarUtils.addHours(CalendarUtils.startOfDay(date), 3);
             if (DAOService.getInstance().getProductionCalendarByDate(currentDate) != null) return; //в выходной день заявки не формируем
-            logger.info("Start generating preorder requests");
+            logger.info("Start generating preorder requests " + new Date().getTime());
             List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(date);
             Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItemsLocal = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems2(false, params); //орги с включенным флагом предзаказа
 
             Integer maxDays = getMaxDateToCreateRequests(currentDate, weekends, MAX_FORBIDDEN_DAYS);
             Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
+            logger.info("Start get info runGeneratePreorderRequests " + new Date().getTime());
             List<PreorderItem> preorderItemList = loadPreorders2(date, dateTo, params); //предзаказы от завтрашнего дня до дня, на который максимум можем сгенерить заявки
             List<OrgGoodRequest> doneOrgGoodRequests = GoodRequestsChangeAsyncNotificationService.getInstance().getDoneOrgGoodRequests(dateTo, params);
             Map<Long, List<SpecialDate>> mapSpecialDates = getAllSpecialDates(orgItemsLocal, date, dateTo);
             List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(date, dateTo);
 
             Map<Long, Map<Date, Long>> clientBalances = getClientBalancesOnDates(preorderItemList, mapSpecialDates, productionCalendar); //балансы клиентов на даты с учетом предзаказов
-
+            logger.info("End get info runGeneratePreorderRequests " + new Date().getTime());
             Integer sizeOrgs = orgItemsLocal.size();
             int counterOrgs = 0;
             Session session = null;
@@ -152,7 +153,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                 for (Map.Entry<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> entry : orgItemsLocal.entrySet()) {
                     counterOrgs++;
                     long idOfOrg = entry.getKey();
-                    logger.info(String.format("Generating preorder requests. orgID=%s (№%s from %s)", idOfOrg, counterOrgs, sizeOrgs));
+                    logger.info(String.format("Generating preorder requests. orgID=%s (№%s from %s)", idOfOrg, counterOrgs, sizeOrgs) + new Date().getTime());
 
                     List<SpecialDate> specialDates = mapSpecialDates.get(idOfOrg); //DAOReadonlyService.getInstance().getSpecialDates(CalendarUtils.addHours(currentDate, 12), dateTo, idOfOrg);
 
@@ -418,29 +419,43 @@ public class PreorderRequestsReportService extends RecoverableService {
 
     public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
         logger.info("Start runTask for generate preorder requests");
+        logger.info("Time before checkOrgContragentBinding " + new Date().getTime());
         // проверка на актуальность связок с контрагентами для нового меню
         checkOrgContragentBinding(params);
+        logger.info("Time after checkOrgContragentBinding " + new Date().getTime());
+        logger.info("Time before relevancePreorders " + new Date().getTime());
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
+        logger.info("Time after relevancePreorders " + new Date().getTime());
+        logger.info("Time before generatePreordersBySchedule " + new Date().getTime());
         //генерация предзаказов по регулярному правилу
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule(params);
+        logger.info("Time after generatePreordersBySchedule " + new Date().getTime());
+        logger.info("Time before runGeneratePreorderRequests " + new Date().getTime());
         //генерация заявок
         runGeneratePreorderRequests(params);
+        logger.info("Time after runGeneratePreorderRequests " + new Date().getTime());
         //сервис проверок предзаказов
         if (instance.equals(firstNode)) {
+            logger.info("Time before dailyCheckPreorders " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders();
+            logger.info("Time after dailyCheckPreorders " + new Date().getTime());
         }
         //
+        logger.info("Time before sendNotification" + new Date().getTime());
         //Запуск рассылки отправлений об отмене предзаказа
         PreorderCancelNotificationService.sendNotification.manualStart();
+        logger.info("Time after sendNotification" + new Date().getTime());
         //
         logger.info("Finish runTask for gererate preorder requests");
     }
 
     public void checkOrgContragentBinding(PreorderRequestsReportServiceParam params) {
         logger.info("Start checking org and contragent bindings");
+        logger.info("start findOrgSetForContragent " + new Date().getTime());
         Map<Long, Set<Long>> contragentMap = GoodRequestsChangeAsyncNotificationService.getInstance()
                 .findOrgSetForContragent(params);
+        logger.info("end findOrgSetForContragent " + new Date().getTime());
         Session session = null;
         Transaction transaction = null;
         try {
@@ -448,19 +463,31 @@ public class PreorderRequestsReportService extends RecoverableService {
             session.setFlushMode(FlushMode.COMMIT);
             transaction = session.beginTransaction();
             for (Long idOfContragent : contragentMap.keySet()) {
+                logger.info("start findWtOrgGroupIdsExcludingContragent " + new Date().getTime());
                 List<Long> orgGroups = findWtOrgGroupIdsExcludingContragent(session, idOfContragent);
+                logger.info("end findWtOrgGroupIdsExcludingContragent " + new Date().getTime());
+                logger.info("start findWtMenuIdsExcludingContragent " + new Date().getTime());
                 List<Long> menus = findWtMenuIdsExcludingContragent(session, idOfContragent);
+                logger.info("end findWtMenuIdsExcludingContragent " + new Date().getTime());
+                logger.info("start findWtComplexIdsExcludingContragent " + new Date().getTime());
                 List<Long> complexes = findWtComplexIdsExcludingContragent(session, idOfContragent);
+                logger.info("start findWtComplexIdsExcludingContragent " + new Date().getTime());
                 for (Long idOfOrg : contragentMap.get(idOfContragent)) {
+                    logger.info("start deleteWtOrgGroupBindings " + new Date().getTime());
                     if (deleteWtOrgGroupBindings(session, orgGroups, idOfOrg)) {
                         logger.info(String.format("Deleted old orgGroup bindings for idOfOrg = %s", idOfOrg));
                     }
+                    logger.info("end deleteWtOrgGroupBindings " + new Date().getTime());
+                    logger.info("start deleteWtMenuBindings " + new Date().getTime());
                     if (deleteWtMenuBindings(session, menus, idOfOrg)) {
                         logger.info(String.format("Deleted old menu bindings for idOfOrg = %s", idOfOrg));
                     }
+                    logger.info("end deleteWtMenuBindings " + new Date().getTime());
+                    logger.info("start deleteWtComplexBindings " + new Date().getTime());
                     if (deleteWtComplexBindings(session, complexes, idOfOrg)) {
                         logger.info(String.format("Deleted old complex bindings for idOfOrg = %s", idOfOrg));
                     }
+                    logger.info("end deleteWtComplexBindings " + new Date().getTime());
                 }
             }
             transaction.commit();
