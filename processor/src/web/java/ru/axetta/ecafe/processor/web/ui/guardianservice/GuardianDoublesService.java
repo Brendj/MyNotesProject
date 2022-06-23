@@ -317,7 +317,7 @@ public class GuardianDoublesService {
                 if (clientOrgs.contains(migrant.getOrgVisit().getIdOfOrg())) continue;
                 if (!haveChildrenInOrgVisit(session, aliveGuardian, migrant.getOrgVisit().getIdOfOrg()) && isParent(aliveGuardian)) continue;
                 if (haveMirgantInOrg(session, client, migrant.getOrgVisit().getIdOfOrg())) continue;
-                if (!clientSameGroup(aliveGuardian, item)) continue;
+                //if (!clientSameGroup(aliveGuardian, item)) continue;
                 createMigrateRequestForClient(session, client, idOfOrgRegistry, migrant.getOrgVisit(),
                         migrant.getVisitStartDate(), migrant.getVisitEndDate());
                 logger.info(String.format("Created migrant idOfClient=%s for org=%s", client.getIdOfClient(),
