@@ -12,7 +12,6 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
     private String series;
     private String number;
     private Long id;
-    private Long idOfClient;
     private String subdivisionCode;
     private String issuer;
     private Date issued;
@@ -36,7 +35,6 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
         this.series = personDocument.getSeries();
         this.number = personDocument.getNumber();
         this.id = personDocument.getId().longValue();
-        this.idOfClient = Long.parseLong(personDocument.getPersonId());
         this.subdivisionCode = personDocument.getSubdivisionCode();
         this.issuer = personDocument.getIssuer();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -44,8 +42,9 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
             this.issued = df.parse(personDocument.getIssued());
         if (personDocument.getExpiration() != null)
             this.expiration = df.parse(personDocument.getExpiration());
-        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        this.createDate = df2.parse(personDocument.getCreatedAt());
+        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        if (personDocument.getCreatedAt() != null)
+            this.createDate = df2.parse(personDocument.getCreatedAt());
         if (personDocument.getUpdatedAt() != null)
             this.lastUpdate = df2.parse(personDocument.getUpdatedAt());
         if (personDocument.getValidationStateId() != null)
@@ -100,14 +99,6 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getIdOfClient() {
-        return idOfClient;
-    }
-
-    public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
     }
 
     public String getSubdivisionCode() {

@@ -114,9 +114,6 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                     email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
-            String s = Base64.getEncoder().encodeToString(result.getResponse());
-            String f  = new String(result.getResponse(), StandardCharsets.UTF_8);
-
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
                 createGuardianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
