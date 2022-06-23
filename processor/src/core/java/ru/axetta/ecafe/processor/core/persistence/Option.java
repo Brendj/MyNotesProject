@@ -184,7 +184,8 @@ public class Option {
             OPTION_ENABLE_NOTIFICATIONS_SPECIAL = 100213,
             OPTION_WT_DAYS_FORBID = 100214,
             OPTION_IMPORT_RNIP_PAYMENTS_URL_V22 = 100300,
-            OPTION_IMPORT_RNIP_PAYMENTS_URL_V24 = 100301;
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V24 = 100301,
+            OPTION_REQUEST_SYNC_ORG_SETTINGS_LIMIT = 100302;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -340,7 +341,8 @@ public class Option {
             OPTION_ENABLE_NOTIFICATIONS_SPECIAL, "1",
             OPTION_WT_DAYS_FORBID, "2",
             OPTION_IMPORT_RNIP_PAYMENTS_URL_V22, "https://test.rnip.mos.ru:9090/frontend-service/MainService",
-            OPTION_IMPORT_RNIP_PAYMENTS_URL_V24, "https://test.rnip.mos.ru:8443/frontend-service/services/MainService"
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V24, "https://test.rnip.mos.ru:8443/frontend-service/services/MainService",
+            OPTION_REQUEST_SYNC_ORG_SETTINGS_LIMIT, "20"
 };
 
     private Long idOfOption;
