@@ -1776,27 +1776,27 @@ public class PreorderDAOService {
 
     private void generatePreordersByScheduleInternal(PreorderRequestsReportServiceParam params) {
         try {
-            logger.info("Start of generating regular preorders");
+            logger.info("Start of generating regular preorders " + new Date().getTime());
             if (params.isEmpty()) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule(params);
             }
-            logger.info("Successful end of generating regular preorders");
+            logger.info("Successful end of generating regular preorders "  + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in generating regular preorders: ", e);
         }
         try {
-            logger.info("Start additional tasks for preorders");
+            logger.info("Start additional tasks for preorders " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForPreorders(params);
-            logger.info("Successful end additional tasks for preorders");
+            logger.info("Successful end additional tasks for preorders " +  + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in additional tasks for preorders: ", e);
         }
         try {
-            logger.info("Start additional tasks for regulars");
+            logger.info("Start additional tasks for regulars "  + new Date().getTime());
             if (params.isEmpty()) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars(params);
             }
-            logger.info("Successful end additional tasks for regulars");
+            logger.info("Successful end additional tasks for regulars " + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in additional tasks for regualrs: ", e);
         }
