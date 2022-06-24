@@ -1262,6 +1262,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 //            }
         }
 
+        for (DulDetail dul : this.dulDetail)
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);

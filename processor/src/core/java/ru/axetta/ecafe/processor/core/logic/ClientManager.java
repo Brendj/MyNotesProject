@@ -2682,8 +2682,7 @@ public class ClientManager {
         }
 
         if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
-            throw new Exception("Знак \"-\" не может быть последним символом элемента. " +
-                    "Знаки \"-\" не могут идти подряд или через пробел.");
+            throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
         }
     }
 

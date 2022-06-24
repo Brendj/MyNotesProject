@@ -756,8 +756,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
 
-        for (DulDetail dul : this.dulDetail)
+        for (DulDetail dul : this.dulDetail) {
             dul.setIdOfClient(client.getIdOfClient());
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
+        }
+
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
 
