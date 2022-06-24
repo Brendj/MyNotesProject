@@ -37,6 +37,7 @@ import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ClientManager {
 
@@ -2681,6 +2682,24 @@ public class ClientManager {
             query.setParameter("snils", snils);
         }
         return query.list();
+    }
+
+    public static void validateFio(String surname, String firstName, String secondName) throws Exception {
+        String fio = String.format("%S %S %S", surname, firstName, secondName);
+        String latin = ".*[a-zA-Z]+.*";
+        String cyrillic = ".*[а-яА-Я]+.*";
+
+        if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()){
+            throw new Exception("Только русские или только английские буквы");
+        }
+
+        if (surname.endsWith("-") || firstName.endsWith("-") || secondName.endsWith("-")) {
+            throw new Exception("Знак \"-\" не может быть последним символом элемента.");
+        }
+
+        if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
+            throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
+        }
     }
 
 }

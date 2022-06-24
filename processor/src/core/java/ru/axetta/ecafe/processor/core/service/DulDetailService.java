@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Scope(value = "singleton")
 public class DulDetailService {
 
-    private final MeshGuardiansService meshGuardiansService = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
 
     @Transactional(rollbackFor = Exception.class)
@@ -29,18 +28,19 @@ public class DulDetailService {
         Set<DulDetail> originDulDetails = new HashSet<>();
         Date currentDate = new Date();
 
-        if (client.getDulDetail() != null)
+        if (client.getDulDetail() != null) {
             originDulDetails = client.getDulDetail().stream()
                     .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
                     .collect(Collectors.toSet());
+        }
         for (DulDetail dulDetail : dulDetails) {
             if (dulDetail.getDeleteState() == null) {
                 dulDetail.setDeleteState(false);
             }
-            if (Boolean.TRUE.equals(dulDetail.getDeleteState()) && dulDetail.getCreateDate() == null) {
+            if (dulDetail.getDeleteState() && dulDetail.getCreateDate() == null) {
                 continue;
             }
-            if (Boolean.TRUE.equals(dulDetail.getDeleteState())) {
+            if (dulDetail.getDeleteState()) {
                 dulDetail.setLastUpdate(currentDate);
                 deleteDulDetail(session, dulDetail, client);
             } else if (isChange(originDulDetails, dulDetail)) {
@@ -56,33 +56,61 @@ public class DulDetailService {
     }
 
     public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
-            throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
-        }
+        validateDul(session, dulDetail, client);
+//        if(ClientManager.isClientGuardian(client)) {
+//            MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
+//            checkError(documentResponse);
+//        }
         session.merge(dulDetail);
     }
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (documentExists(session, client, dulDetail.getDocumentTypeId(), null))
-            throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
-            dulDetail.setIdMkDocument(documentResponse.getId());
-        }
+        validateDul(session, dulDetail, client);
+//        if(ClientManager.isClientGuardian(client)) {
+//            MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
+//            checkError(documentResponse);
+//            dulDetail.setIdMkDocument(documentResponse.getId());
+//        }
         session.save(dulDetail);
         return dulDetail.getId();
     }
 
     public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
-        }
+//        if(ClientManager.isClientGuardian(client)) {
+//            MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
+//            checkError(documentResponse);
+//        }
         session.merge(dulDetail);
+    }
+
+    private void validateDul(Session session, DulDetail dulDetail, Client client) throws Exception {
+        if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
+            throw new DocumentExistsException("У клиента уже есть документ этого типа");
+        if (dulDetail.getExpiration().before(dulDetail.getIssued()))
+            throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
+        checkAnotherClient(session, dulDetail, client);
+    }
+
+    private void checkAnotherClient(Session session, DulDetail dulDetail, Client client) throws DocumentExistsException {
+        //Не должно быть двух персон с одинаковыми действующими документами следующих типов:
+        List<Long> dulTypes = Arrays.asList(3L, 124L, 17L, 9L, 1L, 189L, 15L, 900L);
+
+        if (dulTypes.contains(dulDetail.getDocumentTypeId())) {
+            String query_str = "select d.idOfClient from DulDetail d where d.documentTypeId = :documentTypeId " +
+                    "and d.deleteState = false and d.number = :number ";
+            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) query_str += " and d.series = :series";
+            Query query = session.createQuery(query_str);
+            query.setParameter("number", dulDetail.getNumber());
+            query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
+            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) {
+                query.setParameter("series", dulDetail.getSeries());
+            }
+            List<Long> longList = query.getResultList();
+            if (longList == null || longList.isEmpty())
+                return;
+            if (longList.size() > 1 || !longList.get(0).equals(client.getIdOfClient()))
+                throw new DocumentExistsException("Не должно быть двух персон с одинаковыми действующими документами");
+        }
     }
 
     private boolean documentExists(Session session, Client client, Long documentTypeId, Long id) {
@@ -121,5 +149,9 @@ public class DulDetailService {
                     .findAny().orElse(null);
         }
         return null;
+    }
+
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 }

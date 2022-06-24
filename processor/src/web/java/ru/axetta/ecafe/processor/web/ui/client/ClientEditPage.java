@@ -962,6 +962,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientDiscountItems = Collections.emptyList();
         }
         validateExistingGuardians();
+        ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -1275,6 +1276,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 //            }
         }
 
+        for (DulDetail dul : this.dulDetail)
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
