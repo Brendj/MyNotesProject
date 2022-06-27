@@ -727,22 +727,21 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
 
-        //todo раскомментировать для теста задач по представителям
-//        if (isParentGroup()) {
-//            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
-//                    .createPerson(person.getFirstName(),
-//                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-//                            client.getSan(), client.getMobile().substring(1), client.getEmail());
-//            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-//                client.setMeshGUID(personResponse.getMeshGuid());
-//            else
-//                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-//
-//            for (ClientGuardianItem clientWardItem : clientWardItems) {
-//                RuntimeContext.getAppContext().getBean(MeshGuardiansService.class).addGuardianToClient(client.getMeshGUID(),
-//                        clientWardItem.getMeshGuid(), clientWardItem.getRole());
-//            }
-//        }
+        if (isParentGroup()) {
+            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+                    .createPerson(person.getFirstName(),
+                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+                            client.getSan(), client.getMobile().substring(1), client.getEmail());
+            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+                client.setMeshGUID(personResponse.getMeshGuid());
+            else
+                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                RuntimeContext.getAppContext().getBean(MeshGuardiansService.class).addGuardianToClient(client.getMeshGUID(),
+                        clientWardItem.getMeshGuid(), clientWardItem.getRole());
+            }
+        }
 
         persistenceSession.update(client);
         if (autoContractId)
