@@ -963,6 +963,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         validateExistingGuardians();
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
+        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, this.idOfClient, this.person.surname,
+                this.person.firstName, this.mobile, this.email);
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -1238,6 +1240,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                if (clientWardItem.getIdOfClient().equals(this.idOfClient))
+                    throw new Exception("Персона не может быть представителем самой себя");
+            }
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());

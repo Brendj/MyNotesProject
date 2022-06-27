@@ -644,6 +644,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             throw new Exception("Укажите фамилия и имя обслуживаемого лица");
         }
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
+        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, null, this.person.surname,
+                this.person.firstName, this.mobile, this.email);
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
             this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(this.org.getIdOfOrg());
@@ -773,8 +775,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-
-
 
         clean();
         return client;
