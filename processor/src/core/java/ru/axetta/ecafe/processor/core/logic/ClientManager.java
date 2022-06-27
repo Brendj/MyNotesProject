@@ -2619,7 +2619,7 @@ public class ClientManager {
         String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
         boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
 
-        if(!fioIsEmpty) {
+        if (!fioIsEmpty) {
             q += " and ( ";
         }
         if (lastName != null) {
@@ -2627,18 +2627,18 @@ public class ClientManager {
         }
         if (firstName != null) {
             if (lastName != null)
-                q+= " and ";
+                q += " and ";
             q += " (upper(c.person.firstName) = :firstName) ";
         }
         if (patronymic != null) {
             if (lastName != null || firstName != null)
-                q+= " and ";
+                q += " and ";
             q += " (upper(c.person.secondName) = :patronymic) ";
         }
-        if(!fioIsEmpty) {
+        if (!fioIsEmpty) {
             q += ")";
         }
-        if (mobile != null || snils != null){
+        if (mobile != null || snils != null) {
             q += fioIsEmpty ? " and " : " or ";
         }
         if (mobile != null) {
@@ -2673,7 +2673,7 @@ public class ClientManager {
         String latin = ".*[a-zA-Z]+.*";
         String cyrillic = ".*[а-яА-Я]+.*";
 
-        if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()){
+        if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()) {
             throw new Exception("Только русские или только английские буквы");
         }
 
@@ -2683,6 +2683,36 @@ public class ClientManager {
 
         if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
             throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void isUniqueFioAndMobileOrEmail(Session session, Long idOfClient, String surname, String firstName, String mobile, String email) throws Exception {
+        if (mobile.isEmpty() && email.isEmpty())
+            return;
+        String query_str = "select c.idOfClient from Client c " +
+                "where lower(c.person.firstName) = :firstName and lower(c.person.surname) = :surname ";
+        if (!mobile.isEmpty() && email.isEmpty())
+            query_str += " and c.mobile = :mobile ";
+        if (mobile.isEmpty())
+            query_str += " and c.email = :email ";
+        if (!mobile.isEmpty() && !email.isEmpty())
+            query_str += " and (c.mobile = :mobile or c.email = :email) ";
+
+        javax.persistence.Query query = session.createQuery(query_str);
+        query.setParameter("firstName", firstName.toLowerCase());
+        query.setParameter("surname", surname.toLowerCase());
+        if (!mobile.isEmpty())
+            query.setParameter("mobile", mobile);
+        if (!email.isEmpty())
+            query.setParameter("email", email);
+        List<Long> idOfClientList = query.getResultList();
+
+        if (idOfClientList.size() > 0) {
+            if (idOfClientList.size() == 1 && idOfClientList.get(0).equals(idOfClient))
+                return;
+            throw new Exception("Сочетание Фамилия + имя + телефон должны быть уникальными. " +
+                    "Сочетание Фамилия + Имя + электронная почта должны быть уникальными");
         }
     }
 

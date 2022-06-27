@@ -2823,7 +2823,9 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new DocumentResponse(idOfDocument);
+        DocumentItem documentResponse = new DocumentItem();
+        documentResponse.setIdDocument(idOfDocument);
+        return new DocumentResponse(Collections.singletonList(documentResponse));
     }
 
     @WebMethod(operationName = "updateDocumentForClient")
