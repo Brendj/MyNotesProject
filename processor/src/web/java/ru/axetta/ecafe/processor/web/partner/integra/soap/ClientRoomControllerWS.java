@@ -8877,9 +8877,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
                 guardian.setCreatedFromDesc(creatorMobile);
-                guardian.setPassportNumber(passportNumber);
-                guardian.setPassportSeries(passportSeries);
+
                 session.update(guardian);
+
+                DulDetail dulDetail = new DulDetail();
+                dulDetail.setNumber(passportNumber);
+                dulDetail.setSeries(passportSeries);
+                dulDetail.setIdOfClient(guardian.getIdOfClient());
+                dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+
+                RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), guardian.getIdOfClient());
             }
 
             ClientGuardian clientGuardian = DAOUtils

@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
@@ -5731,12 +5732,6 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getBalanceToNotify() != null) {
                     client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
                 }
-                if (clientParamItem.getPassportNumber() != null) {
-                    client.setPassportNumber(clientParamItem.getPassportNumber());
-                }
-                if (clientParamItem.getPassportSeries() != null) {
-                    client.setPassportSeries(clientParamItem.getPassportSeries());
-                }
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
@@ -5787,6 +5782,16 @@ public class Processor implements SyncProcessor {
             client.setUpdateTime(new Date());
             persistenceSession.update(client);
 
+            if (clientParamItem.getPassportNumber() != null && clientParamItem.getPassportSeries() != null) {
+                DulDetail dulDetail = new DulDetail();
+                dulDetail.setNumber(clientParamItem.getPassportNumber());
+                dulDetail.setSeries(clientParamItem.getPassportSeries());
+                dulDetail.setIdOfClient(client.getIdOfClient());
+                dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+
+                RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .validateAndSaveDulDetails(persistenceSession, Collections.singletonList(dulDetail), client.getIdOfClient());
+            }
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;

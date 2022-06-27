@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSectionForARMAnswer;
@@ -456,8 +457,10 @@ public class SyncResponse {
                 this.balanceToNotify = client.getBalanceToNotify();
                 this.san = client.getSan();
                 this.specialMenu = client.getSpecialMenu();
-                this.passportNumber = client.getPassportNumber();
-                this.passportSeries = client.getPassportSeries();
+                DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .getPassportDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
+                this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
+                this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
                 this.multiCardMode = client.activeMultiCardMode();
                 this.parallel = client.getParallel();
                 this.ssoId = client.getSsoid();

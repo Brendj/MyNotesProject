@@ -45,8 +45,10 @@ public class MeshPersonsSyncService {
     public static final String MESH_REST_PERSONS_TOP_PROPEERTY = "ecafe.processing.mesh.rest.persons.top";
     public static final String MESH_REST_ADDRESS_PROPERTY = "ecafe.processing.mesh.rest.address";
     public static final String MESH_REST_API_KEY_PROPERTY = "ecafe.processing.mesh.rest.api.key";
+    public static final String MESH_REST_CONNECTION_TIMEOUT_PROPERTY = "ecafe.processing.mesh.rest.connection.timeout";
 
     public static final String TOP_DEFAULT = "50000";
+    public static final String CONNECTION_TIMEOUT_DEFAULT = "30000"; //ms
 
     private static final String FILTER_VALUE_ORG = "education.organization_id";
     private static final String FILTER_VALUE_EQUALS = "equal";
@@ -58,15 +60,17 @@ public class MeshPersonsSyncService {
 
     private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    private MeshRestClient meshRestClient;
+    protected MeshRestClient meshRestClient;
 
     protected MeshPersonsSyncService() {
         String serviceAddress;
         String apiKey;
+        Integer connectionTimeout;
         try {
             serviceAddress = getServiceAddress();
             apiKey = getApiKey();
-            this.meshRestClient = new MeshRestClient(serviceAddress, apiKey);
+            connectionTimeout = getConnectionTimeout();
+            this.meshRestClient = new MeshRestClient(serviceAddress, apiKey, connectionTimeout);
         } catch (Exception e) {
             this.meshRestClient = null;
         }
@@ -404,6 +408,11 @@ public class MeshPersonsSyncService {
         String key = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_API_KEY_PROPERTY, "");
         if (key.equals("")) throw new Exception("MESH API key not specified");
         return key;
+    }
+
+    private Integer getConnectionTimeout() throws Exception {
+        String timeout = RuntimeContext.getInstance().getConfigProperties().getProperty(MESH_REST_CONNECTION_TIMEOUT_PROPERTY, CONNECTION_TIMEOUT_DEFAULT);
+        return Integer.parseInt(timeout);
     }
 
 }

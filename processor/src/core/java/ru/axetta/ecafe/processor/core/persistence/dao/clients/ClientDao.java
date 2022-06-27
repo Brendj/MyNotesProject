@@ -324,7 +324,7 @@ public class ClientDao extends WritableJpaDao {
                         Long version = generateNewClientGuardianVersion(session);
                         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(),
                                 version, false, null, null, ClientCreatedFromType.DEFAULT, null,
-                                clientGuardianHistory);
+                                clientGuardianHistory, null, true);
                         session.flush();
 
                         //Устанавливаем правила оповещения для опекуна

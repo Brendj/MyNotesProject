@@ -20,14 +20,19 @@ import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -35,6 +40,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 
@@ -45,14 +51,19 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
+
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
-        ClientSelectPage.CompleteHandler {
+        ClientSelectPage.CompleteHandler,
+        DulSelectPage.CompleteHandler {
 
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
     private String fax;
+
+    public ClientEditPage() {
+    }
 
     public void setFax(String fax) {
         this.fax = fax;
@@ -78,28 +89,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
     public String getCardRequest() {
         return cardRequest;
     }
 
     public void setCardRequest(String cardRequest) {
         this.cardRequest = cardRequest;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
     }
 
     public String getBalanceHold() {
@@ -144,6 +139,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setClientSSOID(String clientSSOID) {
         this.clientSSOID = clientSSOID;
+    }
+
+    @Override
+    public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
+        this.dulDetail.add(new DulDetail(this.idOfClient, dulGuide.getDocumentTypeId(), dulGuide));
     }
 
     public static class OrgItem {
@@ -337,8 +337,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
-    private String passportNumber;
-    private String passportSeries;
     private String cardRequest;
     private String balanceHold;
     private Boolean inOrgEnabledMultiCardMode;
@@ -346,6 +344,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
+    private List<DulDetail> dulDetail = new ArrayList<>();
+    private Date currentDate;
     private String middleGroup;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
@@ -711,6 +711,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.specialMenu = specialMenu;
     }
 
+    public List<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(List<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
+    }
+
+    public Date getCurrentDate() {
+        return currentDate;
+    }
+
+    public void setCurrentDate(Date currentDate) {
+        this.currentDate = currentDate;
+    }
+
     public String getMiddleGroup() {
         return middleGroup;
     }
@@ -757,7 +773,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
-
+        this.dulDetail = client.getDulDetail()
+                .stream().filter(d -> d.getDeleteState() == null
+                        || !d.getDeleteState()).collect(Collectors.toList());
+        this.dulDetail.sort(Comparator.comparing(p -> p.getDulGuide().getName()));
         fill(session, client);
     }
 
@@ -849,14 +868,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                            ClientGuardianRepresentType.UNKNOWN, false));
+                            ClientGuardianRepresentType.UNKNOWN, false, null));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
-                            ClientGuardianRepresentType.UNKNOWN, false));
+                            ClientGuardianRepresentType.UNKNOWN, false, null));
             }
         }
     }
@@ -943,6 +962,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientDiscountItems = Collections.emptyList();
         }
         validateExistingGuardians();
+        ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -1069,7 +1089,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet, client.getDiscountMode(), discountMode,
                         DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
                 client.setLastDiscountsUpdate(new Date());
-            } catch (Exception ignore){}
+            } catch (Exception ignore) {
+            }
         }
 
         if (CollectionUtils.isEmpty(this.idOfCategoryList)) {
@@ -1093,8 +1114,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
             //Для 17 типа мы не можем менять напрямую, только через 11
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
                 continue;
             }
 
@@ -1107,8 +1127,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
 
             //Если поменяли 11, то меняем и 17 событие
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                 ClientNotificationSetting culture = new ClientNotificationSetting(client, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
                 if (item.isEnabled()) {
                     client.getNotificationSettings().add(culture);
@@ -1116,41 +1135,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     client.getNotificationSettings().remove(culture);
                 }
             }
-        }
-
-        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
-                    idOfClient));
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
-                    clientGuardianHistory);
-        }
-        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекун",
-                    idOfClient));
-            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
-        }
-
-        if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
-                    idOfClient));
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
-        }
-        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
-                    idOfClient));
-            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
         }
 
         if (isReplaceOrg) {
@@ -1191,7 +1175,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) || (this.idOfClientGroup == null
                     && client.getIdOfClientGroup() != null) || (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
-				ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
                 clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
                 clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
                 clientGuardianHistory.setReason(String.format("Обновление данных клиента через карточку клиента id = %s",
@@ -1202,15 +1186,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
-
+        if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+            if (this.san == null || this.san.isEmpty()) {
+                throw new Exception("Поле СНИЛС обязательное для заполнения");
+            }
+        }
+        if (this.san != null && !this.san.isEmpty()) {
+            this.san = this.san.replaceAll("[\\D]", "");
+            ClientManager.validateSan(persistenceSession, this.san, idOfClient);
+        }
+        client.setSan(this.san);
         resetNewFlags();
         client.setOrg(org);
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
         client.setAgeTypeGroup(this.ageTypeGroup);
         client.setSpecialMenu(this.specialMenu);
-        client.setPassportNumber(this.passportNumber);
-        client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
         if(middleGroup != null && !middleGroup.isEmpty())
             createMiddleGroup(persistenceSession, this.org.idOfOrg, this.clientGroupName, this.middleGroup);
@@ -1218,6 +1209,82 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         //Получаем параллель клиента после изменений
         ClientParallel.addFoodBoxModifire(client);
+
+        //todo раскомментировать для теста задач по представителям
+//        if (client.getMeshGUID() == null && isParentGroup()) {
+//            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+//                    .createPerson(person.getFirstName(),
+//                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+//                            client.getSan(), client.getMobile().substring(1), client.getEmail());
+//            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+//                client.setMeshGUID(personResponse.getMeshGuid());
+//            else
+//                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+//        }
+
+        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
+                    idOfClient));
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems,
+                    clientGuardianHistory);
+        }
+        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекун",
+                    idOfClient));
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
+        }
+
+        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
+
+            //todo раскомментировать для теста задач по представителям
+//            if (client.getMeshGUID() != null && isParentGroup()) {
+//                for (ClientGuardianItem clientWardItem : clientWardItems) {
+//                    PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+//                            .addGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
+//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE))
+//                        throw new Exception(String.format("Ошибка создания связи с обучающимся в МК: %s", personResponse.getMessage()));
+//                }
+//            }
+        } else if (isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
+
+        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
+
+            //todo раскомментировать для теста задач по представителям
+//            if (client.getMeshGUID() != null && isParentGroup()) {
+//                for (ClientGuardianItem clientWardItem : removeListWardItems) {
+//                    PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+//                            .deleteGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid());
+//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE))
+//                        throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
+//                }
+//            }
+        }
+
+        for (DulDetail dul : this.dulDetail)
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
+
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
@@ -1278,27 +1345,27 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public boolean predefined() {
-        if(ClientGroup.Predefined.parse(this.clientGroupName) == null)
+        if (ClientGroup.Predefined.parse(this.clientGroupName) == null)
             return true;
         else
             return false;
     }
 
     private void validateExistingGuardians() throws Exception {
-        if(clientGuardianItems.isEmpty()) {
+        if (clientGuardianItems.isEmpty()) {
             return;
         }
         StringBuilder notValidGuardianSB = new StringBuilder();
         StringBuilder notValidRepresentative = new StringBuilder();
-        for(ClientGuardianItem item : clientGuardianItems){
-            if(item.getRelation().equals(-1)){
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (item.getRelation().equals(-1)) {
                 notValidGuardianSB.append(item.getPersonName()).append(" ");
             }
             if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
                 notValidRepresentative.append(item.getPersonName()).append(" ");
             }
         }
-        if(notValidGuardianSB.length() > 0){
+        if (notValidGuardianSB.length() > 0) {
             throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
         }
         if (notValidRepresentative.length() > 0) {
@@ -1333,6 +1400,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void removeClient(Session persistenceSession) throws Exception {
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
+        Long idOfClient = client.getIdOfClient();
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
         if (!client.getOrders().isEmpty()) {
             throw new Exception("Имеются зарегистрированные заказы");
         }
@@ -1348,6 +1417,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         persistenceSession.delete(client);
+
+        List<DulDetail> dulDetails = new ArrayList<>(client.getDulDetail());
+        dulDetails.forEach(d -> d.setDeleteState(true));
+        dulDetailService.validateAndSaveDulDetails(persistenceSession, dulDetails, idOfClient);
     }
 
     private void fill(Session session, Client client) throws Exception {
@@ -1396,9 +1469,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         removeListGuardianItems.clear();
         removeListWardItems.clear();
         this.lastConfirmMobile = client.getLastConfirmMobile();
-        this.specialMenu = client.getSpecialMenu();
-        this.passportNumber = client.getPassportNumber();
-        this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
         this.inOrgEnabledMultiCardMode = client.getOrg().multiCardModeIsEnabled();
@@ -1407,6 +1477,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
+        this.currentDate = new Date();
         this.middleGroup = client.getMiddleGroup();
     }
 
@@ -1496,10 +1567,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         result[0] = new SelectItem(-1, "");
         int i = 0;
         for (ClientGuardianRelationType relType : ClientGuardianRelationType.values()) {
-            result[i+1] = new SelectItem(relType.getCode(), relType.getDescription());
+            result[i + 1] = new SelectItem(relType.getCode(), relType.getDescription());
             i++;
         }
 
+        return result;
+    }
+
+    public SelectItem[] getRoles() {
+        SelectItem[] result = new SelectItem[ClientGuardianRoleType.values().length + 1];
+        result[0] = new SelectItem(-1, "");
+        int i = 0;
+        for (ClientGuardianRoleType roleType : ClientGuardianRoleType.values()) {
+            result[i + 1] = new SelectItem(roleType.getCode(), roleType.getDescription());
+            i++;
+        }
         return result;
     }
 
@@ -1519,4 +1601,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
+
+    public Boolean isParentGroup() {
+        if (this.idOfClientGroup != null)
+            return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+        return false;
+    }
+
 }

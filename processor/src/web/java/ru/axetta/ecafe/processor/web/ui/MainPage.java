@@ -39,6 +39,7 @@ import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvid
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.LoadingElementsOfBasicGoodsPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
@@ -99,7 +100,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -504,6 +504,8 @@ public class MainPage implements Serializable {
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
+
+    private final DulSelectPage dulSelectPage = new DulSelectPage();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3891,6 +3893,65 @@ public class MainPage implements Serializable {
 
     public Object showEmptyClientSelectPage() {
         return showClientSelectPage(true);
+    }
+
+    public Object showDulSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                dulSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                modalPages.push(dulSelectPage);
+                dulSelectPage.pushCompleteHandler((DulSelectPage.CompleteHandler) currentTopMostPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill dul selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора документа: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+        }
+        return null;
+    }
+
+    public Object completeDulSelectSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dulSelectPage.completeDulSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора документа: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
     }
 
     public Object showClientSelectPage(boolean doClear) {
@@ -11263,4 +11324,7 @@ public class MainPage implements Serializable {
         return espHelpdeskGroupPage;
     }
 
+    public DulSelectPage getDulSelectPage() {
+        return dulSelectPage;
+    }
 }

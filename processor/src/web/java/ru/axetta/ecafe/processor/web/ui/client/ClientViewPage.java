@@ -17,11 +17,13 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadGuardiansByClient;
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadWardsByClient;
@@ -51,28 +53,12 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
     public String getCardRequest() {
         return cardRequest;
     }
 
     public void setCardRequest(String cardRequest) {
         this.cardRequest = cardRequest;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
     }
 
     public String getBalanceHold() {
@@ -220,8 +206,6 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Date lastConfirmMobile;
     private Boolean specialMenu;
     private Boolean allowedPreorder;
-    private String passportNumber;
-    private String passportSeries;
     private String cardRequest;
     private String balanceHold;
     private Boolean multiCardMode;
@@ -231,6 +215,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean confirmVisualRecognition;
     private Boolean userOP;
     private Long idOfClientGroup;
+    private List<DulDetail> dulDetail;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -575,14 +560,17 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.specialMenu = client.getSpecialMenu();
         this.allowedPreorder = ClientManager.getAllowedPreorderByClient(session, client.getIdOfClient(), null);
-        this.passportNumber = client.getPassportNumber();
-        this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         this.parallel = client.getParallel();
         this.userOP = client.getUserOP();
 
-        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
+        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                .getBalanceHoldListAsString(session, client.getIdOfClient());
 
+        this.dulDetail = client.getDulDetail()
+                .stream().filter(d -> d.getDeleteState() == null
+                        || !d.getDeleteState()).collect(Collectors.toList());
+        this.dulDetail.sort(Comparator.comparing(p -> p.getDulGuide().getName()));
     }
 
     public static List<ClientDiscountItem> buildClientDiscountItem(Session session, Client client) {
@@ -726,5 +714,13 @@ public class ClientViewPage extends BasicWorkspacePage {
             return false;
         }
         return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
+    }
+
+    public List<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(List<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
     }
 }

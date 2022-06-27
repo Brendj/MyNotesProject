@@ -185,10 +185,6 @@
 
             <h:outputText escape="true" value="СНИЛС" styleClass="output-text"/>
             <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="14" styleClass="input-text"/>
-            <h:outputText escape="true" value="Серия паспорта" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientEditPage.passportSeries}" maxlength="64" styleClass="input-text"/>
-            <h:outputText escape="true" value="Номер паспорта" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientEditPage.passportNumber}" maxlength="64" styleClass="input-text"/>
             <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text"/>
             <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
             <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text"/>
@@ -212,6 +208,101 @@
                            converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false"/>
 
+            <h:outputText escape="true" value="Документы" styleClass="output-text"/>
+            <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientEditPage.dulDetail}"
+                            var="dul"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            footerClass="data-table-footer-center">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Название документа"/>
+                    </f:facet>
+                        <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Серия"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text" />
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Кем выдан"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
+                    <f:facet name="header">
+                        <h:outputText escape="true" styleClass="" value="Когда выдан"/>
+                    </f:facet>
+                    <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата истечения срока действия"/>
+                    </f:facet>
+                    <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата создания записи"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{dul.createDate}" converter="dateTimeConverter"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата изменения записи"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{dul.lastUpdate}" converter="dateTimeConverter"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText value="Удалить" escape="true"/>
+                    </f:facet>
+                    <a4j:commandLink styleClass="command-link"
+                                     render="dulDetailEditTable">
+                        <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                        <f:setPropertyActionListener value="true"
+                                                     target="#{dul.deleteState}"/>
+                    </a4j:commandLink>
+                </rich:column>
+
+                <f:facet name="footer">
+                    <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
+                                       render="modalDulSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
+                                       styleClass="command-link">
+                        <f:setPropertyActionListener value="#{mainPage.clientEditPage.dulDetail}"
+                                                     target="#{mainPage.dulSelectPage.dulDetailList}"/>
+                    </a4j:commandButton>
+                </f:facet>
+
+            </rich:dataTable>
             <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
             <rich:dataTable id="clientGuardianEditTable" value="#{mainPage.clientEditPage.clientGuardianItems}"
                             var="clientGuardian"
@@ -353,7 +444,8 @@
                     </f:facet>
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text"/>
-                        <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text">
+                        <h:selectBooleanCheckbox value="#{clientWard.enabled}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"
+                                                 styleClass="output-text">
                             <a4j:ajax render="clientWardEditTable" event="change"
                                       action="#{clientWard.activateNotificationSpecial()}"/>
                         </h:selectBooleanCheckbox>
@@ -372,8 +464,15 @@
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                         <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
-                        <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
-                            <f:selectItems value="#{mainPage.clientEditPage.relations}"/>
+                        <h:selectOneMenu value="#{clientWard.relation}" disabled="#{!mainPage.clientEditPage.isParentGroup()}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.relations}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <h:panelGrid rendered="#{mainPage.clientEditPage.isParentGroup()}" styleClass="borderless-grid"
+                                 columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.role}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.roles}"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
                 </rich:column>
@@ -389,7 +488,8 @@
                             <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text"/>
                         </rich:column>
                         <rich:column styleClass="borderless-grid-all-client">
-                            <h:selectBooleanCheckbox value="#{it.enabled}" styleClass="output-text"/>
+                            <h:selectBooleanCheckbox value="#{it.enabled}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"
+                                                     styleClass="output-text"/>
                         </rich:column>
                     </rich:dataTable>
                 </rich:column>
@@ -407,6 +507,7 @@
                 <f:facet name="footer">
                     <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
                                        render="modalClientSelectorPanel"
+                                       disabled="#{!mainPage.clientEditPage.isParentGroup()}"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                        styleClass="command-link">
                         <f:setPropertyActionListener value="ward" target="#{mainPage.clientEditPage.typeAddClient}"/>

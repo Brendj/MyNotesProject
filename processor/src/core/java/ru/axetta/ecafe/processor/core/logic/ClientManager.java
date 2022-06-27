@@ -12,10 +12,10 @@ import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -37,10 +37,12 @@ import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ClientManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
+
     public enum FieldId {
         CONTRACT_ID, PASSWORD,
         CONTRACT_DATE,
@@ -165,8 +167,7 @@ public class ClientManager {
             }
         }
 
-        public void resetToDefaultValues() throws Exception
-        {
+        public void resetToDefaultValues() throws Exception {
             resetToDefaultValues(fieldInfo);
         }
     }
@@ -261,7 +262,7 @@ public class ClientManager {
     }
 
     public static List<Long> findClientByFullName(Session session, Org organization, String surname, String firstName,
-            String secondName, boolean onlyStudents) throws Exception {
+                                                  String secondName, boolean onlyStudents) throws Exception {
         String q =
                 "select idOfClient from Client client where (client.org = :org) and (upper(client.person.surname) = :surname) and"
                         + "(upper(client.person.firstName) = :firstName)";
@@ -286,7 +287,7 @@ public class ClientManager {
     }
 
     public static Long findClientByFullName(Session session, Org organization, String surname, String firstName,
-            String secondName) throws Exception {
+                                            String secondName) throws Exception {
         List<Long> list = findClientByFullName(session, organization, surname, firstName, secondName, false);
         if (list.isEmpty()) {
             return null;
@@ -298,15 +299,15 @@ public class ClientManager {
     }
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
-            String registerCommentsAdds, Client client, Session persistenceSession,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                                   String registerCommentsAdds, Client client, Session persistenceSession,
+                                                   ClientsMobileHistory clientsMobileHistory) throws Exception {
         return modifyClientTransactionFree(fieldConfig, org, registerCommentsAdds, client, persistenceSession, false,
                 clientsMobileHistory);
     }
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
-            String registerCommentsAdds, Client client, Session persistenceSession,
-            boolean updateSecondNameAnyway, ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                                   String registerCommentsAdds, Client client, Session persistenceSession,
+                                                   boolean updateSecondNameAnyway, ClientsMobileHistory clientsMobileHistory) throws Exception {
         try {
             //tokens[2];
             if (fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE) != null) {
@@ -522,7 +523,7 @@ public class ClientManager {
 
             //token[34]
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null && fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
-                if(Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
+                if (Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
                     Set<CategoryDiscount> newDiscounts = getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT));
                     Integer oldDiscountMode = client.getDiscountMode();
                     Integer newDiscountMode = newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
@@ -569,12 +570,12 @@ public class ClientManager {
     }
 
     public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
-        if(StringUtils.isEmpty(categories)) {
+        if (StringUtils.isEmpty(categories)) {
             return new HashSet<CategoryDiscount>();
         }
         List<Long> list = new ArrayList<Long>();
-        for(String s : categories.split(",")){
-            if(StringUtils.isNotEmpty(s)) {
+        for (String s : categories.split(",")) {
+            if (StringUtils.isNotEmpty(s)) {
                 list.add(Long.valueOf(s));
             }
         }
@@ -582,7 +583,7 @@ public class ClientManager {
         criteria.add(Restrictions.in("idOfCategoryDiscount", list));
         return new HashSet<CategoryDiscount>(criteria.list());
     }
-    
+
     public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList) throws Exception {
         return setCategories(session, cl, idOfCategoryList, null);
     }
@@ -590,7 +591,7 @@ public class ClientManager {
     public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList,
                                         Integer discountMode) throws Exception {
         try {
-            Set<CategoryDiscount> categories = new HashSet <CategoryDiscount>();
+            Set<CategoryDiscount> categories = new HashSet<CategoryDiscount>();
             if (idOfCategoryList != null && idOfCategoryList.size() > 0) {
                 Criteria categoryCriteria = session.createCriteria(CategoryDiscount.class);
                 categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList));
@@ -613,13 +614,13 @@ public class ClientManager {
 
 
     public static long modifyClient(ClientFieldConfigForUpdate fieldConfig,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                    ClientsMobileHistory clientsMobileHistory) throws Exception {
         return modifyClient(fieldConfig, null, null, clientsMobileHistory);
     }
 
 
     public static long modifyClient(ClientFieldConfigForUpdate fieldConfig, Org org, String registerComentsAdds,
-            ClientsMobileHistory clientsMobileHistory)
+                                    ClientsMobileHistory clientsMobileHistory)
             throws Exception {
         fieldConfig.checkRequiredFields();
 
@@ -681,17 +682,17 @@ public class ClientManager {
         }
     }
 
-    public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
-            boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
-        return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+    public static Client registerClientTransactionFree(long idOfOrg, ClientFieldConfig fieldConfig,
+                                                       boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds,
+                                                       ClientsMobileHistory clientsMobileHistory) throws Exception {
+        return registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
                 null, registerCommentsAdds, clientsMobileHistory);
     }
 
-    public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
-                                                      boolean checkFullNameUnique, Session persistenceSession,
-                                                    Transaction persistenceTransaction, String registerCommentsAdds,
-                                                        ClientsMobileHistory clientsMobileHistory) throws Exception {
+    public static Client registerClientTransactionFree(long idOfOrg, ClientFieldConfig fieldConfig,
+                                                       boolean checkFullNameUnique, Session persistenceSession,
+                                                       Transaction persistenceTransaction, String registerCommentsAdds,
+                                                       ClientsMobileHistory clientsMobileHistory) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
@@ -778,11 +779,11 @@ public class ClientManager {
             boolean autoContractId = false;
             if (StringUtils.equals(contractIdText, "AUTO")) {
                 logger.debug("generate ContractId");
-                if(RuntimeContext.RegistryType.isMsk()) {
+                if (RuntimeContext.RegistryType.isMsk()) {
                     contractId = runtimeContext.getClientContractIdGenerator()
                             .generateTransactionFree(organization.getIdOfOrg());
                     autoContractId = true;
-                } else if(RuntimeContext.RegistryType.isSpb()) {
+                } else if (RuntimeContext.RegistryType.isSpb()) {
                     try {
                         String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
                         if (!StringUtils.isEmpty(c)) {
@@ -942,7 +943,8 @@ public class ClientManager {
             persistenceSession.saveOrUpdate(client);
             Long idOfClient = client.getIdOfClient();
 
-            if (autoContractId) RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);
+            if (autoContractId)
+                RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, contractId, idOfOrg);
 
             ///
             logger.debug("register client card");
@@ -982,7 +984,7 @@ public class ClientManager {
     }
 
     public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory)
+                                            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory)
             throws Exception {
         try {
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
@@ -1072,9 +1074,9 @@ public class ClientManager {
     }
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
-            String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
-            String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
-            String ssoid, String guid, ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                                       String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
+                                                       String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
+                                                       String ssoid, String guid, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1120,8 +1122,6 @@ public class ClientManager {
         clientGuardianToSave.setRemarks(remark);
         clientGuardianToSave.setCreatedFrom(createdFrom);
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
-        clientGuardianToSave.setPassportNumber(passportNumber);
-        clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);//Сохраняем клиента ДО сохранения изменений по мобильному номеру
         clientGuardianToSave.initClientMobileHistory(clientsMobileHistory);
         String ssoidOld = clientGuardianToSave.getSsoid();
@@ -1147,13 +1147,25 @@ public class ClientManager {
         }
         logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         session.update(clientGuardianToSave);
+
+        if (!StringUtils.isEmpty(passportNumber) && !StringUtils.isEmpty(passportSeries)) {
+            DulDetail dulDetail = new DulDetail();
+            dulDetail.setNumber(passportNumber);
+            dulDetail.setSeries(passportSeries);
+            dulDetail.setIdOfClient(clientGuardianToSave.getIdOfClient());
+            dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+
+            RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                    .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+        }
+
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
         return clientGuardianToSave;
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
-            ClientGuardianHistory clientGuardianHistory) {
+                                                                         Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
+                                                                         ClientGuardianHistory clientGuardianHistory) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1177,7 +1189,7 @@ public class ClientManager {
             clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
             clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
         }
-        if(enableSpecialNotification){
+        if (enableSpecialNotification) {
             clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian,
                     ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
         }
@@ -1196,8 +1208,8 @@ public class ClientManager {
     }
 
     public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Org organization, Long idOfClientChild, Iterator<Long> iterator,
-            ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception{
+                                      Org organization, Long idOfClientChild, Iterator<Long> iterator,
+                                      ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
@@ -1214,11 +1226,11 @@ public class ClientManager {
     }
 
     public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName,
-            String clientGuid, ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                         String clientGuid, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
         Query query = session.createQuery("select c.idOfClient from Client c where c.externalId = :externalId");
         query.setParameter("externalId", eszId);
-        Long idOfClient = (Long)query.uniqueResult();
+        Long idOfClient = (Long) query.uniqueResult();
         if (idOfClient != null) return idOfClient;
 
         ClientFieldConfig fc = new ClientFieldConfig();
@@ -1232,7 +1244,7 @@ public class ClientManager {
     }
 
     public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig,
-            boolean checkFullNameUnique, boolean noComment, ClientsMobileHistory clientsMobileHistory)
+                                      boolean checkFullNameUnique, boolean noComment, ClientsMobileHistory clientsMobileHistory)
             throws Exception {
         logger.debug("checkRequiredFields");
         fieldConfig.checkRequiredFields();
@@ -1251,7 +1263,7 @@ public class ClientManager {
             Client client;
 
             client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE,
+                    persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE,
                             dateCreate), clientsMobileHistory);
 
             persistenceTransaction.commit();
@@ -1287,7 +1299,7 @@ public class ClientManager {
 
 
     public static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
-            String secondName) throws Exception {
+                                      String secondName) throws Exception {
         if (StringUtils.isEmpty(secondName)) {
             return DAOUtils.existClient(persistenceSession, organization, firstName, null, surname);
         }
@@ -1296,7 +1308,7 @@ public class ClientManager {
 
 
     public static Client getClient(Session persistenceSession, Org organization, String firstName, String surname,
-            String secondName) throws Exception {
+                                   String secondName) throws Exception {
         Long idOfClient = ClientManager
                 .findClientByFullName(persistenceSession, organization, firstName, surname, secondName);
         if (idOfClient < 1 || idOfClient == null) {
@@ -1306,7 +1318,7 @@ public class ClientManager {
     }
 
     private static Long registerCardForClient(RuntimeContext runtimeContext, Session persistenceSession,
-            Transaction persistenceTransaction, ClientManager.ClientFieldConfig fieldConfig, Long idOfClient)
+                                              Transaction persistenceTransaction, ClientManager.ClientFieldConfig fieldConfig, Long idOfClient)
             throws Exception {
         String sCardType = fieldConfig.getValue(ClientManager.FieldId.CARD_TYPE);
         int cardType;
@@ -1340,10 +1352,11 @@ public class ClientManager {
     /**
      * Метод возвращает список клиентов, ко/ые для данной школы являются чужими.
      * Этими клиентами могут быть ученики, администрация и т.д. из чужой школы.
-     * @param session - экземпляр Session.
+     *
+     * @param session        - экземпляр Session.
      * @param destinationOrg - организация (школа), в ко/ой ищем чужих клиентов.
      * @return - хэш-мап клиентов. "RegularClients" - ключ для постоянных клиентов.
-     *                            "TemporaryClients" - ключ для временных клиентов.
+     * "TemporaryClients" - ключ для временных клиентов.
      */
 
     @SuppressWarnings("unchecked")
@@ -1434,11 +1447,11 @@ public class ClientManager {
     public static List<Client> findMatchedAllocatedClients(Session session, Long idOfOrg, String regExp) {
         List<Client> res = new ArrayList<Client>();
 
-        String sql = "SELECT idofclientgroup FROM cf_clientgroups where groupname ~ '"+regExp+"'";
+        String sql = "SELECT idofclientgroup FROM cf_clientgroups where groupname ~ '" + regExp + "'";
         Query query = session.createSQLQuery(sql);
         List idOfClientGroupResult = query.list();
         List<Long> idOfClientGroups = new ArrayList<Long>(idOfClientGroupResult.size());
-        for (Object obj : idOfClientGroupResult){
+        for (Object obj : idOfClientGroupResult) {
             Long value = Long.valueOf(obj.toString());
             idOfClientGroups.add(value);
         }
@@ -1467,7 +1480,7 @@ public class ClientManager {
 
         List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = new ArrayList<ClientGroupsByRegExAndOrgItem>();
 
-        for (Object obj : idOfClientGroupResult){
+        for (Object obj : idOfClientGroupResult) {
             Object[] resultItem = (Object[]) obj;
 
             Long groupId = Long.valueOf(resultItem[0].toString());
@@ -1485,7 +1498,7 @@ public class ClientManager {
 
         List<String> regexpListTrimed = new ArrayList<String>();
 
-        for (String str: regExpList) {
+        for (String str : regExpList) {
             regexpListTrimed.add(str.trim());
         }
 
@@ -1521,7 +1534,7 @@ public class ClientManager {
             criteria.add(Restrictions.eq("idOfClientGroup", clientGroupsByRegExAndOrgItem.getIdOfClientGroup()));
             criteria.setProjection(Projections.property("idOfClient"));
             List<Long> list = criteria.list();
-            if(list != null && list.size() > 0) {
+            if (list != null && list.size() > 0) {
                 res.addAll(list);
             }
         }
@@ -1591,14 +1604,14 @@ public class ClientManager {
         List<ClientGuardian> results = criteria.list();
 
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (ClientGuardian clientGuardian : results){
+        for (ClientGuardian clientGuardian : results) {
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if (cl != null && !cl.isDeletedOrLeaving()) {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
-                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName));
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient()), withFullName, clientGuardian.getRoleType()));
             }
         }
         return guardianItems;
@@ -1693,14 +1706,14 @@ public class ClientManager {
         List<ClientGuardian> results = criteria.list();
 
         List<ClientGuardianItem> wardItems = new ArrayList<ClientGuardianItem>(results.size());
-        for (ClientGuardian clientWard : results){
+        for (ClientGuardian clientWard : results) {
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
-            if(cl != null){
+            if (cl != null) {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
                         getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
-                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName));
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient), withFullName, clientWard.getRoleType()));
             }
         }
         return wardItems;
@@ -1738,7 +1751,7 @@ public class ClientManager {
             if (predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS) || predefined.equals(
                     ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS)) {
                 notificationSettings.add(new NotificationSettingItem(predefined, enableNotifications));
-            } else if(predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL)){
+            } else if (predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL)) {
                 notificationSettings.add(new NotificationSettingItem(predefined, enableSpecialNotification));
             } else {
                 notificationSettings.add(new NotificationSettingItem(predefined));
@@ -1749,14 +1762,14 @@ public class ClientManager {
 
     @SuppressWarnings("unchecked")
     /* получить список опекунов за исключением идентифткатора опекуна idOfGuardian
-    * если идентификатор опекуна пуст то выведутся все опекуны*/
+     * если идентификатор опекуна пуст то выведутся все опекуны*/
     public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, Long idOfGuardian) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
         idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
-        if(idOfGuardian!=null){
+        if (idOfGuardian != null) {
             idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
         }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
@@ -1777,10 +1790,9 @@ public class ClientManager {
                 builder.equal(clientGuardianRoot.get("idOfChildren"), idOfChildren),
                 builder.not(builder.equal(clientGuardianRoot.get("deletedState"), true)),
                 builder.equal(clientGuardianRoot.get("disabled"), false)));
-        List <ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
-        List <Long> clientsId = new ArrayList<>();
-        for (ClientGuardian clientGuardian: clientGuardians)
-        {
+        List<ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
+        List<Long> clientsId = new ArrayList<>();
+        for (ClientGuardian clientGuardian : clientGuardians) {
             clientsId.add(clientGuardian.getIdOfGuardian());
         }
         if (clientsId.isEmpty())
@@ -1792,16 +1804,14 @@ public class ClientManager {
         return session.createQuery(criteriaClient).getResultList();
     }
 
-    public static void addClientMigrationEntry(Session session,Org oldOrg,ClientGroup beforeMigrationGroup,
-            Org newOrg, Client client, String comment, String newGroupName){
+    public static void addClientMigrationEntry(Session session, Org oldOrg, ClientGroup beforeMigrationGroup,
+                                               Org newOrg, Client client, String comment, String newGroupName) {
         ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(comment);
-        if (beforeMigrationGroup != null)
-        {
+        if (beforeMigrationGroup != null) {
             migration.setOldGroupName(beforeMigrationGroup.getGroupName());
-        }
-        else {
+        } else {
             if (client.getClientGroup() != null) {
                 ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class,
                         new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
@@ -1813,7 +1823,7 @@ public class ClientManager {
     }
 
     public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
-            MigrantInitiatorEnum initiator, int years) {
+                                                             MigrantInitiatorEnum initiator, int years) {
         Long idOfProcessorMigrantRequest = MigrantsUtils
                 .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
         CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
@@ -1853,7 +1863,7 @@ public class ClientManager {
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
-        if(countResult>0){
+        if (countResult > 0) {
             Criteria clientCriteria = session.createCriteria(Client.class);
             clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
             clients = clientCriteria.list();
@@ -1877,7 +1887,7 @@ public class ClientManager {
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
-        if(countResult>0){
+        if (countResult > 0) {
             Criteria clientCriteria = session.createCriteria(Client.class);
             clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
             clients = clientCriteria.list();
@@ -1890,14 +1900,14 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", guardianId));
         criteria.add(Restrictions.eq("idOfChildren", clientId));
-        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
+        ClientGuardian cg = (ClientGuardian) criteria.uniqueResult();
         if (cg == null) return false;
         return cg.isDisabled();
     }
 
     /*Является ли опекунская связь Опекун-Клиент активной и включен ли в ней нужный тип оповещения*/
     public static Boolean allowedGuardianshipNotification(Session session, Long guardianId, Long clientId,
-            Long notifyType) throws Exception {
+                                                          Long notifyType) throws Exception {
         ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
         if (predefined == null) {
             return true;
@@ -1922,7 +1932,7 @@ public class ClientManager {
     }
 
     public static Boolean allowedGuardianshipNotificationNew(Session session, Long guardianId, Long clientId,
-                                                          Long notifyType) throws Exception {
+                                                             Long notifyType) throws Exception {
         ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
         if (predefined == null) {
             return true;
@@ -1936,7 +1946,7 @@ public class ClientManager {
                 builder.equal(clientGuardianRoot.get("idOfGuardian"), guardianId),
                 builder.not(builder.equal(clientGuardianRoot.get("deletedState"), true)),
                 builder.equal(clientGuardianRoot.get("disabled"), false)));
-        List <ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
+        List<ClientGuardian> clientGuardians = session.createQuery(criteria).getResultList();
         if (clientGuardians.isEmpty() && predefined.isEnabledAtDefault()) {
             return true;
         }
@@ -1962,30 +1972,30 @@ public class ClientManager {
 
     /* Удалить список опекунов клиента */
     public static void removeGuardiansByClient(Session session, Long idOfClient,
-            List<ClientGuardianItem> clientGuardians, ClientGuardianHistory clientGuardianHistory) {
+                                               List<ClientGuardianItem> clientGuardians, ClientGuardianHistory clientGuardianHistory) {
         Long version = generateNewClientGuardianVersion(session);
-        for (ClientGuardianItem item: clientGuardians){
+        for (ClientGuardianItem item : clientGuardians) {
             removeGuardianByClient(session, idOfClient, item.getIdOfClient(), version, clientGuardianHistory);
         }
     }
 
     /* Удалить список опекаемых клиента */
     public static void removeWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
-            ClientGuardianHistory clientGuardianHistory) {
+                                           ClientGuardianHistory clientGuardianHistory) {
         Long version = generateNewClientGuardianVersion(session);
-        for (ClientGuardianItem item: clientWards){
+        for (ClientGuardianItem item : clientWards) {
             removeGuardianByClient(session, item.getIdOfClient(), idOfClient, version, clientGuardianHistory);
         }
     }
 
     /* Удалить опекуна клиента */
     public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version,
-            ClientGuardianHistory clientGuardianHistory) {
+                                              ClientGuardianHistory clientGuardianHistory) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
-        if(clientGuardian!=null) {
+        if (clientGuardian != null) {
             clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
             clientGuardian.delete(version);
             session.update(clientGuardian);
@@ -1994,20 +2004,21 @@ public class ClientManager {
 
     /* Добавить список опекунов клиента */
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians,
-            ClientGuardianHistory clientGuardianHistory) {
+                                            ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
-            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType, ClientGuardianHistory clientGuardianHistory) {
+                                           ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
+                                           ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType,
+                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType, Boolean informing) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -2020,6 +2031,8 @@ public class ClientManager {
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
+            clientGuardian.setDisabled(informing);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -2030,7 +2043,7 @@ public class ClientManager {
             clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
             session.persist(clientGuardianHistory);
             //
-            Client guardian = (Client)session.get(Client.class, idOfGuardian);
+            Client guardian = (Client) session.get(Client.class, idOfGuardian);
             try {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
@@ -2046,6 +2059,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setRepresentType(representType);
+            clientGuardian.setRoleType(roleType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -2073,7 +2087,7 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion,
-            ClientGuardianHistory clientGuardianHistory) {
+                                            ClientGuardianHistory clientGuardianHistory) {
         if (guardian != null) {
             Criteria cr = session.createCriteria(ClientGuardian.class);
             cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
@@ -2113,7 +2127,7 @@ public class ClientManager {
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
     public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile,
-            Boolean value, Long newVersion, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
+                                          Boolean value, Long newVersion, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (guardian != null) {
             Criteria cr = session.createCriteria(ClientGuardian.class);
             cr.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
@@ -2148,8 +2162,7 @@ public class ClientManager {
         Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
         for (NotificationSettingItem item : notificationItems) {
             //Для 17 типа мы не можем менять напрямую, только через 11
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
                 continue;
             }
 
@@ -2157,8 +2170,7 @@ public class ClientManager {
             createOrRemoveSetting(dbSettings, newSetting, item.isEnabled());
 
             //Если поменяли 11, то меняем и 17 событие
-            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()))
-            {
+            if (item.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                 ClientGuardianNotificationSetting culture = new ClientGuardianNotificationSetting(clientGuardian, ClientNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue());
                 createOrRemoveSetting(dbSettings, culture, item.isEnabled());
             }
@@ -2178,7 +2190,7 @@ public class ClientManager {
     }
 
     private static void createOrRemoveSetting(Set<ClientGuardianNotificationSetting> dbSettings,
-                                                                    ClientGuardianNotificationSetting newSetting, Boolean enabled) {
+                                              ClientGuardianNotificationSetting newSetting, Boolean enabled) {
         for (ClientGuardianNotificationSetting dbSetting : dbSettings) {
             if (dbSetting.getNotifyType().equals(newSetting.getNotifyType())) {
                 if (!enabled) {
@@ -2193,13 +2205,13 @@ public class ClientManager {
     }
 
     public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
-            ClientGuardianHistory clientGuardianHistory) {
+                                        ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
         }
     }
 
@@ -2221,12 +2233,12 @@ public class ClientManager {
     }
 
     /* История миграции клиента */
-    public static List<ClientMigrationItemInfo> reloadMigrationInfoByClient(Session session, Long idOfClient){
+    public static List<ClientMigrationItemInfo> reloadMigrationInfoByClient(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientMigration.class);
         criteria.createCriteria("client").add(Restrictions.eq("idOfClient", idOfClient));
         List<ClientMigration> clientMigrations = criteria.list();
         List<ClientMigrationItemInfo> clientMigrationItemInfoList = new ArrayList<ClientMigrationItemInfo>(clientMigrations.size());
-        for (ClientMigration clientMigration: clientMigrations){
+        for (ClientMigration clientMigration : clientMigrations) {
             clientMigrationItemInfoList.add(new ClientMigrationItemInfo(clientMigration));
         }
         return clientMigrationItemInfoList;
@@ -2239,8 +2251,8 @@ public class ClientManager {
         session.update(registryChangeGuardians);
     }
 
-    public static String firstUpperCase(String word){
-        if(word == null || word.isEmpty()) return "";
+    public static String firstUpperCase(String word) {
+        if (word == null || word.isEmpty()) return "";
         return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 
@@ -2252,7 +2264,7 @@ public class ClientManager {
         return (ClientGroup) criteria.uniqueResult();
     }
 
-    public static void resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(Org org, Session session) throws Exception{
+    public static void resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(Org org, Session session) throws Exception {
         Date beginDate = CalendarUtils.addMonth(new Date(), -1); // Время выборки - месяц
         List<Long> listOfIdsFriendlyOrgs = new LinkedList<Long>(); // Получение списка ID дружественных и целевого ОО
         for (Org fo : org.getFriendlyOrg()) {
@@ -2272,53 +2284,53 @@ public class ClientManager {
             );
             getMultiCardOwnersIdQuery.setParameterList("orgIds", listOfIdsFriendlyOrgs);
             List<BigInteger> multiCardOwnersIds = getMultiCardOwnersIdQuery.list(); // Получение списка ID клиентов с включеным режимом, имеющие на руках больше 1 активной карты
-            if(multiCardOwnersIds == null || multiCardOwnersIds.isEmpty()){
+            if (multiCardOwnersIds == null || multiCardOwnersIds.isEmpty()) {
                 return;
             }
 
             Query getLastActiveCardQuery = session.createSQLQuery(
-                                            " select distinct on(crd.idofclient) crd.idofclient, crd.idofcard, "
-                                            + "                     case "
-                                            + "                        when qee.eventdate is null and qo.eventdate is null then -1 " // Если за месяц не было событий, то -1
-                                            + "                        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate  "
-                                            + "                        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate  "
-                                            + "                        else -1  "
-                                            + "                     end eventdate "
-                                            + " from cf_cards crd "
-                                            + " left join (select idofcard, max(createddate) as eventdate "
-                                            + "           from cf_orders  "
-                                            + "           where idofclient in (:idOfClients) "
-                                            + "           and createddate >= :beginDate "
-                                            + "           and idofcard is not null "
-                                            + "           group by idofcard  "
-                                            + "           order by eventdate desc "
-                                            + "           ) qo on crd.idofcard = qo.idofcard "
-                                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
-                                            + "           from cf_enterevents ee "
-                                            + "           join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
-                                            + "           where crd.idofclient in (:idOfClients) "
-                                            + "           and ee.evtdatetime >= :beginDate "
-                                            + "           group by crd.idofcard  "
-                                            + "           order by eventdate desc "
-                                            + "           ) qee on crd.idofcard = qee.idofcard "
-                                            + " where crd.state = 0 "
-                                            + " and crd.idofclient in (:idOfClients) "
-                                            + " order by crd.idofclient desc, eventdate desc "
+                    " select distinct on(crd.idofclient) crd.idofclient, crd.idofcard, "
+                            + "                     case "
+                            + "                        when qee.eventdate is null and qo.eventdate is null then -1 " // Если за месяц не было событий, то -1
+                            + "                        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate  "
+                            + "                        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate  "
+                            + "                        else -1  "
+                            + "                     end eventdate "
+                            + " from cf_cards crd "
+                            + " left join (select idofcard, max(createddate) as eventdate "
+                            + "           from cf_orders  "
+                            + "           where idofclient in (:idOfClients) "
+                            + "           and createddate >= :beginDate "
+                            + "           and idofcard is not null "
+                            + "           group by idofcard  "
+                            + "           order by eventdate desc "
+                            + "           ) qo on crd.idofcard = qo.idofcard "
+                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
+                            + "           from cf_enterevents ee "
+                            + "           join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
+                            + "           where crd.idofclient in (:idOfClients) "
+                            + "           and ee.evtdatetime >= :beginDate "
+                            + "           group by crd.idofcard  "
+                            + "           order by eventdate desc "
+                            + "           ) qee on crd.idofcard = qee.idofcard "
+                            + " where crd.state = 0 "
+                            + " and crd.idofclient in (:idOfClients) "
+                            + " order by crd.idofclient desc, eventdate desc "
             );
             getLastActiveCardQuery.setParameterList("idOfClients", multiCardOwnersIds);
             getLastActiveCardQuery.setParameter("beginDate", beginDate.getTime());
             List<Object[]> lastActiveCards = getLastActiveCardQuery.list();
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
-            for(Object[] row : lastActiveCards){
-                if(row[0] == null) { // row[0] - ID клиента
+            for (Object[] row : lastActiveCards) {
+                if (row[0] == null) { // row[0] - ID клиента
                     continue;
                 }
                 Client client = (Client) session.get(Client.class, ((BigInteger) row[0]).longValue());
                 List<Card> clientsCards = new LinkedList<Card>(client.getCards());
-                if(row[1] == null || (row[2] == null || row[2].equals(undefinedResult))){ // row[1] - ID карты, row[2] - время последнего события
+                if (row[1] == null || (row[2] == null || row[2].equals(undefinedResult))) { // row[1] - ID карты, row[2] - время последнего события
                     Card lastCreatedCard = DAOUtils.getLastCreatedActiveCardByClient(session, client);
-                    if(lastCreatedCard == null){
+                    if (lastCreatedCard == null) {
                         continue;
                     }
                     clientsCards.remove(lastCreatedCard);
@@ -2326,8 +2338,8 @@ public class ClientManager {
                     Card lastActiveCard = (Card) session.get(Card.class, ((BigInteger) row[1]).longValue());
                     clientsCards.remove(lastActiveCard);
                 }
-                for(Card card : clientsCards){
-                    if(card.getState().equals(CardState.ISSUED.getValue())){
+                for (Card card : clientsCards) {
+                    if (card.getState().equals(CardState.ISSUED.getValue())) {
                         cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                                 CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
                                 "Другое", card.getIssueTime(), card.getExternalId());
@@ -2338,10 +2350,9 @@ public class ClientManager {
 
         } catch (Exception e) {
             logger.error("Failed to reset flags MultiCardMode at clients: ", e);
-        }
-        finally {
+        } finally {
             Query resetFlagMultiCardModeAndUpVersionQuery = session.createSQLQuery(
-                            " update cf_clients "
+                    " update cf_clients "
                             + " set multicardmode = 0, clientregistryversion = :nextClientRegistryVersion"
                             + " where idoforg in (:orgIds) "
                             + " and multicardmode = 1 "
@@ -2353,74 +2364,74 @@ public class ClientManager {
     }
 
     public static void blockExtraCardOfClient(Client client, Session persistenceSession) {
-        try{
+        try {
             BigInteger undefinedResult = new BigInteger("-1"); // Для сортировки в SQL-запросе требовалось значение, отличное от NULL
             Date beginDate = CalendarUtils.addMonth(new Date(), -1);
             Query getDateAndIdLastActiveCardQuery = persistenceSession.createSQLQuery(
-                                            " select crd.idofcard, "
-                                            + "       case "
-                                            + "        when qo.idofcard is null and qee.idofcard is null then -1 " // Если за месяц не было событий, то -1
-                                            + "        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate "
-                                            + "        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate "
-                                            + "        else -1 "
-                                            + "       end maxeventdate "
-                                            + " from cf_cards crd "
-                                            + " left join (select idofcard, max(createddate) as eventdate "
-                                            + "     from cf_orders "
-                                            + "     where idofclient = :idOfClient "
-                                            + "     and createddate >= :beginDate "
-                                            + "     and idofcard is not null "
-                                            + "     group by idofcard "
-                                            + " ) qo on crd.idofcard = qo.idofcard "
-                                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
-                                            + "     from cf_enterevents ee "
-                                            + "     join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
-                                            + "     where crd.idofclient = :idOfClient "
-                                            + "     and ee.evtdatetime >= :beginDate "
-                                            + "     group by crd.idofcard "
-                                            + " ) qee on crd.idofcard = qee.idofcard "
-                                            + " where crd.state = 0 "
-                                            + " and crd.idofclient = :idOfClient "
-                                            + " and (select count(*) "
-                                            + "     from cf_cards "
-                                            + "     where idofclient = :idOfClient "
-                                            + "     and crd.state = 0 ) > 1 "
-                                            + " order by maxeventdate desc "
-                                            + " limit 1"
+                    " select crd.idofcard, "
+                            + "       case "
+                            + "        when qo.idofcard is null and qee.idofcard is null then -1 " // Если за месяц не было событий, то -1
+                            + "        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate "
+                            + "        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate "
+                            + "        else -1 "
+                            + "       end maxeventdate "
+                            + " from cf_cards crd "
+                            + " left join (select idofcard, max(createddate) as eventdate "
+                            + "     from cf_orders "
+                            + "     where idofclient = :idOfClient "
+                            + "     and createddate >= :beginDate "
+                            + "     and idofcard is not null "
+                            + "     group by idofcard "
+                            + " ) qo on crd.idofcard = qo.idofcard "
+                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
+                            + "     from cf_enterevents ee "
+                            + "     join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
+                            + "     where crd.idofclient = :idOfClient "
+                            + "     and ee.evtdatetime >= :beginDate "
+                            + "     group by crd.idofcard "
+                            + " ) qee on crd.idofcard = qee.idofcard "
+                            + " where crd.state = 0 "
+                            + " and crd.idofclient = :idOfClient "
+                            + " and (select count(*) "
+                            + "     from cf_cards "
+                            + "     where idofclient = :idOfClient "
+                            + "     and crd.state = 0 ) > 1 "
+                            + " order by maxeventdate desc "
+                            + " limit 1"
             );
             getDateAndIdLastActiveCardQuery.setParameter("idOfClient", client.getIdOfClient());
             getDateAndIdLastActiveCardQuery.setParameter("beginDate", beginDate.getTime());
             Object[] result = (Object[]) getDateAndIdLastActiveCardQuery.uniqueResult();
-            if(result == null){
+            if (result == null) {
                 return;
             }
-            Long idOfLastActiveCard = ((BigInteger)result[0]).longValue();
+            Long idOfLastActiveCard = ((BigInteger) result[0]).longValue();
             List<Card> clientsCards = new LinkedList<Card>(client.getCards());
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
-            if(result[1].equals(undefinedResult)){ // Если за месяц не было активности, то как основную считать последнюю выданную
+            if (result[1].equals(undefinedResult)) { // Если за месяц не было активности, то как основную считать последнюю выданную
                 Card lastCreatedCard = DAOUtils.getLastCreatedActiveCardByClient(persistenceSession, client);
                 clientsCards.remove(lastCreatedCard);
             } else {
                 Card lastActiveCard = (Card) persistenceSession.get(Card.class, idOfLastActiveCard);
-                if(lastActiveCard == null){
+                if (lastActiveCard == null) {
                     throw new Exception("From DB come ID: " + idOfLastActiveCard + " but such a card does not exist");
                 }
                 clientsCards.remove(lastActiveCard);
             }
-            for(Card card : clientsCards){
-                if(card.getState().equals(CardState.ISSUED.getValue())){
+            for (Card card : clientsCards) {
+                if (card.getState().equals(CardState.ISSUED.getValue())) {
                     cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
                             "Другое", card.getIssueTime(), card.getExternalId());
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to block extra cards for client contractID: " + client.getContractId(), e);
         }
     }
 
     public static void removeExternalIdFromClients(Session session, Long externalId,
-            ClientsMobileHistory clientsMobileHistory) throws Exception {
+                                                   ClientsMobileHistory clientsMobileHistory) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("externalId", externalId));
         List<Client> clientList = criteria.list();
@@ -2438,13 +2449,13 @@ public class ClientManager {
     }
 
     public static void createClientGroupMigrationHistoryLite(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
+                                                             String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
         createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
                 clientGroupName, comment, false, clientGuardianHistory);
     }
 
     public static void createClientGroupMigrationHistoryFull(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment, boolean full, ClientGuardianHistory clientGuardianHistory) {
+                                                             String clientGroupName, String comment, boolean full, ClientGuardianHistory clientGuardianHistory) {
         ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
         if (client.getClientGroup() != null) {
             clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -2462,13 +2473,14 @@ public class ClientManager {
     }
 
     public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
-            String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
+                                                         String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
         createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
                 clientGroupName, comment, true, clientGuardianHistory);
     }
 
     public static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
-        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
+            return;
         try {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
             Long version = null;
@@ -2490,8 +2502,9 @@ public class ClientManager {
     }
 
     private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup,
-            ClientGuardianHistory clientGuardianHistory) {
-        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+                                                           ClientGuardianHistory clientGuardianHistory) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
+            return;
         try {
             List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
             for (Client guardian : guardians) {
@@ -2563,4 +2576,130 @@ public class ClientManager {
         q.setParameterList("clientList", clientList);
         q.executeUpdate();
     }
+
+    //todo уточнить как найти представителя
+    public static boolean isClientGuardian(Client client) {
+        return client.getIdOfClientGroup() > 1000000000L;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void validateSan(Session session, String san, Long idOfClient) throws Exception {
+        if (!checkSanNumber(san))
+            throw new Exception("Неверный номер СНИЛС");
+
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("san", san));
+        criteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        List<Client> clients = (List<Client>) criteria.list();
+
+        for (Client foundClient : clients) {
+            if (foundClient.getSan().equals(san) && !foundClient.getIdOfClient().equals(idOfClient)) {
+                throw new Exception("Клиент с введенным значением СНИЛС уже существует");
+            }
+        }
+    }
+
+    public static boolean checkSanNumber(String san) {
+        String number = san.replaceAll("[\\D]", "");
+        if (number.length() != 11)
+            return false;
+        if (Integer.parseInt(number.substring(0, 9)) <= 1001998)
+            return false;
+
+        int checkSum = Integer.parseInt(number.substring(number.length() - 2));
+        int sum = 0;
+
+        for (int i = 0; i < 9; i++) {
+            int repeatCount = 0;
+            sum += Character.digit(number.charAt(i), 10) * (9 - i);
+            for (int s = 0; s < 9; s++) {
+                if (number.charAt(i) == number.charAt(s))
+                    repeatCount++;
+                else
+                    repeatCount = 0;
+                if (repeatCount == 3)
+                    return false;
+            }
+        }
+
+        if (sum < 100 && sum == checkSum) {
+            return true;
+        } else if ((sum == 100 || sum == 101) && checkSum == 0) {
+            return true;
+        } else return sum > 101 && (sum % 101 == checkSum || (sum % 101 == 100 && checkSum == 0));
+    }
+
+    public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
+                                                               String patronymic, String mobile, String snils) {
+        Long idOfClientGroup = 1000000000L;
+        String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
+        boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
+
+        if(!fioIsEmpty) {
+            q += " and ( ";
+        }
+        if (lastName != null) {
+            q += " (upper(c.person.surname) = :lastName) ";
+        }
+        if (firstName != null) {
+            if (lastName != null)
+                q+= " and ";
+            q += " (upper(c.person.firstName) = :firstName) ";
+        }
+        if (patronymic != null) {
+            if (lastName != null || firstName != null)
+                q+= " and ";
+            q += " (upper(c.person.secondName) = :patronymic) ";
+        }
+        if(!fioIsEmpty) {
+            q += ")";
+        }
+        if (mobile != null || snils != null){
+            q += fioIsEmpty ? " and " : " or ";
+        }
+        if (mobile != null) {
+            q += " c.mobile = :mobile ";
+        }
+        if (snils != null) {
+            q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
+        }
+        Query query = session.createQuery(q);
+        query.setParameter("idOfClientGroup", idOfClientGroup);
+
+        if (firstName != null) {
+            query.setParameter("firstName", StringUtils.upperCase(firstName));
+        }
+        if (lastName != null) {
+            query.setParameter("lastName", StringUtils.upperCase(lastName));
+        }
+        if (patronymic != null) {
+            query.setParameter("patronymic", StringUtils.upperCase(patronymic));
+        }
+        if (mobile != null) {
+            query.setParameter("mobile", mobile);
+        }
+        if (snils != null) {
+            query.setParameter("snils", snils);
+        }
+        return query.list();
+    }
+
+    public static void validateFio(String surname, String firstName, String secondName) throws Exception {
+        String fio = String.format("%S %S %S", surname, firstName, secondName);
+        String latin = ".*[a-zA-Z]+.*";
+        String cyrillic = ".*[а-яА-Я]+.*";
+
+        if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()){
+            throw new Exception("Только русские или только английские буквы");
+        }
+
+        if (surname.endsWith("-") || firstName.endsWith("-") || secondName.endsWith("-")) {
+            throw new Exception("Знак \"-\" не может быть последним символом элемента.");
+        }
+
+        if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
+            throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
+        }
+    }
+
 }

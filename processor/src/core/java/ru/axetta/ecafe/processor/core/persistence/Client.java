@@ -61,6 +61,7 @@ public class Client {
     public static final String[] GROUP_NAME = {"Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
     public static final String[] GROUP_NAME_SCHOOL = {"Средняя школа","Основное общее образование","Начальное общее образование",
                                                "Среднее общее образование"};
+    public static final Long PASSPORT_RF_TYPE = 15L;
 
     private Long idOfClient;
     private long version;
@@ -143,8 +144,6 @@ public class Client {
     private ClientCreatedFromType createdFrom;
     private String createdFromDesc;
     private Boolean specialMenu;
-    private String passportNumber;
-    private String passportSeries;
     private Boolean hasActiveSmartWatch;
     private SmartWatchVendor vendor;
     private String iacRegId;
@@ -156,6 +155,7 @@ public class Client {
 
     private Boolean userOP;
     private ClientsMobileHistory clientsMobileHistory = null;
+    private Set<DulDetail> dulDetail;
 
     protected Client() {
         // For Hibernate only
@@ -1214,22 +1214,6 @@ public class Client {
         this.specialMenu = preorder;
     }
 
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
-    }
-
     public Boolean getHasActiveSmartWatch() {
         return hasActiveSmartWatch;
     }
@@ -1312,5 +1296,13 @@ public class Client {
 
     public void setFoodboxavailabilityguardian(Boolean foodboxavailabilityguardian) {
         this.foodboxavailabilityguardian = foodboxavailabilityguardian;
+    }
+
+    public Set<DulDetail> getDulDetail() {
+        return dulDetail;
+    }
+
+    public void setDulDetail(Set<DulDetail> dulDetail) {
+        this.dulDetail = dulDetail;
     }
 }
