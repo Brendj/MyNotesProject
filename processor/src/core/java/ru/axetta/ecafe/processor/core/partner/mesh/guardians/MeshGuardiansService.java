@@ -44,7 +44,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
-    public static final String PERSONS_LIKE_EXPAND = "documents,contacts";
+    public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
