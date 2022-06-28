@@ -329,7 +329,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     PersonDocument buildPersonDocument(DulDetail dulDetail) {
-        Format formatter = new SimpleDateFormat("dd.MM.yyyy");
+        Format formatter = new SimpleDateFormat("yyyy-MM-dd");
         PersonDocument personDocument = new PersonDocument();
         personDocument.setId(0);
         personDocument.setPersonId(PERSON_ID_STUB);
@@ -597,10 +597,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        Date birthDate,
                                        String snils,
                                        String mobile,
-                                       String email) {
+                                       String email,
+                                       List<DulDetail> dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
+            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic,
+                    lastName, genderId, birthDate, snils, mobile, email, dulDetail);
             String json = objectMapper.writeValueAsString(responsePersons);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(PERSONS_CREATE_URL, json);
             if (result.getCode() == HttpStatus.SC_OK) {

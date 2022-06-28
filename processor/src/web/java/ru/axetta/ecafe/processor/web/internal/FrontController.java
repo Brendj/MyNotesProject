@@ -2823,7 +2823,9 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new DocumentResponse(idOfDocument);
+        DocumentItem documentResponse = new DocumentItem();
+        documentResponse.setIdDocument(idOfDocument);
+        return new DocumentResponse(Collections.singletonList(documentResponse));
     }
 
     @WebMethod(operationName = "updateDocumentForClient")
@@ -3069,7 +3071,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if ((lastName == null || firstName == null) && snils == null && mobile == null)
+            if (lastName == null && snils == null && mobile == null)
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
 
