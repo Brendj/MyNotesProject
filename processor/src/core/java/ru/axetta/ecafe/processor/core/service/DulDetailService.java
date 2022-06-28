@@ -57,29 +57,29 @@ public class DulDetailService {
 
     public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         validateDul(session, dulDetail, client);
-//        if(ClientManager.isClientGuardian(client)) {
-//            MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
-//            checkError(documentResponse);
-//        }
+        if(ClientManager.isClientGuardian(client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
+            checkError(documentResponse);
+        }
         session.merge(dulDetail);
     }
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         validateDul(session, dulDetail, client);
-//        if(ClientManager.isClientGuardian(client)) {
-//            MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
-//            checkError(documentResponse);
-//            dulDetail.setIdMkDocument(documentResponse.getId());
-//        }
+        if(ClientManager.isClientGuardian(client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
+            checkError(documentResponse);
+            dulDetail.setIdMkDocument(documentResponse.getId());
+        }
         session.save(dulDetail);
         return dulDetail.getId();
     }
 
     public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-//        if(ClientManager.isClientGuardian(client)) {
-//            MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
-//            checkError(documentResponse);
-//        }
+        if(ClientManager.isClientGuardian(client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
+            checkError(documentResponse);
+        }
         session.merge(dulDetail);
     }
 
