@@ -19,7 +19,6 @@ import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -952,8 +951,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         validateExistingGuardians();
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
-        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, this.idOfClient, this.person.surname,
-                this.person.firstName, this.mobile, this.email);
+//        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, this.idOfClient, this.person.surname,
+//                this.person.firstName, this.mobile, this.email);
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -1199,7 +1198,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
                     .createPerson(person.getFirstName(),
                             person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                            client.getSan(), client.getMobile().substring(1), client.getEmail());
+                            client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getMeshGuid());
             else

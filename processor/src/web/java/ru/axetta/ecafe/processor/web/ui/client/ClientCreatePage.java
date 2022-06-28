@@ -28,6 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.context.FacesContext;
+import javax.faces.el.MethodBinding;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
@@ -251,6 +252,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private ClientGuardianItem currentClientWard;
     private List<ClientGuardianItem> clientWardItems = new ArrayList<>();
     private String typeAddClient;
+
+    private DulDetail dulForRemove;
 
     public String getTypeAddClient() {
         return typeAddClient;
@@ -570,6 +573,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.dulDetail = dulDetail;
     }
 
+    public DulDetail getDulForRemove() {
+        return dulForRemove;
+    }
+
+    public void setDulForRemove(DulDetail dulForRemove) {
+        this.dulForRemove = dulForRemove;
+    }
+
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -633,7 +644,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         return null;
     }
 
-
     public Client createClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (this.org.getIdOfOrg() == null) {
@@ -643,8 +653,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             throw new Exception("Укажите фамилия и имя обслуживаемого лица");
         }
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
-        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, null, this.person.surname,
-                this.person.firstName, this.mobile, this.email);
+//        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, null, this.person.surname,
+//                this.person.firstName, this.mobile, this.email);
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
             this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(this.org.getIdOfOrg());
@@ -727,22 +737,37 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
 
+        Date currentDate = new Date();
+        for (DulDetail dul : this.dulDetail) {
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
+            dul.setIdOfClient(client.getIdOfClient());
+            dul.setCreateDate(currentDate);
+            dul.setLastUpdate(currentDate);
+            dul.setDeleteState(false);
+            persistenceSession.save(dul);
+        }
+
         if (isParentGroup()) {
-            PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
-                    .createPerson(person.getFirstName(),
+            if (birthDate == null)
+                throw new Exception("Не заполнено поле \"Дата рождения\"");
+
+            PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
                             person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                            client.getSan(), client.getMobile().substring(1), client.getEmail());
+                            client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getMeshGuid());
             else
                 throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
 
             for (ClientGuardianItem clientWardItem : clientWardItems) {
-                RuntimeContext.getAppContext().getBean(MeshGuardiansService.class).addGuardianToClient(client.getMeshGUID(),
+                personResponse = getMeshGuardiansService().addGuardianToClient(client.getMeshGUID(),
                         clientWardItem.getMeshGuid(), clientWardItem.getRole());
+                if (!personResponse.getCode().equals(PersonResponse.OK_CODE))
+                    throw new Exception(String.format("Ошибка создания связи с обучающимся idOfClient = %s : %s",
+                            clientWardItem.getIdOfClient(), personResponse.getMessage()));
             }
         }
-
         persistenceSession.update(client);
         if (autoContractId)
             RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
@@ -756,15 +781,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-
-        for (DulDetail dul : this.dulDetail) {
-            dul.setIdOfClient(client.getIdOfClient());
-            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
-                throw new Exception("Не заполнено поле \"Номер\" документа");
-        }
-
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateAndSaveDulDetails(persistenceSession, this.dulDetail, client.getIdOfClient());
 
         if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
             clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
@@ -861,7 +877,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 }
                 filter = filter.substring(0, filter.length() - 1);
             }
-
         }
     }
 
@@ -896,5 +911,15 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             i++;
         }
         return result;
+    }
+
+    public Object deleteDul() {
+        this.dulDetail.remove(dulForRemove);
+        dulForRemove = null;
+        return null;
+    }
+
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 }
