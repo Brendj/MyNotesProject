@@ -8,19 +8,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum EntityType {
-    PERSON("info"),
-    PERSON_AGENT("agent"),
-    PERSON_ADDRESS("address"),
-    PERSON_CONTACT("contact"),
-    PERSON_DOCUMENT("document"),
-    PERSON_EDUCATION("education"),
-    PERSON_IDS("ids"),
-    CATEGORY("categories"),
-    PERSON_PREVENTION("prevention"),
-    VALIDATION("validation"),
-    CLASS("class");
+    PERSON("person", null),
+    PERSON_AGENT("person_agent", "agent"),
+    PERSON_ADDRESS("person_address", "address"),
+    PERSON_CONTACT("person_contact", "contact"),
+    PERSON_DOCUMENT("person_document", "document"),
+    PERSON_EDUCATION("person_education", "education"),
+    CATEGORY("person_category", "categories"),
+    PERSON_PREVENTION("person_prevention", "prevention"),
+    CLASS("class","class");
 
-    EntityType(String apiField){
+    EntityType(String entityName, String apiField){
+        this.entityName = entityName;
         this.apiField = apiField;
     }
 
@@ -30,16 +29,21 @@ public enum EntityType {
             return null;
         }
         for(EntityType t : EntityType.values()){
-            if(t.name().toLowerCase().equals(entityName)){
+            if(t.getEntityName().equals(entityName)){
                 return t;
             }
         }
         return null;
     }
 
-    private String apiField;
+    private final String entityName;
+    private final String apiField;
 
     public String getApiField() {
         return apiField;
+    }
+
+    public String getEntityName() {
+        return entityName;
     }
 }

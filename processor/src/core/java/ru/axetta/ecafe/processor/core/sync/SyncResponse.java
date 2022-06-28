@@ -21,6 +21,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.ResHardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
@@ -1269,33 +1271,36 @@ public class SyncResponse {
     private ResHardwareSettingsRequest resHardwareSettingsRequest;
     private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
     private ExemptionVisitingClient resExemptionVisitingClient;
+    private FoodBoxPreorderNew foodBoxPreorderNew;
+    private ResFoodBoxChanged resFoodBoxChanged;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
-            String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
-            ResPaymentRegistry resPaymentRegistry, ResAccountOperationsRegistry resAccountOperationsRegistry,
-            AccIncRegistry accIncRegistry, ClientRegistry clientRegistry, ResOrgStructure resOrgStructure,
-            ResMenuExchangeData resMenuExchangeData, ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
-            ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData,
-            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
-            QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
-            ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
-            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
-            ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
-            ResReestrTaloonPreorder resReestrTaloonPreorder, ReestrTaloonPreorderData reestrTaloonPreorderData,
-            OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
-            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
-            ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
-            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
-            ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
-            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer, ExemptionVisitingSection exemptionVisitingSection, ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer,
-            ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
-            ResHardwareSettingsRequest resHardwareSettingsRequest,
-            ResTurnstileSettingsRequest resTurnstileSettingsRequest,
-            ExemptionVisitingClient resExemptionVisitingClient) {
+                        String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
+                        ResPaymentRegistry resPaymentRegistry, ResAccountOperationsRegistry resAccountOperationsRegistry,
+                        AccIncRegistry accIncRegistry, ClientRegistry clientRegistry, ResOrgStructure resOrgStructure,
+                        ResMenuExchangeData resMenuExchangeData, ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
+                        ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData,
+                        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
+                        CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
+                        QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
+                        ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
+                        AccountsRegistry accountsRegistry, ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
+                        ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
+                        ResReestrTaloonPreorder resReestrTaloonPreorder, ReestrTaloonPreorderData reestrTaloonPreorderData,
+                        OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
+                        ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
+                        ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
+                        ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
+                        ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
+                        ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
+                        ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer, ExemptionVisitingSection exemptionVisitingSection, ExemptionVisitingSectionForARMAnswer exemptionVisitingSectionForARMAnswer,
+                        ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData,
+                        ResHardwareSettingsRequest resHardwareSettingsRequest,
+                        ResTurnstileSettingsRequest resTurnstileSettingsRequest,
+                        ExemptionVisitingClient resExemptionVisitingClient,
+                        FoodBoxPreorderNew foodBoxPreorderNew, ResFoodBoxChanged resFoodBoxChanged) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1367,6 +1372,8 @@ public class SyncResponse {
         this.resHardwareSettingsRequest = resHardwareSettingsRequest;
         this.resTurnstileSettingsRequest = resTurnstileSettingsRequest;
         this.resExemptionVisitingClient = resExemptionVisitingClient;
+        this.foodBoxPreorderNew = foodBoxPreorderNew;
+        this.resFoodBoxChanged = resFoodBoxChanged;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1716,6 +1723,13 @@ public class SyncResponse {
         // Список клиентов с измененными датами (по ЕМИАС)
         if (null != resExemptionVisitingClient) {
             envelopeElement.appendChild(resExemptionVisitingClient.toElement(document));
+        }
+
+        if (foodBoxPreorderNew != null) {
+            envelopeElement.appendChild(foodBoxPreorderNew.toElement(document));
+        }
+        if (resFoodBoxChanged != null) {
+            envelopeElement.appendChild(resFoodBoxChanged.toElement(document));
         }
     }
 

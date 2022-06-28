@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderAvailable;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -61,6 +63,15 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxCells.FoodBoxCellsItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxCells.FoodBoxCellsSync;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxChanged.FoodBoxPreorderChanged;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxAvailableItem;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxDishRemain.FoodBoxDishRemain;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxProcessorChanged;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxProcessorNew;
+import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.ResFoodBoxChanged.ResFoodBoxChanged;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
@@ -444,6 +455,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -1192,6 +1205,37 @@ public class Processor implements SyncProcessor {
             }
         }
 
+        try {
+            FoodBoxPreorderChanged foodBoxPreorderChanged = request.getFoodBoxPreorderChanged();
+            if (foodBoxPreorderChanged != null) {
+                resFoodBoxChanged = processFoodBoxPreorderChanged(foodBoxPreorderChanged, request.getIdOfOrg());
+                foodBoxPreorderNew = processFoodBoxPreorderNew(request.getIdOfOrg(), foodBoxPreorderChanged.getMaxVersion());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorder: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxDishRemain foodBoxDishRemain = request.getFoodBoxDishRemain();
+            if (foodBoxDishRemain != null) {
+                processFoodBoxPreorderDishRemain(foodBoxDishRemain, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorderDishRemain: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxCellsSync foodBoxCellsSync = request.getFoodBoxCells();
+            if (foodBoxCellsSync != null) {
+                processFoodBoxCells(foodBoxCellsSync, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxCells: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
@@ -1215,7 +1259,7 @@ public class Processor implements SyncProcessor {
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -2476,6 +2520,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2573,7 +2619,7 @@ public class Processor implements SyncProcessor {
                 resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2641,6 +2687,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2720,7 +2768,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
@@ -2787,6 +2835,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2865,7 +2915,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildRequestsSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -2932,6 +2982,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<>();
 
@@ -3010,7 +3062,7 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -3078,6 +3130,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3157,7 +3211,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -3225,6 +3279,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3340,7 +3396,7 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -3432,6 +3488,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3578,7 +3636,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -3650,6 +3708,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3783,7 +3843,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -3851,6 +3911,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -4014,7 +4076,38 @@ public class Processor implements SyncProcessor {
                 resClientBalanceHoldData = processClientBalanceHoldData(clientBalanceHoldData);
             }
         } catch (Exception e) {
-            String message = String.format("processClientBalanceHoldRequest: %s", e.getMessage());
+            String message = String.format("ClientBalanceHoldData: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxPreorderChanged foodBoxPreorderChanged = request.getFoodBoxPreorderChanged();
+            if (foodBoxPreorderChanged != null) {
+                resFoodBoxChanged = processFoodBoxPreorderChanged(foodBoxPreorderChanged, request.getIdOfOrg());
+                foodBoxPreorderNew = processFoodBoxPreorderNew(request.getIdOfOrg(), foodBoxPreorderChanged.getMaxVersion());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorder: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxDishRemain foodBoxDishRemain = request.getFoodBoxDishRemain();
+            if (foodBoxDishRemain != null) {
+                processFoodBoxPreorderDishRemain(foodBoxDishRemain, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxPreorderDishRemain: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            FoodBoxCellsSync foodBoxCellsSync = request.getFoodBoxCells();
+            if (foodBoxCellsSync != null) {
+                processFoodBoxCells(foodBoxCellsSync, request.getIdOfOrg());
+            }
+        } catch (Exception e) {
+            String message = String.format("processFoodBoxCells: %s", e.getMessage());
             logger.error(message, e);
         }
 
@@ -4033,7 +4126,7 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
@@ -4100,6 +4193,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -4176,7 +4271,7 @@ public class Processor implements SyncProcessor {
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection, exemptionVisitingSectionForARMAnswer, resMenuSupplier,
                 resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -5191,7 +5286,8 @@ public class Processor implements SyncProcessor {
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) || payment.getOrderType()
                             .equals(OrderTypeEnumType.DEFAULT) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.VENDING)) {
+                            .equals(OrderTypeEnumType.VENDING) || payment.getOrderType()
+                            .equals(OrderTypeEnumType.FOODBOX)) {
                         values = EventNotificationService.attachToValues("isBarOrder", "true", values);
                     } else if (payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) || payment.getOrderType()
                             .equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
@@ -7909,6 +8005,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -7987,7 +8085,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory,
@@ -8069,6 +8167,159 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resClientBalanceHoldData;
+    }
+
+    private ResFoodBoxChanged processFoodBoxPreorderChanged(FoodBoxPreorderChanged foodBoxPreorderChanged, Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new FoodBoxProcessorChanged(persistenceSession, foodBoxPreorderChanged, idOfOrg);
+            resFoodBoxChanged = (ResFoodBoxChanged) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e){
+            logger.error("Error in process processFoodBoxPreorderChanged: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resFoodBoxChanged;
+    }
+
+    private FoodBoxPreorderNew processFoodBoxPreorderNew(Long idOfOrg, Long maxVersion) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new FoodBoxProcessorNew(persistenceSession, idOfOrg, maxVersion);
+            foodBoxPreorderNew = (FoodBoxPreorderNew) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e){
+            logger.error("Error in process processFoodBoxPreorderNew: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return foodBoxPreorderNew;
+    }
+
+    private void processFoodBoxPreorderDishRemain(FoodBoxDishRemain foodBoxDishRemain, Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+            List<FoodBoxPreorderAvailable> foodBoxPreorderAvailables =
+                    DAOReadonlyService.getInstance().getFoodBoxPreorderAvailable(org);
+            List<Long> idOfDishes = new ArrayList<>();
+            for (FoodBoxPreorderAvailable foodBoxPreorderAvailableBD :foodBoxPreorderAvailables)
+            {
+                idOfDishes.add(foodBoxPreorderAvailableBD.getIdOfDish());
+            }
+//            DAOService.getInstance().deleteOldFoodBoxAvailable(org);
+            boolean finded = false;
+            for (FoodBoxAvailableItem foodBoxAvailableItem : foodBoxDishRemain.getItems()) {
+                finded = false;
+                //Ищем такую запись по данным БД
+                for (FoodBoxPreorderAvailable foodBoxPreorderAvailableBD :foodBoxPreorderAvailables)
+                {
+                    if (foodBoxPreorderAvailableBD.getIdOfDish().equals(foodBoxAvailableItem.getIdOfDish()))
+                    {
+                        foodBoxPreorderAvailableBD.setUpdateDate(new Date());
+                        foodBoxPreorderAvailableBD.setVersion(foodBoxPreorderAvailableBD.getVersion()+1);
+                        foodBoxPreorderAvailableBD.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
+                        persistenceSession.merge(foodBoxPreorderAvailableBD);
+                        finded = true;
+                        idOfDishes.remove(foodBoxPreorderAvailableBD.getIdOfDish());
+                        break;
+                    }
+                }
+                if (!finded) {
+                    //Если не найдена, то создаем новую запись
+                    FoodBoxPreorderAvailable foodBoxPreorderAvailable = new FoodBoxPreorderAvailable();
+                    foodBoxPreorderAvailable.setCreateDate(new Date());
+                    foodBoxPreorderAvailable.setAvailableQty(foodBoxAvailableItem.getAvailableQty());
+                    foodBoxPreorderAvailable.setIdOfDish(foodBoxAvailableItem.getIdOfDish());
+                    foodBoxPreorderAvailable.setVersion(0L);
+                    foodBoxPreorderAvailable.setOrg(org);
+                    persistenceSession.persist(foodBoxPreorderAvailable);
+                }
+            }
+            for (Long id: idOfDishes)
+            {
+                DAOService.getInstance().deleteOldFoodBoxAvailable(org,id);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e){
+            logger.error("Error in process processFoodBoxPreorderDishRemain: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void processFoodBoxCells(FoodBoxCellsSync foodBoxCellsSync, Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            Org org = daoReadonlyService.findOrg(idOfOrg);
+            Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(org);
+            for (FoodBoxCellsItem foodBoxCellsItem: foodBoxCellsSync.getItems())
+            {
+                Long id = foodBoxCellsItem.getIdFoodBox();
+                Long count = foodBoxCellsItem.getTotalCellsCount();
+                boolean findInTable = false;
+
+                for (Iterator<FoodBoxCells> iterator = foodBoxCells.iterator(); iterator.hasNext();) {
+                    FoodBoxCells item = iterator.next();
+                    if (item.getFbId().equals(id.intValue()))
+                    {
+                        item.setTotalcellscount(count.intValue());
+                        if (item.getBusycells() > item.getTotalcellscount())
+                            item.setBusycells(item.getTotalcellscount());
+                        item.setUpdateDate(new Date());
+                        persistenceSession.merge(item);
+                        findInTable = true;
+                        iterator.remove();
+                        break;
+                    }
+                }
+                if (!findInTable)
+                {
+                    FoodBoxCells foodBoxCells1 = new FoodBoxCells();
+                    foodBoxCells1.setBusycells(0);
+                    foodBoxCells1.setTotalcellscount(count.intValue());
+                    foodBoxCells1.setCreateDate(new Date());
+                    foodBoxCells1.setUpdateDate(new Date());
+                    foodBoxCells1.setFbId(id.intValue());
+                    foodBoxCells1.setOrg(org);
+                    persistenceSession.persist(foodBoxCells1);
+                }
+            }
+            //Удаляем все фудбоксы, которые не пришли
+            DAOService daoService = DAOService.getInstance();
+            for (FoodBoxCells foodBoxCells1: foodBoxCells) {
+                daoService.deleteFoodBox(foodBoxCells1.getFoodboxesid());
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e){
+            logger.error("Error in process processFoodBoxCells: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
     private void fullProcessingPreOrderFeedingRequest(SyncRequest request, SyncHistory syncHistory,
@@ -8489,6 +8740,8 @@ public class Processor implements SyncProcessor {
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
         ExemptionVisitingClient exemptionVisitingClient = null;
+        FoodBoxPreorderNew foodBoxPreorderNew = null;
+        ResFoodBoxChanged resFoodBoxChanged = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -8600,7 +8853,7 @@ public class Processor implements SyncProcessor {
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, exemptionVisitingSection,
                 exemptionVisitingSectionForARMAnswer,
                 resMenuSupplier, resRequestsSupplier, requestsSupplierData, resHardwareSettingsRequest, resTurnstileSettingsRequest,
-                exemptionVisitingClient);
+                exemptionVisitingClient, foodBoxPreorderNew, resFoodBoxChanged);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {

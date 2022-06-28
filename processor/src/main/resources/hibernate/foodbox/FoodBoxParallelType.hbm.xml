@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxParallelType" table="cf_foodbox_parallel_type">
+        <id name="parallelTypeId" column="idType" type="long"/>
+        <property name="parallel" column="parallel" type="integer"/>
+    </class>
+</hibernate-mapping>

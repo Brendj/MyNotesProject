@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
@@ -147,6 +148,8 @@ public class Client {
     private SmartWatchVendor vendor;
     private String iacRegId;
     private Boolean multiCardMode;
+    private Boolean foodboxAvailability;
+    private Boolean foodboxavailabilityguardian;
 
     private String parallel;
 
@@ -188,6 +191,8 @@ public class Client {
         this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
         this.gender = 1; //set default as male
+        this.foodboxAvailability = false;
+        this.foodboxavailabilityguardian = false;
 
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
@@ -1275,6 +1280,22 @@ public class Client {
 
     public void setClearedSsoid(Boolean clearedSsoid) {
         this.clearedSsoid = clearedSsoid;
+    }
+
+    public Boolean getFoodboxAvailability() {
+        return foodboxAvailability;
+    }
+
+    public void setFoodboxAvailability(Boolean foodboxAvailability) {
+        this.foodboxAvailability = foodboxAvailability;
+    }
+
+    public Boolean getFoodboxavailabilityguardian() {
+        return foodboxavailabilityguardian;
+    }
+
+    public void setFoodboxavailabilityguardian(Boolean foodboxavailabilityguardian) {
+        this.foodboxavailabilityguardian = foodboxavailabilityguardian;
     }
 
     public Set<DulDetail> getDulDetail() {

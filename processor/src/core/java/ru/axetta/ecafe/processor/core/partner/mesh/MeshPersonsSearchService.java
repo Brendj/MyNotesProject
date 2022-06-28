@@ -27,12 +27,7 @@ import java.util.Map;
 public class MeshPersonsSearchService extends MeshPersonsSyncService {
 
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSearchService.class);
-    private ThreadLocal<List<ResponsePersons>> meshResponses =  new ThreadLocal<List<ResponsePersons>>(){
-        @Override
-        protected ArrayList<ResponsePersons> initialValue() {
-            return new ArrayList<ResponsePersons>();
-        }
-    };
+    private final ThreadLocal<List<ResponsePersons>> meshResponses = ThreadLocal.withInitial(ArrayList::new);
     public ThreadLocal<List<ResponsePersons>> getMeshResponses() {
         return meshResponses;
     }
@@ -41,7 +36,7 @@ public class MeshPersonsSearchService extends MeshPersonsSyncService {
     protected void processPerson(Session session, ResponsePersons person, Map<Integer, MeshTrainingForm> trainingForms) {
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            Education education = findEducation(person);
+            Education education = findEducation(person, trainingForms);
             String classname = null;
             String guidNsi = null;
             try {

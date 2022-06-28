@@ -30,15 +30,23 @@ public class PreorderOperationsService {
     public void relevancePreorders(PreorderRequestsReportServiceParam params) {
         logger.info("Start process relevance preorders");
         try {
+            logger.info("Start relevancePreordersToOrgs " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(params);
+            logger.info("end relevancePreordersToOrgs " + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in relevancePreordersToOrgs: ", e);
         }
         //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
         try {
+            logger.info("Start runRelevancePreordersToMenu " + new Date().getTime());
             runRelevancePreordersToMenu(params);
+            logger.info("End runRelevancePreordersToMenu " + new Date().getTime());
+            logger.info("Start relevancePreordersToOrgFlag " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
+            logger.info("End relevancePreordersToOrgFlag " + new Date().getTime());
+            logger.info("Start checkPreorderClientGroups " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).checkPreorderClientGroups(params);
+            logger.info("End checkPreorderClientGroups " + new Date().getTime());
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
             logger.error("Error in process relevance preorders ", e);
@@ -46,14 +54,14 @@ public class PreorderOperationsService {
     }
 
     public void dailyCheckPreorders() {
-        logger.info("Start preorders daily check process");
+        logger.info("Start preorders daily check process "  + new Date().getTime());
         try {
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).dailyCheck();
             sendPreorderCheckNotifications(RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderCheckListForNotification());
         } catch (Exception e) {
             logger.error("Error in preorders daily check process:", e);
         }
-        logger.info("End preorders daily check process");
+        logger.info("End preorders daily check process "  + new Date().getTime());
     }
 
     public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {

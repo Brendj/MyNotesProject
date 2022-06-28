@@ -282,6 +282,8 @@ public class DirectiveElement implements AbstractToElement{
             DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
         }
 
+        directiveItemList.add(new DirectiveItem("FoodBoxServiceAvailable", (org.getUsedFoodbox())?"1":"0"));
+
         //OrgWritableRepository.getInstance().saveOrg(org);
     }
 

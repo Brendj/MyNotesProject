@@ -1671,7 +1671,7 @@ public class PreorderDAOService {
         List<WtDish> wtDishes = new ArrayList<>();
         if (complexItem != null) {
             wtDishes = DAOReadExternalsService.getInstance()
-                    .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(preorderDate), CalendarUtils.endOfDay(preorderDate));
+                    .getWtDishesByComplexItemAndDates(complexItem, preorderDate, preorderDate);
         }
         if (complexItem == null || preorderComplex.getPreorderMenuDetails().size() == 0 || wtDishes.size() == 0) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
@@ -1776,27 +1776,27 @@ public class PreorderDAOService {
 
     private void generatePreordersByScheduleInternal(PreorderRequestsReportServiceParam params) {
         try {
-            logger.info("Start of generating regular preorders");
+            logger.info("Start of generating regular preorders " + new Date().getTime());
             if (params.isEmpty()) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule(params);
             }
-            logger.info("Successful end of generating regular preorders");
+            logger.info("Successful end of generating regular preorders "  + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in generating regular preorders: ", e);
         }
         try {
-            logger.info("Start additional tasks for preorders");
+            logger.info("Start additional tasks for preorders " + new Date().getTime());
             RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForPreorders(params);
-            logger.info("Successful end additional tasks for preorders");
+            logger.info("Successful end additional tasks for preorders " +  + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in additional tasks for preorders: ", e);
         }
         try {
-            logger.info("Start additional tasks for regulars");
+            logger.info("Start additional tasks for regulars "  + new Date().getTime());
             if (params.isEmpty()) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars(params);
             }
-            logger.info("Successful end additional tasks for regulars");
+            logger.info("Successful end additional tasks for regulars " + new Date().getTime());
         } catch (Exception e) {
             logger.error("Error in additional tasks for regualrs: ", e);
         }
@@ -2828,7 +2828,7 @@ public class PreorderDAOService {
         query.setParameter("complexItem", complexItem);
         query.setParameter("idOfDish", idOfDish);
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
-        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
         try {
             return (WtDish) query.getSingleResult();
         } catch (Exception e) {

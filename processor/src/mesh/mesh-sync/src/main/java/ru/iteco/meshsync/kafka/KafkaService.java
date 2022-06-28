@@ -60,11 +60,10 @@ public class KafkaService {
         EntityChanges entityChanges = EntityChanges.buildFromDTO(dto);
         dto = null;
         try {
-            boolean process = false;
-            if (entityChanges.getEntity().equals(EntityType.CLASS)) {
-                process = meshService.processClassChanges(entityChanges);
+            if(entityChanges.getEntity().equals(EntityType.CLASS)){
+                meshService.processClassChanges(entityChanges);
             } else {
-                process = meshService.processEntityChanges(entityChanges);
+                meshService.processEntityChanges(entityChanges);
             }
         } catch (Exception e) {
             log.error("Can't process message: ", e);

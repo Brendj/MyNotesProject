@@ -114,6 +114,8 @@
 
         <property name="parallel" column="parallel" type="string" length="255"/>
         <property name="userOP" column="userop" type="java.lang.Boolean"/>
+        <property name="foodboxAvailability" column="foodboxavailability" type="java.lang.Boolean"/>
+        <property name="foodboxavailabilityguardian" column="foodboxavailabilityguardian" type="java.lang.Boolean"/>
 
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>

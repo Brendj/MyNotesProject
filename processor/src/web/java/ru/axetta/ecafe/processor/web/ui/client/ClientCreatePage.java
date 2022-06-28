@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -724,6 +725,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
+        ClientParallel.addFoodBoxModifire(client);
 
         //todo раскомментировать для теста задач по представителям
 //        if (isParentGroup()) {

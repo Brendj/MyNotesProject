@@ -164,6 +164,24 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.preorderlp}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.newСashierMode}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Использовать фудбокс" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.usedfoodbox}" styleClass="input-text" disabled="true" />
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:dataTable id="foodBox" value="#{mainPage.orgViewPage.foodBoxParallelUIS}"
+                        var="it"
+                        rows="#{mainPage.orgViewPage.foodBoxParallelUIS.size()}"
+                        columnClasses="left-aligned-column, center-aligned-column"
+                        footerClass="data-table-footer"
+                        rendered="#{mainPage.orgViewPage.usedfoodbox}">
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{it.nameParallel}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:selectBooleanCheckbox value="#{it.available}" styleClass="input-text" disabled="true"/>
+            </rich:column>
+        </rich:dataTable>
+    </h:panelGrid>
+    <h:panelGroup />
 </h:panelGrid>
 <br />
 

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
@@ -14,6 +16,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.web.CommonTaskServlet;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,39 +27,24 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 public class ArchivedExeptionService {
-
-
+    private static final Logger logger = LoggerFactory.getLogger(ArchivedExeptionService.class);
     final static String AUTO_ARCHIVED = "AutoArchivedExeption";
-    final EventNotificationService notificationService = RuntimeContext.getAppContext()
-            .getBean(EventNotificationService.class);
     public static class archivedExeption implements Job {
 
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
             try {
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class)
-                        .start(persistenceSession);
-                persistenceTransaction.commit();
+                RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).start();
             } catch (Exception e) {
+                logger.error("Failed auto arcived EMIAS", e);
             }
         }
 
         public static void manualStart() throws JobExecutionException {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
             try {
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class)
-                        .start(persistenceSession);
-                persistenceTransaction.commit();
+                RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).start();
             } catch (Exception e) {
+                logger.error("Failed manual arcived EMIAS", e);
             }
         }
     }
@@ -94,11 +82,12 @@ public class ArchivedExeptionService {
             scheduler.scheduleJob(jobDetailSync, triggerSync);
             scheduler.start();
         } catch (Exception e) {
+            logger.error("Failed scheduleSync AutoArchivedExeption", e);
         }
     }
 
 
-    public void start(Session session) throws Exception {
+    public void start() throws Exception {
         //Ставим флаг Архивный тем записям, которые устарели
         DAOService.getInstance().updateExemptionVisiting();
     }

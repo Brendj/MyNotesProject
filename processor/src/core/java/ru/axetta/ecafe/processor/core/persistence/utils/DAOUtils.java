@@ -758,6 +758,30 @@ public class DAOUtils {
         return null;
     }
 
+    /**
+     * производит выборку Группы клиента по номеру организации и имени группы
+     * не игнорируя регистр имени группы
+     *
+     * @param persistenceSession ссылка на сессию
+     * @param idOfOrg            идентификатор организации
+     * @param groupName          имя группы
+     * @return null если таблица пуста, сущность ClientGroup
+     * @since 2012-03-06
+     */
+    public static ClientGroup findClientGroupByGroupNameAndIdOfOrgCase(Session persistenceSession, Long idOfOrg,
+                                                                   String groupName) throws Exception {
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        List<ClientGroup> list = clientGroupCriteria.add(Restrictions
+                        .and(Restrictions.eq("groupName", groupName), Restrictions.eq("org.idOfOrg", idOfOrg)))
+                .list();
+        if (list.isEmpty()) {
+            return null;
+        } else
+        {
+            return list.get(0);
+        }
+    }
+
     public static ClientGroup findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(Session persistenceSession,
             Long idOfOrg, String groupName) throws Exception {
         Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
@@ -3451,7 +3475,7 @@ public class DAOUtils {
     public static long nextVersionByPreorderComplex(Session session) {
         long version = 0L;
         Query query = session
-                .createSQLQuery("select e.version from cf_preorder_complex as e order by e.version desc limit 1");
+                .createSQLQuery("select nextval('cf_preorder_complex_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;
@@ -3792,7 +3816,7 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(Session session, Long idOfOrg,
-            String groupName) {
+            String groupName, Boolean groupNameReg) {
 
         Org o = (Org) session.load(Org.class, idOfOrg);
 
@@ -3808,10 +3832,18 @@ public class DAOUtils {
             idOfMainOrg = o.getIdOfOrg();
         }
 
-        Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
-                + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+        Query query;
+        if (groupNameReg) {
+            query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
+                    + " AND REPLACE(groupName, ' ', '') LIKE REPLACE(:groupName, ' ', '')");
+            query.setParameter("groupName", groupName);
+        }
+        else {
+            query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
+                    + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+            query.setParameter("groupName", groupName.toLowerCase());
+        }
         query.setParameter("idOfMainOrg", idOfMainOrg);
-        query.setParameter("groupName", groupName.toLowerCase());
 
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;
@@ -5767,9 +5799,72 @@ public class DAOUtils {
         return (Contragent) query.uniqueResult();
     }
 
-    public static List<Long> findOrgByContragent(Session session, Contragent defaultSupplier) {
+	public static List<Long> findOrgByContragent(Session session, Contragent defaultSupplier) {
         Query query = session.createQuery("SELECT org.idOfOrg FROM Org org where org.defaultSupplier = :defaultSupplier");
         query.setParameter("defaultSupplier", defaultSupplier);
         return query.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<GroupNamesToOrgs> findMiddleGroupNamesToOrgByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("isMiddleGroup", true));
+        return (List<GroupNamesToOrgs>) criteria.list();
+    }
+	
+	public static boolean updateClientsByOrgFoodBox (Session session, boolean foodboxavailability,
+                                                 Integer foodboxavailabilityguardianInt, List<Integer> parallels,
+                                                 Long idOfOrg) {
+        try {
+            boolean foodboxavailabilityguardian = false;
+            if (foodboxavailabilityguardianInt == 0)
+                foodboxavailabilityguardian = false;
+            if (foodboxavailabilityguardianInt == 1)
+                foodboxavailabilityguardian = true;
+            StringBuilder paral1 = new StringBuilder();
+            StringBuilder paral2 = new StringBuilder();
+            if (parallels != null) {
+                for (Integer paral : parallels) {
+                    paral1.append("'").append(paral).append("',");
+                    paral2.append(paral).append("%,");
+                }
+                paral1 = new StringBuilder(paral1.substring(0, paral1.length() - 1));
+                paral2 = new StringBuilder(paral2.substring(0, paral2.length() - 1));
+            }
+            String sql;
+            if (foodboxavailabilityguardianInt == 2)
+            {
+                sql = "update cf_clients set foodboxavailability = :foodboxavailability" +
+                        " where idofclient in \n" +
+                        "(select cc.idofclient from cf_clients cc left join cf_clientgroups cc2 \n" +
+                        "on cc.idofclientgroup = cc2.idofclientgroup and cc.idoforg = cc2.idoforg where \n" +
+                        "cc.idoforg = :idoforg ";
+            }
+            else {
+                sql = "update cf_clients set foodboxavailability = :foodboxavailability, " +
+                        " foodboxavailabilityguardian = :foodboxavailabilityguardian where idofclient in \n" +
+                        "(select cc.idofclient from cf_clients cc left join cf_clientgroups cc2 \n" +
+                        "on cc.idofclientgroup = cc2.idofclientgroup and cc.idoforg = cc2.idoforg where \n" +
+                        "cc.idoforg = :idoforg ";
+            }
+            if (parallels != null) {
+                sql += " and (\"parallel\" in (" + paral1 + ") or cc2.groupname ~~ ANY('{" +
+                        paral2 + "}')))";
+            } else {
+                sql += ")";
+            }
+            Query query = session.createSQLQuery(sql);
+            query.setParameter("foodboxavailability", foodboxavailability);
+            if (foodboxavailabilityguardianInt != 2)
+                query.setParameter("foodboxavailabilityguardian", foodboxavailabilityguardian);
+            query.setParameter("idoforg", idOfOrg);
+            query.executeUpdate();
+            return true;
+        } catch (Exception e)
+        {
+            logger.error("Error in updateClientsByOrgFoodBox", e);
+            return false;
+        }
     }
 }

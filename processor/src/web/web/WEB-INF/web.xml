@@ -549,6 +549,23 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>FoodBoxServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.meals.MealsController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/ispp/meals</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FoodBoxServlet</servlet-name>
+        <url-pattern>/ispp/meals/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>ESPServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -604,8 +621,9 @@
         <url-pattern>/smartwatch/*</url-pattern>
         <url-pattern>/ispp/library/*</url-pattern>
         <url-pattern>/ispp/ezd/*</url-pattern>
-	<url-pattern>/emias_internal/*</url-pattern>
-	<url-pattern>/ispp/ESP/*</url-pattern>
+	    <url-pattern>/emias_internal/*</url-pattern>
+	    <url-pattern>/ispp/ESP/*</url-pattern>
+        <url-pattern>/ispp/meals/*</url-pattern>
     </filter-mapping>
 <!--
     <filter>

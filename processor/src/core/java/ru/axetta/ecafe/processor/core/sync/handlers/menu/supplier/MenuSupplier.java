@@ -54,7 +54,10 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtComplex> complexes = new HashSet<>();
     private Set<WtComplex> offlineComplexes = new HashSet<>();
     private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
-
+//    private FoodBoxDishRemain foodBoxDishRemain;
+//    private FoodBoxPreorderChanged foodBoxPreorderChanged;
+//    private FoodBoxPreorderNew foodBoxPreorderNew;
+//    private ResFoodBoxChanged resFoodBoxChanged;
     private Integer resCode;
     private String errorMessage;
 
