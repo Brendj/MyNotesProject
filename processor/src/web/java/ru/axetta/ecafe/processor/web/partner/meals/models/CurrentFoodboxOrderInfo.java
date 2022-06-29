@@ -1,6 +1,13 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
+import ru.axetta.ecafe.processor.core.service.MealsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,6 +28,16 @@ public class CurrentFoodboxOrderInfo {
         return this;
     }
 
+    public CurrentFoodboxOrderInfo(Client client, ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal)
+    {
+        this.status = FoodBoxStateTypeEnum.NEW.getDescription();
+        this.expiredAt = simpleDateFormatThreadLocal.get().format(
+                CalendarUtils.convertdateInUTC(new Date(new Date().getTime() + MealsService.TIME_ALIVE))) + "Z";
+        this.createdAt = simpleDateFormatThreadLocal.get().format(
+                CalendarUtils.convertdateInUTC(new Date())) + "Z";
+        this.balance = client.getBalance();
+        this.balanceLimit = client.getExpenditureLimit();
+    }
 
 
     /**

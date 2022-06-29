@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.foodbox;
 
+import ru.axetta.ecafe.processor.web.partner.meals.models.OrderDish;
+
 import java.util.Date;
 
 public class FoodBoxPreorderDish {
@@ -18,9 +20,17 @@ public class FoodBoxPreorderDish {
     private Date createDate;
     private Date updateDate;
 
-    public FoodBoxPreorderDish()
+    public FoodBoxPreorderDish(FoodBoxPreorder foodBoxPreorder, OrderDish orderDish)
     {
-        updateDate = new Date();
+        this.foodBoxPreorder = foodBoxPreorder;
+        this.idOfDish = orderDish.getDishId();
+        this.price = orderDish.getPrice().intValue();
+        this.qty = orderDish.getAmount();
+        this.name = orderDish.getName();
+        this.buffetCategoriesId = orderDish.getBuffetCategoryId();
+        this.buffetCategoriesName = orderDish.getBuffetCategoryName();
+        this.createDate = new Date();
+        this.updateDate = new Date();
     }
 
     public Long getIdFoodBoxPreorderDish() {
