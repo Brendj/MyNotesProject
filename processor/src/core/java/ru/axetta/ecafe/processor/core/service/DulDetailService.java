@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,26 @@ public class DulDetailService {
                     .findAny().orElse(null);
         }
         return null;
+    }
+
+    public Client findClientByDulDetail(Session session, DulDetail dulDetail) {
+        String query_str = "select dd.idOfClient from DulDetail dd where dd.documentTypeId = :typeId " +
+                "and dd.number = :number";
+        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
+            query_str += " and dd.series = :series";
+        }
+        Query query = session.createQuery(query_str);
+        query.setParameter("typeId", dulDetail.getDocumentTypeId());
+        query.setParameter("number", dulDetail.getNumber());
+        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
+            query.setParameter("series", dulDetail.getSeries());
+        }
+        List<Long> list = query.getResultList();
+        if (list.size() == 0) return null;
+        List<Client> list2 = session.createQuery("select c from Client c join fetch c.person where c.idOfClient = :id")
+                .setParameter("id", list.get(0))
+                .getResultList();
+        return list2.get(0);
     }
 
     private MeshGuardiansService getMeshGuardiansService() {

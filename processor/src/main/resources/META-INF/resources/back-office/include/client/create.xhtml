@@ -346,11 +346,18 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
-                       render="clientCreatePanel" styleClass="command-button" />
+                       render="clientCreatePanel,foundClientPanel" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" id="foundClientPanel">
+    <h:outputText escape="true" value="Найденный клиент:" styleClass="output-text" rendered="#{mainPage.clientCreatePage.showFoundClient}"/>
+    <a4j:commandLink render="mainMenu, workspaceForm" value="#{mainPage.clientCreatePage.foundFIO}" styleClass="command-link"
+                     action="#{mainPage.showClientViewPage}" rendered="#{mainPage.clientCreatePage.showFoundClient}">
+        <f:setPropertyActionListener value="#{mainPage.clientCreatePage.foundIdOfClient}" target="#{mainPage.selectedIdOfClient}" />
+    </a4j:commandLink>
 </h:panelGrid>
 </h:panelGrid>
 </ui:composition>
