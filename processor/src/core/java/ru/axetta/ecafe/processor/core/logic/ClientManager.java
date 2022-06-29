@@ -2578,8 +2578,12 @@ public class ClientManager {
     }
 
     //todo уточнить как найти представителя
-    public static boolean isClientGuardian(Client client) {
-        return client.getIdOfClientGroup() > 1000000000L;
+    public static boolean isClientGuardian(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
+        criteria.add(Restrictions.ne("deletedState", true));
+        criteria.add(Restrictions.eq("disabled", false));
+        return !criteria.list().isEmpty() || client.getIdOfClientGroup() > 1000000000L;
     }
 
     @SuppressWarnings("unchecked")

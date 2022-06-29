@@ -340,6 +340,10 @@
                 <h:outputText escape="true" value="Степень родства:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientGuardian.relationStr}" styleClass="output-text" />
             </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Вид представительства:" styleClass="output-text" />
+                <h:outputText escape="true" value="#{clientGuardian.roleStr}" styleClass="output-text" />
+            </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -403,6 +407,10 @@
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                 <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientWard.relationStr}" styleClass="output-text" />
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Вид представительства:" styleClass="output-text" />
+                <h:outputText escape="true" value="#{clientGuardian.roleStr}" styleClass="output-text" />
             </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">

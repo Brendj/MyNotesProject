@@ -1187,11 +1187,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
-        if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-            if (this.san == null || this.san.isEmpty()) {
-                throw new Exception("Поле СНИЛС обязательное для заполнения");
+
+        //https://yt.iteco.dev/issue/ISPP-1004
+        if (ClientManager.isClientGuardian(persistenceSession, client)) {
+            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+                throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
+
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
@@ -1237,6 +1240,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
         }
 
+        for (DulDetail dul : this.dulDetail)
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
+
         if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
             for (ClientGuardianItem clientWardItem : clientWardItems) {
                 if (clientWardItem.getIdOfClient().equals(this.idOfClient))
@@ -1277,10 +1284,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
             }
         }
-
-        for (DulDetail dul : this.dulDetail)
-            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
-                throw new Exception("Не заполнено поле \"Номер\" документа");
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
@@ -1479,8 +1482,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
-        this.currentDate = new Date();
         this.middleGroup = client.getMiddleGroup();
+        this.currentDate = new Date();
     }
 
     public String getIdOfCategoryListString() {

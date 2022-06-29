@@ -3145,7 +3145,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
+            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || genderId == null)
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
 

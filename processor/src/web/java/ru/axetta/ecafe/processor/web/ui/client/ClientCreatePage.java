@@ -4,13 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import org.hibernate.type.TrueFalseType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -726,9 +726,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-        if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-            if (this.san == null || this.san.isEmpty()) {
-                throw new Exception("Поле СНИЛС обязательное для заполнения");
+        if (isParentGroup()) {
+            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+                throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
         if (this.san != null && !this.san.isEmpty()) {
@@ -738,6 +738,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
+
+        RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                .validateDulList(persistenceSession, this.dulDetail, null);
 
         Date currentDate = new Date();
         for (DulDetail dul : this.dulDetail) {
@@ -750,13 +753,27 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             persistenceSession.save(dul);
         }
 
+        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    client.getIdOfClient()));
+            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
+        } else if (isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
+
+
         if (isParentGroup()) {
             if (birthDate == null)
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
 
+//            PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(person.getFirstName(),
+//                    person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+//                    client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
+//            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
+//                throw new Exception(personListResponse.getMessage());
+
             PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
-                            person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                            client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
+                    person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+                    client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getMeshGuid());
             else
@@ -783,13 +800,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-
-        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
-                    client.getIdOfClient()));
-            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
-        } else if (isParentGroup())
-            throw new Exception("Не выбраны \"Опекаемые\"");
 
         clean();
         return client;
