@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
-import ru.axetta.ecafe.processor.web.partner.meals.MealsController;
+import ru.axetta.ecafe.processor.core.service.MealsService;
 
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ import java.util.List;
  * Передача данных о заказе (в контексте списка).
  */
 public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
+    private static final ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"); }
+    };
+
     private Long foodboxOrderId = null;
     private String status = null;
     private String expiredAt = null;
@@ -169,7 +176,8 @@ public class FoodboxOrderInfo implements Comparable<FoodboxOrderInfo> {
     @Override
     public int compareTo(FoodboxOrderInfo o) {
         try {
-            if (MealsController.simpleDateFormat.parse(this.getCreatedAt()).after(MealsController.simpleDateFormat.parse(o.getCreatedAt())))
+            if (simpleDateFormat.get().parse(this.getCreatedAt()).
+                    after(simpleDateFormat.get().parse(o.getCreatedAt())))
                 return -1;
             else
                 return 1;

@@ -48,8 +48,10 @@ public class MealsService {
     public static final String BUFFET_CLOSE_TIME = "ecafe.processor.meals.buffetCloseTime";
     public static final Integer TIME_ALIVE = getHealthTime();
     public static final int HTTP_UNPROCESSABLE_ENTITY = 422;
-    public static final Integer MAX_COUNT_DISH = 5;
-    public static final Integer MAX_COUNT = 40;//Максимальное количество блюд для возвращения в методе
+    public static final String MAX_DISH = "ecafe.processor.meals.maxDishCount";
+    public static final Integer MAX_COUNT_DISH = getMaxDishCount();
+    public static final String MAX_COUNT_PARAM = "ecafe.processor.meals.maxCount";
+    public static final Integer MAX_COUNT = getMaxCount();//Максимальное количество блюд для возвращения в методе
     private static final ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
@@ -778,6 +780,26 @@ public class MealsService {
         } catch (Exception e)
         {
             return 7200000;
+        }
+    }
+
+    private static Integer getMaxDishCount() {
+        try {
+            String health = RuntimeContext.getInstance().getConfigProperties().getProperty(MAX_DISH, "5");
+            return Integer.parseInt(health);
+        } catch (Exception e)
+        {
+            return 5;
+        }
+    }
+
+    private static Integer getMaxCount() {
+        try {
+            String health = RuntimeContext.getInstance().getConfigProperties().getProperty(MAX_COUNT_PARAM, "40");
+            return Integer.parseInt(health);
+        } catch (Exception e)
+        {
+            return 40;
         }
     }
 
