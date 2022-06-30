@@ -27,7 +27,7 @@ public class ResponseResult {
     public List<Result> errorTimeParse(Exception e)
     {
         Result result = new Result();
-        logger.error("Ошибка при получении парсинге времени работы Фудбокса", e);
+        logger.error("Ошибка при получении парсинга времени работы Фудбокса", e);
         result.setCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
         result.setDescription(ResponseCodes.RC_INTERNAL_ERROR.toString());
         List<Result> results = new ArrayList<>();
@@ -37,29 +37,20 @@ public class ResponseResult {
 
     public Result emptyContractId()
     {
-        Result result = new Result();
         logger.error("Отсутствует contractId");
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result wrongFormatContractId(String contractIdStr, Exception e)
     {
-        Result result = new Result();
         logger.error(String.format("Неверный формат contract %s", contractIdStr), e);
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result noXRID()
     {
-        Result result = new Result();
         logger.error("Отсутствует x-request-id");
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result noClient()
@@ -180,38 +171,26 @@ public class ResponseResult {
 
     public Result wrongFormatFrom(String fromStr, Exception e)
     {
-        Result result = new Result();
         logger.error(String.format("Неверный формат from %s", fromStr), e);
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result wrongFormatTo(String toStr, Exception e)
     {
-        Result result = new Result();
         logger.error(String.format("Неверный формат to %s", toStr), e);
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result wrongFormatSort(String sortStr, Exception e)
     {
-        Result result = new Result();
         logger.error(String.format("Неверный формат sort %s", sortStr), e);
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result wrongFormatFoodBoxOrder(String foodboxOrderId, Exception e)
     {
-        Result result = new Result();
         logger.error(String.format("Неверный формат foodboxOrderId %s", foodboxOrderId), e);
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result notFindPreorder (Long isppIdFoodbox)
@@ -225,35 +204,34 @@ public class ResponseResult {
 
     public Result wrongOnDate ()
     {
-        Result result = new Result();
         logger.error("Неверный формат onDate");
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result emptyFoodBoxAvailable ()
     {
-        Result result = new Result();
         logger.error("Отсутствует foodBoxAvailable");
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result wrongFoodBoxAvailable ()
     {
-        Result result = new Result();
         logger.error("Неверный формат foodBoxAvailable");
-        result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
-        result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
-        return result;
+        return wrongRequest();
     }
 
     public Result ok ()
     {
         Result result = new Result();
         logger.error("Все ОК");
+        result.setCode(ResponseCodes.RC_OK.getCode().toString());
+        result.setDescription(ResponseCodes.RC_OK.toString());
+        return result;
+    }
+
+    private Result wrongRequest()
+    {
+        Result result = new Result();
         result.setCode(ResponseCodes.RC_WRONG_REQUST.getCode().toString());
         result.setDescription(ResponseCodes.RC_WRONG_REQUST.toString());
         return result;

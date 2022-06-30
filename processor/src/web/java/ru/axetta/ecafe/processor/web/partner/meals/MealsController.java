@@ -35,6 +35,26 @@ public class MealsController extends Application {
 
     private Logger logger = LoggerFactory.getLogger(MealsController.class);
 
+    public enum MealsFunctions {
+        CREATE_FOODBOX("Создать заказ"),
+        GET_FOODBOX("Получить список фудбокс-заказов по одному обучающемуся"),
+        GET_FOODBOX_BY_ID("Получить заказ по идентификатору"),
+        GET_BUFET("Получить буфетное меню"),
+        SET_FOODBOX_ALLOWED("Изменение разрешений по фудбоксу для одного обучающемуся"),
+        GET_FOODBOX_ALLOWED("Получить данные по клиенту"),;
+
+        private final String description;
+
+        private MealsFunctions(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(value = "contract.yaml")
@@ -86,12 +106,12 @@ public class MealsController extends Application {
             return mealsPOJO.getResponse();
 
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo(mealsPOJO.getContractId(), 1);
+        mealsPOJO = mealsService.validateByClientInfo(mealsPOJO.getContractId(), MealsFunctions.CREATE_FOODBOX);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика запросов к бд
-        mealsService.getDataFromDAO(mealsPOJO.getClient(), 1);
+        mealsService.getDataFromDAO(mealsPOJO.getClient(), MealsFunctions.CREATE_FOODBOX);
 
         //Логика обработки самого заказа
         return mealsService.mainLogicNewPreorder(foodboxOrders, mealsPOJO.getClient(), xrequestStr, mealsPOJO.getAvailableMoney());
@@ -137,16 +157,16 @@ public class MealsController extends Application {
             }
         }
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfo2(contractIdStr, fromStr, toStr, sortStr);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(contractIdStr, fromStr, toStr, sortStr);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo2(mealsPOJO.getContractId());
+        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId());
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика обработки самого заказа
-       return mealsService.mainLogicNewPreorder2(mealsPOJO.getClient(),
+       return mealsService.getPreordersForDates(mealsPOJO.getClient(),
                mealsPOJO.getFrom(), mealsPOJO.getTo(), mealsPOJO.getSortDesc());
     }
 
@@ -163,12 +183,12 @@ public class MealsController extends Application {
         }
 
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfo3(foodboxOrderId);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(foodboxOrderId);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика обработки самого заказа
-        return mealsService.mainLogicNewPreorder3(mealsPOJO.getIsppIdFoodbox());
+        return mealsService.getPreorderById(mealsPOJO.getIsppIdFoodbox());
     }
 
     @GET
@@ -203,20 +223,20 @@ public class MealsController extends Application {
         }
 
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfo4(onDateStr, contractIdStr);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoForBuffet4(onDateStr, contractIdStr);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo(mealsPOJO.getContractId(), 2);
+        mealsPOJO = mealsService.validateByClientInfo(mealsPOJO.getContractId(), MealsFunctions.GET_BUFET);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика запросов к бд
-        mealsService.getDataFromDAO(mealsPOJO.getClient(), 2);
+        mealsService.getDataFromDAO(mealsPOJO.getClient(), MealsFunctions.GET_BUFET);
 
         //Логика получения самого меню
-        return mealsService.mainLogicNewPreorder4();
+        return mealsService.getBuffetInfo();
     }
 
     @PUT
@@ -246,17 +266,17 @@ public class MealsController extends Application {
         }
 
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfo5(contractIdStr, foodBoxAvailableStr, 1);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoClientAllowed(contractIdStr, foodBoxAvailableStr, MealsFunctions.SET_FOODBOX_ALLOWED);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo3(mealsPOJO.getContractId());
+        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO.getContractId());
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика установки флага
-        return mealsService.mainLogicNewPreorder5(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
+        return mealsService.setFoodboxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
     }
 
     @GET
@@ -279,17 +299,17 @@ public class MealsController extends Application {
             }
         }
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfo5(contractIdStr, null,2);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoClientAllowed(contractIdStr, null, MealsFunctions.GET_FOODBOX_ALLOWED);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo3(mealsPOJO.getContractId());
+        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO.getContractId());
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика получения флага
-        return mealsService.mainLogicNewPreorder6(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
+        return mealsService.getFoodBoxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
     }
 
     private Map<String, String> parseParams(HttpServletRequest httpRequest) {
