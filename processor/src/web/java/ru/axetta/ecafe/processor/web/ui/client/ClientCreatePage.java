@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.hibernate.query.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
@@ -16,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
@@ -48,6 +50,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         ClientSelectPage.CompleteHandler,
         DulSelectPage.CompleteHandler {
 
+    private Boolean showFoundClient;
+    private Long foundIdOfClient;
+    private String foundFIO;
+
     public Long getBalanceToNotify() {
         return balanceToNotify;
     }
@@ -74,6 +80,30 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                         ClientGuardianRepresentType.UNKNOWN, false, null));
             }
         }
+    }
+
+    public Boolean getShowFoundClient() {
+        return showFoundClient;
+    }
+
+    public void setShowFoundClient(Boolean showFoundClient) {
+        this.showFoundClient = showFoundClient;
+    }
+
+    public Long getFoundIdOfClient() {
+        return foundIdOfClient;
+    }
+
+    public void setFoundIdOfClient(Long foundIdOfClient) {
+        this.foundIdOfClient = foundIdOfClient;
+    }
+
+    public String getFoundFIO() {
+        return foundFIO;
+    }
+
+    public void setFoundFIO(String foundFIO) {
+        this.foundFIO = foundFIO;
     }
 
     public static class OrgItem {
@@ -680,7 +710,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         clientsMobileHistory.setUser(user);
         clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         client.initClientMobileHistory(clientsMobileHistory);
-        client.setMobile(this.mobile);
+        client.setMobile(Client.checkAndConvertMobile(this.mobile));
         client.setEmail(this.email);
         client.setFax(this.fax);
         client.setRemarks(this.remarks);
@@ -727,8 +757,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
         if (isParentGroup()) {
-            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+            if (StringUtils.isEmpty(this.san) && CollectionUtils.isEmpty(dulDetail)) {
                 throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
+            }
+            if (!StringUtils.isEmpty(this.san)) {
+                checkSnils(persistenceSession, this.san);
+            }
+            if (!CollectionUtils.isEmpty(dulDetail)) {
+                checkDuls(persistenceSession, this.dulDetail);
             }
         }
         if (this.san != null && !this.san.isEmpty()) {
@@ -759,7 +795,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-
+        for (ClientGuardianItem clientWardItem : clientWardItems) {
+            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+                throw new Exception(String.format("У опекаемого %s не указан guid МЭШ", clientWardItem.getPersonName()));
+            }
+        }
 
         if (isParentGroup()) {
             if (birthDate == null)
@@ -773,7 +813,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
             PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
                     person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                    client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
+                    client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getMeshGuid());
             else
@@ -803,6 +843,41 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         clean();
         return client;
+    }
+
+    private void checkSnils(Session session, String san) throws Exception {
+        Query query = session.createQuery("select c from Client c join fetch c.person where c.san = :san");
+        query.setParameter("san", san);
+        List<Client> result = query.list();
+        if (result.size() > 0) {
+            setFoundValues(result.get(0));
+            throw new Exception("Уже существует клиент с указанным СНИЛС");
+        } else {
+            clearFoundValues();
+        }
+    }
+
+    private void checkDuls(Session session, List<DulDetail> dulDetails) throws Exception {
+        for (DulDetail detail : dulDetails) {
+            Client client = RuntimeContext.getAppContext().getBean(DulDetailService.class).findClientByDulDetail(session, detail);
+            if (client != null) {
+                setFoundValues(client);
+                throw new Exception("Уже существует клиент с указанным документом № " + detail.getNumber());
+            }
+        }
+        clearFoundValues();
+    }
+
+    private void setFoundValues(Client client) {
+        foundFIO = client.getPerson().getSurnameAndFirstLetters();
+        foundIdOfClient = client.getIdOfClient();
+        showFoundClient = true;
+    }
+
+    private void clearFoundValues() {
+        foundFIO = null;
+        foundIdOfClient = null;
+        showFoundClient = false;
     }
 
     private void clean() {
