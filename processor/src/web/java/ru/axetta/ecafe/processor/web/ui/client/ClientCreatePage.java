@@ -710,7 +710,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         clientsMobileHistory.setUser(user);
         clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
         client.initClientMobileHistory(clientsMobileHistory);
-        client.setMobile(this.mobile);
+        client.setMobile(Client.checkAndConvertMobile(this.mobile));
         client.setEmail(this.email);
         client.setFax(this.fax);
         client.setRemarks(this.remarks);
@@ -795,7 +795,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-
+        for (ClientGuardianItem clientWardItem : clientWardItems) {
+            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+                throw new Exception(String.format("У опекаемого %s не указан guid МЭШ", clientWardItem.getPersonName()));
+            }
+        }
 
         if (isParentGroup()) {
             if (birthDate == null)
@@ -809,7 +813,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
             PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
                     person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                    client.getSan(), client.getMobile().substring(1), client.getEmail(), this.dulDetail);
+                    client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getMeshGuid());
             else

@@ -94,7 +94,7 @@ public class DulDetailService {
         if (client != null)
             if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
                 throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if (dulDetail.getExpiration().before(dulDetail.getIssued()))
+        if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
             throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
         checkAnotherClient(session, dulDetail, client);
     }
