@@ -173,11 +173,13 @@
                                    disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
-            <h:panelGrid rendered="#{mainPage.clientCreatePage.isParentGroup()}" styleClass="borderless-grid"
+            <h:panelGrid styleClass="borderless-grid"
                          columns="1" bgcolor="#eeeeee">
                 <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
-                <h:selectOneMenu value="#{clientWard.role}" styleClass="input-text">
-                    <f:selectItems value="#{mainPage.clientCreatePage.roles}"/>
+                <h:selectOneMenu value="#{clientWard.role}" disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                 styleClass="input-text">
+                    <f:selectItems value="#{mainPage.clientCreatePage.roles}"
+                                   disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
         </rich:column>
@@ -315,11 +317,13 @@
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true"/>
             </f:facet>
-            <a4j:commandLink styleClass="command-link"
+            <a4j:commandLink action="#{mainPage.clientCreatePage.deleteDul}" styleClass="command-link"
                              render="dulDetailEditTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="true"
                                              target="#{dul.deleteState}"/>
+                <f:setPropertyActionListener value="#{dul}"
+                                             target="#{mainPage.clientCreatePage.dulForRemove}"/>
             </a4j:commandLink>
         </rich:column>
 
@@ -342,11 +346,18 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
-                       render="clientCreatePanel" styleClass="command-button" />
+                       render="clientCreatePanel,foundClientPanel" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" id="foundClientPanel">
+    <h:outputText escape="true" value="Найденный клиент:" styleClass="output-text" rendered="#{mainPage.clientCreatePage.showFoundClient}"/>
+    <a4j:commandLink render="mainMenu, workspaceForm" value="#{mainPage.clientCreatePage.foundFIO}" styleClass="command-link"
+                     action="#{mainPage.showClientViewPage}" rendered="#{mainPage.clientCreatePage.showFoundClient}">
+        <f:setPropertyActionListener value="#{mainPage.clientCreatePage.foundIdOfClient}" target="#{mainPage.selectedIdOfClient}" />
+    </a4j:commandLink>
 </h:panelGrid>
 </h:panelGrid>
 </ui:composition>

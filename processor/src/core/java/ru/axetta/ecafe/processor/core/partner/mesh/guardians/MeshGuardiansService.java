@@ -44,7 +44,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
-    public static final String PERSONS_LIKE_EXPAND = "documents,contacts";
+    public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -329,7 +329,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     PersonDocument buildPersonDocument(DulDetail dulDetail) {
-        Format formatter = new SimpleDateFormat("dd.MM.yyyy");
+        Format formatter = new SimpleDateFormat("yyyy-MM-dd");
         PersonDocument personDocument = new PersonDocument();
         personDocument.setId(0);
         personDocument.setPersonId(PERSON_ID_STUB);
@@ -597,10 +597,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        Date birthDate,
                                        String snils,
                                        String mobile,
-                                       String email) {
+                                       String email,
+                                       List<DulDetail> dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, null);
+            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic,
+                    lastName, genderId, birthDate, snils, mobile, email, dulDetail);
             String json = objectMapper.writeValueAsString(responsePersons);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(PERSONS_CREATE_URL, json);
             if (result.getCode() == HttpStatus.SC_OK) {

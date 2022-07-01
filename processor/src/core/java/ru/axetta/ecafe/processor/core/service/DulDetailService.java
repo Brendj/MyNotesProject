@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 @Scope(value = "singleton")
 public class DulDetailService {
 
-    private final MeshGuardiansService meshGuardiansService = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
 
     @Transactional(rollbackFor = Exception.class)
@@ -29,18 +29,19 @@ public class DulDetailService {
         Set<DulDetail> originDulDetails = new HashSet<>();
         Date currentDate = new Date();
 
-        if (client.getDulDetail() != null)
+        if (client.getDulDetail() != null) {
             originDulDetails = client.getDulDetail().stream()
                     .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
                     .collect(Collectors.toSet());
+        }
         for (DulDetail dulDetail : dulDetails) {
             if (dulDetail.getDeleteState() == null) {
                 dulDetail.setDeleteState(false);
             }
-            if (Boolean.TRUE.equals(dulDetail.getDeleteState()) && dulDetail.getCreateDate() == null) {
+            if (dulDetail.getDeleteState() && dulDetail.getCreateDate() == null) {
                 continue;
             }
-            if (Boolean.TRUE.equals(dulDetail.getDeleteState())) {
+            if (dulDetail.getDeleteState()) {
                 dulDetail.setLastUpdate(currentDate);
                 deleteDulDetail(session, dulDetail, client);
             } else if (isChange(originDulDetails, dulDetail)) {
@@ -56,20 +57,18 @@ public class DulDetailService {
     }
 
     public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
-            throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.modifyPersonDocument(client.getMeshGUID(), dulDetail);
+        validateDul(session, dulDetail, client);
+        if(ClientManager.isClientGuardian(session, client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
         }
         session.merge(dulDetail);
     }
 
     public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (documentExists(session, client, dulDetail.getDocumentTypeId(), null))
-            throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.createPersonDocument(client.getMeshGUID(), dulDetail);
+        validateDul(session, dulDetail, client);
+        if(ClientManager.isClientGuardian(session, client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
             dulDetail.setIdMkDocument(documentResponse.getId());
         }
@@ -78,11 +77,57 @@ public class DulDetailService {
     }
 
     public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if(ClientManager.isClientGuardian(client)) {
-            MeshDocumentResponse documentResponse = meshGuardiansService.deletePersonDocument(client.getMeshGUID(), dulDetail);
+        if(ClientManager.isClientGuardian(session, client)) {
+            MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
         }
         session.merge(dulDetail);
+    }
+
+    public void validateDulList(Session session, List<DulDetail> dulDetail, Client client) throws Exception {
+        for (DulDetail detail : dulDetail) {
+            validateDul(session, detail, client);
+        }
+    }
+
+    private void validateDul(Session session, DulDetail dulDetail, Client client) throws Exception {
+        if (client != null)
+            if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
+                throw new DocumentExistsException("У клиента уже есть документ этого типа");
+        if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
+            throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
+        checkAnotherClient(session, dulDetail, client);
+    }
+
+    private void checkAnotherClient(Session session, DulDetail dulDetail, Client client) throws DocumentExistsException {
+        //Не должно быть двух персон с одинаковыми действующими документами следующих типов:
+        List<Long> dulTypes = Arrays.asList(3L, 124L, 17L, 9L, 1L, 189L, 15L, 900L);
+
+        if (dulTypes.contains(dulDetail.getDocumentTypeId())) {
+            String query_str = "select d.idOfClient from DulDetail d where d.documentTypeId = :documentTypeId " +
+                    "and d.deleteState = false and d.number = :number ";
+            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) query_str += " and d.series = :series";
+            Query query = session.createQuery(query_str);
+            query.setParameter("number", dulDetail.getNumber());
+            query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
+            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) {
+                query.setParameter("series", dulDetail.getSeries());
+            }
+            List<Long> idOfClients = query.getResultList();
+            if (idOfClients == null || idOfClients.isEmpty())
+                return;
+            if (client != null && idOfClients.size() == 1 && idOfClients.get(0).equals(client.getIdOfClient()))
+                return;
+            if (idOfClients.size() > 1) {
+                Long id = client == null ? null : client.getIdOfClient();
+                StringBuilder ids = new StringBuilder();
+                for (Long idOfClient: idOfClients) {
+                    if (!idOfClient.equals(id))
+                        ids.append(idOfClient);
+                }
+                throw new DocumentExistsException(String.format("Персона c данным документом уже существует, идентификатор клиента: %s", ids));
+            }
+        }
     }
 
     private boolean documentExists(Session session, Client client, Long documentTypeId, Long id) {
@@ -121,5 +166,29 @@ public class DulDetailService {
                     .findAny().orElse(null);
         }
         return null;
+    }
+
+    public Client findClientByDulDetail(Session session, DulDetail dulDetail) {
+        String query_str = "select dd.idOfClient from DulDetail dd where dd.documentTypeId = :typeId " +
+                "and dd.number = :number";
+        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
+            query_str += " and dd.series = :series";
+        }
+        Query query = session.createQuery(query_str);
+        query.setParameter("typeId", dulDetail.getDocumentTypeId());
+        query.setParameter("number", dulDetail.getNumber());
+        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
+            query.setParameter("series", dulDetail.getSeries());
+        }
+        List<Long> list = query.getResultList();
+        if (list.size() == 0) return null;
+        List<Client> list2 = session.createQuery("select c from Client c join fetch c.person where c.idOfClient = :id")
+                .setParameter("id", list.get(0))
+                .getResultList();
+        return list2.get(0);
+    }
+
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 }

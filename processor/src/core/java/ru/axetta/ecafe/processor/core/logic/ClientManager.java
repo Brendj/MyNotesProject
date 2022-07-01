@@ -37,6 +37,7 @@ import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ClientManager {
 
@@ -1605,7 +1606,7 @@ public class ClientManager {
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
         for (ClientGuardian clientGuardian : results) {
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
-            if (cl != null && !cl.isDeletedOrLeaving()) {
+            if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
@@ -2577,8 +2578,12 @@ public class ClientManager {
     }
 
     //todo уточнить как найти представителя
-    public static boolean isClientGuardian(Client client) {
-        return client.getIdOfClientGroup() > 1000000000L;
+    public static boolean isClientGuardian(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
+        criteria.add(Restrictions.ne("deletedState", true));
+        criteria.add(Restrictions.eq("disabled", false));
+        return !criteria.list().isEmpty() || client.getIdOfClientGroup() > 1000000000L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2634,7 +2639,7 @@ public class ClientManager {
         String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
         boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
 
-        if(!fioIsEmpty) {
+        if (!fioIsEmpty) {
             q += " and ( ";
         }
         if (lastName != null) {
@@ -2642,18 +2647,18 @@ public class ClientManager {
         }
         if (firstName != null) {
             if (lastName != null)
-                q+= " and ";
+                q += " and ";
             q += " (upper(c.person.firstName) = :firstName) ";
         }
         if (patronymic != null) {
             if (lastName != null || firstName != null)
-                q+= " and ";
+                q += " and ";
             q += " (upper(c.person.secondName) = :patronymic) ";
         }
-        if(!fioIsEmpty) {
+        if (!fioIsEmpty) {
             q += ")";
         }
-        if (mobile != null || snils != null){
+        if (mobile != null || snils != null) {
             q += fioIsEmpty ? " and " : " or ";
         }
         if (mobile != null) {
@@ -2681,6 +2686,54 @@ public class ClientManager {
             query.setParameter("snils", snils);
         }
         return query.list();
+    }
+
+    public static void validateFio(String surname, String firstName, String secondName) throws Exception {
+        String fio = String.format("%S %S %S", surname, firstName, secondName);
+        String latin = ".*[a-zA-Z]+.*";
+        String cyrillic = ".*[а-яА-Я]+.*";
+
+        if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()) {
+            throw new Exception("Только русские или только английские буквы");
+        }
+
+        if (surname.endsWith("-") || firstName.endsWith("-") || secondName.endsWith("-")) {
+            throw new Exception("Знак \"-\" не может быть последним символом элемента.");
+        }
+
+        if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
+            throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void isUniqueFioAndMobileOrEmail(Session session, Long idOfClient, String surname, String firstName, String mobile, String email) throws Exception {
+        if (mobile.isEmpty() && email.isEmpty())
+            return;
+        String query_str = "select c.idOfClient from Client c " +
+                "where lower(c.person.firstName) = :firstName and lower(c.person.surname) = :surname ";
+        if (!mobile.isEmpty() && email.isEmpty())
+            query_str += " and c.mobile = :mobile ";
+        if (mobile.isEmpty())
+            query_str += " and c.email = :email ";
+        if (!mobile.isEmpty() && !email.isEmpty())
+            query_str += " and (c.mobile = :mobile or c.email = :email) ";
+
+        javax.persistence.Query query = session.createQuery(query_str);
+        query.setParameter("firstName", firstName.toLowerCase());
+        query.setParameter("surname", surname.toLowerCase());
+        if (!mobile.isEmpty())
+            query.setParameter("mobile", mobile);
+        if (!email.isEmpty())
+            query.setParameter("email", email);
+        List<Long> idOfClientList = query.getResultList();
+
+        if (idOfClientList.size() > 0) {
+            if (idOfClientList.size() == 1 && idOfClientList.get(0).equals(idOfClient))
+                return;
+            throw new Exception("Сочетание Фамилия + имя + телефон должны быть уникальными. " +
+                    "Сочетание Фамилия + Имя + электронная почта должны быть уникальными");
+        }
     }
 
 }

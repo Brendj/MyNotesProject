@@ -96,14 +96,14 @@ public class CancelledFoodBoxService {
     }
 
     public void scheduleSync() throws Exception {
-        if (!isOn())
-            return;
-        //
-        //Подготавливаем первоначальный список
-        DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
-        List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getActiveFoodBoxPreorder();
-        for (FoodBoxPreorder foodBoxPreorder : foodBoxPreorders) {
-            currentFoodBoxPreorders.put(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getCreateDate());
+        if (isOn()) {
+            //
+            //Подготавливаем первоначальный список
+            DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
+            List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getActiveFoodBoxPreorder();
+            for (FoodBoxPreorder foodBoxPreorder : foodBoxPreorders) {
+                currentFoodBoxPreorders.put(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getCreateDate());
+            }
         }
         //
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
