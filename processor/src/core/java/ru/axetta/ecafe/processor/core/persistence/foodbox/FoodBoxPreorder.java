@@ -32,6 +32,17 @@ public class FoodBoxPreorder  {
         updateDate = new Date();
     }
 
+    public FoodBoxPreorder(Client client, Long version, String xrequestStr)
+    {
+        this.version = version;
+        this.client = client;
+        this.state = FoodBoxStateTypeEnum.NEW;
+        this.org = client.getOrg();
+        this.createDate = new Date();
+        this.idFoodBoxExternal = xrequestStr;
+        this.posted = 0;
+    }
+
     public Long getIdFoodBoxPreorder() {
         return idFoodBoxPreorder;
     }
