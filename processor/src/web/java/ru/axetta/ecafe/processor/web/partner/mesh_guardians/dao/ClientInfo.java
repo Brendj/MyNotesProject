@@ -3,6 +3,8 @@ package ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClientInfo implements IDAOEntity {
     private String personGUID;
@@ -15,10 +17,8 @@ public class ClientInfo implements IDAOEntity {
     private String phone;
     private String mobile;
     private String email;
-    private String passportSeries;
-    private String passportNumber;
-    private String san;
     private String childrenPersonGUID;
+    private List<DocumentInfo> documents = new LinkedList<>();
 
     public String getPersonGUID() {
         return personGUID;
@@ -100,30 +100,6 @@ public class ClientInfo implements IDAOEntity {
         this.email = email;
     }
 
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
-    }
-
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
-    public String getSan() {
-        return san;
-    }
-
-    public void setSan(String san) {
-        this.san = san;
-    }
-
     public String getChildrenPersonGUID() {
         return childrenPersonGUID;
     }
@@ -141,5 +117,13 @@ public class ClientInfo implements IDAOEntity {
         i.setGenderId(c.getGender());
 
         return i;
+    }
+
+    public List<DocumentInfo> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<DocumentInfo> documents) {
+        this.documents = documents;
     }
 }

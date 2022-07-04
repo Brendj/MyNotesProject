@@ -6,10 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ClientInfo;
-import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ErrorMsg;
-import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.GuardianRelationInfo;
-import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.IDAOEntity;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.*;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
@@ -37,6 +35,7 @@ public class InternalClientRestController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createClient(@RequestBody ClientInfo info){
         try {
+            checkParameterClientInfo(info);
             service.createClient(info);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
@@ -115,7 +114,7 @@ public class InternalClientRestController extends Application {
     @Path("guardians")
     public Response processGuardiaRelations(@RequestBody GuardianRelationInfo guardianRelationInfo){
         try {
-            //checkParameter("guardianMeshGuid", personGuid);
+            checkParameterGuardianRelationInfo(guardianRelationInfo);
             service.processRelation(guardianRelationInfo);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
@@ -145,5 +144,48 @@ public class InternalClientRestController extends Application {
 
     private Response generateResponse(Integer responseCode, IDAOEntity entity) {
         return Response.status(responseCode).entity(entity).build();
+    }
+
+    private void checkParameterClientInfo(ClientInfo info) {
+        if (StringUtils.isBlank(info.getPersonGUID())) {
+            throw new IllegalArgumentException("PersonGUID is empty");
+        } else if (StringUtils.isBlank(info.getFirstname())) {
+            throw new IllegalArgumentException("Firstname is empty");
+        } else if (StringUtils.isBlank(info.getPatronymic())) {
+            throw new IllegalArgumentException("Patronymic is empty");
+        } else if (StringUtils.isBlank(info.getLastname())) {
+            throw new IllegalArgumentException("Lastname is empty");
+        } else if (info.getGenderId() == null) {
+            throw new IllegalArgumentException("GenderId is empty");
+        } else if (info.getBirthdate() == null) {
+            throw new IllegalArgumentException("Birthdate is empty");
+        } else if (StringUtils.isBlank(info.getAddress())) {
+            throw new IllegalArgumentException("Address is empty");
+        }
+        if (CollectionUtils.isEmpty(info.getDocuments())) {
+            for (DocumentInfo di : info.getDocuments()) {
+                if (di.getIdMKDocument() == null) {
+                    throw new IllegalArgumentException("IdMKDocument in documents is empty");
+                } else if (StringUtils.isBlank(di.getSeries())) {
+                    throw new IllegalArgumentException("Series in documents is empty");
+                } else if (StringUtils.isBlank(di.getNumber())) {
+                    throw new IllegalArgumentException("Number in documents is empty");
+                } else if (di.getDocumentType() == null) {
+                    throw new IllegalArgumentException("DocumentType is empty");
+                } else if (di.getIssuedDate() == null) {
+                    throw new IllegalArgumentException("IssuedDate in documents is empty");
+                } else if (StringUtils.isBlank(di.getIssuer())) {
+                    throw new IllegalArgumentException("Issuer in documents is empty");
+                }
+            }
+        }
+    }
+
+    private void checkParameterGuardianRelationInfo(GuardianRelationInfo info){
+        if (StringUtils.isBlank(info.getChildrenPersonGuid())) {
+            throw new IllegalArgumentException("ChildrenPersonGuid is empty");
+        } else if(CollectionUtils.isEmpty(info.getGuardianPersonGuids())){
+            throw new IllegalArgumentException("GuardianPersonGuids is empty");
+        }
     }
 }

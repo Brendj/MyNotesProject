@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ClientInfo;
+import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.DocumentInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.GuardianRelationInfo;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -22,8 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.NotFoundException;
 import java.util.Date;
 import java.util.List;
-
-import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.findClientGroupByGroupNameAndIdOfOrg;
+import java.util.Set;
 
 @Service
 @DependsOn("runtimeContext")
@@ -141,6 +141,8 @@ public class MeshClientProcessorService {
             p.setSecondName(info.getLastname());
             session.update(p);
 
+            processDocuments(c.getDulDetail(), info.getDocuments(), session, c.getIdOfClient());
+
             c.setClientRegistryVersion(nextClientVersion);
             c.setBirthDate(info.getBirthdate());
             c.setGender(info.getGenderId());
@@ -148,9 +150,6 @@ public class MeshClientProcessorService {
             c.setPhone(info.getPhone());
             c.setMobile(info.getMobile());
             c.setEmail(info.getEmail());
-            c.setPassportSeries(info.getPassportSeries());
-            c.setPassportNumber(info.getPassportNumber());
-            c.setSan(info.getSan());
             session.update(c);
 
             transaction.commit();
@@ -163,6 +162,44 @@ public class MeshClientProcessorService {
         } finally {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
+        }
+    }
+
+    private void processDocuments(Set<DulDetail> dulDetails, List<DocumentInfo> documents, Session session, Long idOfClient) {
+        for(DocumentInfo di : documents){
+            DulDetail d = dulDetails
+                    .stream()
+                    .filter(dulDetail -> dulDetail.getDocumentTypeId().equals(di.getIdMKDocument()))
+                    .findFirst()
+                    .orElse(null);
+            if(d == null){
+                DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
+                if(dulGuide == null){
+                    throw new NotFoundException("Not found DulGuide by type: " + di.getDocumentType());
+                }
+                d = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
+                d.setIdMkDocument(di.getIdMKDocument());
+                d.setCreateDate(new Date());
+                d.setLastUpdate(new Date());
+                d.setNumber(di.getNumber());
+                d.setSeries(di.getSeries());
+                d.setIssued(di.getIssuedDate());
+                d.setIssuer(di.getIssuer());
+                d.setDeleteState(false);
+
+                session.save(d);
+            }
+        }
+
+        for(DulDetail d : dulDetails){
+            boolean exists = documents.stream()
+                    .anyMatch(di -> di.getIdMKDocument().equals(d.getIdMkDocument()));
+            if(!exists){
+                d.setLastUpdate(new Date());
+                d.setDeleteState(true);
+
+                session.update(d);
+            }
         }
     }
 
@@ -179,7 +216,7 @@ public class MeshClientProcessorService {
             }
 
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-            ClientGroup cg = findClientGroupByGroupNameAndIdOfOrg(session,
+            ClientGroup cg = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session,
                     c.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
 
             c.setClientRegistryVersion(nextClientVersion);

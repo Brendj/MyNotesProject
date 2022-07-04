@@ -1,14 +1,17 @@
 package ru.iteco.meshsync.mesh.service.logic.dto;
 
+import ru.iteco.client.model.PersonContact;
+import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClientRestDTO implements Serializable {
-    private final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    private static final Integer PHONE_ID = 1;
+    private static final Integer EMAIL_ID = 3;
 
     private String personGUID;
     private String firstname;
@@ -20,10 +23,8 @@ public class ClientRestDTO implements Serializable {
     private String phone;
     private String mobile;
     private String email;
-    private String passportSeries;
-    private String passportNumber;
-    private String san;
     private String childrenPersonGUID;
+    private List<DocumentDTO> documents = new LinkedList<>();
 
     public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
@@ -32,7 +33,18 @@ public class ClientRestDTO implements Serializable {
         dto.patronymic = info.getPatronymic();
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
-        dto.birthdate = df.parse(info.getBirthdate().toString());
+        dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
+        dto.address = info.getAddresses().get(0).getAddress().getAddress();
+
+        PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
+        dto.phone = phone == null ? null : phone.getData();
+
+        PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
+        dto.email = email == null ? null : email.getData();
+
+        for(PersonDocument pd : info.getDocuments()){
+            dto.documents.add(DocumentDTO.build(pd));
+        }
 
         return dto;
     }
@@ -124,35 +136,19 @@ public class ClientRestDTO implements Serializable {
         this.email = email;
     }
 
-    public String getPassportSeries() {
-        return passportSeries;
-    }
-
-    public void setPassportSeries(String passportSeries) {
-        this.passportSeries = passportSeries;
-    }
-
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
-    public String getSan() {
-        return san;
-    }
-
-    public void setSan(String san) {
-        this.san = san;
-    }
-
     public String getChildrenPersonGUID() {
         return childrenPersonGUID;
     }
 
     public void setChildrenPersonGUID(String childrenPersonGUID) {
         this.childrenPersonGUID = childrenPersonGUID;
+    }
+
+    public List<DocumentDTO> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<DocumentDTO> documents) {
+        this.documents = documents;
     }
 }

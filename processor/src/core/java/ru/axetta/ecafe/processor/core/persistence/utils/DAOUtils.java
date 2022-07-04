@@ -5867,4 +5867,12 @@ public class DAOUtils {
             return false;
         }
     }
+
+    public static DulGuide getDulGuideByType(Session session, Integer documentType) {
+        Query q = session.createQuery("SELECT dg from DulGuide dg where dg.documentTypeId = :documentType");
+        q.setParameter("documentType", documentType);
+        q.setMaxResults(1);
+
+        return (DulGuide) q.getSingleResult();
+    }
 }
