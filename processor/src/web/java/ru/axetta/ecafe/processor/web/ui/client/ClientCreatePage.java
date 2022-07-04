@@ -795,11 +795,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-        for (ClientGuardianItem clientWardItem : clientWardItems) {
-            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
-                throw new Exception(String.format("У опекаемого %s не указан guid МЭШ", clientWardItem.getPersonName()));
-            }
-        }
+
+        //todo заглушка для теста
+
+//        for (ClientGuardianItem clientWardItem : clientWardItems) {
+//            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+//                throw new Exception(String.format("У опекаемого %s не указан guid МЭШ", clientWardItem.getPersonName()));
+//            }
+//        }
 
         //todo заглушка для теста
 //        if (isParentGroup()) {

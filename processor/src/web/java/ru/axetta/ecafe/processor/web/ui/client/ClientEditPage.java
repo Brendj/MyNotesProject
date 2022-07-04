@@ -1249,18 +1249,19 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     //todo заглушка для теста
 
-//        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
-//            for (ClientGuardianItem clientWardItem : clientWardItems) {
-//                if (clientWardItem.getIdOfClient().equals(this.idOfClient))
-//                    throw new Exception("Персона не может быть представителем самой себя");
-//            }
-//            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-//            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-//            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-//            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
-//                    idOfClient));
-//            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
-//
+        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                if (clientWardItem.getIdOfClient().equals(this.idOfClient))
+                    throw new Exception("Персона не может быть представителем самой себя");
+            }
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems, clientGuardianHistory);
+
+            //todo isParent
 //            if (client.getMeshGUID() != null && isParentGroup()) {
 //                for (ClientGuardianItem clientWardItem : clientWardItems) {
 //                    PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
@@ -1269,18 +1270,19 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 //                        throw new Exception(String.format("Ошибка создания связи с обучающимся в МК: %s", personResponse.getMessage()));
 //                }
 //            }
-//        } else if (isParentGroup())
-//            throw new Exception("Не выбраны \"Опекаемые\"");
+        } else if (isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
 
         //todo заглушка для теста
-//        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-//            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-//            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-//            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-//            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
-//                    idOfClient));
-//            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
-//
+        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
+                    idOfClient));
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
+
+            //todo isParent
 //            if (client.getMeshGUID() != null && isParentGroup()) {
 //                for (ClientGuardianItem clientWardItem : removeListWardItems) {
 //                    PersonResponse personResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
@@ -1289,7 +1291,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 //                        throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
 //                }
 //            }
-//        }
+        }
 
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
                 .validateAndSaveDulDetails(persistenceSession, this.dulDetail, this.idOfClient);
