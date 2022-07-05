@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Created with IntelliJ IDEA.
@@ -78,12 +79,12 @@ public class CompositeIdOfVisitReqResolutionHist implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Long((getBaseForHash(idOfRecord) + getBaseForHash(idOfRequest) + getBaseForHash(idOfOrgResol))).hashCode();
+        return new BigDecimal(getStrForHash(idOfRecord) + getStrForHash(idOfRequest) + getStrForHash(idOfOrgResol)).hashCode();
     }
 
-    private long getBaseForHash(long value) {
-        long result = value > 0L ? value : -value;
-        while (result < BASE_FOR_HASH) result = result << 3;
-        return result;
+    private String getStrForHash(long value) {
+        long result = value >= 0L ? value : -value;
+        return String.valueOf(result);
     }
+
 }

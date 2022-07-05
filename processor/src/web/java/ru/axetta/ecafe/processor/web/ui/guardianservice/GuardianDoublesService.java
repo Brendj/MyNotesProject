@@ -390,7 +390,7 @@ public class GuardianDoublesService {
                 VisitReqResolutionHist.RES_CANCELED, new Date(),
                 MigrantsUtils.resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
-        nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, migrant.getOrgVisit().getIdOfOrg());
+        nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, migrant.getOrgVisit().getIdOfOrg()) - 1;
         CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
                 migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
         VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
