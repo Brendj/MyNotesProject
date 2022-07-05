@@ -2,7 +2,7 @@
 
 --962
 CREATE INDEX cf_log_services_createddate_idx
-    ON cf_log_services USING btree(createddate)
+    ON cf_log_services USING btree(createddate);
 
 --1013
 insert into cf_clientgroups(idoforg, idofclientgroup, groupname)
