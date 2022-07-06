@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.web.partner.meals.ResponseCodesError;
 import ru.axetta.ecafe.processor.web.partner.meals.ResponseResult;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,6 +78,7 @@ public class MealsService {
     @Autowired
     private DAOReadonlyService daoReadonlyService;
 
+    @Transactional
     public MealsPOJO validateByClientInfo(Long contractId, MealsController.MealsFunctions fun)
     {
         MealsPOJO mealsPOJO = verifyClient(contractId);
@@ -137,6 +139,7 @@ public class MealsService {
         return mealsPOJO;
     }
 
+    @Transactional
     public MealsPOJO validateByClientAllowed(Long contractId)
     {
         MealsPOJO mealsPOJO = verifyClient(contractId);
@@ -169,7 +172,7 @@ public class MealsService {
     {
         MealsPOJO mealsPOJO = new MealsPOJO();
         Client client = null;
-        client = daoReadonlyService.getClientByContractId(contractId);
+        client = daoReadonlyService.getClientWithOrgByContractId(contractId);
         if (client == null) {
             mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
                     entity(responseResult.noClient()).build());
