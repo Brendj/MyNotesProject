@@ -74,6 +74,7 @@ public class InternalClientRestController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateClient(@RequestBody ClientInfo info){
         try {
+            checkParameterClientInfo(info);
             service.updateClient(info);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
@@ -94,7 +95,6 @@ public class InternalClientRestController extends Application {
     public Response deleteClient(@QueryParam(value = "guardianMeshGuid") String personGuid){
         try {
             checkParameter("guardianMeshGuid", personGuid);
-
             service.deleteClient(personGuid);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();

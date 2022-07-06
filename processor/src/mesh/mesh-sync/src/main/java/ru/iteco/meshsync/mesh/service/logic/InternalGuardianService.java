@@ -1,10 +1,17 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +21,10 @@ import ru.iteco.meshsync.mesh.service.logic.dto.ClientRestDTO;
 import ru.iteco.meshsync.mesh.service.logic.dto.GuardianRelationDTO;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +45,21 @@ public class InternalGuardianService {
     private HttpHeaders httpHeaders;
 
     @PostConstruct
-    public void init(){
-        this.restTemplate = new RestTemplate();
+    public void init() throws Exception {
+        this.restTemplate = getRestTemplate();
         this.httpHeaders = new HttpHeaders();
         this.httpHeaders.set(X_API_KEY, apiKey);
     }
 
+    private RestTemplate getRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        TrustStrategy acceptingTrustStrategy = (x509Certificates, s) -> true;
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+        return new RestTemplate(requestFactory);
+    }
 
     public Boolean clientExist(String personGUID) {
         Map<String, String> params = new HashMap<>();

@@ -40,7 +40,6 @@ public class MeshClientDAOService {
                     " and c.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:excludeClientGroupsIds)");
 
             q.setParameter("meshGUID", meshGuid)
-                    .setParameter("employId", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
                     .setParameter("excludeClientGroupsIds", excludeClientGroupsIds)
                     .setMaxResults(1);
 
