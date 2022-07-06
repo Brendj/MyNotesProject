@@ -225,6 +225,8 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
                 OnlinePaymentProcessor.PayRequest.V_0, false, defaultContragentId, null, paymentMethod, contractId,
                 paymentId , source, sum, false);
         try {
+            if (!date.matches("\\d{2}.\\d{2}.\\d{4}_\\d{2}:\\d{2}:\\d{2}"))
+                throw new Exception();
             payRequest.setPayDate(timeFormat.parse(date));
         }catch (Exception e){
             throw new InvalidDateException("Invalid value in PAY_DATE: " + date);

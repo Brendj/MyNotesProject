@@ -371,11 +371,7 @@ public class OrgMskNSIService extends MskNSIService {
     }
 
     public OrgMskNSIService getNSIService() {
-        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
-            case Option.NSI2 : return RuntimeContext.getAppContext().getBean("OrgSymmetricDAOService", OrgSymmetricDAOService.class);
-            case Option.NSI3 : return RuntimeContext.getAppContext().getBean(OrgNSI3DAOService.class);
-        }
-        return null;
+        return RuntimeContext.getAppContext().getBean(OrgNSI3DAOService.class);
     }
 
     //Получения списка изменений из реестров с учетом имени, и ограничения на кол-во оргзаписей в ответе
