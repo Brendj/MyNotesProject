@@ -1563,6 +1563,16 @@ public class DAOReadonlyService {
         return DAOUtils.findClientByContractId(entityManager, contractId);
     }
 
+    public Client getClientWithOrgByContractId(long contractid) {
+        try {
+            Query query = entityManager.createQuery("select c from Client c join fetch c.org where c.contractId = :contractid");
+            query.setParameter("contractid", contractid);
+            return (Client) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public List<Client> findClientsBySan(String san) {
         return DAOUtils.findClientsBySan(entityManager, san);
     }
