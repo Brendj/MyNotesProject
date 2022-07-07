@@ -239,6 +239,7 @@ public class CryptoSign {
     }
 
     private static boolean verifyECDSA(byte[] data, byte[] sign, CardSign cardSign) throws Exception {
+        loadProviderBC();
         Signature dsa = Signature.getInstance(ALGORITHM, BC_PROV);
         dsa.initVerify(loadPubKey(cardSign.getPublickeyprovider()));
         dsa.update(data);
