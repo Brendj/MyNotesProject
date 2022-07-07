@@ -27,7 +27,6 @@ public class MeshGuardianPerson {
     private Integer validationStateId;
     private Integer id;
     private List<MeshDocumentResponse> document;
-
     private Boolean alreadyInISPP;
 
     public MeshGuardianPerson() {

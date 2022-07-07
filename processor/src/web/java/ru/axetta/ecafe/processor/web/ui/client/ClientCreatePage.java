@@ -5,22 +5,24 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ContactPerson;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -33,7 +35,9 @@ import org.hibernate.criterion.Restrictions;
 import javax.faces.context.FacesContext;
 import javax.faces.el.MethodBinding;
 import javax.faces.model.SelectItem;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClient;
 
@@ -48,7 +52,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
         ClientSelectPage.CompleteHandler,
-        DulSelectPage.CompleteHandler {
+        DulSelectPage.CompleteHandler,
+        DulViewPage.CompleteHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientCreatePage.class);
 
     private Boolean showFoundClient;
     private Long foundIdOfClient;
@@ -104,6 +111,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setFoundFIO(String foundFIO) {
         this.foundFIO = foundFIO;
+    }
+
+    @Override
+    public void completeDulViewSelection() throws Exception {
+
     }
 
     public static class OrgItem {
@@ -283,8 +295,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private ClientGuardianItem currentClientWard;
     private List<ClientGuardianItem> clientWardItems = new ArrayList<>();
     private String typeAddClient;
-
     private DulDetail dulForRemove;
+    private List<MeshGuardianPerson> meshGuardianPersonList;
+    private MeshGuardianPerson meshGuardianPerson;
+    private Boolean disableCreatePersonKey = true;
+    private Boolean disableLinkPersonKey = true;
+
 
     public String getTypeAddClient() {
         return typeAddClient;
@@ -612,6 +628,50 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.dulForRemove = dulForRemove;
     }
 
+    public List<MeshGuardianPerson> getMeshGuardianPersonList() {
+        return meshGuardianPersonList;
+    }
+
+    public MeshGuardianPerson getMeshGuardianPerson() {
+        return meshGuardianPerson;
+    }
+
+    public void setMeshGuardianPerson(MeshGuardianPerson meshGuardianPerson) {
+        this.meshGuardianPerson = meshGuardianPerson;
+    }
+
+    public void setMeshGuardianPersonList(List<MeshGuardianPerson> meshGuardianPersonList) {
+        this.meshGuardianPersonList = meshGuardianPersonList;
+    }
+
+    public Boolean getDisableCreatePersonKey() {
+        return disableCreatePersonKey;
+    }
+
+    public void setDisableCreatePersonKey(Boolean disableCreatePersonKey) {
+        this.disableCreatePersonKey = disableCreatePersonKey;
+    }
+
+    public Boolean getDisableLinkPersonKey() {
+        return disableLinkPersonKey;
+    }
+
+    public void setDisableLinkPersonKey(Boolean disableLinkPersonKey) {
+        this.disableLinkPersonKey = disableLinkPersonKey;
+    }
+
+    public String getMeshGuardianPersonStr() {
+        if (this.meshGuardianPerson == null)
+            return "";
+        return String.format("%s %s %s, %s, %s, %s",
+                this.meshGuardianPerson.getSurname() == null ? "" : this.meshGuardianPerson.getSurname(),
+                this.meshGuardianPerson.getFirstName() == null ? "" : this.meshGuardianPerson.getFirstName(),
+                this.meshGuardianPerson.getSecondName() == null ? "" : this.meshGuardianPerson.getSecondName(),
+                this.meshGuardianPerson.getGender() == 1 ? "Мужской" : "Женский",
+                new SimpleDateFormat("dd.MM.yyyy").format(this.meshGuardianPerson.getBirthDate()),
+                this.meshGuardianPerson.getMobile() == null ? "" : this.meshGuardianPerson.getMobile());
+    }
+
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -673,6 +733,193 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             filter = "Не выбрано";
         }
         return null;
+    }
+
+    public void searchMeshPerson(Session session) throws Exception {
+
+        if ((this.san == null || this.san.isEmpty()) && (this.dulDetail == null || this.dulDetail.isEmpty())) {
+            throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
+        }
+        if (StringUtils.isEmpty(this.person.surname) || StringUtils.isEmpty(this.person.firstName)) {
+            throw new Exception("Укажите фамилия и имя обслуживаемого лица");
+        }
+        if (birthDate == null) {
+            throw new Exception("Не заполнено поле \"Дата рождения\"");
+        }
+        if (this.san != null && !this.san.isEmpty()) {
+            this.san = this.san.replaceAll("[\\D]", "");
+            ClientManager.validateSan(session, this.san, null);
+        }
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null);
+        ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
+        this.mobile = Client.checkAndConvertMobile(this.mobile);
+
+        PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(person.getFirstName(),
+                person.getSecondName(), person.getSurname(), this.gender, this.birthDate,
+                this.san, this.mobile, this.email, this.dulDetail);
+        if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
+            throw new Exception(personListResponse.getMessage());
+
+//        PersonListResponse personListResponse = new PersonListResponse();
+//        personListResponse.setResponse(new ArrayList<>());
+//
+//        MeshGuardianPerson meshGuardianPerson1 = new MeshGuardianPerson();
+//        MeshDocumentResponse meshDocumentResponse1 = new MeshDocumentResponse();
+//        meshDocumentResponse1.setSeries("323232");
+//        meshDocumentResponse1.setDocumentTypeId(15);
+//        meshDocumentResponse1.setExpiration(new Date());
+//        meshDocumentResponse1.setIssued(new Date());
+//        meshDocumentResponse1.setIssuer("dsdsdsdsd");
+//        meshDocumentResponse1.setSubdivisionCode("1L");
+//        meshDocumentResponse1.setNumber("111111");
+//        meshDocumentResponse1.setValidationStateId(1);
+//
+//        MeshDocumentResponse meshDocumentResponse2 = new MeshDocumentResponse();
+//        meshDocumentResponse2.setSeries("323232");
+//        meshDocumentResponse2.setDocumentTypeId(18);
+//        meshDocumentResponse2.setExpiration(new Date());
+//        meshDocumentResponse2.setIssued(new Date());
+//        meshDocumentResponse2.setIssuer("dsdsdsdsd");
+//        meshDocumentResponse2.setSubdivisionCode("1L");
+//        meshDocumentResponse2.setNumber("111111");
+//        meshDocumentResponse2.setValidationStateId(0);
+//
+//        meshGuardianPerson1.setDocument(Arrays.asList(meshDocumentResponse1, meshDocumentResponse2));
+//
+//        meshGuardianPerson1.setFirstName("Даниил");
+//        meshGuardianPerson1.setSurname("Сагитов");
+//        meshGuardianPerson1.setSecondName("Петрович");
+//        meshGuardianPerson1.setSnils("2342351345");
+//        meshGuardianPerson1.setGender(1);
+//        meshGuardianPerson1.setBirthDate(new Date());
+//        meshGuardianPerson1.setDegree(78);
+//        meshGuardianPerson1.setValidationStateId(1);
+//        meshGuardianPerson1.setMobile("9033434567");
+//        meshGuardianPerson1.setMeshGuid("6d9fe8d4-e3a2-4185-9d42-167bad51feca");
+
+
+//        MeshGuardianPerson meshGuardianPerson2 = new MeshGuardianPerson();
+//        MeshDocumentResponse meshDocumentResponse2 = new MeshDocumentResponse();
+//        meshDocumentResponse2.setSeries("323232");
+//        meshGuardianPerson2.setDocument(Collections.singletonList(meshDocumentResponse2));
+//
+//        meshGuardianPerson2.setFirstName("Антон");
+//        meshGuardianPerson2.setSurname("Максимов");
+//        meshGuardianPerson2.setSecondName("Денисович");
+//        meshGuardianPerson2.setSnils("111110000000");
+//        meshGuardianPerson2.setGender(2);
+//        meshGuardianPerson2.setBirthDate(new Date());
+//        meshGuardianPerson2.setDegree(88);
+
+//        personListResponse.getResponse().add(meshGuardianPerson1);
+//        personListResponse.getResponse().add(meshGuardianPerson2);
+
+        this.meshGuardianPersonList = personListResponse.getResponse()
+                .stream().filter(m -> m.getDegree() > 71).collect(Collectors.toList());
+
+        if (!this.meshGuardianPersonList.isEmpty()) {
+            this.disableLinkPersonKey = false;
+            this.disableCreatePersonKey = true;
+        } else {
+            this.meshGuardianPersonList = personListResponse.getResponse();
+            this.disableCreatePersonKey = false;
+            this.disableLinkPersonKey = true;
+        }
+        if (personListResponse.getResponse() != null && !personListResponse.getResponse().isEmpty()) {
+            List<String> meshGuidList = personListResponse.getResponse()
+                    .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
+            org.hibernate.Query query = session.createQuery("select c.meshGUID from Client c "
+                    + "where meshGuid in :meshGuidList");
+            query.setParameter("meshGuidList", meshGuidList);
+            List<String> list = query.list();
+            personListResponse.getResponse().forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
+        }
+    }
+
+    public Client addGuardianToClient(ClientGuardianHistory clientGuardianHistory, Session session) throws Exception {
+
+        Client client;
+        if (!this.meshGuardianPerson.getAlreadyInISPP()) {
+            client = createClientInISPP(session, clientGuardianHistory);
+        } else {
+            String q = "select c from Client c where c.meshGUID = :meshGUID ";
+            Query query = session.createQuery(q);
+            query.setParameter("meshGUID", this.meshGuardianPerson.getMeshGuid());
+            client = (Client) query.uniqueResult();
+
+            if (client == null)
+                throw new Exception(String.format("Не найден клиент в испп meshGuid = %s ",
+                        this.meshGuardianPerson.getMeshGuid()));
+        }
+        addGuardianToClient(session, clientGuardianHistory, client);
+        return client;
+    }
+
+    private Client createClientInISPP(Session session, ClientGuardianHistory clientGuardianHistory) throws Exception {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        if (clientWardItems == null || clientWardItems.isEmpty()) {
+            throw new Exception("Не выбраны \"Опекаемые\"");
+        }
+        Org org = session.get(Client.class, clientWardItems.get(0).getIdOfClient()).getOrg();
+        if (autoContractId) {
+            this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org.getIdOfOrg());
+        }
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+
+        Person person = new Person(meshGuardianPerson.getFirstName(), meshGuardianPerson.getSurname(), meshGuardianPerson.getSecondName());
+        session.save(person);
+        Person contractPerson = new Person("", "", "");
+
+
+        Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS, this.notifyViaPUSH,
+                this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
+                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
+        session.save(client);
+        ClientsMobileHistory clientsMobileHistory =
+                new ClientsMobileHistory("Регистрация клиента через Клиенты/Регистрация");
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        clientsMobileHistory.setUser(user);
+        clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
+        client.initClientMobileHistory(clientsMobileHistory);
+        client.setMobile(Client.checkAndConvertMobile(this.meshGuardianPerson.getMobile()));
+        client.setEmail(this.meshGuardianPerson.getEmail());
+        client.setMeshGUID(this.meshGuardianPerson.getMeshGuid());
+        client.setSan(this.meshGuardianPerson.getSnils());
+        client.setGender(this.meshGuardianPerson.getGender());
+        client.setBirthDate(this.meshGuardianPerson.getBirthDate());
+        client.setExternalId(null);
+        client.setClientGUID(null);
+        client.setCreatedFrom(ClientCreatedFromType.BACK_OFFICE);
+        client.setCreatedFromDesc(DAOReadonlyService.getInstance().getUserFromSession().getUserName());
+        ClientGroup group = DAOUtils.findClientGroup(session,
+                new CompositeIdOfClientGroup(org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS.getValue()));
+        if (group == null) {
+            DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS);
+        }
+        client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+        ClientParallel.addFoodBoxModifire(client);
+        for (DulDetail dul : this.dulDetail) {
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
+                throw new Exception("Не заполнено поле \"Номер\" документа");
+            dul.setIdOfClient(client.getIdOfClient());
+            session.save(dul);
+        }
+        session.update(client);
+        if (autoContractId)
+            RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, this.contractId, org.getIdOfOrg());
+
+        ClientMigration clientMigration = new ClientMigration(client, org, this.contractTime);
+        session.save(clientMigration);
+
+        if (client.getClientGroup() != null) {
+            ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
+                    ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
+        }
+
+        clean();
+        return client;
     }
 
     public Client createClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory) throws Exception {
@@ -756,17 +1003,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-        if (isParentGroup()) {
-            if (StringUtils.isEmpty(this.san) && CollectionUtils.isEmpty(dulDetail)) {
-                throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
-            }
-            if (!StringUtils.isEmpty(this.san)) {
-                checkSnils(persistenceSession, this.san);
-            }
-            if (!CollectionUtils.isEmpty(dulDetail)) {
-                checkDuls(persistenceSession, this.dulDetail);
-            }
-        }
+
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, null);
@@ -789,42 +1026,19 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             persistenceSession.save(dul);
         }
 
-        if (isParentGroup() && clientWardItems != null && !clientWardItems.isEmpty()) {
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
-                    client.getIdOfClient()));
-            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
-        } else if (isParentGroup())
-            throw new Exception("Не выбраны \"Опекаемые\"");
-
-        //todo заглушка для теста
-
-//        for (ClientGuardianItem clientWardItem : clientWardItems) {
-//            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
-//                throw new Exception(String.format("У опекаемого %s не указан guid МЭШ", clientWardItem.getPersonName()));
-//            }
-//        }
-
-        //todo заглушка для теста
-//        if (isParentGroup()) {
-//            if (birthDate == null)
-//                throw new Exception("Не заполнено поле \"Дата рождения\"");
-//
-//            PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
-//                    person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-//                    client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
-//            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-//                client.setMeshGUID(personResponse.getMeshGuid());
-//            else
-//                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-//
-//            for (ClientGuardianItem clientWardItem : clientWardItems) {
-//                personResponse = getMeshGuardiansService().addGuardianToClient(client.getMeshGUID(),
-//                        clientWardItem.getMeshGuid(), clientWardItem.getRole());
-//                if (!personResponse.getCode().equals(PersonResponse.OK_CODE))
-//                    throw new Exception(String.format("Ошибка создания связи с обучающимся idOfClient = %s : %s",
-//                            clientWardItem.getIdOfClient(), personResponse.getMessage()));
-//            }
-//        }
+        if (isParentGroup()) {
+            if (birthDate == null) {
+                throw new Exception("Не заполнено поле \"Дата рождения\"");
+            }
+            PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
+                    person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+                    client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
+            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+                client.setMeshGUID(personResponse.getMeshGuid());
+            else
+                throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+            addGuardianToClient(persistenceSession, clientGuardianHistory, client);
+        }
         persistenceSession.update(client);
         if (autoContractId)
             RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
@@ -838,9 +1052,33 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
                             FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
         }
-
         clean();
         return client;
+    }
+
+    private void addGuardianToClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory, Client client) throws Exception {
+        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+                    client.getIdOfClient()));
+            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
+        } else if (isParentGroup())
+            throw new Exception("Не выбраны \"Опекаемые\"");
+
+        PersonResponse personResponse;
+        for (ClientGuardianItem clientWardItem : clientWardItems) {
+            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+                throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
+            }
+            if (clientWardItem.getRole() == -1)
+                throw new Exception("У опекаемого не заполнено поле \"Вид представительства\"");
+            personResponse = getMeshGuardiansService().addGuardianToClient(client.getMeshGUID(),
+                    clientWardItem.getMeshGuid(), clientWardItem.getRole());
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                logger.error(String.format("%s: %s", personResponse.getCode(), personResponse.getMessage()));
+                throw new Exception(String.format("Ошибка создания связи с обучающимся idOfClient = %s : %s",
+                        clientWardItem.getIdOfClient(), personResponse.getMessage()));
+            }
+        }
     }
 
     private void checkSnils(Session session, String san) throws Exception {
@@ -918,6 +1156,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.remarks = null;
         this.specialMenu = false;
         this.clientWardItems = new ArrayList<>();
+        this.dulDetail = new ArrayList<>();
     }
 
     private String filter = "Не выбрано";
@@ -1007,4 +1246,5 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private MeshGuardiansService getMeshGuardiansService() {
         return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
+
 }

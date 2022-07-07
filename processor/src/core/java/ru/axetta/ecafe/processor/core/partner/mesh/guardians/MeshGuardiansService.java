@@ -44,7 +44,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
-    public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
+    public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts,agents";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -531,8 +531,28 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (MeshGuardianNotEnoughClientDataException e) {
             return new PersonListResponse().notEnoughClientDataResponse(e.getMessage());
         } catch (Exception e) {
-            logger.error("Error in searchDocumentsByMeshGuid: ", e);
+            logger.error("Error in searchPersonByMeshGuid: ", e);
             return new PersonListResponse().internalErrorResponse();
+        }
+    }
+
+    public AgentListResponse searchAgentsByMeshGuid(String meshGuid) {
+        try {
+            String parameters = String.format("?person=%s&expand=%s&limit=%s", meshGuid, PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CHANGE_URL, parameters);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                TypeFactory typeFactory = objectMapper.getTypeFactory();
+                CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
+                List<SimilarPerson> similarPersons = objectMapper.readValue(result.getResponse(), collectionType);
+                return new AgentListResponse(getMeshGuardianConverter().agentToDTO(similarPersons)).okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toAgentListDTO(errorResponse);
+            }
+        }  catch (Exception e) {
+            logger.error("Error in searchAgentsByMeshGuid: ", e);
+            return new AgentListResponse().internalErrorResponse();
         }
     }
 
@@ -566,11 +586,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public PersonResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonListResponse personListResponse = searchPersonByMeshGuid(agentMeshGuid);
-            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
-                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
-            Integer id = personListResponse.getResponse().get(0).getId();
-
+            AgentListResponse agentListResponse = searchAgentsByMeshGuid(childMeshGuid);
+            if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new PersonResponse(agentListResponse.getCode(), agentListResponse.message);
+            Integer id = 0;
+            for (AgentResponse agentResponse : agentListResponse.getResponse()) {
+                if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
+                    id = agentResponse.getAgentId();
+            }
             MeshResponseWithStatusCode result = meshRestClient
                     .executeDeleteMethod(buildDeleteGuardianToClientUrl(childMeshGuid, id.toString()));
             if (result.getCode() == HttpStatus.SC_OK) {

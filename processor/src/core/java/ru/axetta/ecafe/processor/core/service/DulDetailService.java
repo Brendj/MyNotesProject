@@ -23,7 +23,6 @@ public class DulDetailService {
 
     private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
 
-    @Transactional(rollbackFor = Exception.class)
     public void validateAndSaveDulDetails(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
         Client client = session.get(Client.class, idOfClient);
         Set<DulDetail> originDulDetails = new HashSet<>();
