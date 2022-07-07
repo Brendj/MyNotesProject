@@ -284,6 +284,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
         try {
             RuntimeContext.getAppContext().getBean("meshPersonsSyncService", MeshPersonsSyncService.class).loadPersons(idOfOrg, "null", lastName, firstName, patronymic);
         } catch (Exception e) {
+            logger.error("Ошибка в методе loadMeshRest", e);
             errorMessages = e.getMessage();
         }
     }
