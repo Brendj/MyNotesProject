@@ -42,31 +42,32 @@ public class DulDetailService {
             }
             if (dulDetail.getDeleteState()) {
                 dulDetail.setLastUpdate(currentDate);
-                deleteDulDetail(session, dulDetail, client);
+                deleteDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
             } else if (isChange(originDulDetails, dulDetail)) {
                 dulDetail.setLastUpdate(currentDate);
                 if (dulDetail.getCreateDate() == null) {
                     dulDetail.setCreateDate(currentDate);
-                    saveDulDetail(session, dulDetail, client);
+                    saveDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
                 } else {
-                    updateDulDetail(session, dulDetail, client);
+                    updateDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
                 }
             }
         }
     }
 
-    public void updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+    public void updateDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
         validateDul(session, dulDetail, client);
-        if(ClientManager.isClientGuardian(session, client)) {
+        if (isGuardian) {
             MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
+            dulDetail.setIdMkDocument(documentResponse.getId());
         }
         session.merge(dulDetail);
     }
 
-    public Long saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+    public Long saveDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
         validateDul(session, dulDetail, client);
-        if(ClientManager.isClientGuardian(session, client)) {
+        if (isGuardian) {
             MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
             dulDetail.setIdMkDocument(documentResponse.getId());
@@ -75,8 +76,8 @@ public class DulDetailService {
         return dulDetail.getId();
     }
 
-    public void deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if(ClientManager.isClientGuardian(session, client)) {
+    public void deleteDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
+        if (isGuardian) {
             MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
             checkError(documentResponse);
         }
@@ -105,7 +106,8 @@ public class DulDetailService {
         if (dulTypes.contains(dulDetail.getDocumentTypeId())) {
             String query_str = "select d.idOfClient from DulDetail d where d.documentTypeId = :documentTypeId " +
                     "and d.deleteState = false and d.number = :number ";
-            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) query_str += " and d.series = :series";
+            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty())
+                query_str += " and d.series = :series";
             Query query = session.createQuery(query_str);
             query.setParameter("number", dulDetail.getNumber());
             query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
@@ -120,7 +122,7 @@ public class DulDetailService {
             if (idOfClients.size() > 1) {
                 Long id = client == null ? null : client.getIdOfClient();
                 StringBuilder ids = new StringBuilder();
-                for (Long idOfClient: idOfClients) {
+                for (Long idOfClient : idOfClients) {
                     if (!idOfClient.equals(id))
                         ids.append(idOfClient);
                 }
@@ -142,7 +144,7 @@ public class DulDetailService {
         return query.getResultList().size() > 0;
     }
 
-    private boolean isChange(Set<DulDetail> originDulDetails, DulDetail dulDetail) {
+    public boolean isChange(Set<DulDetail> originDulDetails, DulDetail dulDetail) {
         for (DulDetail originDul : originDulDetails)
             if (dulDetail.equals(originDul))
                 return false;

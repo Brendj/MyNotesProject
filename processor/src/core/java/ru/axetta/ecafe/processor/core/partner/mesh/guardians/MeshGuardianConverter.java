@@ -1,14 +1,12 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import org.springframework.stereotype.Component;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.ErrorResponse;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class MeshGuardianConverter {
@@ -45,8 +43,9 @@ public class MeshGuardianConverter {
     public PersonListResponse toPersonListDTO(ErrorResponse errorResponse) {
         return new PersonListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
-    public AgentListResponse toAgentListDTO(ErrorResponse errorResponse) {
-        return new AgentListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
+
+    public IdListResponse toAgentListDTO(ErrorResponse errorResponse) {
+        return new IdListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
     public MeshDocumentResponse toDTO(PersonDocument personDocument) throws ParseException {
@@ -57,13 +56,15 @@ public class MeshGuardianConverter {
         return new MeshDocumentResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
-    public List<AgentResponse> agentToDTO(List<SimilarPerson> similarPersons) {
-        List<AgentResponse> agentResponses = new ArrayList<>();
-        for (SimilarPerson similarPerson : similarPersons) {
-            for (PersonAgent personAgent : similarPerson.getPerson().getAgent()) {
-                agentResponses.add(new AgentResponse(personAgent.getId(), personAgent.getAgentPersonId()));
-            }
-        }
-        return agentResponses;
+    public List<AgentIdResponse> agentIdToDTO(ResponsePersons responsePersons) {
+        return responsePersons.getAgent()
+                .stream().map(a -> new AgentIdResponse(a.getId(), a.getAgentPersonId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<DocumentIdResponse> documentIdToDTO(ResponsePersons responsePersons) {
+        return responsePersons.getDocuments()
+                .stream().map(a -> new DocumentIdResponse(a.getId(), a.getDocumentTypeId()))
+                .collect(Collectors.toList());
     }
 }

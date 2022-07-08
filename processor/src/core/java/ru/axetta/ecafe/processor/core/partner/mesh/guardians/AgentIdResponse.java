@@ -1,11 +1,11 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
-public class AgentResponse {
+public class AgentIdResponse {
 
     private Integer agentId;
     private String agentMeshGuid;
 
-    public AgentResponse(Integer agentId, String agentMeshGuid) {
+    public AgentIdResponse(Integer agentId, String agentMeshGuid) {
         this.agentId = agentId;
         this.agentMeshGuid = agentMeshGuid;
     }
