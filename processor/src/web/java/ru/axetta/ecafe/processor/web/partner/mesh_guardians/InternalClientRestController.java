@@ -64,7 +64,7 @@ public class InternalClientRestController extends Application {
             log.error("Couldn't find all parameters", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find organizations", e);
+            log.error("Unable to find guardian", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         }
     }
@@ -82,7 +82,7 @@ public class InternalClientRestController extends Application {
             log.error("Couldn't find all parameters", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find organizations", e);
+            log.error("Unable to find guardian", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
             log.error("Internal Error: ", e);
@@ -102,7 +102,7 @@ public class InternalClientRestController extends Application {
             log.error("Couldn't find all parameters", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find organizations", e);
+            log.error("Unable to find guardian", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
             log.error("Internal Error: ", e);
@@ -122,7 +122,7 @@ public class InternalClientRestController extends Application {
             log.error("Couldn't find all parameters", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find organizations", e);
+            log.error("Unable to find guardian", e);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
             log.error("Internal Error: ", e);

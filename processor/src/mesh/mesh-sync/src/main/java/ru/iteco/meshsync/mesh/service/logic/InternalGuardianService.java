@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.iteco.client.model.PersonAgent;
@@ -62,19 +63,27 @@ public class InternalGuardianService {
     }
 
     public Boolean clientExist(String personGUID) {
-        Map<String, String> params = new HashMap<>();
-        params.put("guardianMeshGuid", personGUID);
-        HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("guardianMeshGuid", personGUID);
+            HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
 
-        ResponseEntity<ClientRestDTO> response = restTemplate.exchange(
-                targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
-                HttpMethod.GET,
-                request, ClientRestDTO.class, params);
+            ResponseEntity<ClientRestDTO> response = restTemplate.exchange(
+                    targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                    HttpMethod.GET,
+                    request, ClientRestDTO.class, params);
 
 
-        ClientRestDTO dto = response.getBody();
+            ClientRestDTO dto = response.getBody();
 
-        return dto != null && StringUtils.isNotEmpty(dto.getPersonGUID());
+            return dto != null && StringUtils.isNotEmpty(dto.getPersonGUID());
+        } catch (HttpClientErrorException e){
+            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND)){
+                return false;
+            } else {
+                throw e;
+            }
+        }
     }
 
     public void deleteClient(String personGUID) {
