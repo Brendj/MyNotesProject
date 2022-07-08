@@ -234,7 +234,7 @@ public class MealsService {
                     entity(responseResult.doubleIdentif(xrequestStr)).build());
             return mealsPOJO;
         }
-        return null;
+        return mealsPOJO;
     }
 
     public MealsPOJO validateByFormalInfoGetFoodbox(String contractIdStr, String fromStr, String toStr, String sortStr)

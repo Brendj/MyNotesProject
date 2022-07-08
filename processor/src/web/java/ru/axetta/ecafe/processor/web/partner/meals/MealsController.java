@@ -122,7 +122,6 @@ public class MealsController extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "orders/foodbox")
     public Response getPersonFoodboxOrders(@Context HttpServletRequest request) {
-        Result result = new Result();
         //Контроль безопасности
         if (!mealsService.validateAccess()) {
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
@@ -269,14 +268,14 @@ public class MealsController extends Application {
         MealsPOJO mealsPOJO = mealsService.validateByFormalInfoClientAllowed(contractIdStr, foodBoxAvailableStr, MealsFunctions.SET_FOODBOX_ALLOWED);
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
-
+        Boolean foodAv = mealsPOJO.getFoodBoxAvailable();
         //Логика всех проверок по клиенту
         mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO.getContractId());
         if (mealsPOJO.getResponse() != null)
             return mealsPOJO.getResponse();
 
         //Логика установки флага
-        return mealsService.setFoodboxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
+        return mealsService.setFoodboxAllowed(mealsPOJO.getClient(), foodAv);
     }
 
     @GET
