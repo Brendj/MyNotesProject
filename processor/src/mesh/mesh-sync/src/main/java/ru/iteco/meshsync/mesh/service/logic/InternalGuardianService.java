@@ -66,7 +66,9 @@ public class InternalGuardianService {
         params.put("guardianMeshGuid", personGUID);
         HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
 
-        ResponseEntity<ClientRestDTO> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.GET,
+        ResponseEntity<ClientRestDTO> response = restTemplate.exchange(
+                targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                HttpMethod.GET,
                 request, ClientRestDTO.class, params);
 
 
@@ -80,7 +82,9 @@ public class InternalGuardianService {
         params.put("guardianMeshGuid", personGUID);
 
         HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
-        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.DELETE,
+        ResponseEntity<Void> response = restTemplate.exchange(
+                targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                HttpMethod.DELETE,
                 request, Void.class, params);
 
         if(!response.getStatusCode().equals(HttpStatus.OK)){
