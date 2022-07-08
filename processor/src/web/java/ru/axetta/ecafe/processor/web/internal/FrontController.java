@@ -3024,8 +3024,9 @@ public class FrontController extends HttpServlet {
             throw new FrontControllerException("Не заполнены обязательные параметры");
     }
 
+    //todo тест
     @WebMethod(operationName = "createMeshPerson")
-    public PersonResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
+    public GuardianMeshGuidResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
                                            @WebParam(name = "firstname") String firstName,
                                            @WebParam(name = "patronymic") String patronymic,
                                            @WebParam(name = "lastname") String lastName,
@@ -3051,8 +3052,14 @@ public class FrontController extends HttpServlet {
         if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
             throw new FrontController.FrontControllerException("Указанный снилс уже существует в системе");
         }
-        return getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+        PersonResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
                 mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
+
+        if (!personResponse.getCode().equals(GuardianResponse.OK)) {
+            logger.error(personResponse.getMessage());
+            return new GuardianMeshGuidResponse(personResponse.getCode(), personResponse.getMessage());
+        }
+        return new GuardianMeshGuidResponse(personResponse.getMeshGuid());
     }
 
     @WebMethod(operationName = "getGuardians")
@@ -3132,7 +3139,7 @@ public class FrontController extends HttpServlet {
             if (client.getMeshGUID() != null) {
                 PersonResponse personResponse = getMeshGuardiansService()
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
-                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
+                if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                     logger.error(personResponse.getMessage());
                     return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
                 }

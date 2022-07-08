@@ -44,7 +44,7 @@ public class MeshGuardianConverter {
         return new PersonListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
-    public IdListResponse toAgentListDTO(ErrorResponse errorResponse) {
+    public IdListResponse toIdListDTO(ErrorResponse errorResponse) {
         return new IdListResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 

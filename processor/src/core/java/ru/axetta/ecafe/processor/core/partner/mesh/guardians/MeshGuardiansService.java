@@ -549,10 +549,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 return idListResponse.okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toAgentListDTO(errorResponse);
+                return getMeshGuardianConverter().toIdListDTO(errorResponse);
             }
         }  catch (Exception e) {
-            logger.error("Error in searchAgentsByMeshGuid: ", e);
+            logger.error("Error in searchIdByMeshGuid: ", e);
             return new IdListResponse().internalErrorResponse();
         }
     }
