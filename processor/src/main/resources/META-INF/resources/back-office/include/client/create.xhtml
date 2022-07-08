@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -8,356 +9,508 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <h:panelGrid rendered="#{!mainPage.isEligibleToEditClients()}">
-        <h:outputText escape="true" styleClass="output-text" value="Недостаточно прав для просмотра страницы"></h:outputText>
+        <h:outputText escape="true" styleClass="output-text"
+                      value="Недостаточно прав для просмотра страницы"></h:outputText>
     </h:panelGrid>
-<!-- Панель создания клиента -->
-<h:panelGrid rendered="#{mainPage.isEligibleToEditClients()}">
-<h:panelGrid styleClass="borderless-grid" columns="2" id="clientCreatePanel"
-             binding="#{mainPage.clientCreatePage.pageComponent}">
-    <h:outputText escape="true" value="Организация" styleClass="output-text" />
-    <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.clientCreatePage.org.shortName}" readonly="true" styleClass="input-text"
-                     style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
-                           styleClass="command-link" style="width: 25px;" />
-    </h:panelGroup>
-    <h:outputText escape="true" value="Пароль" styleClass="output-text" />
-    <h:inputSecret value="#{mainPage.clientCreatePage.plainPassword}" maxlength="64" styleClass="input-text" />
-    <h:outputText escape="true" value="Повторите пароль" styleClass="output-text" />
-    <h:inputSecret value="#{mainPage.clientCreatePage.plainPasswordConfirmation}" maxlength="64"
-                   styleClass="input-text" />
-    <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-div" columns="3">
-        <h:inputText value="#{mainPage.clientCreatePage.contractId}" converter="contractIdConverter"
-                     maxlength="#{mainPage.clientCreatePage.contractIdMaxLength}" styleClass="input-text" />
-        <h:outputText escape="true" value="Генерировать автоматически" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.autoContractId}" styleClass="output-text" />
-    </h:panelGrid>
-    <h:outputText escape="true" value="Статус договора" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientCreatePage.contractState}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.clientCreatePage.clientInitContractStateMenu.items}" />
-    </h:selectOneMenu>
-    <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
-    <rich:calendar value="#{mainPage.clientCreatePage.contractTime}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                   inputClass="input-text" showWeeksBar="false" />
-    <h:outputText escape="true" value="Физическое лицо, заключившее контракт" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.contractPerson.surname}" maxlength="128"
-                     styleClass="input-text" />
-        <h:outputText escape="true" value="Имя" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.contractPerson.firstName}" maxlength="64"
-                     styleClass="input-text" />
-        <h:outputText escape="true" value="Отчество" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.contractPerson.secondName}" maxlength="128"
-                     styleClass="input-text" />
-        <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.contractPerson.idDocument}" maxlength="128"
-                     styleClass="input-text" />
-    </h:panelGrid>
-    <h:outputText escape="true" value="Обслуживаемое физическое лицо" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.person.surname}" maxlength="128" styleClass="input-text" />
-        <h:outputText escape="true" value="Имя" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.person.firstName}" maxlength="64" styleClass="input-text" />
-        <h:outputText escape="true" value="Отчество" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.person.secondName}" maxlength="128" styleClass="input-text" />
-        <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
-        <h:inputText value="#{mainPage.clientCreatePage.person.idDocument}" maxlength="128" styleClass="input-text" />
-    </h:panelGrid>
+    <!-- Панель создания клиента -->
+    <h:panelGrid rendered="#{mainPage.isEligibleToEditClients()}">
+        <h:panelGrid styleClass="borderless-grid" columns="2" id="clientCreatePanel"
+                     binding="#{mainPage.clientCreatePage.pageComponent}">
+            <h:outputText escape="true" value="Организация" styleClass="output-text"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.clientCreatePage.org.shortName}" readonly="true" styleClass="input-text"
+                             style="margin-right: 2px;"/>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" render="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
+                                   styleClass="command-link" style="width: 25px;"/>
+            </h:panelGroup>
+            <h:outputText escape="true" value="Пароль" styleClass="output-text"/>
+            <h:inputSecret value="#{mainPage.clientCreatePage.plainPassword}" maxlength="64" styleClass="input-text"/>
+            <h:outputText escape="true" value="Повторите пароль" styleClass="output-text"/>
+            <h:inputSecret value="#{mainPage.clientCreatePage.plainPasswordConfirmation}" maxlength="64"
+                           styleClass="input-text"/>
+            <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text"/>
+            <h:panelGrid styleClass="borderless-div" columns="3">
+                <h:inputText value="#{mainPage.clientCreatePage.contractId}" converter="contractIdConverter"
+                             maxlength="#{mainPage.clientCreatePage.contractIdMaxLength}" styleClass="input-text"/>
+                <h:outputText escape="true" value="Генерировать автоматически" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.autoContractId}" styleClass="output-text"/>
+            </h:panelGrid>
+            <h:outputText escape="true" value="Статус договора" styleClass="output-text"/>
+            <h:selectOneMenu value="#{mainPage.clientCreatePage.contractState}" styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientCreatePage.clientInitContractStateMenu.items}"/>
+            </h:selectOneMenu>
+            <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text"/>
+            <rich:calendar value="#{mainPage.clientCreatePage.contractTime}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false"/>
+            <h:outputText escape="true" value="Физическое лицо, заключившее контракт" styleClass="output-text"/>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Фамилия" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.contractPerson.surname}" maxlength="128"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Имя" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.contractPerson.firstName}" maxlength="64"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Отчество" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.contractPerson.secondName}" maxlength="128"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Номер документа" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.contractPerson.idDocument}" maxlength="128"
+                             styleClass="input-text"/>
+            </h:panelGrid>
+            <h:outputText escape="true" value="Обслуживаемое физическое лицо" styleClass="output-text"/>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Фамилия" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.person.surname}" maxlength="128"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Имя" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.person.firstName}" maxlength="64"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Отчество" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.person.secondName}" maxlength="128"
+                             styleClass="input-text"/>
+                <h:outputText escape="true" value="Номер документа" styleClass="output-text"/>
+                <h:inputText value="#{mainPage.clientCreatePage.person.idDocument}" maxlength="128"
+                             styleClass="input-text"/>
+            </h:panelGrid>
 
-    <h:outputText escape="true" value="Группа" styleClass="output-text" />
-    <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.clientCreatePage.clientGroupName}" readonly="true" styleClass="input-text"
-                     style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" render="modalClientGroupSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
-            <f:param name="idOfOrg" value="#{mainPage.clientCreatePage.org.idOfOrg}" />
-            <f:setPropertyActionListener value="#{mainPage.clientCreatePage.org.idOfOrg}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
-            <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}" />
-        </a4j:commandButton>
-    </h:panelGroup>
+            <h:outputText escape="true" value="Группа" styleClass="output-text"/>
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.clientCreatePage.clientGroupName}" readonly="true"
+                             styleClass="input-text"
+                             style="margin-right: 2px;"/>
+                <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}"
+                                   render="modalClientGroupSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;"
+                                   disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
+                    <f:param name="idOfOrg" value="#{mainPage.clientCreatePage.org.idOfOrg}"/>
+                    <f:setPropertyActionListener value="#{mainPage.clientCreatePage.org.idOfOrg}"
+                                                 target="#{mainPage.clientGroupSelectPage.idOfOrg}"/>
+                    <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}"/>
+                </a4j:commandButton>
+            </h:panelGroup>
 
-    <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.limit}" maxlength="20" converter="copeckSumConverter"
-                 styleClass="input-text" />
-    <h:outputText escape="true" value="Порог снижения до отправки уведомления" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.balanceToNotify}" maxlength="20" converter="copeckSumConverter"
-                 styleClass="input-text" />
-    <h:outputText escape="true" value="Адрес" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.address}" maxlength="128" styleClass="input-text" />
-    <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.phone}" maxlength="32" styleClass="input-text"
-                 converter="phoneConverter" />
-    <h:outputText escape="true" value="Номер мобильного телефона" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.mobile}" maxlength="32" styleClass="input-text"
-                 converter="phoneConverter" />
+            <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.limit}" maxlength="20" converter="copeckSumConverter"
+                         styleClass="input-text"/>
+            <h:outputText escape="true" value="Порог снижения до отправки уведомления" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.balanceToNotify}" maxlength="20"
+                         converter="copeckSumConverter"
+                         styleClass="input-text"/>
+            <h:outputText escape="true" value="Адрес" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.address}" maxlength="128" styleClass="input-text"/>
+            <h:outputText escape="true" value="Контактный телефон" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.phone}" maxlength="32" styleClass="input-text"
+                         converter="phoneConverter"/>
+            <h:outputText escape="true" value="Номер мобильного телефона" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.mobile}" maxlength="32" styleClass="input-text"
+                         converter="phoneConverter"/>
 
-    <h:outputText escape="true" value="Факс" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.fax}" maxlength="32" styleClass="input-text"
-                 converter="phoneConverter" />
+            <h:outputText escape="true" value="Факс" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.fax}" maxlength="32" styleClass="input-text"
+                         converter="phoneConverter"/>
 
-    <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaSMS}" styleClass="output-text" />
-    <h:outputText escape="true" value="Уведомлять с помощью PUSH-уведомлений" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaPUSH}" styleClass="output-text" />
-    <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.email}" maxlength="128" styleClass="input-text" />
-    <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaEmail}" styleClass="output-text" />
-    <h:outputText escape="true" value="Тип SMS-уведомлений (не работает!)" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientCreatePage.payForSMS}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.clientCreatePage.clientPayForSMSMenu.items}" />
-    </h:selectOneMenu>
+            <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaSMS}" styleClass="output-text"/>
+            <h:outputText escape="true" value="Уведомлять с помощью PUSH-уведомлений" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaPUSH}" styleClass="output-text"/>
+            <h:outputText escape="true" value="Электронная почта" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.email}" maxlength="128" styleClass="input-text"/>
+            <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.notifyViaEmail}" styleClass="output-text"/>
+            <h:outputText escape="true" value="Тип SMS-уведомлений (не работает!)" styleClass="output-text"/>
+            <h:selectOneMenu value="#{mainPage.clientCreatePage.payForSMS}" styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientCreatePage.clientPayForSMSMenu.items}"/>
+            </h:selectOneMenu>
 
-    <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
-    <rich:dataTable id="clientWardEditTable" value="#{mainPage.clientCreatePage.clientWardItems}" var="clientWard"
-                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
-                    footerClass="data-table-footer-center" >
-        <rich:column headerClass="column-header" >
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер договора"/>
+            <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
+            <rich:dataTable id="clientWardEditTable" value="#{mainPage.clientCreatePage.clientWardItems}"
+                            var="clientWard"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            footerClass="data-table-footer-center">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер договора"/>
+                    </f:facet>
+                    <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link"
+                                     render="mainMenu, workspaceForm">
+                        <h:outputText escape="true" value="#{clientWard.contractId}" converter="contractIdConverter"
+                                      styleClass="output-text"/>
+                        <f:setPropertyActionListener value="#{clientWard.idOfClient}"
+                                                     target="#{mainPage.selectedIdOfClient}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="ФИО клиента"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{clientWard.personName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Мобильный телефон"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{clientWard.mobile}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Опции"/>
+                    </f:facet>
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
+                        <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text"/>
+                        <h:selectBooleanCheckbox value="#{clientWard.enabled}"
+                                                 disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                                 styleClass="output-text">
+                            <a4j:ajax render="clientWardEditTable" event="change"
+                                      action="#{clientWard.activateNotificationSpecial()}"/>
+                        </h:selectBooleanCheckbox>
+
+                        <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}"
+                                      style="font-size: 8pt;" rendered="#{!clientWard.isCreatedWhereDefault}"/>
+                        <h:outputText value="" rendered="#{!clientWard.isCreatedWhereDefault}"/>
+
+                        <h:outputText escape="true" value="Согласие на предзаказ" styleClass="output-text"/>
+                        <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true"
+                                                 styleClass="output-text"/>
+
+                        <h:outputText escape="true" value="Самостоятельный предзаказ" styleClass="output-text"/>
+                        <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true"
+                                                 styleClass="output-text"/>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.relation}"
+                                         disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                         styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientCreatePage.relations}"
+                                           disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="borderless-grid"
+                                 columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.role}"
+                                         disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                         styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientCreatePage.roles}"
+                                           disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Правила оповещения"/>
+                    </f:facet>
+                    <rich:dataTable id="clientNotificationSettingChildren" value="#{clientWard.notificationItems}"
+                                    var="it"
+                                    rows="11" columnClasses="left-aligned-column, center-aligned-column"
+                                    styleClass="borderless-grid-all-client">
+                        <rich:column styleClass="borderless-grid-all-client">
+                            <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text"/>
+                        </rich:column>
+                        <rich:column styleClass="borderless-grid-all-client">
+                            <h:selectBooleanCheckbox value="#{it.enabled}"
+                                                     disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                                     styleClass="output-text"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Удалить"/>
+                    </f:facet>
+                    <a4j:commandLink styleClass="command-link" render="clientWardEditTable"
+                                     action="#{mainPage.clientCreatePage.removeClientWard}">
+                        <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                        <f:setPropertyActionListener value="#{clientWard}"
+                                                     target="#{mainPage.clientCreatePage.currentClientWard}"/>
+                    </a4j:commandLink>
+                </rich:column>
+                <f:facet name="footer">
+                    <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
+                                       render="modalClientSelectorPanel"
+                                       disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                                       styleClass="command-link">
+                        <f:setPropertyActionListener value="ward" target="#{mainPage.clientCreatePage.typeAddClient}"/>
+                    </a4j:commandButton>
+                </f:facet>
+            </rich:dataTable>
+
+            <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text"/>
+            <h:selectOneMenu value="#{mainPage.clientCreatePage.discountMode}">
+                <a4j:ajax event="change" render="clientCategory"
+                          action="#{mainPage.clientCreatePage.changeClientCategory}"/>
+                <f:selectItems value="#{mainPage.clientCreatePage.selectItemList}"/>
+            </h:selectOneMenu>
+
+            <h:outputText escape="true" value="Категории" styleClass="output-text"/>
+
+            <h:panelGroup id="clientCategory">
+                <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}"
+                                   render="modalCategoryListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;"
+                                   disabled="#{!mainPage.clientCreatePage.discountModeIsCategory}">
+                    <f:param name="fullList" value="false"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
+                              value=" {#{mainPage.clientCreatePage.filter}}"/>
+            </h:panelGroup>
+
+            <h:outputText escape="true" value="СНИЛС" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.san}" maxlength="14" styleClass="input-text"/>
+            <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.externalId}" maxlength="64" styleClass="input-text"/>
+            <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.clientGUID}" maxlength="64"
+                         styleClass="input-text long-field"/>
+            <h:outputText escape="true" value="Пол" styleClass="output-text"/>
+            <h:selectOneMenu value="#{mainPage.clientCreatePage.gender}" styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientCreatePage.clientGenderMenu.items}"/>
+            </h:selectOneMenu>
+            <h:outputText escape="true" value="Дата рождения" styleClass="output-text"/>
+            <rich:calendar value="#{mainPage.clientCreatePage.birthDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false"/>
+            <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text"/>
+            <h:inputText value="#{mainPage.clientCreatePage.ageTypeGroup}" maxlength="128" styleClass="input-text"/>
+
+            <h:outputText escape="true" value="Особенности в питании" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.specialMenu}" styleClass="output-text"/>
+
+            <h:outputText escape="true" value="Документы" styleClass="output-text"/>
+            <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientCreatePage.dulDetail}"
+                            var="dul"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            footerClass="data-table-footer-center">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Название документа"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Серия"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Номер"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Кем выдан"/>
+                    </f:facet>
+                    <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
+                    <f:facet name="header">
+                        <h:outputText escape="true" styleClass="" value="Когда выдан"/>
+                    </f:facet>
+                    <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                </rich:column>
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата истечения срока действия"/>
+                    </f:facet>
+                    <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter"
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                </rich:column>
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                    <f:facet name="header">
+                        <h:outputText value="Удалить" escape="true"/>
+                    </f:facet>
+                    <a4j:commandLink action="#{mainPage.clientCreatePage.deleteDul}" styleClass="command-link"
+                                     render="dulDetailEditTable">
+                        <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                        <f:setPropertyActionListener value="true"
+                                                     target="#{dul.deleteState}"/>
+                        <f:setPropertyActionListener value="#{dul}"
+                                                     target="#{mainPage.clientCreatePage.dulForRemove}"/>
+                    </a4j:commandLink>
+                </rich:column>
+
+                <f:facet name="footer">
+                    <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
+                                       render="modalDulSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
+                                       styleClass="command-link">
+                        <f:setPropertyActionListener value="#{mainPage.clientCreatePage.dulDetail}"
+                                                     target="#{mainPage.dulSelectPage.dulDetailList}"/>
+                    </a4j:commandButton>
+                </f:facet>
+            </rich:dataTable>
+
+            <h:panelGrid styleClass="borderless-grid">
+                <h:outputText escape="true" value="Заметки" styleClass="output-text"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid">
+                <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.remarks}"
+                                 styleClass="input-text"/>
+            </h:panelGrid>
+
+            <h:panelGrid rendered="#{mainPage.clientCreatePage.isParentGroup()}" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Представители" styleClass="output-text"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="meshPersonSelectorPanel" rendered="#{mainPage.clientCreatePage.isParentGroup()}"
+                         styleClass="borderless-grid">
+                <rich:dataTable width="100%" align="center" id="meshPersonSelectorTable"
+                                value="#{mainPage.clientCreatePage.meshGuardianPersonList}" var="item" rows="20"
+                                footerClass="data-table-footer" columnClasses="left-aligned-column, left-aligned-column,
+                        left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                        left-aligned-column, center-aligned-column, center-aligned-column"
+                                rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                onrowclick="#{rich:element('detail')}.click();">
+
+                    <rich:column width="1">
+                        <f:facet name="header">
+                            <h:outputText escape="true" value=""/>
+                        </f:facet>
+                        <a4j:commandButton id="detail" execute="@this" value="" style="display: none;"
+                                           render="meshPersonSelectorTable">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{mainPage.clientCreatePage.meshGuardianPerson}"/>
+                        </a4j:commandButton>
+                    </rich:column>
+
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Фамилия"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.surname}" styleClass="output-text"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Имя"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.firstName}" styleClass="output-text"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Отчество"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.secondName}" styleClass="output-text"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Пол"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.gender}" styleClass="output-text"
+                                      converter="genderTypeConverter"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Дата рождения"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.birthDate}" datePattern="dd.MM.yyyy"
+                                      converter="dateConverter" styleClass="output-text" showWeeksBar="false"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Номер телефона"/>
+                        </f:facet>
+                        <h:outputText escape="true" value="#{item.mobile}" styleClass="output-text"
+                                      showWeeksBar="false"/>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Документы"/>
+                        </f:facet>
+                        <a4j:commandButton value="Открыть" action="#{mainPage.showDulViewPage}"
+                                           render="modalDulViewPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulViewPanel')}.show();"
+                                           styleClass="command-link">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{mainPage.dulViewPage.meshGuardianPerson}"/>
+                        </a4j:commandButton>
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <f:facet name="header">
+                            <h:outputText escape="true" styleClass="" value="Наличие в ИСПП"/>
+                        </f:facet>
+                        <h:graphicImage value="/images/taloons/applied.png"
+                                        rendered="#{item.alreadyInISPP}"/>
+                    </rich:column>
+
+                    <f:facet name="footer">
+                        <div align="center">
+                            <h:panelGrid columns="1" id="selectedMeshPerson">
+                                <h:outputText styleClass="text" escape="true"
+                                              value="#{mainPage.clientCreatePage.meshGuardianPersonStr}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3">
+                                <a4j:commandButton disabled="#{mainPage.clientCreatePage.disableLinkPersonKey}"
+                                                   value="Сделать представителем"
+                                                   action="#{mainPage.addGuardianToClient()}"
+                                                   render="clientCreatePanel"
+                                                   styleClass="command-link">
+                                </a4j:commandButton>
+                                <a4j:commandButton value="Обратиться в ТП"
+                                                   render="clientCreatePanel"
+                                                   styleClass="command-link">
+                                </a4j:commandButton>
+                                <a4j:commandButton disabled="#{mainPage.clientCreatePage.disableCreatePersonKey}"
+                                                   value="Создать представителя" action="#{mainPage.createClient()}"
+                                                   render="clientCreatePanel"
+                                                   styleClass="command-link">
+                                </a4j:commandButton>
+                            </h:panelGrid>
+                        </div>
+                    </f:facet>
+                </rich:dataTable>
+            </h:panelGrid>
+            <f:facet name="footer">
+                <h:panelGrid id="searchPersonPanel" styleClass="borderless-grid">
+                    <a4j:commandButton
+                            value="Найти представителя в МК" rendered="#{mainPage.clientCreatePage.isParentGroup()}"
+                            action="#{mainPage.searchMeshPerson()}"
+                            render="meshPersonSelectorTable, meshPersonSelectorPanel"
+                            styleClass="command-link">
+                    </a4j:commandButton>
+
+                    <a4j:commandButton
+                            rendered="#{!mainPage.clientCreatePage.isParentGroup()}"
+                            value="Зарегистрировать нового клиента" action="#{mainPage.createClient()}"
+                            render="clientCreatePanel,foundClientPanel" styleClass="command-button"/>
+                </h:panelGrid>
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link"
-                             render="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{clientWard.contractId}" converter="contractIdConverter"
-                              styleClass="output-text"/>
-                <f:setPropertyActionListener value="#{clientWard.idOfClient}"
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" id="foundClientPanel">
+            <h:outputText escape="true" value="Найденный клиент:" styleClass="output-text"
+                          rendered="#{mainPage.clientCreatePage.showFoundClient}"/>
+            <a4j:commandLink render="mainMenu, workspaceForm" value="#{mainPage.clientCreatePage.foundFIO}"
+                             styleClass="command-link"
+                             action="#{mainPage.showClientViewPage}"
+                             rendered="#{mainPage.clientCreatePage.showFoundClient}">
+                <f:setPropertyActionListener value="#{mainPage.clientCreatePage.foundIdOfClient}"
                                              target="#{mainPage.selectedIdOfClient}"/>
             </a4j:commandLink>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="ФИО клиента"/>
-            </f:facet>
-            <h:outputText escape="true" value="#{clientWard.personName}" styleClass="output-text"/>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Мобильный телефон"/>
-            </f:facet>
-            <h:outputText escape="true" value="#{clientWard.mobile}" styleClass="output-text"/>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Опции"/>
-            </f:facet>
-            <h:panelGrid styleClass="borderless-grid" columns="2">
-                <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{clientWard.enabled}" disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
-                                         styleClass="output-text">
-                    <a4j:ajax render="clientWardEditTable" event="change"
-                              action="#{clientWard.activateNotificationSpecial()}"/>
-                </h:selectBooleanCheckbox>
-
-                <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}"
-                              style="font-size: 8pt;" rendered="#{!clientWard.isCreatedWhereDefault}"/>
-                <h:outputText value="" rendered="#{!clientWard.isCreatedWhereDefault}"/>
-
-                <h:outputText escape="true" value="Согласие на предзаказ" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true"
-                                         styleClass="output-text"/>
-
-                <h:outputText escape="true" value="Самостоятельный предзаказ" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true"
-                                         styleClass="output-text"/>
-            </h:panelGrid>
-            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
-                <h:selectOneMenu value="#{clientWard.relation}" disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
-                                 styleClass="input-text">
-                    <f:selectItems value="#{mainPage.clientCreatePage.relations}"
-                                   disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
-                </h:selectOneMenu>
-            </h:panelGrid>
-            <h:panelGrid styleClass="borderless-grid"
-                         columns="1" bgcolor="#eeeeee">
-                <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
-                <h:selectOneMenu value="#{clientWard.role}" disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
-                                 styleClass="input-text">
-                    <f:selectItems value="#{mainPage.clientCreatePage.roles}"
-                                   disabled="#{!mainPage.clientCreatePage.isParentGroup()}"/>
-                </h:selectOneMenu>
-            </h:panelGrid>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Правила оповещения"/>
-            </f:facet>
-            <rich:dataTable id="clientNotificationSettingChildren" value="#{clientWard.notificationItems}"
-                            var="it"
-                            rows="11" columnClasses="left-aligned-column, center-aligned-column"
-                            styleClass="borderless-grid-all-client">
-                <rich:column styleClass="borderless-grid-all-client">
-                    <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column styleClass="borderless-grid-all-client">
-                    <h:selectBooleanCheckbox value="#{it.enabled}" disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
-                                             styleClass="output-text"/>
-                </rich:column>
-            </rich:dataTable>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Удалить"/>
-            </f:facet>
-            <a4j:commandLink styleClass="command-link" render="clientWardEditTable"
-                             action="#{mainPage.clientCreatePage.removeClientWard}">
-                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="#{clientWard}"
-                                             target="#{mainPage.clientCreatePage.currentClientWard}"/>
-            </a4j:commandLink>
-        </rich:column>
-        <f:facet name="footer">
-            <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
-                               render="modalClientSelectorPanel"
-                               disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                               styleClass="command-link">
-                <f:setPropertyActionListener value="ward" target="#{mainPage.clientCreatePage.typeAddClient}"/>
-            </a4j:commandButton>
-        </f:facet>
-    </rich:dataTable>
-
-    <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientCreatePage.discountMode}">
-        <a4j:ajax event="change" render="clientCategory" action="#{mainPage.clientCreatePage.changeClientCategory}"/>
-        <f:selectItems value="#{mainPage.clientCreatePage.selectItemList}"/>
-    </h:selectOneMenu>
-
-    <h:outputText escape="true" value="Категории" styleClass="output-text" />
-
-    <h:panelGroup id="clientCategory">
-        <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" render="modalCategoryListSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.clientCreatePage.discountModeIsCategory}">
-            <f:param name="fullList" value="false" />
-        </a4j:commandButton>
-        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientCreatePage.filter}}" />
-    </h:panelGroup>
-
-    <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.san}" maxlength="14" styleClass="input-text" />
-    <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.externalId}" maxlength="64" styleClass="input-text"/>
-    <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.clientGUID}" maxlength="64" styleClass="input-text long-field"/>
-    <h:outputText escape="true" value="Пол" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientCreatePage.gender}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.clientCreatePage.clientGenderMenu.items}" />
-    </h:selectOneMenu>
-    <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
-    <rich:calendar value="#{mainPage.clientCreatePage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                   inputClass="input-text" showWeeksBar="false" />
-    <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientCreatePage.ageTypeGroup}" maxlength="128" styleClass="input-text" />
-
-    <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.specialMenu}" styleClass="output-text" />
-
-    <h:outputText escape="true" value="Документы" styleClass="output-text"/>
-    <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientCreatePage.dulDetail}"
-                    var="dul"
-                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
-                    footerClass="data-table-footer-center">
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
-            <f:facet name="header">
-                <h:outputText escape="true" value="Название документа"/>
-            </f:facet>
-            <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
-        </rich:column>
-
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Серия"/>
-            </f:facet>
-            <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text"/>
-        </rich:column>
-
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер"/>
-            </f:facet>
-            <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text" />
-        </rich:column>
-
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
-            </f:facet>
-            <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text"/>
-        </rich:column>
-
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Кем выдан"/>
-            </f:facet>
-            <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
-        </rich:column>
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
-            <f:facet name="header">
-                <h:outputText escape="true" styleClass="" value="Когда выдан"/>
-            </f:facet>
-            <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter"
-                           inputClass="input-text" inputSize="6" showWeeksBar="false"/>
-        </rich:column>
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Дата истечения срока действия"/>
-            </f:facet>
-            <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter"
-                           inputClass="input-text" inputSize="6" showWeeksBar="false"/>
-        </rich:column>
-        <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
-            <f:facet name="header">
-                <h:outputText value="Удалить" escape="true"/>
-            </f:facet>
-            <a4j:commandLink action="#{mainPage.clientCreatePage.deleteDul}" styleClass="command-link"
-                             render="dulDetailEditTable">
-                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="true"
-                                             target="#{dul.deleteState}"/>
-                <f:setPropertyActionListener value="#{dul}"
-                                             target="#{mainPage.clientCreatePage.dulForRemove}"/>
-            </a4j:commandLink>
-        </rich:column>
-
-        <f:facet name="footer">
-            <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
-                               render="modalDulSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
-                               styleClass="command-link">
-                <f:setPropertyActionListener value="#{mainPage.clientCreatePage.dulDetail}"
-                                             target="#{mainPage.dulSelectPage.dulDetailList}"/>
-            </a4j:commandButton>
-        </f:facet>
-
-    </rich:dataTable>
-
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
-    <h:outputText escape="true" value="Заметки" styleClass="output-text" />
-    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.remarks}" styleClass="input-text" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
-                       render="clientCreatePanel,foundClientPanel" styleClass="command-button" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid" id="foundClientPanel">
-    <h:outputText escape="true" value="Найденный клиент:" styleClass="output-text" rendered="#{mainPage.clientCreatePage.showFoundClient}"/>
-    <a4j:commandLink render="mainMenu, workspaceForm" value="#{mainPage.clientCreatePage.foundFIO}" styleClass="command-link"
-                     action="#{mainPage.showClientViewPage}" rendered="#{mainPage.clientCreatePage.showFoundClient}">
-        <f:setPropertyActionListener value="#{mainPage.clientCreatePage.foundIdOfClient}" target="#{mainPage.selectedIdOfClient}" />
-    </a4j:commandLink>
-</h:panelGrid>
-</h:panelGrid>
+        </h:panelGrid>
+    </h:panelGrid>
 </ui:composition>

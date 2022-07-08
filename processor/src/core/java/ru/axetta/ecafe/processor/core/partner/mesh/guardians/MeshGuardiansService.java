@@ -45,6 +45,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
     public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
+    public static final String ID_SEARCH_EXPAND = "agents,documents";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -261,8 +262,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public MeshDocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
-            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument));
+            IdListResponse idListResponse = findIdMkDocument(meshGuid, dulDetail.getDocumentTypeId());
+            if (!idListResponse.getCode().equals(IdListResponse.OK_CODE))
+                return new MeshDocumentResponse(idListResponse.code, idListResponse.message);
+            Integer id = idListResponse.getDocumentResponse().get(0).getDocumentId();
+            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id));
             if (result.getCode() == HttpStatus.SC_OK) {
                 return new MeshDocumentResponse().okResponse();
             } else {
@@ -275,24 +279,18 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    private Long findIdMkDocument(String meshGuid, DulDetail dulDetail) {
-        PersonListResponse personListResponse = searchPersonByMeshGuid(meshGuid);
-        if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty()) {
-            throw new NullPointerException("Не найден клиент по \"meshGuid\"");
+    private IdListResponse findIdMkDocument(String meshGuid, Long documentTypeId) {
+        IdListResponse agentListResponse = searchIdByMeshGuid(meshGuid);
+        if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
+            return new IdListResponse(agentListResponse.getCode(), agentListResponse.message);
+        Integer id = 0;
+        for (DocumentIdResponse documentIdResponse : agentListResponse.getDocumentResponse()) {
+            if (documentIdResponse.getDocumentType() == documentTypeId.intValue())
+                id = documentIdResponse.getDocumentId();
         }
-        List<MeshDocumentResponse> documentResponseList = personListResponse.getResponse().get(0).getDocument();
-
-        if (documentResponseList == null || documentResponseList.isEmpty()) {
-            throw new NullPointerException("Не найден документ у клиента");
-        }
-        MeshDocumentResponse document = documentResponseList
-                .stream().filter(d -> dulDetail.getDocumentTypeId().equals((long) d.getDocumentTypeId()) &&
-                        dulDetail.getNumber().equals(d.getNumber()))
-                .findFirst().orElse(null);
-        if (document == null) {
-            throw new NullPointerException("Не найден документ у клиента");
-        }
-        return (long) document.getDocumentTypeId();
+        IdListResponse idListResponse = new IdListResponse();
+        idListResponse.setDocumentResponse(Collections.singletonList(new DocumentIdResponse(id, null)));
+        return idListResponse.okResponse();
     }
 
     public MeshDocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
@@ -300,9 +298,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonDocument parameter = buildPersonDocument(dulDetail);
             String json = objectMapper.writeValueAsString(parameter);
-            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
-            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument), json);
-
+            IdListResponse idListResponse = findIdMkDocument(meshGuid, dulDetail.getDocumentTypeId());
+            if (!idListResponse.getCode().equals(IdListResponse.OK_CODE))
+                return new MeshDocumentResponse(idListResponse.code, idListResponse.message);
+            Integer id = idListResponse.getDocumentResponse().get(0).getDocumentId();
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
                 return getMeshGuardianConverter().toDTO(personDocument);
@@ -391,7 +391,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return String.format(CONTACT_CREATE_URL, meshGuid);
     }
 
-    private String buildDeleteAndModifyDocumentUrl(String meshGuid, Long id) {
+    private String buildDeleteAndModifyDocumentUrl(String meshGuid, Integer id) {
         return String.format(DOCUMENT_DELETE_URL, meshGuid, id);
     }
 
@@ -516,9 +516,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
 
     public PersonListResponse searchPersonByMeshGuid(String meshGuid) {
         try {
-            String parameters = String.format("?person=%s&expand=%s&limit=%s", meshGuid, PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
+            String parameters = String.format("/%s?&expand=%s&limit=%s", meshGuid, PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
             ObjectMapper objectMapper = new ObjectMapper();
-            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CHANGE_URL, parameters);
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CREATE_URL, parameters);
             if (result.getCode() == HttpStatus.SC_OK) {
                 TypeFactory typeFactory = objectMapper.getTypeFactory();
                 CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
@@ -531,8 +531,29 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (MeshGuardianNotEnoughClientDataException e) {
             return new PersonListResponse().notEnoughClientDataResponse(e.getMessage());
         } catch (Exception e) {
-            logger.error("Error in searchDocumentsByMeshGuid: ", e);
+            logger.error("Error in searchPersonByMeshGuid: ", e);
             return new PersonListResponse().internalErrorResponse();
+        }
+    }
+
+    public IdListResponse searchIdByMeshGuid(String meshGuid) {
+        try {
+            String parameters = String.format("/%s?&expand=%s", meshGuid, ID_SEARCH_EXPAND);
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CREATE_URL, parameters);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                ResponsePersons responsePersons = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                IdListResponse idListResponse = new IdListResponse();
+                idListResponse.setAgentResponse(getMeshGuardianConverter().agentIdToDTO(responsePersons));
+                idListResponse.setDocumentResponse(getMeshGuardianConverter().documentIdToDTO(responsePersons));
+                return idListResponse.okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toAgentListDTO(errorResponse);
+            }
+        }  catch (Exception e) {
+            logger.error("Error in searchAgentsByMeshGuid: ", e);
+            return new IdListResponse().internalErrorResponse();
         }
     }
 
@@ -566,11 +587,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public PersonResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonListResponse personListResponse = searchPersonByMeshGuid(agentMeshGuid);
-            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
-                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
-            Integer id = personListResponse.getResponse().get(0).getId();
-
+            IdListResponse agentListResponse = searchIdByMeshGuid(childMeshGuid);
+            if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new PersonResponse(agentListResponse.getCode(), agentListResponse.message);
+            Integer id = 0;
+            for (AgentIdResponse agentResponse : agentListResponse.getAgentResponse()) {
+                if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
+                    id = agentResponse.getAgentId();
+            }
             MeshResponseWithStatusCode result = meshRestClient
                     .executeDeleteMethod(buildDeleteGuardianToClientUrl(childMeshGuid, id.toString()));
             if (result.getCode() == HttpStatus.SC_OK) {

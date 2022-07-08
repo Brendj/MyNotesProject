@@ -40,6 +40,7 @@ import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvid
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulViewPage;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
@@ -91,6 +92,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.el.MethodBinding;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
@@ -500,12 +502,10 @@ public class MainPage implements Serializable {
     private final ClientCreateByCardOperatorPage clientRegistrationByCardOperatorPage = new ClientCreateByCardOperatorPage();
     private final AutoEnterEventReportPage autoEnterEventReportPage = new AutoEnterEventReportPage();
     private final EnterEventJournalReportPage enterEventJournalReportPage = new EnterEventJournalReportPage();
-
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
-
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
-
     private final DulSelectPage dulSelectPage = new DulSelectPage();
+    private final DulViewPage dulViewPage = new DulViewPage();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3660,6 +3660,59 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object addGuardianToClient() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+            Client client = clientCreatePage.addGuardianToClient(clientGuardianHistory, persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, String.format("Связь обучающегося с представителем (Идентификатор %d Номер лицевого счета %d) успешно создана",
+                            client.getIdOfClient(), client.getContractId()), null));
+        } catch (Exception e) {
+            logger.error("Failed to add guardian to client", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка создания связи обучающегося с представителем: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object searchMeshPerson() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientCreatePage.searchMeshPerson(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to search mesh client", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка поиска клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
     public Object createClientByCardOperator() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -3924,6 +3977,29 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showDulViewPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof DulViewPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                dulViewPage.fill();
+                modalPages.push(dulViewPage);
+                dulViewPage.pushCompleteHandler((DulViewPage.CompleteHandler) currentTopMostPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill dul view page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы просмотра документов: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
     public Object completeDulSelectSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -3948,7 +4024,51 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
 
+    public Object cancelDulSelectSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            dulSelectPage.cancelDulSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора документа: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object completeDulViewSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dulViewPage.completeDulViewSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulViewPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul view", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке просмотра документов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
 
         }
         return null;
@@ -11326,5 +11446,9 @@ public class MainPage implements Serializable {
 
     public DulSelectPage getDulSelectPage() {
         return dulSelectPage;
+    }
+
+    public DulViewPage getDulViewPage() {
+        return dulViewPage;
     }
 }

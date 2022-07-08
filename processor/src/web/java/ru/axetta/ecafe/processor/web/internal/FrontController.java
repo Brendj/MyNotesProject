@@ -2836,7 +2836,7 @@ public class FrontController extends HttpServlet {
                         DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
-            idOfDocument = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            idOfDocument = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client, client.getMeshGUID() != null);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
@@ -2884,7 +2884,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            dulDetailService.updateDulDetail(persistenceSession, dulDetail, client, client.getMeshGUID() != null);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
@@ -2926,7 +2926,7 @@ public class FrontController extends HttpServlet {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client, client.getMeshGUID() != null);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
