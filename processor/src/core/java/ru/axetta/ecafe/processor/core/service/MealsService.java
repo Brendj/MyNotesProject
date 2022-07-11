@@ -668,7 +668,7 @@ public class MealsService {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).
                 entity(responseResult.ok()).build();
     }
 
