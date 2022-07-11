@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
+import ru.axetta.ecafe.processor.web.internal.DocumentResponse;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -42,46 +43,55 @@ public class DulDetailService {
             }
             if (dulDetail.getDeleteState()) {
                 dulDetail.setLastUpdate(currentDate);
-                deleteDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
+                deleteDulDetail(session, dulDetail, client);
             } else if (isChange(originDulDetails, dulDetail)) {
                 dulDetail.setLastUpdate(currentDate);
                 if (dulDetail.getCreateDate() == null) {
                     dulDetail.setCreateDate(currentDate);
-                    saveDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
+                    saveDulDetail(session, dulDetail, client);
                 } else {
-                    updateDulDetail(session, dulDetail, client, client.getMeshGUID() != null);
+                    updateDulDetail(session, dulDetail, client);
                 }
             }
         }
     }
 
-    public void updateDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
+    public MeshDocumentResponse updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         validateDul(session, dulDetail, client);
-        if (isGuardian) {
-            MeshDocumentResponse documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
-            dulDetail.setIdMkDocument(documentResponse.getId());
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        if (client.getMeshGUID() != null) {
+            documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
+            if (documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE))
+                dulDetail.setIdMkDocument(documentResponse.getId());
+            else
+                return documentResponse;
         }
         session.merge(dulDetail);
+        return documentResponse.okResponse();
     }
 
-    public Long saveDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
+    public MeshDocumentResponse saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         validateDul(session, dulDetail, client);
-        if (isGuardian) {
-            MeshDocumentResponse documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
-            dulDetail.setIdMkDocument(documentResponse.getId());
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        if (client.getMeshGUID() != null) {
+            documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
+            if (documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE))
+                dulDetail.setIdMkDocument(documentResponse.getId());
+            else
+                return documentResponse;
         }
         session.save(dulDetail);
-        return dulDetail.getId();
+        return documentResponse.okResponse();
     }
 
-    public void deleteDulDetail(Session session, DulDetail dulDetail, Client client, Boolean isGuardian) throws Exception {
-        if (isGuardian) {
-            MeshDocumentResponse documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
-            checkError(documentResponse);
+    public MeshDocumentResponse deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        if (client.getMeshGUID() != null) {
+            documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
         }
         session.merge(dulDetail);
+        return documentResponse.okResponse();
+
     }
 
     public void validateDulList(Session session, List<DulDetail> dulDetail, Client client) throws Exception {
@@ -149,13 +159,6 @@ public class DulDetailService {
             if (dulDetail.equals(originDul))
                 return false;
         return true;
-    }
-
-    private void checkError(MeshDocumentResponse documentResponse) throws Exception {
-        if (documentResponse.getCode() != 0) {
-            logger.error(String.format("%s: %s", documentResponse.getCode(), documentResponse.getMessage()));
-            throw new MeshDocumentSaveException(documentResponse.getMessage());
-        }
     }
 
     //todo на переходный период (пока толстый клиент не доработался)

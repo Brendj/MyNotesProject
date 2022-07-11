@@ -228,7 +228,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -248,7 +248,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -305,7 +305,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -549,10 +549,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 return idListResponse.okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toAgentListDTO(errorResponse);
+                return getMeshGuardianConverter().toIdListDTO(errorResponse);
             }
         }  catch (Exception e) {
-            logger.error("Error in searchAgentsByMeshGuid: ", e);
+            logger.error("Error in searchIdByMeshGuid: ", e);
             return new IdListResponse().internalErrorResponse();
         }
     }
