@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.service.MealsService;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
@@ -194,8 +195,8 @@ public class MealsController extends Application {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "menu/buffet")
+    @Transactional
     public Response getPersonBuffetMenu(@Context HttpServletRequest request) {
-        Result result = new Result();
         //Контроль безопасности
         if (!mealsService.validateAccess()) {
             return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
