@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.*;
 import ru.axetta.ecafe.processor.core.card.CryptoSign;
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
@@ -15,10 +16,13 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @WebService(targetNamespace = "http://ru.axetta.ecafe")
 public class CardSignature extends HttpServlet {
+
+    public static final String IS_TEST = "ecafe.processor.card.sign.soap.test";
 
     private List<ResponseCardSign> ErrorMessage (String message)
     {
@@ -48,7 +52,7 @@ public class CardSignature extends HttpServlet {
         }
         //Проверяем подпись поставщика
         try {
-            if (!test)
+            if (!isTest(signofProvider))
                 if (!CryptoSign.verifySignforProvider(requestCardForSigns, signofProvider,cardSign))
                     return ErrorMessage ("Подпись поставщика не действительна");
         }
@@ -64,4 +68,14 @@ public class CardSignature extends HttpServlet {
         //Отправляем для подписания
         return CryptoSign.createSignforCard(requestCardForSigns, cardSign);
     }
+
+    private boolean isTest(byte[] signofProvider)
+    {
+        String sign = Base64.getEncoder().encodeToString(signofProvider);
+        String testKey = RuntimeContext.getInstance().getConfigProperties().getProperty(IS_TEST, "ThiskeyIsSpeciallyMadeForTesting");
+        if (sign.equals(testKey))
+            return true;
+        return false;
+    }
+
 }
