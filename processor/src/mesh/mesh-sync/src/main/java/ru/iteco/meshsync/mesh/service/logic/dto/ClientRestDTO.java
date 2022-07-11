@@ -1,5 +1,6 @@
 package ru.iteco.meshsync.mesh.service.logic.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import ru.iteco.client.model.PersonContact;
 import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
@@ -18,7 +19,10 @@ public class ClientRestDTO implements Serializable {
     private String patronymic;
     private String lastname;
     private Integer genderId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
+
     private String address;
     private String phone;
     private String mobile;

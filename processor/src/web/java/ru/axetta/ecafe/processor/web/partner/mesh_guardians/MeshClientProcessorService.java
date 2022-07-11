@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ClientInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.DocumentInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.GuardianRelationInfo;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.NotFoundException;
@@ -57,8 +56,6 @@ public class MeshClientProcessorService {
             transaction = session.beginTransaction();
 
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason("Создание клиента через внутренний REST-сервис");
 
             registryClient(info, session, clientGuardianHistory);
@@ -85,7 +82,7 @@ public class MeshClientProcessorService {
 
         // Copy from ClientCreatePage
         Client client = new Client(org, p, p, 0, notifyViaEmail, true, notifyViaPUSH, contractId,
-                new Date(), 0, null, 1, nextVersion, limit, expenditureLimit);
+                new Date(), 0, contractId.toString(), 1, nextVersion, limit, expenditureLimit);
 
         client.setAddress(info.getAddress());
         client.setPhone(info.getPhone());
@@ -96,6 +93,7 @@ public class MeshClientProcessorService {
         clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
         client.initClientMobileHistory(clientsMobileHistory);
 
+        client.setMeshGUID(info.getPersonGUID());
         client.setMobile(info.getMobile());
         client.setEmail(info.getEmail());
         client.setBirthDate(info.getBirthdate());
@@ -111,6 +109,10 @@ public class MeshClientProcessorService {
         client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
 
         session.update(client);
+
+        for(DocumentInfo di : info.getDocuments()){
+            createDul(di, session, client.getIdOfClient());
+        }
 
         ClientMigration clientMigration = new ClientMigration(client, org, new Date());
         session.save(clientMigration);
@@ -169,25 +171,17 @@ public class MeshClientProcessorService {
         for(DocumentInfo di : documents){
             DulDetail d = dulDetails
                     .stream()
-                    .filter(dulDetail -> dulDetail.getDocumentTypeId().equals(di.getIdMKDocument()))
+                    .filter(dulDetail -> dulDetail.getIdMkDocument().equals(di.getIdMKDocument()))
                     .findFirst()
                     .orElse(null);
             if(d == null){
-                DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
-                if(dulGuide == null){
-                    throw new NotFoundException("Not found DulGuide by type: " + di.getDocumentType());
-                }
-                d = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
-                d.setIdMkDocument(di.getIdMKDocument());
-                d.setCreateDate(new Date());
-                d.setLastUpdate(new Date());
-                d.setNumber(di.getNumber());
+                createDul(di, session, idOfClient);
+            } else {
                 d.setSeries(di.getSeries());
-                d.setIssued(di.getIssuedDate());
+                d.setNumber(di.getNumber());
                 d.setIssuer(di.getIssuer());
-                d.setDeleteState(false);
-
-                session.save(d);
+                d.setIssued(di.getIssuedDate());
+                d.setLastUpdate(new Date());
             }
         }
 
@@ -201,6 +195,24 @@ public class MeshClientProcessorService {
                 session.update(d);
             }
         }
+    }
+
+    private void createDul(DocumentInfo di, Session session, Long idOfClient) {
+        DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
+        if(dulGuide == null){
+            throw new NotFoundException("Not found DulGuide by type: " + di.getDocumentType());
+        }
+        DulDetail d = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
+        d.setIdMkDocument(di.getIdMKDocument());
+        d.setCreateDate(new Date());
+        d.setLastUpdate(new Date());
+        d.setNumber(di.getNumber());
+        d.setSeries(di.getSeries());
+        d.setIssued(di.getIssuedDate());
+        d.setIssuer(di.getIssuer());
+        d.setDeleteState(false);
+
+        session.save(d);
     }
 
     public void deleteClient(String personGuid) throws Exception {

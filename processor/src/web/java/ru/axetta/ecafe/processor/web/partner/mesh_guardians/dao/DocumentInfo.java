@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class DocumentInfo {
@@ -7,7 +9,10 @@ public class DocumentInfo {
     private String series;
     private String number;
     private Long idMKDocument;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date issuedDate;
+
     private String issuer;
 
     public Integer getDocumentType() {

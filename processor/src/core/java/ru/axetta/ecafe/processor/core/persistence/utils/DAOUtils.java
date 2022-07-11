@@ -5870,7 +5870,7 @@ public class DAOUtils {
 
     public static DulGuide getDulGuideByType(Session session, Integer documentType) {
         Query q = session.createQuery("SELECT dg from DulGuide dg where dg.documentTypeId = :documentType");
-        q.setParameter("documentType", documentType);
+        q.setParameter("documentType", documentType.longValue());
         q.setMaxResults(1);
 
         return (DulGuide) q.getSingleResult();

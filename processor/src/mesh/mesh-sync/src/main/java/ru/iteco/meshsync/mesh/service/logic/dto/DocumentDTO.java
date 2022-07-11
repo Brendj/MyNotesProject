@@ -1,5 +1,6 @@
 package ru.iteco.meshsync.mesh.service.logic.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import ru.iteco.client.model.PersonDocument;
 
 import java.io.Serializable;
@@ -10,7 +11,10 @@ public class DocumentDTO implements Serializable {
     private String series;
     private String number;
     private Long idMKDocument;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date issuedDate;
+
     private String issuer;
 
     public static DocumentDTO build(PersonDocument pd) throws Exception {

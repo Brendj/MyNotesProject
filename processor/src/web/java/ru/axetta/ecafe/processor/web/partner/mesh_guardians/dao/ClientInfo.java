@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.util.Date;
@@ -12,7 +13,10 @@ public class ClientInfo implements IDAOEntity {
     private String patronymic;
     private String lastname;
     private Integer genderId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
+
     private String address;
     private String phone;
     private String mobile;

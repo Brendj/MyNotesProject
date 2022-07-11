@@ -65,7 +65,7 @@ public class MeshClientDAOService {
                 " where cg.compositeIdOfClientGroup.idOfClientGroup = :parentClientGroupId" +
                 " and cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg");
 
-        q.setParameter("parentClientGroupId", ClientGroup.Predefined.CLIENT_PARENTS);
+        q.setParameter("parentClientGroupId", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
         q.setParameter("idOfOrg", org.getIdOfOrg());
 
         return (ClientGroup) q.getSingleResult();
