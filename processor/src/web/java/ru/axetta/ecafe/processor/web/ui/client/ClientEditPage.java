@@ -1352,16 +1352,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
 
+        //todo проверка ошибок мк
         //Работа с документами
         for (DulDetail dulDetail : this.dulDetail) {
             if (dulDetail.getDeleteState()) {
-                getMeshDulDetailService().deleteDulDetail(persistenceSession, dulDetail, client, client.getMeshGUID() != null);
+                getMeshDulDetailService().deleteDulDetail(persistenceSession, dulDetail, client);
             }
             if (dulDetail.getNew()) {
-                getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client,client.getMeshGUID() != null);
+                getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client);
             } else {
                 if (getMeshDulDetailService().isChange(originClient.getDulDetail(), dulDetail)) {
-                    getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client,client.getMeshGUID() != null);
+                    getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client);
                 }
             }
         }

@@ -40,7 +40,8 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_LONG_CARDNO_NOT_UNIQUE = 480;
     public static final int ERROR_MESH_DOCUMENT_NOT_SAVE = 490;
     public static final int ERROR_DOCUMENT_EXISTS = 491;
-    public static final int ERROR_DOCUMENT_NOT_FOUND = 500;
+    public static final int ERROR_DOCUMENT_NOT_FOUND = 510;
+    public static final int ERROR_SNILS_EXISTS = 520;
 
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
@@ -76,6 +77,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
     public static final String ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE = "Ошибка сохранения в методе МЭШ Контингент";
     public static final String ERROR_DOCUMENT_NOT_FOUND_MESSAGE = "Документы по запросу не найдены";
+    public static final String ERROR_SNILS_EXISTS_MESSAGE = "Указанный снилс уже существует в системе";
 
     public int code;
     public String message;
