@@ -20,6 +20,11 @@ public class FoodBoxPreorderDish {
     private Date createDate;
     private Date updateDate;
 
+    public FoodBoxPreorderDish()
+    {
+    }
+
+
     public FoodBoxPreorderDish(FoodBoxPreorder foodBoxPreorder, OrderDish orderDish)
     {
         this.foodBoxPreorder = foodBoxPreorder;
