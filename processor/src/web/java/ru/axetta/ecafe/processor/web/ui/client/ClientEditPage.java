@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshAgentResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonResponse;
@@ -1262,7 +1263,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                         person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
                         client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
                 if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-                    client.setMeshGUID(personResponse.getMeshGuid());
+                    client.setMeshGUID(personResponse.getResponse().getMeshGuid());
                 else {
                     logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
                     throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
@@ -1318,7 +1319,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
             //Создание связи с опекаемыми в МК
             for (ClientGuardianItem clientWardItem : itemsForSave) {
-                PersonResponse personResponse = getMeshGuardiansService()
+                MeshAgentResponse personResponse = getMeshGuardiansService()
                         .addGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
                 if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                     logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));

@@ -8898,7 +8898,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     description = ClientGuardianRelationType.fromInteger(relation.intValue()).getDescription();
                 }
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, description, false,
+                        .createClientGuardianInfoTransactionFree(session, guardian, description, null,  false,
                                 client.getIdOfClient(), ClientCreatedFromType.MPGU, roleRepresentative, clientGuardianHistory);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);

@@ -302,7 +302,7 @@ public class ClientMigrationHistoryService {
                     if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {
                         //есть дети в других ОО, создаем заявку на посещение
                         ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(),
-                                MigrantInitiatorEnum.INITIATOR_PROCESSING, 12);
+                                MigrantInitiatorEnum.INITIATOR_PROCESSING, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
                     }
                 }
             }

@@ -1,13 +1,12 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.Contact;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonAgent;
-import ru.axetta.ecafe.processor.core.partner.mesh.json.SimilarPerson;
+import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,34 +19,87 @@ public class MeshGuardianPerson {
     private String meshGuid;
     private Date birthDate;
     private String snils;
-    private Integer gender;
+    private Integer meshGender;
     private String mobile;
     private String email;
     private Integer degree;
     private Integer validationStateId;
     private Integer id;
     private List<MeshDocumentResponse> document;
+    private List<MeshAgentResponse> agents;
     private Boolean alreadyInISPP;
 
     public MeshGuardianPerson() {
 
     }
 
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
+    }
+
     public MeshGuardianPerson(SimilarPerson similarPerson) throws Exception {
-        this.meshGuid = similarPerson.getPerson().getPersonId();
-        this.firstName = similarPerson.getPerson().getFirstname();
-        this.secondName = similarPerson.getPerson().getPatronymic();
-        this.surname = similarPerson.getPerson().getLastname();
-        this.birthDate = getDateFromString(similarPerson.getPerson().getBirthdate());
-        this.snils = similarPerson.getPerson().getSnils();
-        this.gender = getMeshGender(similarPerson.getPerson().getGenderId());
-        if (similarPerson.getPerson().getContacts() != null) {
-            this.mobile = Client.checkAndConvertMobile(getContact(similarPerson.getPerson().getContacts(), MeshGuardiansService.CONTACT_MOBILE_TYPE_ID));
-            this.email = getContact(similarPerson.getPerson().getContacts(), MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
-        }
+        this(similarPerson.getPerson());
         this.degree = similarPerson.getDegree();
-        this.validationStateId = similarPerson.getPerson().getValidationStateId();
-        this.id = similarPerson.getPerson().getId();
+    }
+
+    public MeshGuardianPerson(ResponsePersons responsePersons) throws Exception {
+        this.id = responsePersons.getId();
+        this.meshGuid = responsePersons.getPersonId();
+        this.firstName = responsePersons.getFirstname();
+        this.secondName = responsePersons.getPatronymic();
+        this.surname = responsePersons.getLastname();
+        this.birthDate = getDateFromString(responsePersons.getBirthdate());
+        this.snils = responsePersons.getSnils();
+        this.meshGender = responsePersons.getGenderId();
+        if (responsePersons.getContacts() != null) {
+            this.mobile = Client.checkAndConvertMobile(getContact(responsePersons.getContacts(), MeshGuardiansService.CONTACT_MOBILE_TYPE_ID));
+            this.email = getContact(responsePersons.getContacts(), MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
+        }
+        this.validationStateId = responsePersons.getValidationStateId();
+
+        List<PersonDocument> personDocuments = responsePersons.getDocuments();
+        if (personDocuments != null && !personDocuments.isEmpty()) {
+            List<MeshDocumentResponse> meshDocumentResponses = new ArrayList<>();
+            for (PersonDocument personDocument : personDocuments) {
+                meshDocumentResponses.add(new MeshDocumentResponse(personDocument));
+            }
+            this.setDocument(meshDocumentResponses);
+        }
+        List<PersonAgent> personAgents = responsePersons.getAgents();
+        if (personAgents != null && !personAgents.isEmpty()) {
+            List<MeshAgentResponse> meshAgentResponses = new ArrayList<>();
+            for (PersonAgent personAgent : personAgents) {
+                meshAgentResponses.add(new MeshAgentResponse(personAgent));
+            }
+            this.setAgents(meshAgentResponses);
+        }
+    }
+
+    public MeshGuardianPerson(PersonAgent personAgent) throws Exception {
+        this.meshGuid = personAgent.getAgentPersonId();
+        if (personAgent.getAgentPerson() != null) {
+            this.id = personAgent.getAgentPerson().getId();
+            this.firstName = personAgent.getAgentPerson().getFirstname();
+            this.secondName = personAgent.getAgentPerson().getPatronymic();
+            this.surname = personAgent.getAgentPerson().getLastname();
+            this.birthDate = getDateFromString(personAgent.getAgentPerson().getBirthdate());
+            this.snils = personAgent.getAgentPerson().getSnils();
+            this.meshGender = personAgent.getAgentPerson().getGenderId();
+            if (personAgent.getAgentPerson().getContacts() != null) {
+                this.mobile = Client.checkAndConvertMobile(getContact(personAgent.getAgentPerson().getContacts(), MeshGuardiansService.CONTACT_MOBILE_TYPE_ID));
+                this.email = getContact(personAgent.getAgentPerson().getContacts(), MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
+            }
+            this.validationStateId = personAgent.getAgentPerson().getValidationStateId();
+
+            List<PersonDocument> personDocuments = personAgent.getAgentPerson().getDocuments();
+            if (personDocuments != null && !personDocuments.isEmpty()) {
+                List<MeshDocumentResponse> meshDocumentResponses = new ArrayList<>();
+                for (PersonDocument personDocument : personDocuments) {
+                    meshDocumentResponses.add(new MeshDocumentResponse(personDocument));
+                }
+                this.setDocument(meshDocumentResponses);
+            }
+        }
     }
 
     private MeshGuardianConverter getMeshGuardianConverter() {
@@ -65,26 +117,11 @@ public class MeshGuardianPerson {
         return null;
     }
 
-    public MeshGuardianPerson(PersonAgent personAgent) throws Exception {
-        this.meshGuid = personAgent.getPersonId();
-        if (personAgent.getAgentPerson() != null) {
-            this.firstName = personAgent.getAgentPerson().getFirstname();
-            this.secondName = personAgent.getAgentPerson().getPatronymic();
-            this.surname = personAgent.getAgentPerson().getLastname();
-            this.birthDate = getDateFromString(personAgent.getAgentPerson().getBirthdate());
-            this.snils = personAgent.getAgentPerson().getSnils();
-            this.gender = getMeshGender(personAgent.getAgentPerson().getGenderId());
-        }
-    }
-
     private Date getDateFromString(String date) throws Exception {
         DateFormat dateFormat = new SimpleDateFormat(MeshGuardiansService.DATE_PATTERN);
         return dateFormat.parse(date);
     }
 
-    private Integer getMeshGender(Integer gender) {
-        return gender;
-    }
 
     public String getMobile() {
         return mobile;
@@ -150,12 +187,17 @@ public class MeshGuardianPerson {
         this.snils = snils;
     }
 
-    public Integer getGender() {
-        return gender;
+    public Integer getMeshGender() {
+        return meshGender;
     }
 
-    public void setGender(Integer gender) {
-        this.gender = gender;
+    public void setMeshGender(Integer meshGender) {
+        this.meshGender = meshGender;
+    }
+
+    public Integer getIsppGender() {
+        if (this.meshGender == 2) return 0;
+        else return 1;
     }
 
     public Integer getDegree() {
@@ -188,6 +230,14 @@ public class MeshGuardianPerson {
 
     public void setDocument(List<MeshDocumentResponse> document) {
         this.document = document;
+    }
+
+    public List<MeshAgentResponse> getAgents() {
+        return agents;
+    }
+
+    public void setAgents(List<MeshAgentResponse> agents) {
+        this.agents = agents;
     }
 
     public Boolean getAlreadyInISPP() {

@@ -14,26 +14,25 @@ public class MeshGuardianConverter {
         List<MeshGuardianPerson> result = new ArrayList<>();
         for (SimilarPerson similarPerson : similarPersons) {
             MeshGuardianPerson meshGuardianPerson = toDTO(similarPerson);
-            meshGuardianPerson.setDocument(documentsToDTO(similarPerson));
             result.add(meshGuardianPerson);
         }
         return result;
     }
 
-    private List<MeshDocumentResponse> documentsToDTO(SimilarPerson similarPerson) throws ParseException {
-        List<PersonDocument> personDocuments = similarPerson.getPerson().getDocuments();
-        if (personDocuments != null && !personDocuments.isEmpty()) {
-            List<MeshDocumentResponse> meshDocumentResponses = new ArrayList<>();
-            for (PersonDocument personDocument : personDocuments) {
-                meshDocumentResponses.add(toDTO(personDocument));
-            }
-            return meshDocumentResponses;
-        }
-        return new ArrayList<>();
-    }
-
     public MeshGuardianPerson toDTO(SimilarPerson similarPerson) throws Exception {
         return new MeshGuardianPerson(similarPerson);
+    }
+
+    public MeshGuardianPerson toDTO(ResponsePersons responsePersons) throws Exception {
+        return new MeshGuardianPerson(responsePersons);
+    }
+
+    public MeshAgentResponse toAgentDTO(PersonAgent personAgent) throws Exception {
+        return new MeshAgentResponse(personAgent);
+    }
+
+    public MeshAgentResponse toAgentErrorDTO(ErrorResponse errorResponse) {
+        return new MeshAgentResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
     }
 
     public PersonResponse toPersonDTO(ErrorResponse errorResponse) {
@@ -57,7 +56,7 @@ public class MeshGuardianConverter {
     }
 
     public List<AgentIdResponse> agentIdToDTO(ResponsePersons responsePersons) {
-        return responsePersons.getAgent()
+        return responsePersons.getAgents()
                 .stream().map(a -> new AgentIdResponse(a.getId(), a.getAgentPersonId()))
                 .collect(Collectors.toList());
     }
