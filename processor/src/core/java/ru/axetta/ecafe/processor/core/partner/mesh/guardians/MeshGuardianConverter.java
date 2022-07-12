@@ -56,12 +56,16 @@ public class MeshGuardianConverter {
     }
 
     public List<AgentIdResponse> agentIdToDTO(ResponsePersons responsePersons) {
+        if (responsePersons.getAgents() == null || responsePersons.getAgents().isEmpty())
+            return new ArrayList<>();
         return responsePersons.getAgents()
                 .stream().map(a -> new AgentIdResponse(a.getId(), a.getAgentPersonId()))
                 .collect(Collectors.toList());
     }
 
     public List<DocumentIdResponse> documentIdToDTO(ResponsePersons responsePersons) {
+        if (responsePersons.getDocuments() == null || responsePersons.getDocuments().isEmpty())
+            return new ArrayList<>();
         return responsePersons.getDocuments()
                 .stream().map(a -> new DocumentIdResponse(a.getId(), a.getDocumentTypeId()))
                 .collect(Collectors.toList());

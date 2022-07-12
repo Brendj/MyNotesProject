@@ -3203,7 +3203,6 @@ public class FrontController extends HttpServlet {
                     ClientGuardianRoleType.fromInteger(agentTypeId), informing);
 
             MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
-
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
                 return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
@@ -3257,7 +3256,7 @@ public class FrontController extends HttpServlet {
             ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
                     newGuardiansVersions, clientGuardianHistory);
 
-            PersonResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
+            MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
 
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
