@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.json.PersonDocument;
+import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -62,6 +63,19 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
         this.setMessage(INTERNAL_ERROR_MESSAGE);
         return this;
     }
+
+    public DulDetail getDulDetail() {
+        DulDetail dulDetail = new DulDetail();
+        dulDetail.setDocumentTypeId(new Long(this.documentTypeId));
+        dulDetail.setSeries(this.getSeries());
+        dulDetail.setNumber(this.getNumber());
+        dulDetail.setSubdivisionCode(this.getSubdivisionCode());
+        dulDetail.setIssuer(this.getIssuer());
+        dulDetail.setIssued(this.getIssued());
+        dulDetail.setExpiration(this.getExpiration());
+        return dulDetail;
+    }
+
 
     /*public DocumentResponse mkErrorResponse() {
         this.setCode(OK_CODE);ClientAuthenticator

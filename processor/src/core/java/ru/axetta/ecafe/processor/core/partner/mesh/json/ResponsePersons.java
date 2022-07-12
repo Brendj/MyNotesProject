@@ -94,7 +94,7 @@ public class ResponsePersons {
     @JsonProperty("ids")
     private Object ids;
     @JsonProperty("agents")
-    private List<PersonAgent> agent = null;
+    private List<PersonAgent> agents = null;
     @JsonProperty("children")
     private List<PersonAgent> children = null;
     @JsonProperty("education")
@@ -359,12 +359,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("agents")
-    public List<PersonAgent> getAgent() {
-        return agent;
+    public List<PersonAgent> getAgents() {
+        return agents;
     }
     @JsonProperty("agents")
-    public void setAgent(List<PersonAgent> agent) {
-        this.agent = agent;
+    public void setAgents(List<PersonAgent> agents) {
+        this.agents = agents;
     }
 
     @JsonProperty("children")

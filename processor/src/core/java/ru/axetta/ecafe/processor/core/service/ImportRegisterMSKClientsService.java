@@ -7,12 +7,14 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -30,6 +32,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.web.internal.ResponseItem;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -112,6 +115,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             logError("Failed to parse date from options", e, null);
         }
         return new Date(0);
+    }
+
+    private MeshGuardiansService getMeshGuardiansService() {
+        return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 
     public StringBuffer runSyncForOrg(long idOfOrg, boolean performChanges) throws Exception {
@@ -1395,6 +1402,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
 
+                    processClientGuardians(afterSaveClient, change.getOperation(),
+                            clientsMobileHistory, clientGuardianHistory, null);
                     break;
                 case DELETE_OPERATION:
                     ClientGroup deletedClientGroup = DAOUtils
@@ -1416,6 +1425,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
+
+                    processClientGuardians(dbClient, change.getOperation(),
+                            clientsMobileHistory, clientGuardianHistory, null);
                     break;
                 case MOVE_OPERATION:
                     migration = true;
@@ -1456,6 +1468,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
+
+                    processClientGuardians(dbClient, change.getOperation(),
+                            clientsMobileHistory, clientGuardianHistory, beforeMigrateOrg.getIdOfOrg());
+                    break;
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
@@ -1509,6 +1525,244 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             session.update(change);
 
     }
+
+    public void processClientGuardians(
+            Client child, Integer operation, ClientsMobileHistory clientsMobileHistory,
+            ClientGuardianHistory clientGuardianHistory, Long beforeMigrateOrgId){
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            if (operation.equals(CREATE_OPERATION)) {
+                processCreateOperationForGuardian(session, child, clientsMobileHistory, clientGuardianHistory);
+            }
+            else {
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, child.getIdOfClient());
+                if (guardians.isEmpty()) {
+                    logger.error(String.format("processClientGuardians(): Не удалось найти представителей ребенка c MЭШ.GUID: %s в ИСПП",
+                            child.getMeshGUID().toString()));
+                    return;
+                }
+                for (Client guardian : guardians) {
+                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient());
+                    if (children.isEmpty()) {
+                        logger.error(String.format("processClientGuardians(): Не удалось найти детей представителя c MЭШ.GUID: %s в ИСПП",
+                                child.getMeshGUID().toString()));
+                        return;
+                    }
+
+                    switch (operation) {
+                        case DELETE_OPERATION:
+                            processDeleteOperationForGuardian(session, child, guardian, children);
+                            break;
+                        case MOVE_OPERATION:
+                            processMoveOperationForGuardian(session, child, guardian, children, beforeMigrateOrgId);
+                            break;
+                    }
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        }
+        catch (Exception ex) {
+            logger.error("Error in processClientGuardians() : ", ex);
+        }
+        finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private void processCreateOperationForGuardian(
+            Session session, Client child, ClientsMobileHistory clientsMobileHistory,
+            ClientGuardianHistory clientGuardianHistory) throws Exception {
+        // Запрос в МК обучающегося с информацией о представителях
+        PersonResponse childPersonResponse = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class)
+                .searchPersonByMeshGuid(child.getMeshGUID());
+        if (!childPersonResponse.getCode().equals(PersonListResponse.OK_CODE) ||
+                childPersonResponse.getResponse() == null) {
+            logger.error(String.format("processCreateOperationForGuardian(): Не удалось найти ребенка c MЭШ.GUID: %s в МЭШ.Контингент",
+                    child.getMeshGUID().toString()));
+            return;
+        }
+
+        for (MeshAgentResponse meshAgentResponse : childPersonResponse.getResponse().getAgents()) {
+            MeshGuardianPerson guardianPerson = meshAgentResponse.getAgentPerson();
+
+            Client guardian = DAOUtils.findClientByMeshGuid(session, meshAgentResponse.getAgentPersonId());
+
+            if (guardian != null) {
+                guardian = DAOUtils.findClientByMeshGuid(session, meshAgentResponse.getAgentPersonId());
+                if (guardian == null) {
+                    logger.error(String.format("processCreateOperationForGuardian(): Не удалось найти представителя c MЭШ.GUID: %s в ИСПП",
+                            guardian.getMeshGUID().toString()));
+                    return;
+                }
+
+                // Данные персоны из МК записываем поверх данных клиента в ИСПП
+                guardian.setMeshGUID(guardianPerson.getMeshGuid());
+                guardian.setBirthDate(guardianPerson.getBirthDate());
+                if(!guardian.getPerson().getFirstName().equals(guardianPerson.getFirstName()) ||
+                        !guardian.getPerson().getSurname().equals(guardianPerson.getSurname()) ||
+                        !guardian.getPerson().getSecondName().equals(guardianPerson.getSecondName())) {
+                    guardian.getPerson().setFirstName(guardianPerson.getFirstName());
+                    guardian.getPerson().setSurname(guardianPerson.getSurname());
+                    guardian.getPerson().setSecondName(guardianPerson.getSecondName());
+                }
+                guardian.setSan(guardianPerson.getSnils());
+                guardian.setGender(guardianPerson.getIsppGender());
+                List<DulDetail> dulDetails = new ArrayList<>();
+                if (!guardianPerson.getDocument().isEmpty()) {
+                    for (MeshDocumentResponse document : guardianPerson.getDocument()) {
+                        dulDetails.add(document.getDulDetail());
+                    }
+                    RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                            .validateAndSaveDulDetails(session, dulDetails, guardian.getIdOfClient());
+                }
+                guardian.setMobile(guardianPerson.getMobile());
+                guardian.setEmail(guardianPerson.getEmail());
+
+                // Проверяем наличие связи обучающегося и представителя и ее статус
+                ClientGuardian clientGuardian = DAOUtils.findClientGuardian(
+                        session, child.getIdOfClient(), guardian.getIdOfClient());
+                if (clientGuardian == null) {
+                    clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
+                            session, guardian, null, ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                            ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
+                }
+                else {
+                    if (clientGuardian.getDeletedState().equals(Boolean.TRUE)) {
+                        clientGuardian.setDeletedState(Boolean.FALSE);
+                        session.merge(clientGuardian);
+                    }
+                }
+
+                if (guardian.isActiveAdultGroup()) {
+                    if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                        createMigrateRequestForGuardian(session,guardian, child.getOrg());
+                    }
+                } else if (guardian.isLeaving()){
+                    guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                    guardian.setOrg(child.getOrg());
+                }
+                session.merge(guardian);
+            } else {
+                // Создаем нового клиента-представителя и связь с обучающимся
+                String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE,
+                        new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+                guardian = getMeshGuardiansService().createGuardianInternalByMeshGuardianPerson(
+                        session,
+                        guardianPerson,
+                        child.getOrg(),
+                        remark,
+                        ClientCreatedFromType.REGISTRY,
+                        clientsMobileHistory);
+
+                ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
+                        session, guardian, null, ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                        ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
+            }
+        }
+    }
+
+
+    private void processDeleteOperationForGuardian(Session session, Client child, Client guardian, List<Client> children) throws Exception {
+        if (children.size() > 1) {
+            Org newOrg = null;
+
+            for (Client childItem : children) {
+                if (childItem.getIdOfClient().equals(child.getIdOfClient())) {
+                    continue;
+                }
+                if (childItem.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                    return;
+                }
+                if (newOrg == null) {
+                    newOrg = childItem.getOrg();
+                }
+            }
+            if (guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                if (guardian.isParent()){
+                    guardian.setOrg(newOrg);
+                    session.merge(guardian);
+                }
+            }
+            else {
+                MigrantsUtils.disableMigrantRequestIfExists(
+                        session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
+            }
+        }
+        else {
+            if (guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                if(guardian.isParent()) {
+                    guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                    session.merge(guardian);
+                }
+            }
+        }
+    }
+
+    private void processMoveOperationForGuardian(
+            Session session, Client child, Client guardian, List<Client> children, Long beforeMigrateOrgId) throws Exception {
+        boolean guardianHasOtherChildrenInOldOrg = false;
+
+        if (children.size() > 1) {
+            for (Client childItem : children) {
+                if (childItem.getIdOfClient().equals(child.getIdOfClient())) {
+                    continue;
+                }
+                if (childItem.getOrg().getIdOfOrg().equals(beforeMigrateOrgId)) {
+                    guardianHasOtherChildrenInOldOrg = true;
+                    break;
+                }
+            }
+        }
+
+        if (guardianHasOtherChildrenInOldOrg) {
+            if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                createMigrateRequestForGuardian(session, guardian, child.getOrg());
+            }
+        }
+        else {
+            if(guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId)) {
+                if (guardian.isParent()) {
+                    guardian.setOrg(child.getOrg());
+                    session.merge(guardian);
+                }
+                else if (guardian.isActiveAdultGroup()) {
+                    createMigrateRequestForGuardian(session,guardian, child.getOrg());
+                }
+
+            }
+            else {
+                MigrantsUtils.disableMigrantRequestIfExists(
+                        session, beforeMigrateOrgId, guardian.getIdOfClient());
+
+                if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                }
+            }
+        }
+    }
+
+
+    private void createMigrateRequestForGuardian(Session session, Client client, Org orgVisit) {
+        if (!DAOUtils.isFriendlyOrganizations(session, client.getOrg(), orgVisit)) {
+            if(MigrantsUtils.findActiveMigrant(
+                    session, orgVisit.getIdOfOrg(), client.getIdOfClient()) == null) {
+                ClientManager.createMigrationForGuardianWithConfirm(
+                        session,
+                        client,
+                        new Date(),
+                        orgVisit,
+                        MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                        VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR,
+                        12);
+            }
+        }
+    }
+
 
     private void checkGroupNamesToOrgs(Session session, String groupName, Long idofOrg) {
         try {
