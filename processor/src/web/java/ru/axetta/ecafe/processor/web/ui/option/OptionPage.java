@@ -95,7 +95,6 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer simultaneousAccIncSyncTimeout;
     private Integer retryAfter;
     private Integer syncLimitFilter;
-    private Integer syncOrgSettingsLimit;
     private String syncRestrictFullSyncPeriods;
     private String syncRegisterSupportEmail;
     private Integer thinClientMinClaimsEditableDays;
@@ -593,14 +592,6 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncLimitFilter = syncLimitFilter;
     }
 
-    public Integer getSyncOrgSettingsLimit() {
-        return syncOrgSettingsLimit;
-    }
-
-    public void setSyncOrgSettingsLimit(Integer syncOrgSettingsLimit) {
-        this.syncOrgSettingsLimit = syncOrgSettingsLimit;
-    }
-
     public String getSyncRestrictFullSyncPeriods() {
         return syncRestrictFullSyncPeriods;
     }
@@ -971,7 +962,6 @@ public class OptionPage extends BasicWorkspacePage {
         simultaneousAccIncSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
-        syncOrgSettingsLimit = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_ORG_SETTINGS_LIMIT);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
         syncRestrictFullSyncPeriods = runtimeContext.getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS);
         reportOn = runtimeContext.getOptionValueBool(Option.OPTION_SAVE_SYNC_CALC);
@@ -1210,7 +1200,6 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_ACCINC_SYNC_TIMEOUT, simultaneousAccIncSyncTimeout);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
-            runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_ORG_SETTINGS_LIMIT, syncOrgSettingsLimit);
             runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);

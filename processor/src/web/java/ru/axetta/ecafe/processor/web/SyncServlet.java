@@ -65,7 +65,6 @@ public class SyncServlet extends HttpServlet {
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> accIncSyncsInProgress = new HashSet<Long>();
-    private static final HashSet<Long> orgSettingsSyncsInProgress = new HashSet<Long>();
     private static List<String[]> restrictedFullSyncPeriods;
     private static final AtomicLong threadCounter = new AtomicLong();
     public static int MAX_SYNCS;
@@ -150,32 +149,24 @@ public class SyncServlet extends HttpServlet {
 
             /////// Недопущение двух и более одновременных синхронизаций от одной организации
             boolean success, tooManyRequests = false;
-            int allSyncsCount, fullSyncsCount, accIncSyncsCount, orgSettingsSyncsCount = 0;
+            int allSyncsCount, fullSyncsCount, accIncSyncsCount = 0;
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
-                if (success && syncType == SyncType.TYPE_FULL) {
+                if (success && syncType==SyncType.TYPE_FULL) {
                     fullSyncsInProgress.add(idOfOrg);
                 }
                 //Тип синхры AccInc - разрешаем выполнение одновременно с другими типами
-                if (syncType == SyncType.TYPE_GET_ACC_INC) {
+                if (syncType==SyncType.TYPE_GET_ACC_INC) {
                     success = accIncSyncsInProgress.add(idOfOrg);
                 }
-                if (success && syncType == SyncType.TYPE_ORG_SETTINGS) {
-                    success = orgSettingsSyncsInProgress.add(idOfOrg);
-                }
-
-                // ограничение количества одновременных синхр - срабатывает только для полных синхр и настроек ОО
-                if (success &&
-                        ((syncType == SyncType.TYPE_FULL && fullSyncsInProgress.size()
-                                > runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS)) ||
-                        (syncType == SyncType.TYPE_ORG_SETTINGS && orgSettingsSyncsInProgress.size()
-                                > runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_ORG_SETTINGS_LIMIT)))) {
+                // ограничение количества одновременных синхр - срабатывает только для полных синхр
+                if (success && (syncType==SyncType.TYPE_FULL &&
+                        fullSyncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS))) {
                     tooManyRequests = true;
                 }
                 allSyncsCount = syncsInProgress.size();
                 fullSyncsCount = fullSyncsInProgress.size();
                 accIncSyncsCount = accIncSyncsInProgress.size();
-                orgSettingsSyncsCount = orgSettingsSyncsInProgress.size();
             }
             if (!success) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
@@ -184,8 +175,8 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             if (tooManyRequests) {
-                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s, accInc syncs: %s, orgSettings syncs: %s",
-                        idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, orgSettingsSyncsCount);
+                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s, accInc syncs: %s",
+                        idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount);
                 logger.error(message);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
@@ -207,8 +198,8 @@ public class SyncServlet extends HttpServlet {
 
 
             long begin_sync = System.currentTimeMillis();
-            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s, orgSettings syncs: %s, available permits: %s, permit acquired in: %s ms",
-                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, orgSettingsSyncsCount, permitsForSync.availablePermits(), System.currentTimeMillis() - currentTime));
+            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s, available permits: %s, permit acquired in: %s ms",
+                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, permitsForSync.availablePermits(), System.currentTimeMillis() - currentTime));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
