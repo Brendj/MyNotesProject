@@ -2572,7 +2572,7 @@ public class FrontController extends HttpServlet {
 
             //
             ClientGuardian clientGuardian = ClientManager
-                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
+                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null, false,
                             clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
             clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
@@ -2706,8 +2706,8 @@ public class FrontController extends HttpServlet {
                 clientGuardianHistory.setWebAdress(req.getRemoteAddr());
                 //
                 ClientGuardian clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                                clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
+                        .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null,
+                                false, clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
                 clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);
@@ -2719,7 +2719,7 @@ public class FrontController extends HttpServlet {
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
                 ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
-                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
+                        MigrantInitiatorEnum.INITIATOR_ORG, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }
@@ -3054,14 +3054,14 @@ public class FrontController extends HttpServlet {
             if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
-            PersonResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+            MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
                     mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
 
             if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                 logger.error(personResponse.getMessage());
                 return new GuardianMeshGuidResponse(personResponse.getCode(), personResponse.getMessage());
             }
-            return new GuardianMeshGuidResponse(personResponse.getMeshGuid());
+            return new GuardianMeshGuidResponse(personResponse.getAgentPersonId());
         } catch (Exception e) {
             logger.error(e.getMessage());
             return new GuardianMeshGuidResponse(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
@@ -3202,7 +3202,7 @@ public class FrontController extends HttpServlet {
                     ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
                     ClientGuardianRoleType.fromInteger(agentTypeId), informing);
 
-            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
+            MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
 
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
@@ -3290,7 +3290,7 @@ public class FrontController extends HttpServlet {
             guardianItem.setLastName(r.getSurname());
             guardianItem.setFirstName(r.getFirstName());
             guardianItem.setPatronymic(r.getSecondName());
-            guardianItem.setGender(r.getGender());
+            guardianItem.setGender(r.getIsppGender());
             guardianItem.setBirthDate(r.getBirthDate());
             guardianItem.setSnils(r.getSnils());
             guardianItem.setMobile(r.getMobile());

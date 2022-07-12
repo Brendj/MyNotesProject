@@ -524,6 +524,19 @@ public class MigrantsUtils {
         return (Migrant) migrantList.get(0);
     }
 
+    public static Migrant findActiveMigrant(Session session, Long orgVisitId, Long clientMigrateId) {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", orgVisitId));
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", clientMigrateId));
+        criteria.add(Restrictions.gt("visitEndDate", new Date()));
+        criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
+        List<Migrant> migrantList = criteria.list();
+        if (migrantList.isEmpty()) {
+            return null;
+        }
+        return (Migrant) migrantList.get(0);
+    }
+
     public static void disableMigrantRequestIfExists(Session session, Long orgVisitId, Long clientMigrateId) {
         Migrant migrant = findMigrant(session, orgVisitId, clientMigrateId);
         if (null != migrant) {

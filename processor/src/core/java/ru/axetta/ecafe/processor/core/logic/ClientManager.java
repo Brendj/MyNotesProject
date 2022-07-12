@@ -1114,7 +1114,7 @@ public class ClientManager {
         if (mobile != null) {
             mobile = Client.checkAndConvertMobile(mobile);
             if (mobile == null) {
-                throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
+                throw new Exception("Ошибка при создании представителя: Неверный формат мобильного телефона");
             }
         }
         clientGuardianToSave.setAddress("");
@@ -1145,7 +1145,7 @@ public class ClientManager {
         if (gender != null) {
             clientGuardianToSave.setGender(gender);
         }
-        logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
+        logger.info("class : ClientManager, method : createGuardianTransactionFree , idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         session.update(clientGuardianToSave);
 
         if (!StringUtils.isEmpty(passportNumber) && !StringUtils.isEmpty(passportSeries)) {
@@ -1163,9 +1163,11 @@ public class ClientManager {
         return clientGuardianToSave;
     }
 
-    public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-                                                                         Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
-                                                                         ClientGuardianHistory clientGuardianHistory) {
+    public static ClientGuardian createClientGuardianInfoTransactionFree(
+            Session session, Client guardian, String relation, ClientGuardianRoleType roleType,  Boolean disabled,
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
+            ClientGuardianHistory clientGuardianHistory) {
+
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1182,6 +1184,9 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
+        if (roleType != null) {
+            clientGuardian.setRoleType(roleType);
+        }
         clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
@@ -1219,7 +1224,7 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY,
+                null, true, idOfClientChild, ClientCreatedFromType.REGISTRY,
                 registryChangeGuardians.getIntegerRepresentative(), clientGuardianHistory);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
@@ -1822,8 +1827,13 @@ public class ClientManager {
         session.save(migration);
     }
 
-    public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
-                                                             MigrantInitiatorEnum initiator, int years) {
+    public static void createMigrationForGuardianWithConfirm(Session session,
+                                                             Client guardian,
+                                                             Date fireTime,
+                                                             Org orgVisit,
+                                                             MigrantInitiatorEnum initiator,
+                                                             VisitReqResolutionHistInitiatorEnum historyInitiator,
+                                                             int years) {
         Long idOfProcessorMigrantRequest = MigrantsUtils
                 .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
         CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
@@ -1838,13 +1848,35 @@ public class ClientManager {
         migrantNew.setInitiator(initiator);
         session.save(migrantNew);
 
-        session.save(ImportMigrantsService
-                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                        VisitReqResolutionHist.RES_CREATED, fireTime));
+        createVisitReqResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CREATED, fireTime, historyInitiator);
         session.flush();
-        session.save(ImportMigrantsService
-                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+        createVisitReqResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 5), historyInitiator);
+    }
+
+    public static void createVisitReqResolutionHistory(Session session,
+                                                       Client client,
+                                                       Long idOfRequest,
+                                                       Integer resolution,
+                                                       Date date,
+                                                       VisitReqResolutionHistInitiatorEnum initiator) {
+
+        Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
+        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
+                idOfRequest, client.getOrg().getIdOfOrg());
+
+        session.save(
+                new VisitReqResolutionHist(
+                        comIdOfHist,
+                        client.getOrg(),
+                        resolution,
+                        date,
+                        MigrantsUtils.getResolutionString(resolution),
+                        null,
+                        null,
+                        VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                        initiator));
     }
 
     /* получить список опекунов по опекаемому */

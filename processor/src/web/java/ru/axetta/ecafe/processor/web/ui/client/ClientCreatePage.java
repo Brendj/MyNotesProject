@@ -667,7 +667,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 this.meshGuardianPerson.getSurname() == null ? "" : this.meshGuardianPerson.getSurname(),
                 this.meshGuardianPerson.getFirstName() == null ? "" : this.meshGuardianPerson.getFirstName(),
                 this.meshGuardianPerson.getSecondName() == null ? "" : this.meshGuardianPerson.getSecondName(),
-                this.meshGuardianPerson.getGender() == 1 ? "Мужской" : "Женский",
+                this.meshGuardianPerson.getIsppGender() == 1 ? "Мужской" : "Женский",
                 new SimpleDateFormat("dd.MM.yyyy").format(this.meshGuardianPerson.getBirthDate()),
                 this.meshGuardianPerson.getMobile() == null ? "" : this.meshGuardianPerson.getMobile());
     }
@@ -885,7 +885,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setEmail(this.meshGuardianPerson.getEmail());
         client.setMeshGUID(this.meshGuardianPerson.getMeshGuid());
         client.setSan(this.meshGuardianPerson.getSnils());
-        client.setGender(this.meshGuardianPerson.getGender());
+        client.setGender(this.meshGuardianPerson.getIsppGender());
         client.setBirthDate(this.meshGuardianPerson.getBirthDate());
         client.setExternalId(null);
         client.setClientGUID(null);
@@ -1034,7 +1034,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
                     client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-                client.setMeshGUID(personResponse.getMeshGuid());
+                client.setMeshGUID(personResponse.getResponse().getMeshGuid());
             else
                 throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
             addGuardianToClient(persistenceSession, clientGuardianHistory, client);
@@ -1064,7 +1064,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
 
-        PersonResponse personResponse;
+        MeshAgentResponse personResponse;
         for (ClientGuardianItem clientWardItem : clientWardItems) {
             if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
                 throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
