@@ -89,14 +89,14 @@ public class ResponseResult {
         return result;
     }
 
-    public Result doubleIdentif(String xrequestStr)
-    {
-        Result result = new Result();
-        logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", xrequestStr));
-        result.setCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
-        result.setDescription(ResponseCodes.RC_FOUND_FOODBOX.toString());
-        return result;
-    }
+//    public Result doubleIdentif(String xrequestStr)
+//    {
+//        Result result = new Result();
+//        logger.error(String.format("Заказ с данным идентификатором уже зарегистрирвоан в системе. externalid = %s", xrequestStr));
+//        result.setCode(ResponseCodes.RC_FOUND_FOODBOX.getCode().toString());
+//        result.setDescription(ResponseCodes.RC_FOUND_FOODBOX.toString());
+//        return result;
+//    }
 
     public OrderErrorInfo notEndedPrev(FoodBoxPreorder foodBoxPreorder)
     {
