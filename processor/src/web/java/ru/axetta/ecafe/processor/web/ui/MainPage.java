@@ -506,6 +506,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
     private final DulSelectPage dulSelectPage = new DulSelectPage();
     private final DulViewPage dulViewPage = new DulViewPage();
+    private final MeshClientSelectPage meshClientSelectPage = new MeshClientSelectPage();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -4259,6 +4260,29 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
 
 
+        }
+        return null;
+    }
+
+    public Object updateMeshClientSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            meshClientSelectPage.searchMeshPerson(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill mesh client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }
@@ -11450,5 +11474,9 @@ public class MainPage implements Serializable {
 
     public DulViewPage getDulViewPage() {
         return dulViewPage;
+    }
+
+    public MeshClientSelectPage getMeshClientSelectPage() {
+        return meshClientSelectPage;
     }
 }

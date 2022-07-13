@@ -348,8 +348,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean userOP;
     private String middleGroup;
     private List<DulDetail> dulDetail = new ArrayList<>();
-    private Date currentDate;
-
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
     public ClientGenderMenu getClientGenderMenu() {
@@ -729,16 +727,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.dulDetail = dulDetail;
     }
 
-    public Date getCurrentDate() {
-        return currentDate;
-    }
-
-    public void setCurrentDate(Date currentDate) {
-        this.currentDate = currentDate;
-    }
-
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
+
         idOfCategoryList.clear();
         for (CategoryDiscount categoryDiscount : client.getCategories()) {
             idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
@@ -775,9 +766,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient, true);
         this.clientWardItems = loadWardsByClient(session, idOfClient, true);
         this.changePassword = false;
-        this.dulDetail = client.getDulDetail()
-                .stream().filter(d -> d.getDeleteState() == null
-                        || !d.getDeleteState()).collect(Collectors.toList());
+        this.dulDetail = client.getDulDetail().stream().filter(d -> d.getDeleteState() == null
+                || !d.getDeleteState()).collect(Collectors.toList());
         this.dulDetail.sort(Comparator.comparing(p -> p.getDulGuide().getName()));
         this.dulDetail.forEach(d -> d.setNew(false));
         fill(session, client);
@@ -1314,7 +1304,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                         throw new Exception(String.format("Ошибка создания связи с обучающимся в МК: %s", personResponse.getMessage()));
                     }
-                    resetNewFlags();
+                    clientWardItem.setIsNew(false);
                 } else {
                     MeshAgentResponse personResponse = getMeshGuardiansService()
                             .changeGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
@@ -1325,7 +1315,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-
 
         //Удаление связи с опекаемым
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
@@ -1580,7 +1569,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
         this.middleGroup = client.getMiddleGroup();
-        this.currentDate = new Date();
     }
 
     public String getIdOfCategoryListString() {

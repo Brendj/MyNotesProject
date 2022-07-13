@@ -168,6 +168,7 @@ public class ClientFilter {
     private Long permanentOrgId;
     private Integer limit = 0;
     private Integer offset = 0;
+    private String san;
 
     public ClientBalanceFilter getClientBalanceMenu() {
         return clientBalanceMenu;
@@ -297,11 +298,19 @@ public class ClientFilter {
         this.permanentOrgId = permanentOrgId;
     }
 
+    public String getSan() {
+        return san;
+    }
+
+    public void setSan(String san) {
+        this.san = san;
+    }
+
     public boolean isEmpty() {
         if (ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && person.isEmpty() && contractPerson.isEmpty()
                 && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID)
-                && StringUtils.isEmpty(filterClientMESHGUID)) {
+                && StringUtils.isEmpty(filterClientMESHGUID) && StringUtils.isEmpty(san)) {
             if (!org.isEmpty() && org.getIdOfOrg().equals(getPermanentOrgId()) || org.isEmpty()) {
                 return true;
             }
@@ -330,6 +339,7 @@ public class ClientFilter {
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
         clientGroupId = ClientGroupMenu.CLIENT_ALL;
         email = null;
+        san = null;
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws HibernateException {
@@ -430,6 +440,9 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(filterClientMESHGUID)) {
             criteria.add(Restrictions.eq("meshGUID", filterClientMESHGUID.trim()));
+        }
+        if (StringUtils.isNotEmpty(san)) {
+            criteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
         }
         criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
         String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";

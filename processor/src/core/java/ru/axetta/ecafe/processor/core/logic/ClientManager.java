@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
@@ -18,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
+import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,15 +28,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -2665,59 +2665,34 @@ public class ClientManager {
         } else return sum > 101 && (sum % 101 == checkSum || (sum % 101 == 100 && checkSum == 0));
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
-                                                               String patronymic, String mobile, String snils) {
-        Long idOfClientGroup = 1000000000L;
-        String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
-        boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
-
-        if (!fioIsEmpty) {
-            q += " and ( ";
-        }
+                                                               String patronymic, String mobile, String snils) throws Exception {
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.createAlias("person","p", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.gt("idOfClientGroup", 1000000000L));
+        criteria.add(Restrictions.isNotNull("meshGUID"));
+        Conjunction conjunction = Restrictions.conjunction();
+        Disjunction disjunction = Restrictions.disjunction();
         if (lastName != null) {
-            q += " (upper(c.person.surname) = :lastName) ";
+            conjunction.add(Restrictions.ilike("p.surname", lastName, MatchMode.ANYWHERE));
         }
         if (firstName != null) {
-            if (lastName != null)
-                q += " and ";
-            q += " (upper(c.person.firstName) = :firstName) ";
+            conjunction.add(Restrictions.ilike("p.firstName", firstName, MatchMode.ANYWHERE));
         }
         if (patronymic != null) {
-            if (lastName != null || firstName != null)
-                q += " and ";
-            q += " (upper(c.person.secondName) = :patronymic) ";
+            conjunction.add(Restrictions.ilike("p.secondName", patronymic, MatchMode.ANYWHERE));
         }
-        if (!fioIsEmpty) {
-            q += ")";
-        }
-        if (mobile != null || snils != null) {
-            q += fioIsEmpty ? " and " : " or ";
-        }
-        if (mobile != null) {
-            q += " c.mobile = :mobile ";
-        }
-        if (snils != null) {
-            q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
-        }
-        Query query = session.createQuery(q);
-        query.setParameter("idOfClientGroup", idOfClientGroup);
+        disjunction.add(conjunction);
 
-        if (firstName != null) {
-            query.setParameter("firstName", StringUtils.upperCase(firstName));
-        }
-        if (lastName != null) {
-            query.setParameter("lastName", StringUtils.upperCase(lastName));
-        }
-        if (patronymic != null) {
-            query.setParameter("patronymic", StringUtils.upperCase(patronymic));
-        }
         if (mobile != null) {
-            query.setParameter("mobile", mobile);
+            disjunction.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobile), MatchMode.ANYWHERE));
         }
         if (snils != null) {
-            query.setParameter("snils", snils);
+            disjunction.add(Restrictions.ilike("san", snils, MatchMode.EXACT));
         }
-        return query.list();
+        criteria.add(disjunction);
+        return (List<Client>) criteria.list();
     }
 
     public static void validateFio(String surname, String firstName, String secondName) throws Exception {
@@ -2728,11 +2703,9 @@ public class ClientManager {
         if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()) {
             throw new Exception("Только русские или только английские буквы");
         }
-
         if (surname.endsWith("-") || firstName.endsWith("-") || secondName.endsWith("-")) {
             throw new Exception("Знак \"-\" не может быть последним символом элемента.");
         }
-
         if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
             throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
         }
