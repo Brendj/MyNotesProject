@@ -230,8 +230,8 @@ public class MealsService {
 
         FoodBoxPreorder foodBoxPreorderDB = daoReadonlyService.getFoodBoxPreorderByExternalId(xrequestStr);
         if (foodBoxPreorderDB != null) {
-            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-                    entity(responseResult.doubleIdentif(xrequestStr)).build());
+            mealsPOJO.setResponse(Response.status(HTTP_UNPROCESSABLE_ENTITY).
+                    entity(responseResult.notEndedPrev(foodBoxPreorderDB)).build());
             return mealsPOJO;
         }
         return mealsPOJO;
