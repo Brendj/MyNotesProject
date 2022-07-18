@@ -1184,9 +1184,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
-        if (roleType != null) {
-            clientGuardian.setRoleType(roleType);
-        }
+        clientGuardian.setRoleType(roleType);
         clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
