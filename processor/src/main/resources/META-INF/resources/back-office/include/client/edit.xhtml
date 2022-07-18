@@ -371,6 +371,13 @@
                             <f:selectItems value="#{mainPage.clientEditPage.relations}"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
+                    <h:panelGrid styleClass="borderless-grid"
+                                 columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientGuardian.role}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.roles}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <f:facet name="header">
@@ -444,7 +451,7 @@
                     </f:facet>
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text"/>
-                        <h:selectBooleanCheckbox value="#{clientWard.enabled}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"
+                        <h:selectBooleanCheckbox value="#{clientWard.enabled}"
                                                  styleClass="output-text">
                             <a4j:ajax render="clientWardEditTable" event="change"
                                       action="#{clientWard.activateNotificationSpecial()}"/>
@@ -464,15 +471,18 @@
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                         <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
-                        <h:selectOneMenu value="#{clientWard.relation}" disabled="#{!mainPage.clientEditPage.isParentGroup()}" styleClass="input-text">
-                            <f:selectItems value="#{mainPage.clientEditPage.relations}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"/>
+                        <h:selectOneMenu value="#{clientWard.relation}"  styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.relations}"
+                                           />
                         </h:selectOneMenu>
                     </h:panelGrid>
-                    <h:panelGrid rendered="#{mainPage.clientEditPage.isParentGroup()}" styleClass="borderless-grid"
+                    <h:panelGrid styleClass="borderless-grid"
                                  columns="1" bgcolor="#eeeeee">
                         <h:outputText escape="true" value="Вид представительства:" styleClass="output-text"/>
-                        <h:selectOneMenu value="#{clientWard.role}" styleClass="input-text">
-                            <f:selectItems value="#{mainPage.clientEditPage.roles}"/>
+                        <h:selectOneMenu value="#{clientWard.role}"
+                                         styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.roles}"
+                                           />
                         </h:selectOneMenu>
                     </h:panelGrid>
                 </rich:column>
@@ -488,7 +498,7 @@
                             <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text"/>
                         </rich:column>
                         <rich:column styleClass="borderless-grid-all-client">
-                            <h:selectBooleanCheckbox value="#{it.enabled}" disabled="#{!mainPage.clientEditPage.isParentGroup()}"
+                            <h:selectBooleanCheckbox value="#{it.enabled}"
                                                      styleClass="output-text"/>
                         </rich:column>
                     </rich:dataTable>
@@ -507,7 +517,6 @@
                 <f:facet name="footer">
                     <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
                                        render="modalClientSelectorPanel"
-                                       disabled="#{!mainPage.clientEditPage.isParentGroup()}"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                        styleClass="command-link">
                         <f:setPropertyActionListener value="ward" target="#{mainPage.clientEditPage.typeAddClient}"/>

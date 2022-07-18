@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -44,7 +45,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
-    public static final String PERSONS_LIKE_EXPAND = "documents,contacts";
+    public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
+    public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,children";
+    public static final String ID_SEARCH_EXPAND = "agents,documents";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -93,21 +96,21 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPersonWithEducation(Long idOfOrg,
-                                                    String firstName,
-                                                    String patronymic,
-                                                    String lastName,
-                                                    Integer genderId,
-                                                    Date birthDate,
-                                                    String snils,
-                                                    String mobile,
-                                                    String email,
-                                                    String childMeshGuid,
-                                                    List<DulDetail> dulDetails,
-                                                    Integer agentTypeId,
-                                                    Integer relation,
-                                                    Integer typeOfLegalRepresent,
-                                                    Boolean informing) {
+    public MeshAgentResponse createPersonWithEducation(Long idOfOrg,
+                                                       String firstName,
+                                                       String patronymic,
+                                                       String lastName,
+                                                       Integer genderId,
+                                                       Date birthDate,
+                                                       String snils,
+                                                       String mobile,
+                                                       String email,
+                                                       String childMeshGuid,
+                                                       List<DulDetail> dulDetails,
+                                                       Integer agentTypeId,
+                                                       Integer relation,
+                                                       Integer typeOfLegalRepresent,
+                                                       Boolean informing) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
@@ -118,18 +121,18 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
                 createGuardianInternal(idOfOrg, personResult.getAgentPersonId(), firstName, patronymic, lastName,
                         genderId, birthDate, snils, mobile, childMeshGuid, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing);
-                return new PersonResponse(personResult.getAgentPersonId()).okResponse();
+                return getMeshGuardianConverter().toAgentDTO(personResult).okResponse();
             } else if (result.getCode() >= 500) {
-                return new PersonResponse().internalErrorResponse("" + result.getCode());
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
             } else {
-                return getPersonResponse(objectMapper, result);
+                return getMeshAgentResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in createPersonWithEducation: ", te);
-            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in createPersonWithEducation: ", e);
-            return new PersonResponse().internalErrorResponse();
+            return new MeshAgentResponse().internalErrorResponse();
         }
     }
 
@@ -137,18 +140,18 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                        String patronymic, String lastName,
                                        Integer genderId, Date birthDate, String snils) {
         try {
-            PersonListResponse personListResponse = searchPersonByMeshGuid(personId);
-            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
-                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
-            Integer id = personListResponse.getResponse().get(0).getId();
+            PersonResponse personResponse = searchPersonByMeshGuid(personId);
+            if (!personResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new PersonResponse(personResponse.getCode(), personResponse.message);
+            Integer id = personResponse.getResponse().getId();
             ObjectMapper objectMapper = new ObjectMapper();
             ResponsePersons request = buildResponsePerson(personId, firstName, patronymic, lastName, genderId,
                     birthDate, snils, null, null, null);
             String json = objectMapper.writeValueAsString(request);
             MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangePersonUrl(id.longValue()), json);
             if (result.getCode() == HttpStatus.SC_OK) {
-                ResponsePersons response = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
-                return new PersonResponse().okResponse();
+                ResponsePersons responsePersons = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                return new PersonResponse(getMeshGuardianConverter().toDTO(responsePersons)).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
@@ -201,7 +204,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
             Client client = DAOUtils.findClientByMeshGuid(session, childMeshGuid);
             ClientGuardian clientGuardian = ClientManager
-                    .createClientGuardianInfoTransactionFree(session, guardian, description, false,
+                    .createClientGuardianInfoTransactionFree(session, guardian, description, null, false,
                             client.getIdOfClient(), ClientCreatedFromType.MPGU, typeOfLegalRepresent, clientGuardianHistory);
             clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(agentTypeId));
             clientGuardian.setDisabled(informing);
@@ -218,6 +221,32 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
+    public Client createGuardianInternalByMeshGuardianPerson(
+            Session session, MeshGuardianPerson guardianPerson, Org org, String remark,
+            ClientCreatedFromType clientCreatedFromType, ClientsMobileHistory clientsMobileHistory) throws Exception {
+
+        Client guardian = ClientManager
+                .createGuardianTransactionFree(session, guardianPerson.getFirstName(), guardianPerson.getSecondName(),
+                        guardianPerson.getSurname(), guardianPerson.getMobile(), remark, guardianPerson.getIsppGender(),
+                        org, clientCreatedFromType, "", null, null, null,
+                        null, null, clientsMobileHistory);
+        guardian.setMeshGUID(guardianPerson.getMeshGuid());
+        guardian.setSan(guardianPerson.getSnils());
+        guardian.setBirthDate(guardianPerson.getBirthDate());
+        session.update(guardian);
+
+        List<DulDetail> dulDetails = new ArrayList<>();
+        if (!guardianPerson.getDocument().isEmpty()) {
+            for (MeshDocumentResponse document : guardianPerson.getDocument()) {
+                dulDetails.add(document.getDulDetail());
+            }
+            RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                    .validateAndSaveDulDetails(session, dulDetails, guardian.getIdOfClient());
+        }
+
+        return guardian;
+    }
+
     public MeshGuardianResponse createPersonContact(String meshGuid, Integer typeId, String data, boolean defaultFlag) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -227,7 +256,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -247,7 +276,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
 
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -261,8 +290,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public MeshDocumentResponse deletePersonDocument(String meshGuid, DulDetail dulDetail) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
-            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument));
+            IdListResponse idListResponse = findIdMkDocument(meshGuid, dulDetail.getDocumentTypeId());
+            if (!idListResponse.getCode().equals(IdListResponse.OK_CODE))
+                return new MeshDocumentResponse(idListResponse.code, idListResponse.message);
+            Integer id = idListResponse.getDocumentResponse().get(0).getDocumentId();
+            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id));
             if (result.getCode() == HttpStatus.SC_OK) {
                 return new MeshDocumentResponse().okResponse();
             } else {
@@ -275,24 +307,18 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    private Long findIdMkDocument(String meshGuid, DulDetail dulDetail) {
-        PersonListResponse personListResponse = searchPersonByMeshGuid(meshGuid);
-        if (personListResponse.getResponse() == null || personListResponse.getResponse().isEmpty()) {
-            throw new NullPointerException("Не найден клиент по \"meshGuid\"");
+    private IdListResponse findIdMkDocument(String meshGuid, Long documentTypeId) {
+        IdListResponse agentListResponse = searchIdByMeshGuid(meshGuid);
+        if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
+            return new IdListResponse(agentListResponse.getCode(), agentListResponse.message);
+        Integer id = 0;
+        for (DocumentIdResponse documentIdResponse : agentListResponse.getDocumentResponse()) {
+            if (documentIdResponse.getDocumentType() == documentTypeId.intValue())
+                id = documentIdResponse.getDocumentId();
         }
-        List<MeshDocumentResponse> documentResponseList = personListResponse.getResponse().get(0).getDocument();
-
-        if (documentResponseList == null || documentResponseList.isEmpty()) {
-            throw new NullPointerException("Не найден документ у клиента");
-        }
-        MeshDocumentResponse document = documentResponseList
-                .stream().filter(d -> dulDetail.getDocumentTypeId().equals((long) d.getDocumentTypeId()) &&
-                        dulDetail.getNumber().equals(d.getNumber()))
-                .findFirst().orElse(null);
-        if (document == null) {
-            throw new NullPointerException("Не найден документ у клиента");
-        }
-        return (long) document.getDocumentTypeId();
+        IdListResponse idListResponse = new IdListResponse();
+        idListResponse.setDocumentResponse(Collections.singletonList(new DocumentIdResponse(id, null)));
+        return idListResponse.okResponse();
     }
 
     public MeshDocumentResponse modifyPersonDocument(String meshGuid, DulDetail dulDetail) {
@@ -300,12 +326,14 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonDocument parameter = buildPersonDocument(dulDetail);
             String json = objectMapper.writeValueAsString(parameter);
-            Long idMkDocument = findIdMkDocument(meshGuid, dulDetail);
-            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, idMkDocument), json);
-
+            IdListResponse idListResponse = findIdMkDocument(meshGuid, dulDetail.getDocumentTypeId());
+            if (!idListResponse.getCode().equals(IdListResponse.OK_CODE))
+                return new MeshDocumentResponse(idListResponse.code, idListResponse.message);
+            Integer id = idListResponse.getDocumentResponse().get(0).getDocumentId();
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument);
+                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toDTO(errorResponse);
@@ -391,8 +419,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return String.format(CONTACT_CREATE_URL, meshGuid);
     }
 
-    private String buildDeleteAndModifyDocumentUrl(String meshGuid, Long id) {
+    private String buildDeleteAndModifyDocumentUrl(String meshGuid, Integer id) {
         return String.format(DOCUMENT_DELETE_URL, meshGuid, id);
+    }
+
+    private String buildChangeAgentUrl(String meshGuid, Integer id) {
+        return String.format(PERSONS_DELETE_URL, meshGuid, id);
     }
 
     private ResponsePersons buildResponsePerson(String personId,
@@ -514,29 +546,46 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         else return 1;
     }
 
-    public PersonListResponse searchPersonByMeshGuid(String meshGuid) {
+    public PersonResponse searchPersonByMeshGuid(String meshGuid) {
         try {
-            String parameters = String.format("?person=%s&expand=%s&limit=%s", meshGuid, PERSONS_LIKE_EXPAND, PERSONS_LIKE_LIMIT);
+            String parameters = String.format("/%s?&expand=%s", meshGuid, PERSONS_SEARCH_EXPAND);
             ObjectMapper objectMapper = new ObjectMapper();
-            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CHANGE_URL, parameters);
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CREATE_URL, parameters);
             if (result.getCode() == HttpStatus.SC_OK) {
-                TypeFactory typeFactory = objectMapper.getTypeFactory();
-                CollectionType collectionType = typeFactory.constructCollectionType(List.class, SimilarPerson.class);
-                List<SimilarPerson> similarPersons = objectMapper.readValue(result.getResponse(), collectionType);
-                return new PersonListResponse(getMeshGuardianConverter().toDTO(similarPersons)).okResponse();
+                ResponsePersons responsePersons = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                return new PersonResponse(getMeshGuardianConverter().toDTO(responsePersons)).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toPersonListDTO(errorResponse);
+                return getMeshGuardianConverter().toPersonDTO(errorResponse);
             }
-        } catch (MeshGuardianNotEnoughClientDataException e) {
-            return new PersonListResponse().notEnoughClientDataResponse(e.getMessage());
         } catch (Exception e) {
-            logger.error("Error in searchDocumentsByMeshGuid: ", e);
-            return new PersonListResponse().internalErrorResponse();
+            logger.error("Error in searchPersonByMeshGuid: ", e);
+            return new PersonResponse().internalErrorResponse();
         }
     }
 
-    public PersonResponse addGuardianToClient(String meshGuid, String childMeshGuid, Integer agentTypeId) {
+    public IdListResponse searchIdByMeshGuid(String meshGuid) {
+        try {
+            String parameters = String.format("/%s?&expand=%s", meshGuid, ID_SEARCH_EXPAND);
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeGetMethod(PERSONS_CREATE_URL, parameters);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                ResponsePersons responsePersons = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                IdListResponse idListResponse = new IdListResponse();
+                idListResponse.setAgentResponse(getMeshGuardianConverter().agentIdToDTO(responsePersons));
+                idListResponse.setDocumentResponse(getMeshGuardianConverter().documentIdToDTO(responsePersons));
+                return idListResponse.okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toIdListDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in searchIdByMeshGuid: ", e);
+            return new IdListResponse().internalErrorResponse();
+        }
+    }
+
+    public MeshAgentResponse addGuardianToClient(String meshGuid, String childMeshGuid, Integer agentTypeId) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = new PersonAgent();
@@ -548,45 +597,82 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
-                return new PersonResponse(personResult.getAgentPersonId()).okResponse();
+                return getMeshGuardianConverter().toAgentDTO(personResult).okResponse();
             } else if (result.getCode() >= 500) {
-                return new PersonResponse().internalErrorResponse("" + result.getCode());
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
             } else {
-                return getPersonResponse(objectMapper, result);
+                return getMeshAgentResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in addGuardianToClient: ", te);
-            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in addGuardianToClient: ", e);
-            return new PersonResponse().internalErrorResponse();
+            return new MeshAgentResponse().internalErrorResponse();
         }
     }
 
-    public PersonResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
+    public MeshAgentResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            PersonListResponse personListResponse = searchPersonByMeshGuid(agentMeshGuid);
-            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
-                return new PersonResponse(personListResponse.getCode(), personListResponse.message);
-            Integer id = personListResponse.getResponse().get(0).getId();
-
+            IdListResponse agentListResponse = searchIdByMeshGuid(childMeshGuid);
+            if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new MeshAgentResponse(agentListResponse.getCode(), agentListResponse.message);
+            Integer id = 0;
+            for (AgentIdResponse agentResponse : agentListResponse.getAgentResponse()) {
+                if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
+                    id = agentResponse.getAgentId();
+            }
             MeshResponseWithStatusCode result = meshRestClient
                     .executeDeleteMethod(buildDeleteGuardianToClientUrl(childMeshGuid, id.toString()));
             if (result.getCode() == HttpStatus.SC_OK) {
-                return new PersonResponse().okResponse();
+                return new MeshAgentResponse().okResponse();
             } else if (result.getCode() >= 500) {
-                return new PersonResponse().internalErrorResponse("" + result.getCode());
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
             } else {
-                return getPersonResponse(objectMapper, result);
+                return getMeshAgentResponse(objectMapper, result);
             }
 
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in deleteGuardianToClient: ", te);
-            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in deleteGuardianToClient: ", e);
-            return new PersonResponse().internalErrorResponse();
+            return new MeshAgentResponse().internalErrorResponse();
+        }
+    }
+
+    public MeshAgentResponse changeGuardianToClient(String agentMeshGuid, String childMeshGuid, Integer agentTypeId) {
+        try {
+            IdListResponse agentListResponse = searchIdByMeshGuid(childMeshGuid);
+            if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE)) {
+                return new MeshAgentResponse(agentListResponse.getCode(), agentListResponse.message);
+            }
+            Integer id = 0;
+            for (AgentIdResponse agentResponse : agentListResponse.getAgentResponse()) {
+                if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
+                    id = agentResponse.getAgentId();
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            PersonAgent personAgent = new PersonAgent();
+            personAgent.setAgentTypeId(agentTypeId);
+            personAgent.setId(id);
+            personAgent.setPersonId(childMeshGuid);
+            String json = objectMapper.writeValueAsString(personAgent);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangeAgentUrl(childMeshGuid, id), json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                return new MeshAgentResponse().okResponse();
+            } else if (result.getCode() >= 500) {
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
+            } else {
+                return getMeshAgentResponse(objectMapper, result);
+            }
+        } catch (ConnectTimeoutException te) {
+            logger.error("Connection timeout in changeGuardianToClient: ", te);
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
+        } catch (Exception e) {
+            logger.error("Error in changeGuardianToClient: ", e);
+            return new MeshAgentResponse().internalErrorResponse();
         }
     }
 
@@ -607,7 +693,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(PERSONS_CREATE_URL, json);
             if (result.getCode() == HttpStatus.SC_OK) {
                 ResponsePersons personResult = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
-                return new PersonResponse(personResult.getPersonId()).okResponse();
+                return new PersonResponse(getMeshGuardianConverter().toDTO(personResult)).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
@@ -629,6 +715,16 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         } catch (JsonParseException e) {
             logger.error(e.getMessage());
             return new PersonResponse(result.getCode(), new String(result.getResponse(), StandardCharsets.UTF_8));
+        }
+    }
+
+    private MeshAgentResponse getMeshAgentResponse(ObjectMapper objectMapper, MeshResponseWithStatusCode result) throws IOException {
+        try {
+            ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+            return getMeshGuardianConverter().toAgentErrorDTO(errorResponse);
+        } catch (JsonParseException e) {
+            logger.error(e.getMessage());
+            return new MeshAgentResponse(result.getCode(), new String(result.getResponse(), StandardCharsets.UTF_8));
         }
     }
 }

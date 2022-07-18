@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
@@ -18,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
+import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,15 +28,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1114,7 +1114,7 @@ public class ClientManager {
         if (mobile != null) {
             mobile = Client.checkAndConvertMobile(mobile);
             if (mobile == null) {
-                throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
+                throw new Exception("Ошибка при создании представителя: Неверный формат мобильного телефона");
             }
         }
         clientGuardianToSave.setAddress("");
@@ -1145,7 +1145,7 @@ public class ClientManager {
         if (gender != null) {
             clientGuardianToSave.setGender(gender);
         }
-        logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
+        logger.info("class : ClientManager, method : createGuardianTransactionFree , idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         session.update(clientGuardianToSave);
 
         if (!StringUtils.isEmpty(passportNumber) && !StringUtils.isEmpty(passportSeries)) {
@@ -1163,9 +1163,11 @@ public class ClientManager {
         return clientGuardianToSave;
     }
 
-    public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-                                                                         Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
-                                                                         ClientGuardianHistory clientGuardianHistory) {
+    public static ClientGuardian createClientGuardianInfoTransactionFree(
+            Session session, Client guardian, String relation, ClientGuardianRoleType roleType,  Boolean disabled,
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative,
+            ClientGuardianHistory clientGuardianHistory) {
+
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1182,6 +1184,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
+        clientGuardian.setRoleType(roleType);
         clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
@@ -1219,7 +1222,7 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY,
+                null, true, idOfClientChild, ClientCreatedFromType.REGISTRY,
                 registryChangeGuardians.getIntegerRepresentative(), clientGuardianHistory);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
@@ -1822,8 +1825,13 @@ public class ClientManager {
         session.save(migration);
     }
 
-    public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
-                                                             MigrantInitiatorEnum initiator, int years) {
+    public static void createMigrationForGuardianWithConfirm(Session session,
+                                                             Client guardian,
+                                                             Date fireTime,
+                                                             Org orgVisit,
+                                                             MigrantInitiatorEnum initiator,
+                                                             VisitReqResolutionHistInitiatorEnum historyInitiator,
+                                                             int years) {
         Long idOfProcessorMigrantRequest = MigrantsUtils
                 .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
         CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
@@ -1838,13 +1846,35 @@ public class ClientManager {
         migrantNew.setInitiator(initiator);
         session.save(migrantNew);
 
-        session.save(ImportMigrantsService
-                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                        VisitReqResolutionHist.RES_CREATED, fireTime));
+        createVisitReqResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CREATED, fireTime, historyInitiator);
         session.flush();
-        session.save(ImportMigrantsService
-                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+        createVisitReqResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 5), historyInitiator);
+    }
+
+    public static void createVisitReqResolutionHistory(Session session,
+                                                       Client client,
+                                                       Long idOfRequest,
+                                                       Integer resolution,
+                                                       Date date,
+                                                       VisitReqResolutionHistInitiatorEnum initiator) {
+
+        Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
+        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
+                idOfRequest, client.getOrg().getIdOfOrg());
+
+        session.save(
+                new VisitReqResolutionHist(
+                        comIdOfHist,
+                        client.getOrg(),
+                        resolution,
+                        date,
+                        MigrantsUtils.getResolutionString(resolution),
+                        null,
+                        null,
+                        VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                        initiator));
     }
 
     /* получить список опекунов по опекаемому */
@@ -2578,8 +2608,12 @@ public class ClientManager {
     }
 
     //todo уточнить как найти представителя
-    public static boolean isClientGuardian(Client client) {
-        return client.getIdOfClientGroup() > 1000000000L;
+    public static boolean isClientGuardian(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
+        criteria.add(Restrictions.ne("deletedState", true));
+        criteria.add(Restrictions.eq("disabled", false));
+        return !criteria.list().isEmpty() || client.getIdOfClientGroup() > 1000000000L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2629,59 +2663,34 @@ public class ClientManager {
         } else return sum > 101 && (sum % 101 == checkSum || (sum % 101 == 100 && checkSum == 0));
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Client> findGuardianByNameOrMobileOrSun(Session session, String firstName, String lastName,
-                                                               String patronymic, String mobile, String snils) {
-        Long idOfClientGroup = 1000000000L;
-        String q = "select c from Client c where c.meshGUID is not null and c.idOfClientGroup > :idOfClientGroup ";
-        boolean fioIsEmpty = firstName == null && lastName == null && patronymic == null;
-
-        if (!fioIsEmpty) {
-            q += " and ( ";
-        }
+                                                               String patronymic, String mobile, String snils) throws Exception {
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.createAlias("person","p", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.gt("idOfClientGroup", 1000000000L));
+        criteria.add(Restrictions.isNotNull("meshGUID"));
+        Conjunction conjunction = Restrictions.conjunction();
+        Disjunction disjunction = Restrictions.disjunction();
         if (lastName != null) {
-            q += " (upper(c.person.surname) = :lastName) ";
+            conjunction.add(Restrictions.ilike("p.surname", lastName, MatchMode.ANYWHERE));
         }
         if (firstName != null) {
-            if (lastName != null)
-                q += " and ";
-            q += " (upper(c.person.firstName) = :firstName) ";
+            conjunction.add(Restrictions.ilike("p.firstName", firstName, MatchMode.ANYWHERE));
         }
         if (patronymic != null) {
-            if (lastName != null || firstName != null)
-                q += " and ";
-            q += " (upper(c.person.secondName) = :patronymic) ";
+            conjunction.add(Restrictions.ilike("p.secondName", patronymic, MatchMode.ANYWHERE));
         }
-        if (!fioIsEmpty) {
-            q += ")";
-        }
-        if (mobile != null || snils != null) {
-            q += fioIsEmpty ? " and " : " or ";
-        }
-        if (mobile != null) {
-            q += " c.mobile = :mobile ";
-        }
-        if (snils != null) {
-            q += mobile == null ? "c.san = :snils " : " or c.san = :snils ";
-        }
-        Query query = session.createQuery(q);
-        query.setParameter("idOfClientGroup", idOfClientGroup);
+        disjunction.add(conjunction);
 
-        if (firstName != null) {
-            query.setParameter("firstName", StringUtils.upperCase(firstName));
-        }
-        if (lastName != null) {
-            query.setParameter("lastName", StringUtils.upperCase(lastName));
-        }
-        if (patronymic != null) {
-            query.setParameter("patronymic", StringUtils.upperCase(patronymic));
-        }
         if (mobile != null) {
-            query.setParameter("mobile", mobile);
+            disjunction.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobile), MatchMode.ANYWHERE));
         }
         if (snils != null) {
-            query.setParameter("snils", snils);
+            disjunction.add(Restrictions.ilike("san", snils, MatchMode.EXACT));
         }
-        return query.list();
+        criteria.add(disjunction);
+        return (List<Client>) criteria.list();
     }
 
     public static void validateFio(String surname, String firstName, String secondName) throws Exception {
@@ -2692,11 +2701,9 @@ public class ClientManager {
         if (Pattern.compile(latin).matcher(fio).matches() && Pattern.compile(cyrillic).matcher(fio).matches()) {
             throw new Exception("Только русские или только английские буквы");
         }
-
         if (surname.endsWith("-") || firstName.endsWith("-") || secondName.endsWith("-")) {
             throw new Exception("Знак \"-\" не может быть последним символом элемента.");
         }
-
         if (fio.contains(" -") || fio.contains("- ") || fio.contains("--")) {
             throw new Exception("Знаки \"-\" не могут идти подряд или через пробел.");
         }

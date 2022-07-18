@@ -250,6 +250,15 @@ public class Client {
         return isSomeGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
     }
 
+    public boolean isActiveAdultGroup() {
+        return (this.getIdOfClientGroup().intValue() > ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue().intValue()
+                && isActiveGroup());
+    }
+
+    public boolean isActiveGroup() {
+        return this.getIdOfClientGroup().intValue() < ClientGroup.Predefined.CLIENT_VISITORS.getValue().intValue();
+    }
+
     public boolean isEmployee() {
         return isSomeGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
     }

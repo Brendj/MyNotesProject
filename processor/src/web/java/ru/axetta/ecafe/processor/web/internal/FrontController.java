@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import org.opensaml.xml.signature.G;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -2571,7 +2572,7 @@ public class FrontController extends HttpServlet {
 
             //
             ClientGuardian clientGuardian = ClientManager
-                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
+                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null, false,
                             clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
             clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
@@ -2705,8 +2706,8 @@ public class FrontController extends HttpServlet {
                 clientGuardianHistory.setWebAdress(req.getRemoteAddr());
                 //
                 ClientGuardian clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
-                                clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
+                        .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null,
+                                false, clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
 
                 clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);
@@ -2718,7 +2719,7 @@ public class FrontController extends HttpServlet {
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
                 ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
-                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
+                        MigrantInitiatorEnum.INITIATOR_ORG, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }
@@ -2804,16 +2805,17 @@ public class FrontController extends HttpServlet {
                         DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
-            idOfDocument = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
+                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+            }
+            idOfDocument = meshDocumentResponse.getId();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in createDocumentForClient", e);
-            if (e instanceof MeshDocumentSaveException) {
-                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
-                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
-            } else if (e instanceof DocumentExistsException) {
+            if (e instanceof DocumentExistsException) {
                 return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
             } else {
                 return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
@@ -2848,23 +2850,18 @@ public class FrontController extends HttpServlet {
                         DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
-            if (dulDetail.getId() == null)
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
+                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+            }
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in updateDocumentForClient", e);
-            if (e instanceof MeshDocumentSaveException) {
-                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
-                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
-            } else {
-                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
-            }
+            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                    DocumentResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2894,19 +2891,17 @@ public class FrontController extends HttpServlet {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
+                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+            }
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in deleteDocumentForClient", e);
-            if (e instanceof MeshDocumentSaveException) {
-                return new DocumentResponse(DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE,
-                        DocumentResponse.ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE);
-            } else {
-                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
-            }
+            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
+                    DocumentResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2920,8 +2915,6 @@ public class FrontController extends HttpServlet {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        DocumentResponse documentResponse;
-
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -2938,27 +2931,28 @@ public class FrontController extends HttpServlet {
             if (client.getDulDetail() != null) {
                 dulDetails = client.getDulDetail().stream().filter(d -> !d.getDeleteState()).collect(Collectors.toList());
             }
-            if (client.getDulDetail() == null || dulDetails.isEmpty()) {
-                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
-                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+
+            DocumentResponse documentResponse = new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+            if (client.getDulDetail() != null || !dulDetails.isEmpty()) {
+                List<DocumentItem> documentItems = new ArrayList<>();
+                dulDetails.forEach(dulDetail -> {
+                    DocumentItem documentItem = new DocumentItem();
+                    documentItem.setIdDocument(dulDetail.getId());
+                    documentItem.setDocumentTypeId(dulDetail.getDocumentTypeId());
+                    documentItem.setSeries(dulDetail.getSeries());
+                    documentItem.setNumber(dulDetail.getNumber());
+                    documentItem.setSubdivisionCode(dulDetail.getSubdivisionCode());
+                    documentItem.setIssuer(dulDetail.getIssuer());
+                    documentItem.setIssued(dulDetail.getIssued());
+                    documentItem.setExpiration(dulDetail.getExpiration());
+                    documentItems.add(documentItem);
+                });
+                documentResponse = new DocumentResponse(documentItems);
             }
-            List<DocumentItem> documentItems = new ArrayList<>();
-            dulDetails.forEach(dulDetail -> {
-                DocumentItem documentItem = new DocumentItem();
-                documentItem.setIdDocument(dulDetail.getId());
-                documentItem.setDocumentTypeId(dulDetail.getDocumentTypeId());
-                documentItem.setSeries(dulDetail.getSeries());
-                documentItem.setNumber(dulDetail.getNumber());
-                documentItem.setSubdivisionCode(dulDetail.getSubdivisionCode());
-                documentItem.setIssuer(dulDetail.getIssuer());
-                documentItem.setIssued(dulDetail.getIssued());
-                documentItem.setExpiration(dulDetail.getExpiration());
-                documentItems.add(documentItem);
-            });
-            documentResponse = new DocumentResponse(documentItems);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
+            return documentResponse;
         } catch (Exception e) {
             logger.error("Error in getDocumentForClient", e);
             return new DocumentResponse(DocumentResponse.ERROR_INTERNAL, DocumentResponse.ERROR_INTERNAL_MESSAGE);
@@ -2966,11 +2960,10 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return documentResponse;
     }
 
     @WebMethod(operationName = "searchMeshPerson")
-    public PersonListResponse searchMeshPerson(
+    public GuardianResponse searchMeshPerson(
             @WebParam(name = "firstname") String firstName,
             @WebParam(name = "patronymic") String patronymic,
             @WebParam(name = "lastname") String lastName,
@@ -2985,7 +2978,10 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents);
+            if (checkSearchMeshPerson(firstName, lastName, genderId, birthDate, snils, documents)) {
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
             List<DulDetail> dulDetails = new ArrayList<>();
             if (documents != null)
                 for (DocumentItem item : documents) {
@@ -2993,6 +2989,11 @@ public class FrontController extends HttpServlet {
                 }
             PersonListResponse personListResponse = getMeshGuardiansService()
                     .searchPerson(firstName, patronymic, lastName, genderId, birthDate, snils, mobile, email, dulDetails);
+
+            if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE)) {
+                return new GuardianResponse(personListResponse.getCode(), personListResponse.getMessage());
+            }
+            GuardianResponse guardianResponse = new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
             if (personListResponse.getResponse() != null && !personListResponse.getResponse().isEmpty()) {
                 List<String> meshGuidList = personListResponse.getResponse()
                         .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
@@ -3001,58 +3002,70 @@ public class FrontController extends HttpServlet {
                         + "where meshGuid in :meshGuidList");
                 query.setParameter("meshGuidList", meshGuidList);
                 List<String> list = query.list();
-
                 personListResponse.getResponse().forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
+                guardianResponse.setPersonsList(fillingGuardianResponse(personListResponse));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
-            return personListResponse;
+            return guardianResponse;
         } catch (Exception e) {
             logger.error("Error in searchMeshPerson", e);
-            return new PersonListResponse(PersonResponse.INTERNAL_ERROR_CODE, PersonResponse.INTERNAL_ERROR_MESSAGE);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
     }
 
-    private void checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
-                                       Date birthDate, String snils, List<DocumentItem> documents) throws FrontControllerException {
-        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || (snils == null && (documents == null || documents.isEmpty())))
-            throw new FrontControllerException("Не заполнены обязательные параметры");
+    private boolean checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
+                                          Date birthDate, String snils, List<DocumentItem> documents) {
+        return StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+                || birthDate == null || (snils == null && (documents == null || documents.isEmpty()));
     }
 
     @WebMethod(operationName = "createMeshPerson")
-    public PersonResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
-                                           @WebParam(name = "firstname") String firstName,
-                                           @WebParam(name = "patronymic") String patronymic,
-                                           @WebParam(name = "lastname") String lastName,
-                                           @WebParam(name = "genderId") Integer genderId,
-                                           @WebParam(name = "birthDate") Date birthDate,
-                                           @WebParam(name = "snils") String snils,
-                                           @WebParam(name = "mobile") String mobile,
-                                           @WebParam(name = "email") String email,
-                                           @WebParam(name = "childMeshGuid") String childMeshGuid,
-                                           @WebParam(name = "documents") List<DocumentItem> documents,
-                                           @WebParam(name = "agentTypeId") Integer agentTypeId,
-                                           @WebParam(name = "relation") Integer relation,
-                                           @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
-                                           @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
-        checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
-                relation, typeOfLegalRepresent, informing);
-        List<DulDetail> dulDetails = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(documents)) {
-            for (DocumentItem item : documents) {
-                dulDetails.add(getDulDetailFromDocumentItem(item));
+    public GuardianMeshGuidResponse createMeshPerson(@WebParam(name = "idOfOrg") Long idOfOrg,
+                                                     @WebParam(name = "firstname") String firstName,
+                                                     @WebParam(name = "patronymic") String patronymic,
+                                                     @WebParam(name = "lastname") String lastName,
+                                                     @WebParam(name = "genderId") Integer genderId,
+                                                     @WebParam(name = "birthDate") Date birthDate,
+                                                     @WebParam(name = "snils") String snils,
+                                                     @WebParam(name = "mobile") String mobile,
+                                                     @WebParam(name = "email") String email,
+                                                     @WebParam(name = "childMeshGuid") String childMeshGuid,
+                                                     @WebParam(name = "documents") List<DocumentItem> documents,
+                                                     @WebParam(name = "agentTypeId") Integer agentTypeId,
+                                                     @WebParam(name = "relation") Integer relation,
+                                                     @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
+                                                     @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
+        try {
+            if (checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
+                    relation, typeOfLegalRepresent, informing)) {
+                return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+            List<DulDetail> dulDetails = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(documents)) {
+                for (DocumentItem item : documents) {
+                    dulDetails.add(getDulDetailFromDocumentItem(item));
+                }
+            }
+            if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
+                return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
+            }
+            MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
+
+            if (!personResponse.getCode().equals(GuardianResponse.OK)) {
+                logger.error(personResponse.getMessage());
+                return new GuardianMeshGuidResponse(personResponse.getCode(), personResponse.getMessage());
+            }
+            return new GuardianMeshGuidResponse(personResponse.getAgentPersonId());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new GuardianMeshGuidResponse(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
         }
-        if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
-            throw new FrontController.FrontControllerException("Указанный снилс уже существует в системе");
-        }
-        return getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
     }
 
     @WebMethod(operationName = "getGuardians")
@@ -3062,28 +3075,24 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "patronymic") String patronymic,
             @WebParam(name = "mobile") String mobile,
             @WebParam(name = "snils") String snils) {
-
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         GuardianResponse guardianResponse;
-
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (lastName == null && snils == null && mobile == null)
+            if (lastName == null && snils == null && mobile == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
-
+            }
             List<Client> clients = ClientManager
                     .findGuardianByNameOrMobileOrSun(persistenceSession, firstName, lastName, patronymic, mobile, snils);
-
-            if (clients.isEmpty())
+            if (clients.isEmpty()) {
                 return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
                         GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
-
+            }
             guardianResponse = new GuardianResponse(clients);
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
@@ -3113,7 +3122,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || snils == null || genderId == null)
+            if (idOfClient == null || lastName == null || firstName == null || birthDate == null || genderId == null)
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
 
@@ -3132,8 +3141,7 @@ public class FrontController extends HttpServlet {
             if (client.getMeshGUID() != null) {
                 PersonResponse personResponse = getMeshGuardiansService()
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
-                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
-                    logger.error(personResponse.getMessage());
+                if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                     return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
                 }
             }
@@ -3194,8 +3202,7 @@ public class FrontController extends HttpServlet {
                     ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
                     ClientGuardianRoleType.fromInteger(agentTypeId), informing);
 
-            PersonResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
-
+            MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
                 return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
@@ -3249,13 +3256,11 @@ public class FrontController extends HttpServlet {
             ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
                     newGuardiansVersions, clientGuardianHistory);
 
-            PersonResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
+            MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
 
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                logger.error(String.format("Error in deleteGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
                 return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
             }
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
@@ -3269,13 +3274,32 @@ public class FrontController extends HttpServlet {
         return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
     }
 
-    private void checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
-                                                 Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
-                                                 Integer relation, Integer typeOfLegalRepresent, Boolean informing) throws FrontControllerException {
-        if (idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
+    private boolean checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
+                                                    Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
+                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing) throws FrontControllerException {
+        return idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
                 || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
-                || relation == null || typeOfLegalRepresent == null || informing == null)
-            throw new FrontControllerException("Не заполнены обязательные параметры");
+                || relation == null || typeOfLegalRepresent == null || informing == null;
+    }
+
+    private List<GuardianItem> fillingGuardianResponse(PersonListResponse personListResponse) {
+        return personListResponse.getResponse().stream().map(r -> {
+            GuardianItem guardianItem = new GuardianItem();
+            guardianItem.setMeshGuid(r.getMeshGuid());
+            guardianItem.setLastName(r.getSurname());
+            guardianItem.setFirstName(r.getFirstName());
+            guardianItem.setPatronymic(r.getSecondName());
+            guardianItem.setGender(r.getIsppGender());
+            guardianItem.setBirthDate(r.getBirthDate());
+            guardianItem.setSnils(r.getSnils());
+            guardianItem.setMobile(r.getMobile());
+            guardianItem.setEmail(r.getEmail());
+            guardianItem.setDegree(r.getDegree());
+            guardianItem.setValidationStateId(r.getValidationStateId());
+            guardianItem.setAlreadyInISPP(r.getAlreadyInISPP());
+            guardianItem.setDocument(r.getDocument());
+            return guardianItem;
+        }).collect(Collectors.toList());
     }
 
     private DulDetail getDulDetailFromDocumentItem(DocumentItem item) {

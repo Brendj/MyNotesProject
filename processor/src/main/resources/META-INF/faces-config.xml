@@ -371,4 +371,16 @@
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateTimeConverter</converter-class>
     </converter>
 
+    <converter>
+        <description>Gender Type Converter</description>
+        <converter-id>genderTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.GenderTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Dul Type Converter</description>
+        <converter-id>dulTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DulTypeConverter</converter-class>
+    </converter>
+
 </faces-config>

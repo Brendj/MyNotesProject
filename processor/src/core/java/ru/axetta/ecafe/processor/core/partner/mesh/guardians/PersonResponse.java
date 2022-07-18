@@ -1,7 +1,7 @@
 package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 public class PersonResponse extends MeshGuardianResponse {
-    private String meshGuid;
+    private MeshGuardianPerson response;
 
     public PersonResponse() {
 
@@ -11,8 +11,8 @@ public class PersonResponse extends MeshGuardianResponse {
         super(code, message);
     }
 
-    public PersonResponse(String meshGuid) {
-        this.meshGuid = meshGuid;
+    public PersonResponse(MeshGuardianPerson response) {
+        this.response = response;
     }
 
     public PersonResponse okResponse() {
@@ -33,11 +33,11 @@ public class PersonResponse extends MeshGuardianResponse {
         return this;
     }
 
-    public String getMeshGuid() {
-        return meshGuid;
+    public MeshGuardianPerson getResponse() {
+        return response;
     }
 
-    public void setMeshGuid(String meshGuid) {
-        this.meshGuid = meshGuid;
+    public void setResponse(MeshGuardianPerson response) {
+        this.response = response;
     }
 }

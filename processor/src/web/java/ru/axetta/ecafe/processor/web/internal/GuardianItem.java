@@ -1,8 +1,10 @@
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 public class GuardianItem {
@@ -18,6 +20,14 @@ public class GuardianItem {
     private Long idOfClientGroup;
     private String groupName;
     private String meshGuid;
+    private Integer gender;
+    private Date birthDate;
+    private String email;
+    private Integer degree;
+    private Integer validationStateId;
+    private Boolean alreadyInISPP;
+
+    private List<MeshDocumentResponse> document;
 
     public GuardianItem() {
     }
@@ -108,5 +118,61 @@ public class GuardianItem {
 
     public void setMeshGuid(String meshGuid) {
         this.meshGuid = meshGuid;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getDegree() {
+        return degree;
+    }
+
+    public void setDegree(Integer degree) {
+        this.degree = degree;
+    }
+
+    public Integer getValidationStateId() {
+        return validationStateId;
+    }
+
+    public void setValidationStateId(Integer validationStateId) {
+        this.validationStateId = validationStateId;
+    }
+
+    public Boolean getAlreadyInISPP() {
+        return alreadyInISPP;
+    }
+
+    public void setAlreadyInISPP(Boolean alreadyInISPP) {
+        this.alreadyInISPP = alreadyInISPP;
+    }
+
+    public List<MeshDocumentResponse> getDocument() {
+        return document;
+    }
+
+    public void setDocument(List<MeshDocumentResponse> document) {
+        this.document = document;
     }
 }

@@ -44,6 +44,10 @@ public class DulSelectPage extends BasicPage {
             }
         } else this.dulGuideList = allDulGuides;
     }
+    public void cancelDulSelection() {
+        completeHandlers.clear();
+        this.dulGuide = null;
+    }
 
     public DulGuide getDulGuide() {
         return dulGuide;

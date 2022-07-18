@@ -18,11 +18,13 @@ public class DulDetail {
     private Date lastUpdate;
     private Boolean deleteState;
     private DulGuide dulGuide;
+    private Boolean isNew;
 
     public DulDetail(Long idOfClient, Long documentTypeId, DulGuide dulGuide) {
         this.idOfClient = idOfClient;
         this.documentTypeId = documentTypeId;
         this.dulGuide = dulGuide;
+        this.isNew = true;
     }
 
     public DulDetail(Long documentTypeId, DulGuide dulGuide) {
@@ -163,5 +165,13 @@ public class DulDetail {
 
     public void setIdMkDocument(Long idMkDocument) {
         this.idMkDocument = idMkDocument;
+    }
+
+    public Boolean getNew() {
+        return isNew;
+    }
+
+    public void setNew(Boolean aNew) {
+        isNew = aNew;
     }
 }
