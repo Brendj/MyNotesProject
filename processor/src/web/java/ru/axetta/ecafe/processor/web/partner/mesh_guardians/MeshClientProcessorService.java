@@ -273,8 +273,9 @@ public class MeshClientProcessorService {
                 ClientGuardian clientGuardian = DAOUtils
                         .findClientGuardian(session, c.getIdOfClient(), guardian.getIdOfClient());
                 if (clientGuardian == null) {
-                    ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false,
-                                    c.getIdOfClient(), ClientCreatedFromType.DEFAULT, ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
+                    ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null,
+                            ClientGuardianRoleType.GUARDIAN, false, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
+                            ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
                 } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                     boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
                     Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
