@@ -93,6 +93,12 @@
                             <h:outputText escape="true" value="Отчество" styleClass="output-text" />
                             <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.secondName}"
                                          maxlength="128" styleClass="input-text" />
+                            <h:outputText escape="true" value="Снилс" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.san}"
+                                         maxlength="128" styleClass="input-text" />
+                            <h:outputText escape="true" value="Номер мобильного" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.mobileNumber}"
+                                         maxlength="128" styleClass="input-text" />
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"

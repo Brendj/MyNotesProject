@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MeshDocumentResponse extends MeshGuardianResponse {
+
+    private String documentName;
     private int documentTypeId;
     private String series;
     private String number;
@@ -50,6 +52,8 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
             this.lastUpdate = df2.parse(personDocument.getUpdatedAt());
         if (personDocument.getValidationStateId() != null)
             this.validationStateId = personDocument.getValidationStateId();
+        if (personDocument.getDocumentType() != null)
+            this.documentName = personDocument.getDocumentType().getName();
     }
 
     public MeshDocumentResponse okResponse() {
@@ -73,6 +77,7 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
         dulDetail.setIssuer(this.getIssuer());
         dulDetail.setIssued(this.getIssued());
         dulDetail.setExpiration(this.getExpiration());
+        dulDetail.setIdMkDocument(this.getId());
         return dulDetail;
     }
 
@@ -82,6 +87,14 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
         this.setMessage(OK_MESSAGE);
         return this;
     }*/
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
 
     public int getDocumentTypeId() {
         return documentTypeId;

@@ -506,6 +506,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
     private final DulSelectPage dulSelectPage = new DulSelectPage();
     private final DulViewPage dulViewPage = new DulViewPage();
+    private final MeshClientSelectPage meshClientSelectPage = new MeshClientSelectPage();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3660,59 +3661,6 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object addGuardianToClient() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-            clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-            Client client = clientCreatePage.addGuardianToClient(clientGuardianHistory, persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, String.format("Связь обучающегося с представителем (Идентификатор %d Номер лицевого счета %d) успешно создана",
-                            client.getIdOfClient(), client.getContractId()), null));
-        } catch (Exception e) {
-            logger.error("Failed to add guardian to client", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка создания связи обучающегося с представителем: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object searchMeshPerson() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            clientCreatePage.searchMeshPerson(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to search mesh client", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка поиска клиента МК: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return null;
-    }
-
     public Object createClientByCardOperator() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -3950,7 +3898,7 @@ public class MainPage implements Serializable {
 
     public Object showDulSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
+//        if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
@@ -3962,8 +3910,10 @@ public class MainPage implements Serializable {
                 dulSelectPage.fill(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                modalPages.push(dulSelectPage);
-                dulSelectPage.pushCompleteHandler((DulSelectPage.CompleteHandler) currentTopMostPage);
+                if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
+                    dulSelectPage.pushCompleteHandler((DulSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(dulSelectPage);
+                }
             } catch (Exception e) {
                 logger.error("Failed to fill dul selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -3973,7 +3923,7 @@ public class MainPage implements Serializable {
                 HibernateUtils.close(persistenceSession, logger);
 
             }
-        }
+//        }
         return null;
     }
 
@@ -4100,9 +4050,52 @@ public class MainPage implements Serializable {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-
-
             }
+        }
+        return null;
+    }
+
+    public Object showMeshClientSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof MeshClientSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                meshClientSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                meshClientSelectPage.pushCompleteHandler((MeshClientSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(meshClientSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill mesh client selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора клиента МК: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object cancelMeshClientSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            meshClientSelectPage.cancelDulSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == meshClientSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete mesh client selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента МК: " + e.getMessage(), null));
         }
         return null;
     }
@@ -4263,6 +4256,57 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateMeshClientSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            meshClientSelectPage.searchMeshPerson(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill mesh client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object completeMeshClientSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            meshClientSelectPage.completeMeshClientSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == meshClientSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete mesh client selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
     public Object completeClientSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -4287,8 +4331,6 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }
@@ -11450,5 +11492,9 @@ public class MainPage implements Serializable {
 
     public DulViewPage getDulViewPage() {
         return dulViewPage;
+    }
+
+    public MeshClientSelectPage getMeshClientSelectPage() {
+        return meshClientSelectPage;
     }
 }

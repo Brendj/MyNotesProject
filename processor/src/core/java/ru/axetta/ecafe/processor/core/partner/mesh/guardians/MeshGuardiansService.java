@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @DependsOn("runtimeContext")
 @Component("meshGuardiansService")
@@ -97,20 +98,20 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     public MeshAgentResponse createPersonWithEducation(Long idOfOrg,
-                                                    String firstName,
-                                                    String patronymic,
-                                                    String lastName,
-                                                    Integer genderId,
-                                                    Date birthDate,
-                                                    String snils,
-                                                    String mobile,
-                                                    String email,
-                                                    String childMeshGuid,
-                                                    List<DulDetail> dulDetails,
-                                                    Integer agentTypeId,
-                                                    Integer relation,
-                                                    Integer typeOfLegalRepresent,
-                                                    Boolean informing) {
+                                                       String firstName,
+                                                       String patronymic,
+                                                       String lastName,
+                                                       Integer genderId,
+                                                       Date birthDate,
+                                                       String snils,
+                                                       String mobile,
+                                                       String email,
+                                                       String childMeshGuid,
+                                                       List<DulDetail> dulDetails,
+                                                       Integer agentTypeId,
+                                                       Integer relation,
+                                                       Integer typeOfLegalRepresent,
+                                                       Boolean informing) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
@@ -150,8 +151,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             String json = objectMapper.writeValueAsString(request);
             MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangePersonUrl(id.longValue()), json);
             if (result.getCode() == HttpStatus.SC_OK) {
-                ResponsePersons response = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
-                return new PersonResponse().okResponse();
+                ResponsePersons responsePersons = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
+                return new PersonResponse(getMeshGuardianConverter().toDTO(responsePersons)).okResponse();
             } else if (result.getCode() >= 500) {
                 return new PersonResponse().internalErrorResponse("" + result.getCode());
             } else {
@@ -235,13 +236,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         guardian.setBirthDate(guardianPerson.getBirthDate());
         session.update(guardian);
 
-        List<DulDetail> dulDetails = new ArrayList<>();
-        if (!guardianPerson.getDocument().isEmpty()) {
-            for (MeshDocumentResponse document : guardianPerson.getDocument()) {
-                dulDetails.add(document.getDulDetail());
-            }
-            RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                    .validateAndSaveDulDetails(session, dulDetails, guardian.getIdOfClient());
+        if (guardianPerson.getDocument() != null && !guardianPerson.getDocument().isEmpty()) {
+            List<DulDetail> dulDetails = guardianPerson.getDocument()
+                    .stream().map(MeshDocumentResponse::getDulDetail).collect(Collectors.toList());
+
+            RuntimeContext.getAppContext().getBean(DulDetailService.class).saveDulFromMk(session, dulDetails, guardian.getIdOfClient());
         }
 
         return guardian;
@@ -423,6 +422,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return String.format(DOCUMENT_DELETE_URL, meshGuid, id);
     }
 
+    private String buildChangeAgentUrl(String meshGuid, Integer id) {
+        return String.format(PERSONS_DELETE_URL, meshGuid, id);
+    }
+
     private ResponsePersons buildResponsePerson(String personId,
                                                 String firstName,
                                                 String patronymic,
@@ -554,8 +557,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toPersonDTO(errorResponse);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in searchPersonByMeshGuid: ", e);
             return new PersonResponse().internalErrorResponse();
         }
@@ -576,7 +578,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
                 return getMeshGuardianConverter().toIdListDTO(errorResponse);
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in searchIdByMeshGuid: ", e);
             return new IdListResponse().internalErrorResponse();
         }
@@ -609,12 +611,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
+    public MeshAgentResponse deleteGuardianToClient(String agentMeshGuid, String childMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             IdListResponse agentListResponse = searchIdByMeshGuid(childMeshGuid);
             if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE))
-                return new PersonResponse(agentListResponse.getCode(), agentListResponse.message);
+                return new MeshAgentResponse(agentListResponse.getCode(), agentListResponse.message);
             Integer id = 0;
             for (AgentIdResponse agentResponse : agentListResponse.getAgentResponse()) {
                 if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
@@ -623,19 +625,53 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             MeshResponseWithStatusCode result = meshRestClient
                     .executeDeleteMethod(buildDeleteGuardianToClientUrl(childMeshGuid, id.toString()));
             if (result.getCode() == HttpStatus.SC_OK) {
-                return new PersonResponse().okResponse();
+                return new MeshAgentResponse().okResponse();
             } else if (result.getCode() >= 500) {
-                return new PersonResponse().internalErrorResponse("" + result.getCode());
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
             } else {
-                return getPersonResponse(objectMapper, result);
+                return getMeshAgentResponse(objectMapper, result);
             }
 
         } catch (ConnectTimeoutException te) {
             logger.error("Connection timeout in deleteGuardianToClient: ", te);
-            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in deleteGuardianToClient: ", e);
-            return new PersonResponse().internalErrorResponse();
+            return new MeshAgentResponse().internalErrorResponse();
+        }
+    }
+
+    public MeshAgentResponse changeGuardianToClient(String agentMeshGuid, String childMeshGuid, Integer agentTypeId) {
+        try {
+            IdListResponse agentListResponse = searchIdByMeshGuid(childMeshGuid);
+            if (!agentListResponse.getCode().equals(PersonListResponse.OK_CODE)) {
+                return new MeshAgentResponse(agentListResponse.getCode(), agentListResponse.message);
+            }
+            Integer id = 0;
+            for (AgentIdResponse agentResponse : agentListResponse.getAgentResponse()) {
+                if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
+                    id = agentResponse.getAgentId();
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            PersonAgent personAgent = new PersonAgent();
+            personAgent.setAgentTypeId(agentTypeId);
+            personAgent.setId(id);
+            personAgent.setPersonId(childMeshGuid);
+            String json = objectMapper.writeValueAsString(personAgent);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangeAgentUrl(childMeshGuid, id), json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                return new MeshAgentResponse().okResponse();
+            } else if (result.getCode() >= 500) {
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
+            } else {
+                return getMeshAgentResponse(objectMapper, result);
+            }
+        } catch (ConnectTimeoutException te) {
+            logger.error("Connection timeout in changeGuardianToClient: ", te);
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
+        } catch (Exception e) {
+            logger.error("Error in changeGuardianToClient: ", e);
+            return new MeshAgentResponse().internalErrorResponse();
         }
     }
 
