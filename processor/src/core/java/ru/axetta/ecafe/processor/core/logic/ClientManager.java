@@ -2669,6 +2669,7 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.createAlias("person","p", JoinType.INNER_JOIN);
         criteria.add(Restrictions.gt("idOfClientGroup", 1000000000L));
+        criteria.add(Restrictions.eq("dontShowToExternal", false));
         criteria.add(Restrictions.isNotNull("meshGUID"));
         Conjunction conjunction = Restrictions.conjunction();
         Disjunction disjunction = Restrictions.disjunction();
