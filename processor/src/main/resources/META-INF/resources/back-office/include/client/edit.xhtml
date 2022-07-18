@@ -213,11 +213,11 @@
                             var="dul"
                             columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
                             footerClass="data-table-footer-center">
-                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Название документа"/>
                     </f:facet>
-                        <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+                    <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
@@ -231,7 +231,7 @@
                     <f:facet name="header">
                         <h:outputText escape="true" value="Номер"/>
                     </f:facet>
-                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text" />
+                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
@@ -407,12 +407,18 @@
                     </a4j:commandLink>
                 </rich:column>
                 <f:facet name="footer">
-                    <a4j:commandButton value="Добавить" action="#{mainPage.showClientSelectPage}"
-                                       render="modalClientSelectorPanel"
+                    <a4j:commandButton value="Добавить представителя" action="#{mainPage.showClientSelectPage}"
+                                       render="modalClientSelectorPanel" style="margin-right: 2px;"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                        styleClass="command-link">
                         <f:setPropertyActionListener value="guardian"
                                                      target="#{mainPage.clientEditPage.typeAddClient}"/>
+                    </a4j:commandButton>
+                    <a4j:commandButton value="Добавить представителя МК"
+                                       action="#{mainPage.showMeshClientSelectPage}"
+                                       render="modalMeshClientSelectorPanel" style="margin-left: 2px;"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.show();"
+                                       styleClass="command-link">
                     </a4j:commandButton>
                 </f:facet>
             </rich:dataTable>
@@ -471,9 +477,9 @@
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                         <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
-                        <h:selectOneMenu value="#{clientWard.relation}"  styleClass="input-text">
+                        <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
                             <f:selectItems value="#{mainPage.clientEditPage.relations}"
-                                           />
+                            />
                         </h:selectOneMenu>
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid"
@@ -482,7 +488,7 @@
                         <h:selectOneMenu value="#{clientWard.role}"
                                          styleClass="input-text">
                             <f:selectItems value="#{mainPage.clientEditPage.roles}"
-                                           />
+                            />
                         </h:selectOneMenu>
                     </h:panelGrid>
                 </rich:column>

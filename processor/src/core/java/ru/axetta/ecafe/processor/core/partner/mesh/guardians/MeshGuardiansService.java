@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @DependsOn("runtimeContext")
 @Component("meshGuardiansService")
@@ -235,13 +236,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         guardian.setBirthDate(guardianPerson.getBirthDate());
         session.update(guardian);
 
-        List<DulDetail> dulDetails = new ArrayList<>();
-        if (!guardianPerson.getDocument().isEmpty()) {
-            for (MeshDocumentResponse document : guardianPerson.getDocument()) {
-                dulDetails.add(document.getDulDetail());
-            }
-            RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                    .validateAndSaveDulDetails(session, dulDetails, guardian.getIdOfClient());
+        if (guardianPerson.getDocument() != null && !guardianPerson.getDocument().isEmpty()) {
+            List<DulDetail> dulDetails = guardianPerson.getDocument()
+                    .stream().map(MeshDocumentResponse::getDulDetail).collect(Collectors.toList());
+
+            RuntimeContext.getAppContext().getBean(DulDetailService.class).saveDulFromMk(session, dulDetails, guardian.getIdOfClient());
         }
 
         return guardian;

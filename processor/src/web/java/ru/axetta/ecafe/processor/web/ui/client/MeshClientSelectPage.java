@@ -10,14 +10,22 @@ import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansServic
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
+import ru.axetta.ecafe.processor.core.persistence.DulGuide;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
 
+import javax.persistence.Query;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MeshClientSelectPage extends BasicPage {
+public class MeshClientSelectPage extends BasicPage implements DulSelectPage.CompleteHandler{
+
+    @Override
+    public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
+        this.dulDetail.add(new DulDetail(dulGuide.getDocumentTypeId(), dulGuide));
+    }
 
     public interface CompleteHandler {
         void completeMeshClientSelection(Session session, MeshGuardianPerson meshGuardianPerson) throws Exception;
@@ -31,106 +39,55 @@ public class MeshClientSelectPage extends BasicPage {
     private String san;
     private String mobileNumber;
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
-    private List<MeshGuardianPerson> meshGuardianPersonList = new ArrayList<>();
+    private List<MeshGuardianPerson> meshGuardianPersonList;
     private List<DulDetail> dulDetail = new ArrayList<>();
     private Boolean disableCreatePersonKey = true;
-    private Boolean disableLinkPersonKey = true;
     private MeshGuardianPerson meshGuardianPerson;
 
     public void searchMeshPerson(Session session) throws Exception {
-//        if ((this.san == null || this.san.isEmpty()) && (this.dulDetail == null || this.dulDetail.isEmpty())) {
-//            throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
-//        }
-//        if (StringUtils.isEmpty(this.surname) || StringUtils.isEmpty(this.firstName)) {
-//            throw new Exception("Укажите фамилия и имя обслуживаемого лица");
-//        }
-//        if (birthDate == null) {
-//            throw new Exception("Не заполнено поле \"Дата рождения\"");
-//        }
-//        if (this.san != null && !this.san.isEmpty()) {
-//            this.san = this.san.replaceAll("[\\D]", "");
-//            ClientManager.validateSan(session, this.san, null);
-//        }
-//        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null);
-//        ClientManager.validateFio(this.surname, this.firstName, this.secondName);
-//        this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
-//
-//        PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(getFirstName(),
-//                getSecondName(), getSurname(), this.gender, this.birthDate,
-//                this.san, this.mobileNumber, null, this.dulDetail);
-//        if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
-//            throw new Exception(personListResponse.getMessage());
+        if ((this.san == null || this.san.isEmpty()) && (this.dulDetail == null || this.dulDetail.isEmpty())) {
+            throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
+        }
+        if (StringUtils.isEmpty(this.surname) || StringUtils.isEmpty(this.firstName)) {
+            throw new Exception("Укажите фамилия и имя обслуживаемого лица");
+        }
+        if (birthDate == null) {
+            throw new Exception("Не заполнено поле \"Дата рождения\"");
+        }
+        if (this.san != null && !this.san.isEmpty()) {
+            this.san = this.san.replaceAll("[\\D]", "");
+            ClientManager.validateSan(session, this.san, null);
+        }
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null);
+        ClientManager.validateFio(this.surname, this.firstName, this.secondName);
+        this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
 
-        PersonListResponse personListResponse = new PersonListResponse();
-        personListResponse.setResponse(new ArrayList<>());
+        this.dulDetail = this.dulDetail.stream()
+                .filter(d -> d.getDeleteState() == null || !d.getDeleteState()).collect(Collectors.toList());
 
-        MeshGuardianPerson meshGuardianPerson1 = new MeshGuardianPerson();
-        MeshDocumentResponse meshDocumentResponse1 = new MeshDocumentResponse();
-        meshDocumentResponse1.setSeries("323232");
-        meshDocumentResponse1.setDocumentTypeId(15);
-        meshDocumentResponse1.setExpiration(new Date());
-        meshDocumentResponse1.setIssued(new Date());
-        meshDocumentResponse1.setIssuer("dsdsdsdsd");
-        meshDocumentResponse1.setSubdivisionCode("1L");
-        meshDocumentResponse1.setNumber("111111");
-        meshDocumentResponse1.setValidationStateId(1);
-
-        MeshDocumentResponse meshDocumentResponse2 = new MeshDocumentResponse();
-        meshDocumentResponse2.setSeries("323232");
-        meshDocumentResponse2.setDocumentTypeId(18);
-        meshDocumentResponse2.setExpiration(new Date());
-        meshDocumentResponse2.setIssued(new Date());
-        meshDocumentResponse2.setIssuer("dsdsdsdsd");
-        meshDocumentResponse2.setSubdivisionCode("1L");
-        meshDocumentResponse2.setNumber("111111");
-        meshDocumentResponse2.setValidationStateId(0);
-
-        meshGuardianPerson1.setDocument(Arrays.asList(meshDocumentResponse1, meshDocumentResponse2));
-
-        meshGuardianPerson1.setFirstName("Даниил");
-        meshGuardianPerson1.setSurname("Сагитов");
-        meshGuardianPerson1.setSecondName("Петрович");
-        meshGuardianPerson1.setSnils("2342351345");
-        meshGuardianPerson1.setMeshGender(1);
-        meshGuardianPerson1.setBirthDate(new Date());
-        meshGuardianPerson1.setDegree(78);
-        meshGuardianPerson1.setValidationStateId(1);
-        meshGuardianPerson1.setMobile("9033434567");
-        meshGuardianPerson1.setMeshGuid("6d9fe8d4-e3a2-4185-9d42-167bad51feca");
-
-
-        MeshGuardianPerson meshGuardianPerson2 = new MeshGuardianPerson();
-
-        meshGuardianPerson2.setFirstName("Антон");
-        meshGuardianPerson2.setSurname("Максимов");
-        meshGuardianPerson2.setSecondName("Денисович");
-        meshGuardianPerson2.setSnils("111110000000");
-        meshGuardianPerson2.setMeshGender(2);
-        meshGuardianPerson2.setBirthDate(new Date());
-        meshGuardianPerson2.setDegree(88);
-
-        personListResponse.getResponse().add(meshGuardianPerson1);
-        personListResponse.getResponse().add(meshGuardianPerson2);
+        PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(getFirstName(),
+                getSecondName(), getSurname(), this.gender, this.birthDate,
+                this.san, this.mobileNumber, null, this.dulDetail);
+        if (!personListResponse.getCode().equals(PersonListResponse.OK_CODE))
+            throw new Exception(personListResponse.getMessage());
 
         this.meshGuardianPersonList = personListResponse.getResponse()
                 .stream().filter(m -> m.getDegree() > 71).collect(Collectors.toList());
 
         if (!this.meshGuardianPersonList.isEmpty()) {
-            this.disableLinkPersonKey = false;
             this.disableCreatePersonKey = true;
         } else {
             this.meshGuardianPersonList = personListResponse.getResponse();
             this.disableCreatePersonKey = false;
-            this.disableLinkPersonKey = true;
         }
-        if (personListResponse.getResponse() != null && !personListResponse.getResponse().isEmpty()) {
-            List<String> meshGuidList = personListResponse.getResponse()
+        if (this.meshGuardianPersonList != null && !this.meshGuardianPersonList.isEmpty()) {
+            List<String> meshGuidList = this.meshGuardianPersonList
                     .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
-            org.hibernate.Query query = session.createQuery("select c.meshGUID from Client c "
+            Query query = session.createQuery("select c.meshGUID from Client c "
                     + "where meshGuid in :meshGuidList");
             query.setParameter("meshGuidList", meshGuidList);
-            List<String> list = query.list();
-            personListResponse.getResponse().forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
+            List<String> list = query.getResultList();
+            this.meshGuardianPersonList.forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
         }
     }
 
@@ -146,6 +103,13 @@ public class MeshClientSelectPage extends BasicPage {
                 this.meshGuardianPerson.getMobile() == null ? "" : this.meshGuardianPerson.getMobile());
     }
 
+    public void fill(Session persistenceSession) {
+    }
+
+    public void cancelDulSelection() {
+        this.meshGuardianPerson = null;
+    }
+
     public Object clear() {
         this.surname = null;
         this.firstName = null;
@@ -157,7 +121,6 @@ public class MeshClientSelectPage extends BasicPage {
         this.meshGuardianPersonList = new ArrayList<>();
         this.dulDetail = new ArrayList<>();
         this.disableCreatePersonKey = true;
-        this.disableLinkPersonKey = true;
         this.meshGuardianPerson = null;
         return null;
     }
@@ -261,14 +224,6 @@ public class MeshClientSelectPage extends BasicPage {
 
     public void setDisableCreatePersonKey(Boolean disableCreatePersonKey) {
         this.disableCreatePersonKey = disableCreatePersonKey;
-    }
-
-    public Boolean getDisableLinkPersonKey() {
-        return disableLinkPersonKey;
-    }
-
-    public void setDisableLinkPersonKey(Boolean disableLinkPersonKey) {
-        this.disableLinkPersonKey = disableLinkPersonKey;
     }
 
     public MeshGuardianPerson getMeshGuardianPerson() {

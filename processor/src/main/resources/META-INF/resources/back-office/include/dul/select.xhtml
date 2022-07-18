@@ -27,7 +27,7 @@
                                         onrowclick="#{rich:element('detail')}.click();">
 
                             <rich:column width="1" style="display: none">
-                                <a4j:commandButton id="detail" render="modalDulSelectorForm,#{mainPage.topMostPage.pageComponent.id}" execute="@this"
+                                <a4j:commandButton id="detail" render="modalDulSelectorForm,#{mainPage.topMostPage.pageComponent.id},modalMeshClientSelectorForm" execute="@this"
                                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.hide();"
                                                    action="#{mainPage.completeDulSelectSelection}">
                                     <f:setPropertyActionListener value="#{item}"
@@ -60,7 +60,7 @@
                         <h:panelGroup styleClass="borderless-div">
 
                             <a4j:commandButton value="Отмена" action="#{mainPage.cancelDulSelectSelection}"
-                                               render="#{mainPage.topMostPage.pageComponent.id}"
+                                               render="#{mainPage.topMostPage.pageComponent.id},modalMeshClientSelectorForm"
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.hide();"
                                                styleClass="command-button" style="width: 80px;">
                                 <f:setPropertyActionListener value="#{null}"

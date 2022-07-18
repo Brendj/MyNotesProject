@@ -1,18 +1,17 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DulDetail;
-import ru.axetta.ecafe.processor.web.internal.DocumentResponse;
+import ru.axetta.ecafe.processor.core.persistence.DulGuide;
 
 import javax.persistence.Query;
 import java.util.*;
@@ -50,7 +49,7 @@ public class DulDetailService {
     }
 
     public MeshDocumentResponse updateDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        if (isChange(dulDetail, client)) {
+        if (!isChange(dulDetail, client)) {
             return new MeshDocumentResponse().okResponse();
         }
         validateDul(session, dulDetail, client);
@@ -209,6 +208,25 @@ public class DulDetailService {
         if (!documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
             logger.error(String.format("%s: %s", documentResponse.getCode(), documentResponse.getMessage()));
             throw new Exception(documentResponse.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void saveDulFromMk(Session session, List<DulDetail> dulDetails, Long idOfClient) {
+        Criteria criteria = session.createCriteria(DulGuide.class);
+        List<DulGuide> allDulGuides = (List<DulGuide>) criteria.list();
+        List<Long> dulGuidesId = allDulGuides.stream().map(DulGuide::getDocumentTypeId).collect(Collectors.toList());
+        Date currentDate = new Date();
+
+        for (DulDetail dulDetail : dulDetails) {
+            if (!dulGuidesId.contains(dulDetail.getDocumentTypeId()))
+                continue;
+            if (dulDetail.getCreateDate() == null)
+                dulDetail.setCreateDate(currentDate);
+            if (dulDetail.getLastUpdate() == null)
+                dulDetail.setLastUpdate(currentDate);
+            dulDetail.setIdOfClient(idOfClient);
+            session.save(dulDetail);
         }
     }
 }

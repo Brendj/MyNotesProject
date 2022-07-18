@@ -2741,4 +2741,12 @@ public class ClientManager {
         }
     }
 
+    public static Client findClientByMeshGuid(Session session, String meshGUID) {
+        if (meshGUID == null || meshGUID.isEmpty())
+            return null;
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.eq("meshGUID", meshGUID));
+        return (Client) clientCriteria.uniqueResult();
+    }
+
 }
