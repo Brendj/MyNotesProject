@@ -35,6 +35,7 @@ public class CardSignature extends HttpServlet {
 
     @WebMethod
     public List<ResponseCardSign> signatureCard(
+            @WebParam(name = "forTEST") Boolean test,
             @WebParam(name = "idProvider") Integer idOfProvider,
             @WebParam(name = "signProvider") byte[] signofProvider,
             @WebParam(name = "cardForSign") List<RequestCardForSign> requestCardForSigns

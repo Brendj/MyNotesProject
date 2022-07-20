@@ -49,7 +49,6 @@ public class ClientMigrationHistoryService {
         return repository.findAll(org, client);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
     public void processOrgChange() {
         if (!isOnBalanceOrDiscount()) { return; }
         logger.info("Start process Org change service");
@@ -58,7 +57,7 @@ public class ClientMigrationHistoryService {
         List<ClientMigration> list = repository.findAllSinceDate(lastProcess);
         int counter = 0;
         if (isOn(NODE_BALANCE_CHANGE_ORG)) {
-            balanceChange(list);
+            RuntimeContext.getAppContext().getBean(ClientMigrationHistoryService.class).balanceChange(list);
         }
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
@@ -79,7 +78,8 @@ public class ClientMigrationHistoryService {
                 list.size()));
     }
 
-    private void balanceChange(List<ClientMigration> list) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
+    public void balanceChange(List<ClientMigration> list) {
         int counter = 0;
         for (ClientMigration clientMigration : list) {
             if (clientMigration.getOldContragent() != null && clientMigration.getNewContragent() != null
