@@ -1220,13 +1220,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
-
-        if (ClientManager.isClientGuardian(persistenceSession, client) || !clientWardItems.isEmpty()) {
+        if (!this.clientWardItems.isEmpty()) {
             if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
                 throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
-
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
