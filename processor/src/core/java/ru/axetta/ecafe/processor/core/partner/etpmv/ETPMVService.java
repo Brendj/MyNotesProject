@@ -8,6 +8,7 @@ import generated.contingent.ispp.*;
 import generated.etp.ObjectFactory;
 import generated.etp.*;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -17,7 +18,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xerces.dom.ElementNSImpl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -114,7 +114,7 @@ public class ETPMVService {
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
 
-        ElementNSImpl serviceProperties = (ElementNSImpl) customAttributes.getAny();
+        Element serviceProperties = (Element) customAttributes.getAny();
         String guid;
         List<String> benefits;
         String yavl_lgot = "";
@@ -331,17 +331,17 @@ public class ETPMVService {
         return TimeZone.getTimeZone("Europe/Moscow").getRawOffset()/60000; //значение часового сдвига в мс выражаем в минутах
     }
 
-    private String getServicePropertiesValue(ElementNSImpl serviceProperties, String elementName) {
-        for (int i = 0; i < serviceProperties.getLength(); i++) {
+    private String getServicePropertiesValue(Element serviceProperties, String elementName) {
+        for (int i = 0; i < serviceProperties.getChildNodes().getLength(); i++) {
             Node node = serviceProperties.getChildNodes().item(i);
             if (node.getLocalName().equals(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
         }
         return null;
     }
 
-    private List<String> getBenefitsFromServiceProperties(ElementNSImpl serviceProperties) {
+    private List<String> getBenefitsFromServiceProperties(Element serviceProperties) {
         List<String> result = new ArrayList<>();
-        for (int i = 0; i < serviceProperties.getLength(); i++) {
+        for (int i = 0; i < serviceProperties.getChildNodes().getLength(); i++) {
             Node node = serviceProperties.getChildNodes().item(i);
             if (node.getLocalName() != null && node.getLocalName().equals("PreferentialCategory")) {
                 for (int j = 0; j < node.getChildNodes().getLength(); j++) {
