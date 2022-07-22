@@ -1220,13 +1220,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
-
-        if (ClientManager.isClientGuardian(persistenceSession, client) || !clientWardItems.isEmpty()) {
+        if (!this.clientWardItems.isEmpty()) {
             if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
                 throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
-
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
@@ -1245,54 +1243,54 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         //Получаем параллель клиента после изменений
         ClientParallel.addFoodBoxModifire(client);
 
-//        for (DulDetail dul : this.dulDetail)
-//            if (dul.getNumber().isEmpty() || dul.getNumber() == null && !dul.getDeleteState())
-//                throw new Exception("Не заполнено поле \"Номер\" документа");
+        for (DulDetail dul : this.dulDetail)
+            if (dul.getNumber().isEmpty() || dul.getNumber() == null && !dul.getDeleteState())
+                throw new Exception("Не заполнено поле \"Номер\" документа");
 
         //Явялется ли клиент представителем
         if (!this.clientGuardianItems.isEmpty() || !this.clientWardItems.isEmpty()) {
 
-//            if (birthDate == null) {
-//                throw new Exception("Не заполнено поле \"Дата рождения\"");
-//            }
-//            for (ClientGuardianItem clientWardItem : clientWardItems) {
-//                if (clientWardItem.getIdOfClient().equals(this.idOfClient))
-//                    throw new Exception("Персона не может быть представителем самой себя");
-//            }
-//            for (ClientGuardianItem clientWardItem : clientWardItems) {
-//                if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
-//                    throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
-//                }
-//            }
-//
-//            //Поиск представителя в МК
-//            PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(this.person.firstName,
-//                    this.person.secondName, this.person.surname, this.gender, this.birthDate, this.san, this.mobile,
-//                    this.email, this.dulDetail);
-//            if (personListResponse.getResponse().size() == 1 && personListResponse.getResponse().get(0).getDegree() == 100)
-//                client.setMeshGUID(personListResponse.getResponse().get(0).getMeshGuid());
+            if (birthDate == null) {
+                throw new Exception("Не заполнено поле \"Дата рождения\"");
+            }
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                if (clientWardItem.getIdOfClient().equals(this.idOfClient))
+                    throw new Exception("Персона не может быть представителем самой себя");
+            }
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+                    throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
+                }
+            }
+
+            //Поиск представителя в МК
+            PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(this.person.firstName,
+                    this.person.secondName, this.person.surname, this.gender, this.birthDate, this.san, this.mobile,
+                    this.email, this.dulDetail);
+            if (personListResponse.getResponse().size() == 1 && personListResponse.getResponse().get(0).getDegree() == 100)
+                client.setMeshGUID(personListResponse.getResponse().get(0).getMeshGuid());
 
             //Создание представителя в МК
-//            if (client.getMeshGUID() == null) {
-//                PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
-//                        person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-//                        client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
-//                if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-//                    client.setMeshGUID(personResponse.getResponse().getMeshGuid());
-//                else {
-//                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
-//                    throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-//                }
-//            } else {
-//                //Изменение представителя в МК
-//                PersonResponse personResponse = getMeshGuardiansService()
-//                        .changePerson(this.meshGUID, this.person.firstName, this.person.secondName,
-//                                this.person.surname, this.gender, this.birthDate, this.san);
-//                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
-//                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
-//                    throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));
-//                }
-//            }
+            if (client.getMeshGUID() == null) {
+                PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
+                        person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+                        client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
+                if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+                    client.setMeshGUID(personResponse.getResponse().getMeshGuid());
+                else {
+                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
+                    throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+                }
+            } else {
+                //Изменение представителя в МК
+                PersonResponse personResponse = getMeshGuardiansService()
+                        .changePerson(this.meshGUID, this.person.firstName, this.person.secondName,
+                                this.person.surname, this.gender, this.birthDate, this.san);
+                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
+                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
+                    throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));
+                }
+            }
         }
 
         //Опекуны
@@ -1306,23 +1304,23 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             addGuardiansByClient(persistenceSession, idOfClient, this.clientGuardianItems,
                     clientGuardianHistory);
 
-//            //Создание связи с опекунами в МК
-//            for (ClientGuardianItem clientGuardianItem : this.clientGuardianItems) {
-//                if (clientGuardianItem.getIsNew()) {
-//                    MeshAgentResponse personResponse = getMeshGuardiansService()
-//                            .addGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID(), clientGuardianItem.getRole());
-//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                        throw new Exception(String.format("Ошибка создания связи с представителем в МК: %s", personResponse.getMessage()));
-//                    }
-//                    clientGuardianItem.setIsNew(false);
-//                } else {
-//                    MeshAgentResponse personResponse = getMeshGuardiansService()
-//                            .changeGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID(), clientGuardianItem.getRole());
-//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                        throw new Exception(String.format("Ошибка изменения связи с представителем в МК: %s", personResponse.getMessage()));
-//                    }
-//                }
-//            }
+            //Создание связи с опекунами в МК
+            for (ClientGuardianItem clientGuardianItem : this.clientGuardianItems) {
+                if (clientGuardianItem.getIsNew()) {
+                    MeshAgentResponse personResponse = getMeshGuardiansService()
+                            .addGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID(), clientGuardianItem.getRole());
+                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка создания связи с представителем в МК: %s", personResponse.getMessage()));
+                    }
+                    clientGuardianItem.setIsNew(false);
+                } else {
+                    MeshAgentResponse personResponse = getMeshGuardiansService()
+                            .changeGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID(), clientGuardianItem.getRole());
+                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка изменения связи с представителем в МК: %s", personResponse.getMessage()));
+                    }
+                }
+            }
         }
         //Удаление связи с опекунами
         if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
@@ -1333,16 +1331,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     idOfClient));
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems, clientGuardianHistory);
 
-//            //Удаление связи с опекунами в МК
-//            for (ClientGuardianItem clientGuardianItem : removeListGuardianItems) {
-//                if (clientGuardianItem.getMeshGuid() == null)
-//                    continue;
-//                MeshAgentResponse personResponse = getMeshGuardiansService()
-//                        .deleteGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID());
-//                if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                    throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
-//                }
-//            }
+            //Удаление связи с опекунами в МК
+            for (ClientGuardianItem clientGuardianItem : removeListGuardianItems) {
+                if (clientGuardianItem.getMeshGuid() == null)
+                    continue;
+                MeshAgentResponse personResponse = getMeshGuardiansService()
+                        .deleteGuardianToClient(clientGuardianItem.getMeshGuid(), client.getMeshGUID());
+                if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                    throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
+                }
+            }
         }
 
         //Опекаемые
@@ -1355,23 +1353,23 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     idOfClient));
             addWardsByClient(persistenceSession, idOfClient, this.clientWardItems, clientGuardianHistory);
 
-//            //Создание связи с опекаемыми в МК
-//            for (ClientGuardianItem clientWardItem : this.clientWardItems) {
-//                if (clientWardItem.getIsNew()) {
-//                    MeshAgentResponse personResponse = getMeshGuardiansService()
-//                            .addGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
-//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                        throw new Exception(String.format("Ошибка создания связи с обучающимся в МК: %s", personResponse.getMessage()));
-//                    }
-//                    clientWardItem.setIsNew(false);
-//                } else {
-//                    MeshAgentResponse personResponse = getMeshGuardiansService()
-//                            .changeGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
-//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                        throw new Exception(String.format("Ошибка изменения связи с обучающимся в МК: %s", personResponse.getMessage()));
-//                    }
-//                }
-//            }
+            //Создание связи с опекаемыми в МК
+            for (ClientGuardianItem clientWardItem : this.clientWardItems) {
+                if (clientWardItem.getIsNew()) {
+                    MeshAgentResponse personResponse = getMeshGuardiansService()
+                            .addGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
+                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка создания связи с обучающимся в МК: %s", personResponse.getMessage()));
+                    }
+                    clientWardItem.setIsNew(false);
+                } else {
+                    MeshAgentResponse personResponse = getMeshGuardiansService()
+                            .changeGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid(), clientWardItem.getRole());
+                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка изменения связи с обучающимся в МК: %s", personResponse.getMessage()));
+                    }
+                }
+            }
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
 
@@ -1384,37 +1382,37 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     idOfClient));
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems, clientGuardianHistory);
 
-//            //Удаление связи с опекаемым в МК
-//            if (client.getMeshGUID() != null) {
-//                for (ClientGuardianItem clientWardItem : removeListWardItems) {
-//                    MeshAgentResponse personResponse = getMeshGuardiansService()
-//                            .deleteGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid());
-//                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                        throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
-//                    }
-//                }
-//            }
+            //Удаление связи с опекаемым в МК
+            if (client.getMeshGUID() != null) {
+                for (ClientGuardianItem clientWardItem : removeListWardItems) {
+                    MeshAgentResponse personResponse = getMeshGuardiansService()
+                            .deleteGuardianToClient(client.getMeshGUID(), clientWardItem.getMeshGuid());
+                    if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка удаления связи с обучающимся в МК: %s", personResponse.getMessage()));
+                    }
+                }
+            }
         }
 
         //Работа с документами
-//        for (DulDetail dulDetail : this.dulDetail) {
-//            if (dulDetail.getDeleteState() != null && dulDetail.getDeleteState()) {
-//                MeshDocumentResponse meshDocumentResponse = getMeshDulDetailService().deleteDulDetail(persistenceSession, dulDetail, client);
-//                if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                    throw new Exception(String.format("Ошибка удаления документов в МК: %s", meshDocumentResponse.getMessage()));
-//                }
-//                continue;
-//            }
-//            MeshDocumentResponse meshDocumentResponse;
-//            if (dulDetail.getNew()) {
-//                meshDocumentResponse = getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client);
-//            } else {
-//                meshDocumentResponse = getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client);
-//            }
-//            if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
-//                throw new Exception(String.format("Ошибка сохранения документов в МК: %s", meshDocumentResponse.getMessage()));
-//            }
-//        }
+        for (DulDetail dulDetail : this.dulDetail) {
+            if (dulDetail.getDeleteState() != null && dulDetail.getDeleteState()) {
+                MeshDocumentResponse meshDocumentResponse = getMeshDulDetailService().deleteDulDetail(persistenceSession, dulDetail, client);
+                if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                    throw new Exception(String.format("Ошибка удаления документов в МК: %s", meshDocumentResponse.getMessage()));
+                }
+                continue;
+            }
+            MeshDocumentResponse meshDocumentResponse;
+            if (dulDetail.getNew()) {
+                meshDocumentResponse = getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client);
+            } else {
+                meshDocumentResponse = getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client);
+            }
+            if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                throw new Exception(String.format("Ошибка сохранения документов в МК: %s", meshDocumentResponse.getMessage()));
+            }
+        }
 
         //Получаем параллель клиента после изменений
         ClientParallel.addFoodBoxModifire(client);
