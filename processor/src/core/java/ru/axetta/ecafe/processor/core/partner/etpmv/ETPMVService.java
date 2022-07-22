@@ -121,6 +121,12 @@ public class ETPMVService {
         if (newFormat) {
             guid = getServicePropertiesValue(serviceProperties, "IDLink");
             benefits = getBenefitsFromServiceProperties(serviceProperties);
+            Boolean isLegal = Boolean.parseBoolean(getServicePropertiesValue(serviceProperties, "IsLegalRepresentative"));
+            if (!isLegal) {
+                logger.error("Error in processCoordinateMessage: not legal represent");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not legal represent");
+                return;
+            }
             if (benefits.size() == 0) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
