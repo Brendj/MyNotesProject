@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
@@ -119,12 +120,126 @@ public class DebugInfoPage extends BasicWorkspacePage {
     }
 
     public void runTest2() throws Exception {
-        ApplicationForFoodProcessingService service = RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class);
+        RuntimeContext.getAppContext().getBean(ETPMVService.class).processIncoming("<ns4:CoordinateMessage xmlns:ns4=\"http://asguf.mos.ru/rkis_gu/coordinate/v6_1/\"\n" +
+                "                       xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"\n" +
+                "                       xmlns:ns3=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"\n" +
+                "                       xmlns:ns5=\"http://mos.ru/gu/service/063101/\"\n" +
+                "                       class=\" FB_FW_ext BlitzScPluginAdapter\">\n" +
+                "\t<ns4:CoordinateDataMessage>\n" +
+                "\t\t<ns4:Service>\n" +
+                "\t\t\t<ns4:RegNum>156353734</ns4:RegNum>\n" +
+                "\t\t\t<ns4:RegDate>2022-07-12T17:45:07.000+03:00</ns4:RegDate>\n" +
+                "\t\t\t<ns4:ServiceNumber>0001-9300120-063101-00000187/22</ns4:ServiceNumber>\n" +
+                "\t\t\t<ns4:Responsible>\n" +
+                "\t\t\t\t<ns4:LastName>оператор Портала</ns4:LastName>\n" +
+                "\t\t\t\t<ns4:FirstName>оператор Портала</ns4:FirstName>\n" +
+                "\t\t\t\t<ns4:MiddleName>оператор Портала</ns4:MiddleName>\n" +
+                "\t\t\t\t<ns4:JobTitle>оператор Портала</ns4:JobTitle>\n" +
+                "\t\t\t\t<ns4:Phone>+7 (495) 539-55-55</ns4:Phone>\n" +
+                "\t\t\t\t<ns4:Email>cpgu@mos.ru</ns4:Email>\n" +
+                "\t\t\t</ns4:Responsible>\n" +
+                "\t\t\t<ns4:Department>\n" +
+                "\t\t\t\t<ns4:Name>Департамент информационных технологий города Москвы</ns4:Name>\n" +
+                "\t\t\t\t<ns4:Code>2043</ns4:Code>\n" +
+                "\t\t\t\t<ns4:Inn>7710878000</ns4:Inn>\n" +
+                "\t\t\t\t<ns4:Ogrn>1107746943347</ns4:Ogrn>\n" +
+                "\t\t\t\t<ns4:RegDate>2019-09-12T00:00:00</ns4:RegDate>\n" +
+                "\t\t\t\t<ns4:SystemCode>9300003</ns4:SystemCode>\n" +
+                "\t\t\t</ns4:Department>\n" +
+                "\t\t\t<ns4:CreatedByDepartment>\n" +
+                "\t\t\t\t<ns4:Name>ПГУ</ns4:Name>\n" +
+                "\t\t\t\t<ns4:Code>1</ns4:Code>\n" +
+                "\t\t\t\t<ns4:Inn>7710878000</ns4:Inn>\n" +
+                "\t\t\t\t<ns4:Ogrn>1107746943347</ns4:Ogrn>\n" +
+                "\t\t\t\t<ns4:RegDate>2019-09-12T00:00:00</ns4:RegDate>\n" +
+                "\t\t\t\t<ns4:SystemCode>1</ns4:SystemCode>\n" +
+                "\t\t\t</ns4:CreatedByDepartment>\n" +
+                "\t\t\t<ns4:OutputKind>Portal</ns4:OutputKind>\n" +
+                "\t\t\t<ns4:PortalNum>156178271</ns4:PortalNum>\n" +
+                "\t\t</ns4:Service>\n" +
+                "\t\t<ns4:SignService Id=\"ab778a9f-929c-40ca-8064-4db3cd2b7f61\">\n" +
+                "\t\t\t<ns4:ServiceType>\n" +
+                "\t\t\t\t<ns4:Code>063101</ns4:Code>\n" +
+                "\t\t\t\t<ns4:Name>Подача заявления о предоставлении питания за счет средств бюджета города Москвы</ns4:Name>\n" +
+                "\t\t\t</ns4:ServiceType>\n" +
+                "\t\t\t<ns4:Contacts>\n" +
+                "\t\t\t\t<ns4:BaseDeclarant xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "\t\t\t\t                   Id=\"3ee3a7e2-1f22-48fe-aee5-2b2bcf8a0c18\"\n" +
+                "\t\t\t\t                   xsi:type=\"ns4:RequestContact\">\n" +
+                "\t\t\t\t\t<ns4:Type>Child</ns4:Type>\n" +
+                "\t\t\t\t\t<ns4:Documents>\n" +
+                "\t\t\t\t\t\t<ns4:ServiceDocument>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocKind>\n" +
+                "\t\t\t\t\t\t\t\t<ns4:Code>22</ns4:Code>\n" +
+                "\t\t\t\t\t\t\t\t<ns4:Name>Свидетельство о рождении</ns4:Name>\n" +
+                "\t\t\t\t\t\t\t</ns4:DocKind>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocSerie>II-МН</ns4:DocSerie>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocNumber>903453</ns4:DocNumber>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocDate>2022-07-01T00:00:00</ns4:DocDate>\n" +
+                "\t\t\t\t\t\t\t<ns4:WhoSign>фывфывфыв</ns4:WhoSign>\n" +
+                "\t\t\t\t\t\t\t<ns4:ListCount xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t\t\t\t<ns4:CopyCount xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t\t\t</ns4:ServiceDocument>\n" +
+                "\t\t\t\t\t</ns4:Documents>\n" +
+                "\t\t\t\t\t<ns4:LastName>Боярская</ns4:LastName>\n" +
+                "\t\t\t\t\t<ns4:FirstName>Екатерина</ns4:FirstName>\n" +
+                "\t\t\t\t\t<ns4:MiddleName>Олеговна</ns4:MiddleName>\n" +
+                "\t\t\t\t\t<ns4:Gender>Female</ns4:Gender>\n" +
+                "\t\t\t\t\t<ns4:BirthDate>2009-09-09</ns4:BirthDate>\n" +
+                "\t\t\t\t\t<ns4:CitizenshipType xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t</ns4:BaseDeclarant>\n" +
+                "\t\t\t\t<ns4:BaseDeclarant xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "\t\t\t\t                   Id=\"1c252591-f8f2-46d1-b80a-24a3253b3464\"\n" +
+                "\t\t\t\t                   xsi:type=\"ns4:RequestContact\">\n" +
+                "\t\t\t\t\t<ns4:Type>Declarant</ns4:Type>\n" +
+                "\t\t\t\t\t<ns4:Documents>\n" +
+                "\t\t\t\t\t\t<ns4:ServiceDocument>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocKind>\n" +
+                "\t\t\t\t\t\t\t\t<ns4:Code>20001</ns4:Code>\n" +
+                "\t\t\t\t\t\t\t\t<ns4:Name>Паспорт гражданина РФ</ns4:Name>\n" +
+                "\t\t\t\t\t\t\t</ns4:DocKind>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocSerie>1231</ns4:DocSerie>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocNumber>123123</ns4:DocNumber>\n" +
+                "\t\t\t\t\t\t\t<ns4:DocDate>2022-07-01T00:00:00</ns4:DocDate>\n" +
+                "\t\t\t\t\t\t\t<ns4:WhoSign>фывфыв</ns4:WhoSign>\n" +
+                "\t\t\t\t\t\t\t<ns4:ListCount xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t\t\t\t<ns4:CopyCount xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t\t\t\t<ns4:DivisionCode>213-123</ns4:DivisionCode>\n" +
+                "\t\t\t\t\t\t</ns4:ServiceDocument>\n" +
+                "\t\t\t\t\t</ns4:Documents>\n" +
+                "\t\t\t\t\t<ns4:LastName>Тришин</ns4:LastName>\n" +
+                "\t\t\t\t\t<ns4:FirstName>Сергей</ns4:FirstName>\n" +
+                "\t\t\t\t\t<ns4:MiddleName>Константинович</ns4:MiddleName>\n" +
+                "\t\t\t\t\t<ns4:Gender>Male</ns4:Gender>\n" +
+                "\t\t\t\t\t<ns4:BirthDate>1968-12-19</ns4:BirthDate>\n" +
+                "\t\t\t\t\t<ns4:Snils>514-590-282 79</ns4:Snils>\n" +
+                "\t\t\t\t\t<ns4:MobilePhone>1231231322</ns4:MobilePhone>\n" +
+                "\t\t\t\t\t<ns4:EMail>atrishin@inform-tb.ru</ns4:EMail>\n" +
+                "\t\t\t\t\t<ns4:CitizenshipType xsi:nil=\"true\"/>\n" +
+                "\t\t\t\t\t<ns4:SsoId>01f7de71-7c87-4d2f-a570-41807710e437</ns4:SsoId>\n" +
+                "\t\t\t\t</ns4:BaseDeclarant>\n" +
+                "\t\t\t</ns4:Contacts>\n" +
+                "\t\t\t<ns4:CustomAttributes>\n" +
+                "\t\t\t\t<ns5:ServiceProperties>\n" +
+                "\t\t\t\t\t<ns5:IsLegalRepresentative>true</ns5:IsLegalRepresentative>\n" +
+                "\t\t\t\t\t<ns5:Validity>false</ns5:Validity>\n" +
+                "\t\t\t\t\t<ns5:ValidationGuardianship>false</ns5:ValidationGuardianship>\n" +
+                "\t\t\t\t\t<ns5:EduName>ГБПОУ ТК № 21</ns5:EduName>\n" +
+                "\t\t\t\t\t<ns5:IDLink>650f3f79-6df2-4ba0-a299-4852f254f6cc</ns5:IDLink>\n" +
+                "\t\t\t\t\t<ns5:PreferentialCategory>\n" +
+                "\t\t\t\t\t\t<ns5:LargeFamily>true</ns5:LargeFamily>\n" +
+                "\t\t\t\t\t</ns5:PreferentialCategory>\n" +
+                "\t\t\t\t</ns5:ServiceProperties>\n" +
+                "\t\t\t</ns4:CustomAttributes>\n" +
+                "\t\t</ns4:SignService>\n" +
+                "\t</ns4:CoordinateDataMessage>\n" +
+                "</ns4:CoordinateMessage>");
+        /*ApplicationForFoodProcessingService service = RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class);
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         Transaction transaction = session.beginTransaction();
         logger.info(CalendarUtils.dateTimeToString(service.getTriggerDateByProductionCalendar(session, new Date(), 3)));
         transaction.rollback();
-        session.close();
+        session.close();*/
         /*RegularPaymentSubscriptionService notificationService = RuntimeContext.getInstance()
                 .getRegularPaymentSubscriptionService();
         notificationService.checkClientBalances();*/

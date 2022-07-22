@@ -12,7 +12,6 @@ import java.util.Set;
 public class ApplicationForFood {
     private Long idOfApplicationForFood;
     private Client client;
-    private Long dtisznCode;
     private Date createdDate;
     private Date discountDateStart;
     private Date discountDateEnd;
@@ -31,12 +30,12 @@ public class ApplicationForFood {
     private Boolean sendToAISContingent;
     private Date archiveDate;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
+    private Set<ApplicationForFoodDiscount> dtisznCodes;
 
-    public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
+    public ApplicationForFood(Client client, ApplicationForFoodStatus status, String mobile, String applicantName,
             String applicantSecondName, String applicantSurname, String serviceNumber, ApplicationForFoodCreatorType creatorType,
             String idOfDocOrder, Date docOrderDate, Long version) {
         this.client = client;
-        this.dtisznCode = dtisznCode;
         this.createdDate = CalendarUtils.truncateToSecond(new Date()).getTime();
         this.status = status;
         this.mobile = mobile;
@@ -71,14 +70,6 @@ public class ApplicationForFood {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public Long getDtisznCode() {
-        return dtisznCode;
-    }
-
-    public void setDtisznCode(Long dtisznCode) {
-        this.dtisznCode = dtisznCode;
     }
 
     public Date getCreatedDate() {
@@ -224,5 +215,13 @@ public class ApplicationForFood {
 
     public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
+    }
+
+    public Set<ApplicationForFoodDiscount> getDtisznCodes() {
+        return dtisznCodes;
+    }
+
+    public void setDtisznCodes(Set<ApplicationForFoodDiscount> dtisznCodes) {
+        this.dtisznCodes = dtisznCodes;
     }
 }

@@ -85,6 +85,7 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
         private Long idOfCategoryDiscount;
         private String categoryName;
         private Long ETPCode;
+        private String ETPTextCode;
 
         public CategoryDiscountDSZNItem(CategoryDiscountDSZN categoryDiscountDSZN) {
             this.idOfCategoryDiscountDSZN = categoryDiscountDSZN.getIdOfCategoryDiscountDSZN();
@@ -98,6 +99,7 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
                 this.categoryName = null;
             }
             this.ETPCode = categoryDiscountDSZN.getETPCode();
+            this.ETPTextCode = categoryDiscountDSZN.getETPTextCode();
         }
 
         public long getIdOfCategoryDiscountDSZN() {
@@ -146,6 +148,14 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
 
         public void setETPCode(Long ETPCode) {
             this.ETPCode = ETPCode;
+        }
+
+        public String getETPTextCode() {
+            return ETPTextCode;
+        }
+
+        public void setETPTextCode(String ETPTextCode) {
+            this.ETPTextCode = ETPTextCode;
         }
     }
 

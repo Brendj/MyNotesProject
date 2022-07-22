@@ -18,12 +18,13 @@ public class CategoryDiscountDSZN {
     private Long version;
     private Boolean deleted;
     private Long ETPCode;
+    private String ETPTextCode;
     private String guid;
 
     public CategoryDiscountDSZN() {
     }
 
-    public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long ETPCode,
+    public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long ETPCode, String ETPTextCode,
             Long version, String guid) {
         this.code = code;
         this.description = description;
@@ -31,6 +32,7 @@ public class CategoryDiscountDSZN {
         this.version = version;
         this.deleted = false;
         this.ETPCode = ETPCode;
+        this.ETPTextCode = ETPTextCode;
         this.guid = guid;
     }
 
@@ -129,5 +131,13 @@ public class CategoryDiscountDSZN {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public String getETPTextCode() {
+        return ETPTextCode;
+    }
+
+    public void setETPTextCode(String ETPTextCode) {
+        this.ETPTextCode = ETPTextCode;
     }
 }

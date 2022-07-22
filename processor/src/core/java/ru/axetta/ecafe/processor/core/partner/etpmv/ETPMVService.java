@@ -8,6 +8,7 @@ import generated.contingent.ispp.*;
 import generated.etp.ObjectFactory;
 import generated.etp.*;
 
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
@@ -16,7 +17,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import org.apache.xerces.dom.ElementNSImpl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -68,8 +69,6 @@ public class ETPMVService {
     private final String REQUEST_TIMEOUT = "com.sun.xml.internal.ws.request.timeout";
     private final String CONNECT_TIMEOUT = "com.sun.xml.internal.ws.connect.timeout";
 
-    private boolean useMeshGuid = false;
-
     @Async
     public void processIncoming(String message) {
         try {
@@ -90,17 +89,23 @@ public class ETPMVService {
         }
     }
 
+    private boolean getCoordinateMessageFormat(String message) {
+        return message.contains("IDLink");
+    }
+
     private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
         long begin_time = System.currentTimeMillis();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
 
         InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-        CoordinateMessage coordinateMessage = (CoordinateMessage)unmarshaller.unmarshal(stream);
+        CoordinateMessage coordinateMessage = (CoordinateMessage) unmarshaller.unmarshal(stream);
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
+
+        boolean newFormat = getCoordinateMessageFormat(message);
 
         daoService.saveEtpPacket(serviceNumber, message);
 
@@ -108,14 +113,23 @@ public class ETPMVService {
         RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
 
         ElementNSImpl serviceProperties = (ElementNSImpl) customAttributes.getAny();
-        String guid = getServicePropertiesValue(serviceProperties, "guid");
-        String yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
-        String benefit = getServicePropertiesValue(serviceProperties, "benefit");
+        String guid;
+        List<String> benefits;
+        String yavl_lgot = "";
+        if (newFormat) {
+            guid = getServicePropertiesValue(serviceProperties, "IDLink");
+            benefits = getBenefitsFromServiceProperties(serviceProperties);
+        } else {
+            guid = getServicePropertiesValue(serviceProperties, "guid");
+            yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
 
-        if (wrongBenefits(yavl_lgot, benefit)) {
-            logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
-            return;
+            benefits = Arrays.asList(getServicePropertiesValue(serviceProperties, "benefit"));
+
+            if (wrongBenefits(yavl_lgot, benefits.get(0))) {
+                logger.error("Error in processCoordinateMessage: wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                return;
+            }
         }
 
         ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();
@@ -125,21 +139,16 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong contacts data");
             return;
         }
-        String firstName = ((RequestContact)baseDeclarant).getFirstName();
-        String lastName = ((RequestContact)baseDeclarant).getLastName();
-        String middleName = ((RequestContact)baseDeclarant).getMiddleName();
-        String mobile = Client.checkAndConvertMobile(((RequestContact)baseDeclarant).getMobilePhone());
+        String firstName = ((RequestContact) baseDeclarant).getFirstName();
+        String lastName = ((RequestContact) baseDeclarant).getLastName();
+        String middleName = ((RequestContact) baseDeclarant).getMiddleName();
+        String mobile = Client.checkAndConvertMobile(((RequestContact) baseDeclarant).getMobilePhone());
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
-                logger.error("Error in processCoordinateMessage: not enough data");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
-                return;
+            logger.error("Error in processCoordinateMessage: not enough data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
+            return;
         }
-        Client client;
-        if (useMeshGuid) {
-            client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
-        } else {
-            client = DAOReadonlyService.getInstance().getClientByGuid(guid);
-        }
+        Client client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
 
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
@@ -155,9 +164,16 @@ public class ETPMVService {
                 return;
             }
         }
-        Long _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefit);
+        List<Long> _benefits;
+        if (newFormat) {
+            _benefits = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefits(benefits);
+        } else {
+            _benefits = yavl_lgot.equals(BENEFIT_INOE) ? Arrays.asList(null)
+                    : Arrays.asList(RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefits.get(0)));
+        }
+
         try {
-            daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber,
+            daoService.createApplicationForGood(client, _benefits, mobile, firstName, middleName, lastName, serviceNumber,
                     ApplicationForFoodCreatorType.PORTAL);
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
@@ -289,9 +305,50 @@ public class ETPMVService {
     private String getServicePropertiesValue(ElementNSImpl serviceProperties, String elementName) {
         for (int i = 0; i < serviceProperties.getLength(); i++) {
             String nodeName = serviceProperties.getChildNodes().item(i).getNodeName();
-            if (nodeName != null && nodeName.equals(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
+            if (nodeName != null && nodeName.contains(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
         }
         return null;
+    }
+
+    //private List<String> getBenefitsFromServiceProperties(RequestServiceForSign.CustomAttributes customAttributes) {
+    private List<String> getBenefitsFromServiceProperties(ElementNSImpl serviceProperties) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < serviceProperties.getLength(); i++) {
+            Node node = serviceProperties.getChildNodes().item(i);
+            String nodeName = node.getNodeName();
+            if (nodeName != null && nodeName.contains("PreferentialCategory")) {
+                for (int j = 0; j < node.getChildNodes().getLength(); j++) {
+                    Node node2 = node.getChildNodes().item(j);
+                    if (Boolean.parseBoolean(node2.getNodeValue())) {
+                        result.add(node2.getLocalName());
+                    }
+                }
+            }
+        }
+        /*ServiceProperties serviceProperties = (ServiceProperties)customAttributes.getAny();
+        ServiceProperties.PreferentialCategory preferentialCategory = serviceProperties.getPreferentialCategory();
+        if (preferentialCategory.isChildrenWithDisabilities()) {
+            result.add();
+        }
+        if (preferentialCategory.isUnemployedPersons()) {
+            result.add("56"); //отличается формулировка льготы
+        }
+        if (preferentialCategory.isDisabledChild()) {
+            result.add("24");
+        }
+        if (preferentialCategory.isLargeFamily()) {
+            result.add("66");
+        }
+        if (preferentialCategory.isLowIncomeFamily()) {
+            result.add("48");
+        }
+        if (preferentialCategory.isRecipient()) {
+            //нет
+        }
+        if (preferentialCategory.isWithoutParentalCare()) {
+            result.add("52");
+        }*/
+        return result;
     }
 
     public void resendStatuses() {
@@ -364,19 +421,21 @@ public class ETPMVService {
         int counter = 0;
         int sent_counter = 0;
         for (ApplicationForFood applicationForFood : list) {
-            Child child = objectFactory.createChild();
-            child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
-            child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
-            children.getChild().add(child);
-            sent_counter++;
-            if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
-                counter++;
-                setBenefitsRequest.setChildren(children);
-                logger.info(String.format("Sending request %s to AIS Contingent", counter));
-                SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
-                logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
-                processResponseFromAISContingent(response);
-                children.getChild().clear();
+            for (ApplicationForFoodDiscount appDiscount: applicationForFood.getDtisznCodes()) {
+                Child child = objectFactory.createChild();
+                child.setBenefitCode(appDiscount.getDtisznCode() == null ? "0" : appDiscount.getDtisznCode().toString());
+                child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
+                children.getChild().add(child);
+                sent_counter++;
+                if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
+                    counter++;
+                    setBenefitsRequest.setChildren(children);
+                    logger.info(String.format("Sending request %s to AIS Contingent", counter));
+                    SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
+                    logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
+                    processResponseFromAISContingent(response);
+                    children.getChild().clear();
+                }
             }
         }
         if (children.getChild().size() > 0) {
@@ -467,7 +526,6 @@ public class ETPMVService {
             case COORDINATE_MESSAGE:
                 if (jaxbConsumerContext == null) {
                     jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                    useMeshGuid = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.useMeshGuid", "false").equals("true");
                 }
                 return jaxbConsumerContext;
         }
@@ -475,7 +533,7 @@ public class ETPMVService {
     }
 
     private int getMessageType(String message) throws Exception {
-        if (message.startsWith("<ns1:CoordinateMessage")) {
+        if (message.contains(":CoordinateMessage")) {
             return COORDINATE_MESSAGE;
         }
         throw new Exception("Unknown message type");

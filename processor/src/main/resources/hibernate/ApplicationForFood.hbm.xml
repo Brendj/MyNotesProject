@@ -13,7 +13,6 @@
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" fetch="select"/>
-        <property name="dtisznCode" column="DTISZNCode" type="long"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="discountDateStart" column="DiscountDateStart" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="discountDateEnd" column="DiscountDateEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -39,5 +38,10 @@
             <key column="idOfApplicationForFood"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodHistory"/>
         </set>
+        <set name="applicationForFoodDiscounts" inverse="true" cascade="all">
+            <key column="idOfApplicationForFood"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDiscount"/>
+        </set>
+
     </class>
 </hibernate-mapping>

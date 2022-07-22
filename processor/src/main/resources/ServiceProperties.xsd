@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://mos.ru/gu/service/063101/" targetNamespace="http://mos.ru/gu/service/063101/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="ServiceProperties">
+        <xs:annotation>
+            <xs:documentation xml:lang="ru">Подача заявления о предоставлении питания за счет средств бюджета города Москвы</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="IsLegalRepresentative" type="xs:boolean">
+                    <xs:annotation>
+                        <xs:documentation>Подтверждаю, что являюсь законным представителем ребенка - родителем / опекуном / попечителем.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="Validity" type="xs:boolean" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>Валидность паспорта</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="ValidationGuardianship" type="xs:boolean">
+                    <xs:annotation>
+                        <xs:documentation>Наличие признака валидации родства / опекунства в ЛК ФЛ</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="EduName" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>Наименование образовательной организации</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="IDLink" type="xs:string" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>Ссылка на идентификатор персоны МЭШ.Контингент</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="PreferentialCategory">
+                    <xs:annotation>
+                        <xs:documentation>Наличие льготной категории6</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="LargeFamily" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Ребенок из многодетной семьи</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="LowIncomeFamily" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Ребенок из малообеспеченной семьи</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="WithoutParentalCare" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Ребенок-сирота или ребенок, оставшийся без попечения родителей</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="DisabledChild" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Ребенок-инвалид до 18 лет</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="UnemployedPersons" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Ребенок, у которого оба или единственный родитель являются неработающими инвалидами 1 или 2 группы (под единственным родителем понимается одинокая мать или одинокий отец)</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="Recipient" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Получатель выплат (доплат) к пенсии (ребенок, получающий пенсию по потере кормильца)</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="ChildrenWithDisabilities" type="xs:boolean" minOccurs="0">
+                                <xs:annotation>
+                                    <xs:documentation>Дети с ограниченными возможностями здоровья.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

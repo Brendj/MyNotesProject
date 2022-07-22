@@ -37,6 +37,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
     private CategoryDiscount categoryDiscount;
     private String categoryName;
     private String ETPCode = "";
+    private String ETPTextCode = "";
 
     @Override
     public void onShow() throws Exception {
@@ -68,6 +69,11 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
 
         if(StringUtils.isEmpty(ETPCode)) {
             printError("Добавьте код льготы ЕТП");
+            return null;
+        }
+
+        if(StringUtils.isEmpty(ETPTextCode)) {
+            printError("Добавьте новый (текстовый) код льготы ЕТП");
             return null;
         }
 
@@ -116,7 +122,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
                 guid = UUID.randomUUID().toString();
-                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, nextVersion, guid);
+                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, ETPTextCode, nextVersion, guid);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;
@@ -168,5 +174,13 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
 
     public void setETPCode(String ETPCode) {
         this.ETPCode = ETPCode;
+    }
+
+    public String getETPTextCode() {
+        return ETPTextCode;
+    }
+
+    public void setETPTextCode(String ETPTextCode) {
+        this.ETPTextCode = ETPTextCode;
     }
 }
