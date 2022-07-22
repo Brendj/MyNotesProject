@@ -8,6 +8,7 @@ import generated.contingent.ispp.*;
 import generated.etp.ObjectFactory;
 import generated.etp.*;
 
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
@@ -16,7 +17,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import org.apache.xerces.dom.ElementNSImpl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -90,6 +91,10 @@ public class ETPMVService {
         }
     }
 
+    private boolean getCoordinateMessageFormat(String message) {
+        return message.contains("IDLink");
+    }
+
     private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
         long begin_time = System.currentTimeMillis();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
@@ -102,20 +107,36 @@ public class ETPMVService {
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
 
+        boolean newFormat = getCoordinateMessageFormat(message);
+
         daoService.saveEtpPacket(serviceNumber, message);
 
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
 
         ElementNSImpl serviceProperties = (ElementNSImpl) customAttributes.getAny();
-        String guid = getServicePropertiesValue(serviceProperties, "guid");
-        String yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
-        String benefit = getServicePropertiesValue(serviceProperties, "benefit");
+        String guid;
+        List<String> benefits;
+        String yavl_lgot = "";
+        if (newFormat) {
+            guid = getServicePropertiesValue(serviceProperties, "IDLink");
+            benefits = getBenefitsFromServiceProperties(serviceProperties);
+            if (benefits.size() == 0) {
+                logger.error("Error in processCoordinateMessage: wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                return;
+            }
+        } else {
+            guid = getServicePropertiesValue(serviceProperties, "guid");
+            yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
 
-        if (wrongBenefits(yavl_lgot, benefit)) {
-            logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
-            return;
+            benefits = Arrays.asList(getServicePropertiesValue(serviceProperties, "benefit"));
+
+            if (wrongBenefits(yavl_lgot, benefits.get(0))) {
+                logger.error("Error in processCoordinateMessage: wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                return;
+            }
         }
 
         ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();
@@ -155,7 +176,13 @@ public class ETPMVService {
                 return;
             }
         }
-        Long _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefit);
+        Long _benefit;
+        if (newFormat) {
+            _benefit = getDSZNBenefits(benefits);
+        } else {
+            _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null
+                    : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefits.get(0));
+        }
         try {
             daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber,
                     ApplicationForFoodCreatorType.PORTAL);
@@ -173,6 +200,18 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
         daoService.updateEtpPacketWithSuccess(serviceNumber);
+    }
+
+    private Long getDSZNBenefits(List<String> benefits) throws Exception {
+        String benefit = benefits.get(0);
+        if (benefit.equals("LargeFamily")) return 66L;
+        if (benefit.equals("LowIncomeFamily")) return 48L;
+        if (benefit.equals("WithoutParentalCare")) return 52L;
+        if (benefit.equals("DisabledChild")) return 24L;
+        if (benefit.equals("UnemployedPersons")) return 56L;
+        if (benefit.equals("Recipient")) return 41L;
+        if (benefit.equals("ChildrenWithDisabilities")) return 56L;
+        throw new Exception("Unknown benefit");
     }
 
     private BaseDeclarant getBaseDeclarant(ArrayOfBaseDeclarant contacts) {
@@ -288,10 +327,26 @@ public class ETPMVService {
 
     private String getServicePropertiesValue(ElementNSImpl serviceProperties, String elementName) {
         for (int i = 0; i < serviceProperties.getLength(); i++) {
-            String nodeName = serviceProperties.getChildNodes().item(i).getNodeName();
-            if (nodeName != null && nodeName.equals(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
+            Node node = serviceProperties.getChildNodes().item(i);
+            if (node.getLocalName().equals(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
         }
         return null;
+    }
+
+    private List<String> getBenefitsFromServiceProperties(ElementNSImpl serviceProperties) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < serviceProperties.getLength(); i++) {
+            Node node = serviceProperties.getChildNodes().item(i);
+            if (node.getLocalName() != null && node.getLocalName().equals("PreferentialCategory")) {
+                for (int j = 0; j < node.getChildNodes().getLength(); j++) {
+                    Node node2 = node.getChildNodes().item(j);
+                    if (node2.getFirstChild() != null && Boolean.parseBoolean(node2.getFirstChild().getTextContent())) {
+                        result.add(node2.getLocalName());
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     public void resendStatuses() {
@@ -475,7 +530,7 @@ public class ETPMVService {
     }
 
     private int getMessageType(String message) throws Exception {
-        if (message.startsWith("<ns1:CoordinateMessage")) {
+        if (message.contains(":CoordinateMessage")) {
             return COORDINATE_MESSAGE;
         }
         throw new Exception("Unknown message type");
