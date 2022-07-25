@@ -361,6 +361,11 @@ public class MealsService {
 
     public Response mainLogicNewPreorder(FoodboxOrder foodboxOrders, Client client, String xrequestStr, Long availableMoney)
     {
+        //Если количество свободных ячеек не позволяет создавать новый заказ
+        if (countFree <= countunlocketed) {
+            return Response.status(HTTP_UNPROCESSABLE_ENTITY).
+                    entity(responseResult.errorCell(client.getOrg().getIdOfOrg())).build();
+        }
         //Структура ответа
         CurrentFoodboxOrderInfo currentFoodboxOrderInfo = new CurrentFoodboxOrderInfo(client, simpleDateFormat);
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -476,11 +481,6 @@ public class MealsService {
                     return Response.status(HTTP_UNPROCESSABLE_ENTITY).
                             entity(responseResult.moreLimitByDay(client.getExpenditureLimit())).build();
                 }
-            }
-            //Если количество свободных ячеек не позволяет создавать новый заказ
-            if (countFree <= countunlocketed) {
-                return Response.status(HTTP_UNPROCESSABLE_ENTITY).
-                        entity(responseResult.errorCell(client.getOrg().getIdOfOrg())).build();
             }
             persistenceTransaction.commit();
             //Добавляем заказ для отслеживания
