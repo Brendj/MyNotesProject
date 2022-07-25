@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import org.opensaml.xml.signature.G;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -3042,7 +3041,7 @@ public class FrontController extends HttpServlet {
                                                      @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
         try {
             if (checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
-                    relation, typeOfLegalRepresent, informing)) {
+                    relation, typeOfLegalRepresent, informing, documents)) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             List<DulDetail> dulDetails = new ArrayList<>();
@@ -3276,10 +3275,11 @@ public class FrontController extends HttpServlet {
 
     private boolean checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                     Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
-                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing) throws FrontControllerException {
+                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing, List<DocumentItem> documents) throws FrontControllerException {
         return idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
-                || relation == null || typeOfLegalRepresent == null || informing == null;
+                || birthDate == null || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
+                || relation == null || typeOfLegalRepresent == null || informing == null ||
+                (StringUtils.isEmpty(snils) && (documents == null || documents.isEmpty()));
     }
 
     private List<GuardianItem> fillingGuardianResponse(PersonListResponse personListResponse) {
