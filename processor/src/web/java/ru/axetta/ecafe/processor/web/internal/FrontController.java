@@ -3050,7 +3050,7 @@ public class FrontController extends HttpServlet {
                     dulDetails.add(getDulDetailFromDocumentItem(item));
                 }
             }
-            if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
+            if (snils != null && !snils.isEmpty() && DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
             MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
