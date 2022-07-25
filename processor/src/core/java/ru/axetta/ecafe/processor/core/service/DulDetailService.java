@@ -212,10 +212,12 @@ public class DulDetailService {
     }
 
     @SuppressWarnings("unchecked")
-    public void saveDulFromMk(Session session, List<DulDetail> dulDetails, Long idOfClient) {
+    public void saveDulOnlyISPP(Session session, List<DulDetail> dulDetails, Long idOfClient) {
+        //проверка на случай отсутсвия типа документа из мк в испп
         Criteria criteria = session.createCriteria(DulGuide.class);
         List<DulGuide> allDulGuides = (List<DulGuide>) criteria.list();
-        List<Long> dulGuidesId = allDulGuides.stream().map(DulGuide::getDocumentTypeId).collect(Collectors.toList());
+        List<Long> dulGuidesId = allDulGuides.stream()
+                .map(DulGuide::getDocumentTypeId).collect(Collectors.toList());
         Date currentDate = new Date();
 
         for (DulDetail dulDetail : dulDetails) {

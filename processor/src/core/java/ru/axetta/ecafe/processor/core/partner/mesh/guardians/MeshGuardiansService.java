@@ -191,11 +191,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             guardian.setMeshGUID(personId);
             guardian.setSan(snils);
             guardian.setBirthDate(birthDate);
-            if (!CollectionUtils.isEmpty(dulDetails)) {
-                guardian.setDulDetail(new HashSet<>(dulDetails));
-            }
             session.update(guardian);
 
+            if (dulDetails != null && !dulDetails.isEmpty()) {
+                dulDetails = dulDetails.stream().peek(d -> d.setDeleteState(false)).collect(Collectors.toList());
+                RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
+            }
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("soap метод createMeshPerson");
             clientGuardianHistory.setGuardian(mobile);
@@ -240,7 +242,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             List<DulDetail> dulDetails = guardianPerson.getDocument()
                     .stream().map(MeshDocumentResponse::getDulDetail).collect(Collectors.toList());
 
-            RuntimeContext.getAppContext().getBean(DulDetailService.class).saveDulFromMk(session, dulDetails, guardian.getIdOfClient());
+            RuntimeContext.getAppContext().getBean(DulDetailService.class).saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
         }
 
         return guardian;
