@@ -133,6 +133,7 @@ public class MealsJwtFilter extends OncePerRequestFilter {
         } catch (Exception e)
         {
             logger.error("Ошибка при логировании фудбокса", e);
+            e.printStackTrace();
         }
     }
 
