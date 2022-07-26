@@ -92,15 +92,17 @@ public class CancelledFoodBoxService {
                 return true;
             }
         }
+        logger.info("Сервис CancelledFoodBoxService не запущен instance:" + instance + ", reqInstance:" + reqInstance);
         return false;
     }
 
     public void scheduleSync() throws Exception {
         if (isOn()) {
-            //
+            logger.info("Сервис CancelledFoodBoxService успешно запущен");
             //Подготавливаем первоначальный список
             DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
             List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getActiveFoodBoxPreorder();
+            logger.info("Первоначальное сканирование обнаружило " + foodBoxPreorders.size() + " заказов фудбокса для удаления");
             for (FoodBoxPreorder foodBoxPreorder : foodBoxPreorders) {
                 currentFoodBoxPreorders.put(foodBoxPreorder.getIdFoodBoxPreorder(), foodBoxPreorder.getCreateDate());
             }
@@ -139,6 +141,7 @@ public class CancelledFoodBoxService {
                 foodBoxPreorder.setPosted(2);
                 session.merge(foodBoxPreorder);
                 it.remove();
+                logger.info("Удаление фудбокс заказа " + foodBoxPreorder.getIdFoodBoxPreorder());
             }
         }
     }
