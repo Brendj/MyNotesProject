@@ -4,13 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.Message;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 
 public class LoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
     private final Logger log = LoggerFactory.getLogger(LoggingListenableFutureCallback.class);
-    private final String message;
+    private final Message<AbstractPushData> message;
 
-    public LoggingListenableFutureCallback(String message) {
+    public LoggingListenableFutureCallback(Message<AbstractPushData> message) {
         this.message = message;
     }
 
@@ -20,12 +22,11 @@ public class LoggingListenableFutureCallback implements ListenableFutureCallback
             onFailure(new NullPointerException("SendResult is null"));
             return;
         }
-        log.info("Message: " + message + ", Timestamp: " + result.getRecordMetadata().timestamp()
-                + ", Partition: " + result.getRecordMetadata().partition());
+        log.info("Kafka message: " + message + ", Partition: " + result.getRecordMetadata().partition());
     }
 
     @Override
     public void onFailure(@NonNull Throwable e) {
-        throw new RuntimeException(String.format("Failed to send message to kafka: %s", message), e);
+        log.error(String.format("Failed to send message to kafka: %s", message), e);
     }
 }

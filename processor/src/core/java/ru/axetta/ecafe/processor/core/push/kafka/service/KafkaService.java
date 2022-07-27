@@ -33,17 +33,19 @@ public class KafkaService {
 
     @Async
     public void sendMessage(AbstractPushData data) {
-        try {
+        //todo закоменчено для теста, пока что нет конфигов для kafka
+//        try {
             Message<AbstractPushData> message = MessageBuilder.withPayload(data)
                     .setHeader("correlationId", UUID.randomUUID())
                     .setHeader("createdAt", System.currentTimeMillis())
                     .build();
-            ListenableFuture<SendResult<String, Object>> future = kafkaTemplate
-                    .send(getTopicFromConfig(data), message);
-            future.addCallback(new LoggingListenableFutureCallback(data.toString()));
-        } catch (Exception e) {
-            log.error(String.format("Failed to send message [%s] due to : %s", data.toString(), e));
-        }
+//            ListenableFuture<SendResult<String, Object>> future = kafkaTemplate
+//                    .send(getTopicFromConfig(data), message);
+//            future.addCallback(new LoggingListenableFutureCallback(message));
+//        } catch (Exception e) {
+//            log.error(String.format("Failed to send message [%s] due to : %s", data.toString(), e));
+//        }
+        log.info("Kafka message: " + message);
     }
 
     private String getTopicFromConfig(AbstractPushData data) throws Exception {
