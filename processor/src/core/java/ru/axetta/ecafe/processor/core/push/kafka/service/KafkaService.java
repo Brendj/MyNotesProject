@@ -24,6 +24,7 @@ import java.util.UUID;
 @Service
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
+    public static final String MESH_KAFKA_ENABLE_PROPERTY = "ecafe.processing.mesh.kafka.enable";
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
