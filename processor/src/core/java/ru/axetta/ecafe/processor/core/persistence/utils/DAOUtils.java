@@ -4825,7 +4825,8 @@ public class DAOUtils {
 
     public static List<ApplicationForFood> getApplicationForFoodListByClient(Session session, Long idOfClient) {
         Query query = session.createQuery(
-                "select a from ApplicationForFood a where a.client.idOfClient = :idOfClient order by a.serviceNumber");
+                "select a from ApplicationForFood a join fetch a.dtisznCodes where a.client.idOfClient = :idOfClient " +
+                        "order by a.serviceNumber");
         query.setParameter("idOfClient", idOfClient);
         return query.list();
     }
@@ -5006,7 +5007,7 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession,
-            String serviceNumber, Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile,
+            String serviceNumber, Client client, ApplicationForFoodStatus status, String mobile,
             String applicantName, String applicantSecondName, String applicantSurname, Long version,
             Long historyVersion, Date docOrderDate, String idOfDocOrder) throws Exception {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession,
@@ -5016,7 +5017,6 @@ public class DAOUtils {
             return null;
         }
         applicationForFood.setClient(client);
-        applicationForFood.setDtisznCode(dtisznCode);
         applicationForFood.setStatus(status);
         applicationForFood.setMobile(mobile);
         applicationForFood.setApplicantName(applicantName);

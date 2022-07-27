@@ -216,7 +216,7 @@ public class ETPMVDaoService {
         ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
         for (ApplicationForFood applicationForFood : apps) {
             try {
-                if (applicationForFood.getDtisznCode() != null) {
+                if (!applicationForFood.isInoe()) {
                     result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status,
                             nextVersion, historyVersion));
                 } else {

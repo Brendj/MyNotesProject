@@ -76,7 +76,7 @@ public class ApplicationForFoodConfirmDocumentsCommand {
                         "ApplicationForFood with record ID = '" + recordId + "' was not found");
             }
             if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.PAUSED
-                    || applicationForFood.getDtisznCode() != null) {
+                    || !applicationForFood.isInoe()) {
                 throw WebApplicationException.badRequest(400, "ApplicationForFood with record ID = '" + recordId
                         + "' confirm documents not available due its state");
             }

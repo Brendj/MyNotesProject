@@ -133,7 +133,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
-                ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(session, applicationForFood);
+                ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
                 ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient());
                 if (info != null) {
                     item.setStartDate(info.getDateStart());

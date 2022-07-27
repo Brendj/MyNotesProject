@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
+import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDiscount;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodStatus;
 
@@ -40,29 +41,31 @@ public class ApplicationForFoodReportItem {
 
     }
 
-    public ApplicationForFoodReportItem(Session session, ApplicationForFood applicationForFood) {
-        this.serviceNumber = applicationForFood.getServiceNumber();
-        this.createdDate = applicationForFood.getCreatedDate();
-        this.applicationForFoodStatus = applicationForFood.getStatus();
-        this.lastUpdate = applicationForFood.getLastUpdate();
-        this.archiveDate = applicationForFood.getArchiveDate();
-        this.contractId = applicationForFood.getClient().getContractId();
-        this.fio = applicationForFood.getClient().getPerson().getFullName();
-        this.applicantFio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
-        this.idOfOrg = applicationForFood.getClient().getOrg().getIdOfOrg();
-        this.orgName = applicationForFood.getClient().getOrg().getShortNameInfoService();
-        this.benefit = applicationForFood.getDtisznCode() == null ? "Иное" : applicationForFood.getDtisznCode().toString();
-        this.isInoe = applicationForFood.getDtisznCode() == null;
-        this.applicationForFood = applicationForFood;
-        isChanged = false;
-        this.mobile = applicationForFood.getMobile();
-        statuses = new ArrayList<ApplicationForFoodStatus>();
-        this.archieved = applicationForFood.getArchived();
-        if (applicationForFood.getDiscountDateStart() != null && applicationForFood.getDiscountDateEnd() != null) {
-            this.startDate = applicationForFood.getDiscountDateStart();
-            this.endDate = applicationForFood.getDiscountDateEnd();
+    public ApplicationForFoodReportItem(ApplicationForFood applicationForFood) {
+        for (ApplicationForFoodDiscount item : applicationForFood.getDtisznCodes()) {
+            this.serviceNumber = applicationForFood.getServiceNumber();
+            this.createdDate = applicationForFood.getCreatedDate();
+            this.applicationForFoodStatus = applicationForFood.getStatus();
+            this.lastUpdate = applicationForFood.getLastUpdate();
+            this.archiveDate = applicationForFood.getArchiveDate();
+            this.contractId = applicationForFood.getClient().getContractId();
+            this.fio = applicationForFood.getClient().getPerson().getFullName();
+            this.applicantFio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
+            this.idOfOrg = applicationForFood.getClient().getOrg().getIdOfOrg();
+            this.orgName = applicationForFood.getClient().getOrg().getShortNameInfoService();
+            this.benefit = item.getDtisznCode() == null ? "Иное" : item.getDtisznCode().toString();
+            this.isInoe = item.getDtisznCode() == null;
+            this.applicationForFood = applicationForFood;
+            isChanged = false;
+            this.mobile = applicationForFood.getMobile();
+            statuses = new ArrayList<ApplicationForFoodStatus>();
+            this.archieved = applicationForFood.getArchived();
+            if (applicationForFood.getDiscountDateStart() != null && applicationForFood.getDiscountDateEnd() != null) {
+                this.startDate = applicationForFood.getDiscountDateStart();
+                this.endDate = applicationForFood.getDiscountDateEnd();
+            }
+            this.expand = false;
         }
-        this.expand = false;
     }
 
     public String getApplicationForFoodStateString() {

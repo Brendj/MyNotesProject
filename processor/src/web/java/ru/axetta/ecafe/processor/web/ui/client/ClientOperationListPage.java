@@ -258,7 +258,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         applicationsForFood.clear();
         List<ApplicationForFood> applicationForFoodList = DAOUtils.getApplicationForFoodListByClient(session, this.idOfClient);
         for (ApplicationForFood applicationForFood : applicationForFoodList) {
-            applicationsForFood.add(new ApplicationForFoodReportItem(session, applicationForFood));
+            applicationsForFood.add(new ApplicationForFoodReportItem(applicationForFood));
         }
     }
 

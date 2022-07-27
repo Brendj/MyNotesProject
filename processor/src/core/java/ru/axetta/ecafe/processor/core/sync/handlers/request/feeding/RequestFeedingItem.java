@@ -13,7 +13,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestFeedingItem {
 
@@ -32,7 +36,7 @@ public class RequestFeedingItem {
     private String applicantSecondName;
     private String applicantPhone;
     private ApplicationForFoodCreatorType creatorType;
-    private Long dtisznCode;
+    private List<Long> dtisznCodes;
     private String idOfDocOrder;
     private Date docOrderDate;
     private Boolean isArchive;
@@ -47,7 +51,7 @@ public class RequestFeedingItem {
     public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status,
             Integer declineReason, Date applicationCreatedDate, Long idOfClient, String applicantSurname,
             String applicantName, String applicantSecondName, String applicantPhone,
-            ApplicationForFoodCreatorType creatorType, Long dtisznCode, String idOfDocOrder, Date docOrderDate,
+            ApplicationForFoodCreatorType creatorType, List<Long> dtisznCodes, String idOfDocOrder, Date docOrderDate,
             Boolean isArchive, Date otherDiscountStartDate, Date otherDiscountEndDate, String errorMessage) {
         this.applicationForFeedingNumber = applicationForFeedingNumber;
         this.servNumber = servNumber;
@@ -60,7 +64,7 @@ public class RequestFeedingItem {
         this.applicantSecondName = applicantSecondName;
         this.applicantPhone = applicantPhone;
         this.creatorType = creatorType;
-        this.dtisznCode = dtisznCode;
+        this.dtisznCodes = dtisznCodes;
         this.idOfDocOrder = idOfDocOrder;
         this.docOrderDate = docOrderDate;
         this.isArchive = isArchive;
@@ -72,6 +76,11 @@ public class RequestFeedingItem {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
             this.errorMessage = errorMessage;
         }
+    }
+
+    public boolean isInoe() {
+        //Если льгота одна и она Иное, то true
+        return (dtisznCodes != null && dtisznCodes.size() == 1 && dtisznCodes.get(0) == null);
     }
 
     public RequestFeedingItem(ApplicationForFood applicationForFood, Date statusCreatedDate) {
@@ -87,14 +96,14 @@ public class RequestFeedingItem {
         this.applicantName = applicationForFood.getApplicantName();
         this.applicantSecondName = applicationForFood.getApplicantSecondName();
         this.applicantPhone = applicationForFood.getMobile();
-        this.dtisznCode = applicationForFood.getDtisznCode();
+        this.dtisznCodes = applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode().longValue()).collect(Collectors.toList());
         this.isArchive = applicationForFood.getArchived();
         this.version = applicationForFood.getVersion();
         this.servNumber = applicationForFood.getServiceNumber();
         this.creatorType = applicationForFood.getCreatorType();
         this.idOfDocOrder = applicationForFood.getIdOfDocOrder();
         this.docOrderDate = applicationForFood.getDocOrderDate();
-        this.hasSocialDiscount = (null != applicationForFood.getDtisznCode());
+        this.hasSocialDiscount = (applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode()).collect(Collectors.toList())).contains(null);
         this.statusCreatedDate = statusCreatedDate;
     }
 
@@ -119,6 +128,7 @@ public class RequestFeedingItem {
         String applicantSecondName;
         String applicantPhone;
         Long dtisznDiscount;
+        List<Long> newDiscounts = new ArrayList<>();
         Boolean archived;
         String serviceNumber;
         ApplicationForFoodCreatorType creatorType;
@@ -204,9 +214,18 @@ public class RequestFeedingItem {
         otherDiscountStartDate = XMLUtils.getDateAttributeValue(itemNode, "FDate");
         otherDiscountEndDate = XMLUtils.getDateAttributeValue(itemNode, "LDate");
 
+        Node discountNode = itemNode.getFirstChild();
+        while (null != discountNode) {
+            if (Node.ELEMENT_NODE == discountNode.getNodeType() && discountNode.getNodeName().equals("RFD")) {
+                newDiscounts.add(XMLUtils.getLongAttributeValue(discountNode, "DiscountDtszn"));
+            }
+            discountNode = discountNode.getNextSibling();
+        }
+        if (newDiscounts.size() == 0) newDiscounts.add(dtisznDiscount);
+
         return new RequestFeedingItem(applicationForFeedingNumber, serviceNumber, state, declineReason, regDate,
                 idOfClient, applicantSurname, applicantName, applicantSecondName, applicantPhone, creatorType,
-                dtisznDiscount, idOfDocOrder, docOrderDate, archived, otherDiscountStartDate, otherDiscountEndDate,
+                newDiscounts, idOfDocOrder, docOrderDate, archived, otherDiscountStartDate, otherDiscountEndDate,
                 errorMessage.toString());
     }
 
@@ -244,8 +263,13 @@ public class RequestFeedingItem {
         if (null != applicantPhone) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantPhone", applicantPhone);
         }
-        if (null != dtisznCode) {
-            XMLUtils.setAttributeIfNotNull(element, "DiscountDtszn", dtisznCode);
+        for (Long code : dtisznCodes) {
+            Element discountElement = document.createElement("RFD");
+            XMLUtils.setAttributeIfNotNull(discountElement, "DiscountDtszn", code);
+            element.appendChild(discountElement);
+            if (null != code) {
+                XMLUtils.setAttributeIfNotNull(element, "DiscountDtszn", code);
+            }
         }
         if (null != isArchive) {
             XMLUtils.setAttributeIfNotNull(element, "D", isArchive.toString());
@@ -349,12 +373,12 @@ public class RequestFeedingItem {
         this.applicantPhone = applicantPhone;
     }
 
-    public Long getDtisznCode() {
-        return dtisznCode;
+    public List<Long> getDtisznCodes() {
+        return dtisznCodes;
     }
 
-    public void setDtisznCode(Long dtisznCode) {
-        this.dtisznCode = dtisznCode;
+    public void setDtisznCodes(List<Long> dtisznCodes) {
+        this.dtisznCodes = dtisznCodes;
     }
 
     public Boolean getArchive() {

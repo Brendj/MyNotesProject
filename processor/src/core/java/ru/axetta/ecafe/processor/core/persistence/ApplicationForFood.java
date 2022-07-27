@@ -56,6 +56,11 @@ public class ApplicationForFood {
 
     }
 
+    public boolean isInoe() {
+        //Если льгота одна и она Иное, то true
+        return (dtisznCodes != null && dtisznCodes.size() == 1 && dtisznCodes.iterator().next().getDtisznCode() == null);
+    }
+
     public Long getIdOfApplicationForFood() {
         return idOfApplicationForFood;
     }

@@ -38,7 +38,7 @@
             <key column="idOfApplicationForFood"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodHistory"/>
         </set>
-        <set name="applicationForFoodDiscounts" inverse="true" cascade="all">
+        <set name="dtisznCodes" inverse="true" cascade="all">
             <key column="idOfApplicationForFood"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDiscount"/>
         </set>

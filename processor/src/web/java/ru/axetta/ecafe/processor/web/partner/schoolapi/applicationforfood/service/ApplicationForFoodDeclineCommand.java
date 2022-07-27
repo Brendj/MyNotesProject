@@ -76,7 +76,7 @@ public class ApplicationForFoodDeclineCommand {
                         "ApplicationForFood with record ID = '" + recordId + "' was not found");
             }
             if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME
-                    || applicationForFood.getDtisznCode() != null) {
+                    || !applicationForFood.isInoe()) {
                 throw WebApplicationException.badRequest(400,
                         "ApplicationForFood with record ID = '" + recordId + "' decline not available due its state");
             }

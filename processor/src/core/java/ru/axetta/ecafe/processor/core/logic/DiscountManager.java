@@ -190,13 +190,18 @@ public class DiscountManager {
 
     public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
         CategoryDiscountDSZN categoryDiscountDSZN;
-        if (item.getDtisznCode() == null) {
-            ///для льготы Иное
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
-        } else {
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        boolean result = true;
+        for (ApplicationForFoodDiscount discount : item.getDtisznCodes()) {
+            if (discount.getDtisznCode() == null) {
+                ///для льготы Иное
+                categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
+            } else {
+                categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, discount.getDtisznCode().longValue());
+            }
+            if (!categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete()) result = false;
         }
-        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
+
+        return result;
     }
 
     public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
