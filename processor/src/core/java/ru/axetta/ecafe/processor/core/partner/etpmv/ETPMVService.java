@@ -52,6 +52,7 @@ public class ETPMVService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVService.class);
     private final int COORDINATE_MESSAGE = 0;
     public static final String ISPP_ID = "-063101-";
+    public static final String NEW_ISPP_ID = "-100101-";
     private final int PAUSE_IN_MILLIS = 1000;
     public final String BENEFIT_INOE = "0";
     public final String BENEFIT_REGULAR = "1";
@@ -92,7 +93,7 @@ public class ETPMVService {
     }
 
     private boolean getCoordinateMessageFormat(String message) {
-        return message.contains("IDLink");
+        return message.contains(NEW_ISPP_ID);
     }
 
     private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
@@ -105,7 +106,7 @@ public class ETPMVService {
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
-        if (!serviceNumber.contains(ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
+        if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
 
         boolean newFormat = getCoordinateMessageFormat(message);
 
