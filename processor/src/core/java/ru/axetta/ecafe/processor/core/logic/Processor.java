@@ -7582,12 +7582,17 @@ public class Processor implements SyncProcessor {
                 }
             }
         }
-        return new String[]{
+        String[] result = new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
                 guardianName, "empTime", empTime, "childPassCheckerMark", childPassCheckerMark, "childPassCheckerName",
                 childPassCheckerName, EventNotificationService.ENTER_WITH_CHECKER_VALUES_KEY, enterWithChecker};
+        if (childPassCheckerId != null) {
+            result = EventNotificationService
+                    .attachToValues("childPassCheckerId", event.getChildPassCheckerId().toString(), result);
+        }
+        return result;
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
