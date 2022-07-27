@@ -2684,8 +2684,9 @@ public class ClientManager {
         if (patronymic != null) {
             conjunction.add(Restrictions.ilike("p.secondName", patronymic, MatchMode.ANYWHERE));
         }
-        disjunction.add(conjunction);
-
+        if (firstName != null || lastName != null || patronymic != null) {
+            disjunction.add(conjunction);
+        }
         if (mobile != null) {
             disjunction.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobile), MatchMode.ANYWHERE));
         }
