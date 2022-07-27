@@ -1290,14 +1290,14 @@ public class DAOService {
         q.executeUpdate();
     }
 
-	public boolean orgNotExistsByNsiId(Integer organizationId) {
-        if(organizationId == null){
+	public Boolean orgNotExistsByNsiId(Integer organizationId) {
+        if(organizationId == null) {
             return true;
         }
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_orgs WHERE organizationidfromnsi = :organizationId");
-        q.setParameter("organizationId", organizationId);
+        Query query = entityManager.createNativeQuery("SELECT NOT EXISTS(SELECT 1 FROM cf_orgs where organizationidfromnsi = :organizationId)");
+        query.setParameter("organizationId", organizationId);
 
-        return HibernateUtils.getDbLong(q.getSingleResult()) == 0;
+        return (Boolean)query.getSingleResult();
     }
 	
 	public void deleteOldFoodBoxAvailable(Org org, Long idOfDish) {
