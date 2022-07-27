@@ -350,8 +350,10 @@ public class EventNotificationService {
     }
 
     public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
-        sendPushToMK(destClient, dataClient, type, values, eventTime, passDirection, guardian);
-
+        if (RuntimeContext.getInstance().getConfigProperties()
+                .getProperty(KafkaService.MESH_KAFKA_ENABLE_PROPERTY, "0").equals("1")) {
+            sendPushToMK(destClient, dataClient, type, values, eventTime, passDirection, guardian);
+        }
         if (dataClient == null && !isNotificationEnabled(destClient, type, values)) {
             return;
         }
