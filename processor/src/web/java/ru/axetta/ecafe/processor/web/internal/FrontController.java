@@ -3311,7 +3311,15 @@ public class FrontController extends HttpServlet {
         return idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
                 || birthDate == null || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
                 || relation == null || typeOfLegalRepresent == null || informing == null ||
-                (StringUtils.isEmpty(snils) && (documents == null || documents.isEmpty()));
+                (StringUtils.isEmpty(snils) && (documents == null || documents.isEmpty() ||
+                        checkDocumentsForRequiredFields(documents)));
+    }
+
+    private boolean checkDocumentsForRequiredFields(List<DocumentItem> documents) {
+        for (DocumentItem document : documents)
+            if (document.getDocumentTypeId() == null || document.getNumber() == null)
+                return true;
+        return false;
     }
 
     private List<GuardianItem> fillingGuardianResponse(PersonListResponse personListResponse) {
