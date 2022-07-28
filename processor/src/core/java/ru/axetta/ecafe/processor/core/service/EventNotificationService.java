@@ -434,17 +434,16 @@ public class EventNotificationService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         EnterEventData enterEventData = new EnterEventData();
 
-        if (type.equals(NOTIFICATION_ENTER_EVENT)) {
-            if (passDirection != null && passDirection != 0 && passDirection != 1)
+        if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
+            if (passDirection == null)
                 return null;
-            enterEventData.setActionType(passDirection);
-        } else if (type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
-            if (passDirection != null && passDirection != 0 && passDirection != 1)
-                return null;
-            if (guardian != null) {
+            if ((passDirection == 0 || passDirection == 6))
+                enterEventData.setActionType(0);
+            else if ((passDirection == 2 || passDirection == 7))
+                enterEventData.setActionType(1);
+            else return null;
+            if (guardian != null)
                 enterEventData.setAgentId(guardian.getIdOfClient().intValue());
-            }
-            enterEventData.setActionType(passDirection);
         } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
             enterEventData.setTicketStatus("0");
             enterEventData.setOrganizationName(findValueInParams
