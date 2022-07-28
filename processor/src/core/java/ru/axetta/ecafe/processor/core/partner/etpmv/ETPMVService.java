@@ -8,6 +8,7 @@ import generated.contingent.ispp.*;
 import generated.etp.ObjectFactory;
 import generated.etp.*;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -17,7 +18,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xerces.dom.ElementNSImpl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -52,6 +52,7 @@ public class ETPMVService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVService.class);
     private final int COORDINATE_MESSAGE = 0;
     public static final String ISPP_ID = "-063101-";
+    public static final String NEW_ISPP_ID = "-100101-";
     private final int PAUSE_IN_MILLIS = 1000;
     public final String BENEFIT_INOE = "0";
     public final String BENEFIT_REGULAR = "1";
@@ -90,7 +91,7 @@ public class ETPMVService {
     }
 
     private boolean getCoordinateMessageFormat(String message) {
-        return message.contains("IDLink");
+        return message.contains(NEW_ISPP_ID);
     }
 
     private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
@@ -103,7 +104,7 @@ public class ETPMVService {
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
-        if (!serviceNumber.contains(ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
+        if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
 
         boolean newFormat = getCoordinateMessageFormat(message);
 
@@ -112,13 +113,24 @@ public class ETPMVService {
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
 
-        ElementNSImpl serviceProperties = (ElementNSImpl) customAttributes.getAny();
+        Element serviceProperties = (Element) customAttributes.getAny();
         String guid;
         List<String> benefits;
         String yavl_lgot = "";
         if (newFormat) {
             guid = getServicePropertiesValue(serviceProperties, "IDLink");
             benefits = getBenefitsFromServiceProperties(serviceProperties);
+            Boolean isLegal = Boolean.parseBoolean(getServicePropertiesValue(serviceProperties, "IsLegalRepresentative"));
+            if (!isLegal) {
+                logger.error("Error in processCoordinateMessage: not legal represent");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not legal represent");
+                return;
+            }
+            if (benefits.size() == 0) {
+                logger.error("Error in processCoordinateMessage: wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                return;
+            }
         } else {
             guid = getServicePropertiesValue(serviceProperties, "guid");
             yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
@@ -302,52 +314,27 @@ public class ETPMVService {
         return TimeZone.getTimeZone("Europe/Moscow").getRawOffset()/60000; //значение часового сдвига в мс выражаем в минутах
     }
 
-    private String getServicePropertiesValue(ElementNSImpl serviceProperties, String elementName) {
-        for (int i = 0; i < serviceProperties.getLength(); i++) {
-            String nodeName = serviceProperties.getChildNodes().item(i).getNodeName();
-            if (nodeName != null && nodeName.contains(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
+    private String getServicePropertiesValue(Element serviceProperties, String elementName) {
+        for (int i = 0; i < serviceProperties.getChildNodes().getLength(); i++) {
+            Node node = serviceProperties.getChildNodes().item(i);
+            if (node.getLocalName().equals(elementName)) return serviceProperties.getChildNodes().item(i).getFirstChild().getNodeValue();
         }
         return null;
     }
 
-    //private List<String> getBenefitsFromServiceProperties(RequestServiceForSign.CustomAttributes customAttributes) {
-    private List<String> getBenefitsFromServiceProperties(ElementNSImpl serviceProperties) {
+    private List<String> getBenefitsFromServiceProperties(Element serviceProperties) {
         List<String> result = new ArrayList<>();
-        for (int i = 0; i < serviceProperties.getLength(); i++) {
+        for (int i = 0; i < serviceProperties.getChildNodes().getLength(); i++) {
             Node node = serviceProperties.getChildNodes().item(i);
-            String nodeName = node.getNodeName();
-            if (nodeName != null && nodeName.contains("PreferentialCategory")) {
+            if (node.getLocalName() != null && node.getLocalName().equals("PreferentialCategory")) {
                 for (int j = 0; j < node.getChildNodes().getLength(); j++) {
                     Node node2 = node.getChildNodes().item(j);
-                    if (Boolean.parseBoolean(node2.getNodeValue())) {
+                    if (node2.getFirstChild() != null && Boolean.parseBoolean(node2.getFirstChild().getTextContent())) {
                         result.add(node2.getLocalName());
                     }
                 }
             }
         }
-        /*ServiceProperties serviceProperties = (ServiceProperties)customAttributes.getAny();
-        ServiceProperties.PreferentialCategory preferentialCategory = serviceProperties.getPreferentialCategory();
-        if (preferentialCategory.isChildrenWithDisabilities()) {
-            result.add();
-        }
-        if (preferentialCategory.isUnemployedPersons()) {
-            result.add("56"); //отличается формулировка льготы
-        }
-        if (preferentialCategory.isDisabledChild()) {
-            result.add("24");
-        }
-        if (preferentialCategory.isLargeFamily()) {
-            result.add("66");
-        }
-        if (preferentialCategory.isLowIncomeFamily()) {
-            result.add("48");
-        }
-        if (preferentialCategory.isRecipient()) {
-            //нет
-        }
-        if (preferentialCategory.isWithoutParentalCare()) {
-            result.add("52");
-        }*/
         return result;
     }
 
@@ -600,3 +587,4 @@ public class ETPMVService {
         }
     }
 }
+

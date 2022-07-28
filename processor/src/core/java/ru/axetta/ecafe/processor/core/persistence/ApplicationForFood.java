@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
@@ -58,7 +59,16 @@ public class ApplicationForFood {
 
     public boolean isInoe() {
         //Если льгота одна и она Иное, то true
-        return (dtisznCodes != null && dtisznCodes.size() == 1 && dtisznCodes.iterator().next().getDtisznCode() == null);
+        return (dtisznCodes != null && dtisznCodes.size() == 1
+                && ((ApplicationForFoodDiscount)dtisznCodes.toArray()[0]).getDtisznCode() == null);
+    }
+
+    public ApplicationForFoodDiscount getApplicationDiscountOldFormat() {
+        return (ApplicationForFoodDiscount)dtisznCodes.toArray()[0];
+    }
+
+    public boolean isNewFormat() {
+        return serviceNumber.contains(ETPMVService.NEW_ISPP_ID);
     }
 
     public Long getIdOfApplicationForFood() {
