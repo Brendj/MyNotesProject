@@ -3020,7 +3020,8 @@ public class FrontController extends HttpServlet {
     private boolean checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
                                           Date birthDate, String snils, List<DocumentItem> documents) {
         return StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || (snils == null && (documents == null || documents.isEmpty()));
+                || birthDate == null || (snils == null && (documents == null || documents.isEmpty() ||
+                checkDocumentsForRequiredFields(documents)));
     }
 
     @WebMethod(operationName = "createMeshPerson")
@@ -3297,7 +3298,7 @@ public class FrontController extends HttpServlet {
             guardianItem.setLastName(r.getSurname());
             guardianItem.setFirstName(r.getFirstName());
             guardianItem.setPatronymic(r.getSecondName());
-            guardianItem.setGender(r.getIsppGender());
+            guardianItem.setGender(r.getMeshGender());
             guardianItem.setBirthDate(r.getBirthDate());
             guardianItem.setSnils(r.getSnils());
             guardianItem.setMobile(r.getMobile());
