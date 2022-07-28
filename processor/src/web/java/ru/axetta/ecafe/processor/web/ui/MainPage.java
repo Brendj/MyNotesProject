@@ -4086,7 +4086,7 @@ public class MainPage implements Serializable {
     public Object cancelMeshClientSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
-            meshClientSelectPage.cancelDulSelection();
+            meshClientSelectPage.cancelMeshClientSelection();
             if (!modalPages.empty()) {
                 if (modalPages.peek() == meshClientSelectPage) {
                     modalPages.pop();
