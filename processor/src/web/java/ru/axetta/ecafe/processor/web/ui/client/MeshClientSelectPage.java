@@ -106,7 +106,7 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
     public void fill(Session persistenceSession) {
     }
 
-    public void cancelDulSelection() {
+    public void cancelMeshClientSelection() {
         this.meshGuardianPerson = null;
     }
 

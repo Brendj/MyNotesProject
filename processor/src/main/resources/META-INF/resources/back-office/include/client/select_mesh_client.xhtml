@@ -11,7 +11,7 @@
     <rich:popupPanel modal="true" id="modalMeshClientSelectorPanel" autosized="false" width="1000" height="700" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalMeshClientSelectorPanel')}.hide();return false;"/>
         <f:facet name="header">
-            <h:outputText escape="true" value="Выбор Документа"/>
+            <h:outputText escape="true" value="Выбор представителя мк"/>
         </f:facet>
         <h:form id="modalMeshClientSelectorForm"
                 styleClass="borderless-form" eventsQueue="modalMeshClientSelectorFormEventsQueue">
@@ -270,7 +270,7 @@
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.hide();"
                                                styleClass="command-link">
                             </a4j:commandButton>
-                            <a4j:commandButton value="Отмена" action="#{mainPage.completeMeshClientSelection}"
+                            <a4j:commandButton value="Отмена" action="#{mainPage.cancelMeshClientSelection}"
                                                render="#{mainPage.topMostPage.pageComponent.id}"
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.hide();"
                                                styleClass="command-button" style="width: 80px;">
