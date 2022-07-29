@@ -72,11 +72,6 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
             return null;
         }
 
-        if(StringUtils.isEmpty(ETPTextCode)) {
-            printError("Добавьте новый (текстовый) код льготы ЕТП");
-            return null;
-        }
-
         try {
             convertCode = Integer.parseInt(code);
         } catch (NumberFormatException e) {
@@ -122,7 +117,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
                 guid = UUID.randomUUID().toString();
-                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, ETPTextCode, nextVersion, guid);
+                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, StringUtils.isEmpty(ETPTextCode) ? null : ETPTextCode, nextVersion, guid);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;

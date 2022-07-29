@@ -176,7 +176,7 @@ public class ETPMVService {
                 return;
             }
         }
-        List<Long> _benefits;
+        List<Integer> _benefits;
         if (newFormat) {
             _benefits = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefits(benefits);
         } else {

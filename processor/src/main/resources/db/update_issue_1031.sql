@@ -16,7 +16,7 @@ create table cf_applications_for_food_discount(
 );
 
 comment on table cf_applications_for_food_discount is 'Льготы по ЗЛП';
-comment on column cf_applications_for_food_discount.cf_applications_for_food_discount is 'Первичный ключ';
+comment on column cf_applications_for_food_discount.idofappdiscount is 'Первичный ключ';
 comment on column cf_applications_for_food_discount.idofapplicationforfood is 'Ссылка на заявление';
 comment on column cf_applications_for_food_discount.dtiszncode is 'Код льготы ДТиСЗН';
 

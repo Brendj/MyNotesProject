@@ -258,8 +258,16 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         applicationsForFood.clear();
         List<ApplicationForFood> applicationForFoodList = DAOUtils.getApplicationForFoodListByClient(session, this.idOfClient);
         for (ApplicationForFood applicationForFood : applicationForFoodList) {
-            applicationsForFood.add(new ApplicationForFoodReportItem(applicationForFood));
+            applicationsForFood.addAll(getApplicationForFoodReportItems(applicationForFood));
         }
+    }
+
+    private List<ApplicationForFoodReportItem> getApplicationForFoodReportItems(ApplicationForFood applicationForFood) {
+        List<ApplicationForFoodReportItem> result = new ArrayList<>();
+        for (ApplicationForFoodDiscount item : applicationForFood.getDtisznCodes()) {
+            result.add(new ApplicationForFoodReportItem(applicationForFood, item.getDtisznCode()));
+        }
+        return result;
     }
 
     public List<ApplicationForFoodReportItem> getApplicationsForFood() {

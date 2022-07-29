@@ -36,7 +36,7 @@ public class RequestFeedingItem {
     private String applicantSecondName;
     private String applicantPhone;
     private ApplicationForFoodCreatorType creatorType;
-    private List<Long> dtisznCodes;
+    private List<Integer> dtisznCodes;
     private String idOfDocOrder;
     private Date docOrderDate;
     private Boolean isArchive;
@@ -51,7 +51,7 @@ public class RequestFeedingItem {
     public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status,
             Integer declineReason, Date applicationCreatedDate, Long idOfClient, String applicantSurname,
             String applicantName, String applicantSecondName, String applicantPhone,
-            ApplicationForFoodCreatorType creatorType, List<Long> dtisznCodes, String idOfDocOrder, Date docOrderDate,
+            ApplicationForFoodCreatorType creatorType, List<Integer> dtisznCodes, String idOfDocOrder, Date docOrderDate,
             Boolean isArchive, Date otherDiscountStartDate, Date otherDiscountEndDate, String errorMessage) {
         this.applicationForFeedingNumber = applicationForFeedingNumber;
         this.servNumber = servNumber;
@@ -96,7 +96,7 @@ public class RequestFeedingItem {
         this.applicantName = applicationForFood.getApplicantName();
         this.applicantSecondName = applicationForFood.getApplicantSecondName();
         this.applicantPhone = applicationForFood.getMobile();
-        this.dtisznCodes = applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode().longValue()).collect(Collectors.toList());
+        this.dtisznCodes = applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode()).collect(Collectors.toList());
         this.isArchive = applicationForFood.getArchived();
         this.version = applicationForFood.getVersion();
         this.servNumber = applicationForFood.getServiceNumber();
@@ -127,8 +127,8 @@ public class RequestFeedingItem {
         String applicantName;
         String applicantSecondName;
         String applicantPhone;
-        Long dtisznDiscount;
-        List<Long> newDiscounts = new ArrayList<>();
+        Integer dtisznDiscount;
+        List<Integer> newDiscounts = new ArrayList<>();
         Boolean archived;
         String serviceNumber;
         ApplicationForFoodCreatorType creatorType;
@@ -195,7 +195,7 @@ public class RequestFeedingItem {
             errorMessage.append("Attribute ApplicantPhone is incorrect ");
         }
 
-        dtisznDiscount = XMLUtils.getLongAttributeValue(itemNode, "DiscountDtszn");
+        dtisznDiscount = XMLUtils.getIntegerAttributeValue(itemNode, "DiscountDtszn");
 
         archived = XMLUtils.getBooleanAttributeValue(itemNode, "D");
 
@@ -217,7 +217,7 @@ public class RequestFeedingItem {
         Node discountNode = itemNode.getFirstChild();
         while (null != discountNode) {
             if (Node.ELEMENT_NODE == discountNode.getNodeType() && discountNode.getNodeName().equals("RFD")) {
-                newDiscounts.add(XMLUtils.getLongAttributeValue(discountNode, "DiscountDtszn"));
+                newDiscounts.add(XMLUtils.getIntegerAttributeValue(discountNode, "DiscountDtszn"));
             }
             discountNode = discountNode.getNextSibling();
         }
@@ -263,7 +263,7 @@ public class RequestFeedingItem {
         if (null != applicantPhone) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantPhone", applicantPhone);
         }
-        for (Long code : dtisznCodes) {
+        for (Integer code : dtisznCodes) {
             Element discountElement = document.createElement("RFD");
             XMLUtils.setAttributeIfNotNull(discountElement, "DiscountDtszn", code);
             element.appendChild(discountElement);
@@ -373,11 +373,11 @@ public class RequestFeedingItem {
         this.applicantPhone = applicantPhone;
     }
 
-    public List<Long> getDtisznCodes() {
+    public List<Integer> getDtisznCodes() {
         return dtisznCodes;
     }
 
-    public void setDtisznCodes(List<Long> dtisznCodes) {
+    public void setDtisznCodes(List<Integer> dtisznCodes) {
         this.dtisznCodes = dtisznCodes;
     }
 

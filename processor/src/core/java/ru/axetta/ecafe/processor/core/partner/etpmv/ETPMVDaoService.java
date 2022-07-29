@@ -113,7 +113,7 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void createApplicationForGood(Client client, List<Long> dtisznCodes, String mobile,
+    public void createApplicationForGood(Client client, List<Integer> dtisznCodes, String mobile,
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
             ApplicationForFoodCreatorType creatorType) throws Exception {
         Session session = entityManager.unwrap(Session.class);
@@ -134,15 +134,15 @@ public class ETPMVDaoService {
     }
 
     @Transactional(readOnly = true)
-    public Long getDSZNBenefit(String benefit) {
+    public Integer getDSZNBenefit(String benefit) {
         Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPCode = :benefit");
         query.setParameter("benefit", Long.parseLong(benefit));
         query.setMaxResults(1);
-        return new Long((Integer)query.getSingleResult());
+        return (Integer)query.getSingleResult();
     }
 
     @Transactional(readOnly = true)
-    public List<Long> getDSZNBenefits(List<String> benefits) {
+    public List<Integer> getDSZNBenefits(List<String> benefits) {
         Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPTextCode in (:benefits)");
         query.setParameter("benefits", benefits);
         return query.getResultList();

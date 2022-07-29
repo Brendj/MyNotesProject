@@ -4574,7 +4574,7 @@ public class DAOUtils {
         return (ApplicationForFood) criteria.uniqueResult();
     }
 
-    public static ApplicationForFood createApplicationForFood(Session session, Client client, List<Long> dtisznCodes,
+    public static ApplicationForFood createApplicationForFood(Session session, Client client, List<Integer> dtisznCodes,
             String mobile, String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
             ApplicationForFoodCreatorType creatorType) throws Exception {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
@@ -4585,7 +4585,7 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood createApplicationForFoodWithVersion(Session session, Client client,
-            List<Long> dtisznCodes, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
+            List<Integer> dtisznCodes, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
             String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) throws Exception {
         //Дополнительно проверяем на существование заявления перед созданием нового
         List<ApplicationForFood> existingApps = getApplicationForFoodByClient(session, client);
@@ -4597,7 +4597,7 @@ public class DAOUtils {
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version);
         session.save(applicationForFood);
-        for (Long code: dtisznCodes) {
+        for (Integer code: dtisznCodes) {
             ApplicationForFoodDiscount obj = new ApplicationForFoodDiscount(code == null ? null : code.intValue());
             obj.setApplicationForFood(applicationForFood);
             session.save(obj);
@@ -4825,7 +4825,7 @@ public class DAOUtils {
 
     public static List<ApplicationForFood> getApplicationForFoodListByClient(Session session, Long idOfClient) {
         Query query = session.createQuery(
-                "select a from ApplicationForFood a join fetch a.dtisznCodes where a.client.idOfClient = :idOfClient " +
+                "select a from ApplicationForFood a where a.client.idOfClient = :idOfClient " +
                         "order by a.serviceNumber");
         query.setParameter("idOfClient", idOfClient);
         return query.list();

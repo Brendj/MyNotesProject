@@ -39,6 +39,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     private CategoryDiscount categoryDiscount;
     private String categoryName;
     private String ETPCode;
+    private String ETPTextCode;
 
     @Override
     public void completeCategorySelection(Session session, Long idOfCategory) throws Exception {
@@ -94,6 +95,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
             categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
             categoryDiscountDSZN.setVersion(nextVersion);
             categoryDiscountDSZN.setETPCode(etpCodeLong);
+            categoryDiscountDSZN.setETPTextCode(StringUtils.isEmpty(ETPTextCode) ? null : ETPTextCode);
             categoryDiscountDSZN.setCode(DSZNcode);
 
             persistenceSession.update(categoryDiscountDSZN);
@@ -133,6 +135,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         } else {
             this.ETPCode = null;
         }
+        this.ETPTextCode = categoryDiscountDSZN.getETPTextCode();
     }
 
     public EntityManager getEntityManager() {
@@ -193,5 +196,13 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
 
     public void setETPCode(String ETPCode) {
         this.ETPCode = ETPCode;
+    }
+
+    public String getETPTextCode() {
+        return ETPTextCode;
+    }
+
+    public void setETPTextCode(String ETPTextCode) {
+        this.ETPTextCode = ETPTextCode;
     }
 }

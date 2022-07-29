@@ -13,9 +13,5 @@
         <many-to-one name="applicationForFood" class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFood" column="idofapplicationforfood"
                      not-null="true" fetch="join"/>
         <property name="dtisznCode" column="DTISZNCode" type="integer"/>
-        <set name="applicationForFoodHistories" inverse="true" cascade="all">
-            <key column="idOfApplicationForFood"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodHistory"/>
-        </set>
     </class>
 </hibernate-mapping>

@@ -41,7 +41,7 @@ public class ApplicationForFoodReportItem {
 
     }
 
-    public ApplicationForFoodReportItem(ApplicationForFood applicationForFood) {
+    public ApplicationForFoodReportItem(ApplicationForFood applicationForFood, Integer dtisznCode) {
         for (ApplicationForFoodDiscount item : applicationForFood.getDtisznCodes()) {
             this.serviceNumber = applicationForFood.getServiceNumber();
             this.createdDate = applicationForFood.getCreatedDate();
@@ -53,8 +53,8 @@ public class ApplicationForFoodReportItem {
             this.applicantFio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
             this.idOfOrg = applicationForFood.getClient().getOrg().getIdOfOrg();
             this.orgName = applicationForFood.getClient().getOrg().getShortNameInfoService();
-            this.benefit = item.getDtisznCode() == null ? "Иное" : item.getDtisznCode().toString();
-            this.isInoe = item.getDtisznCode() == null;
+            this.benefit = dtisznCode == null ? "Иное" : dtisznCode.toString();
+            this.isInoe = dtisznCode == null;
             this.applicationForFood = applicationForFood;
             isChanged = false;
             this.mobile = applicationForFood.getMobile();
