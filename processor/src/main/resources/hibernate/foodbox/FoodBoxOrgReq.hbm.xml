@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgReq" table="cf_foodbox_org_lock" >
+    <class name="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgReq" table="cf_foodbox_org_lock" optimistic-lock="version">
         <id name="orglockId" column="orglockId" type="long">
             <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
                 <param name="optimizer">pooled-lo</param>
@@ -14,7 +14,7 @@
                 <param name="sequence_name">cf_foodbox_org_lock_seq</param>
             </generator>
         </id>
-        <property name="version" column="version" type="long"/>
+        <version name="version" column="version" type="long"/>
         <property name="currentversion" column="currentversion" type="long"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
                      not-null="true" update="false"/>

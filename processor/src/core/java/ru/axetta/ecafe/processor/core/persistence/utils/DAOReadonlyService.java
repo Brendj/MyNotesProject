@@ -1573,6 +1573,16 @@ public class DAOReadonlyService {
         }
     }
 
+    public FoodBoxOrgReq getFooboxOrgReq (Org org) {
+        try {
+            Query query = entityManager.createQuery("select fb from FoodBoxOrgReq fb where fb.org=:org");
+            query.setParameter("org", org);
+            return  (FoodBoxOrgReq) query.getSingleResult();
+        } catch (NoResultException  e) {
+            return null;
+        }
+    }
+
     public List<Client> findClientsBySan(String san) {
         return DAOUtils.findClientsBySan(entityManager, san);
     }

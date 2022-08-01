@@ -124,10 +124,10 @@ public class MealsJwtFilter extends OncePerRequestFilter {
             String date = simpleDateFormat.get().format(new Date());
             writer.append(date + " in: " + NEWLINE +
                     "\tQuery: " + paramStringReq + NEWLINE +
-                    "\tHeaders: " + paramStringHeadersReq + NEWLINE +
+//                    "\tHeaders: " + paramStringHeadersReq + NEWLINE +
                     "\tBody: " + requestBody + NEWLINE);
             writer.append(date + " out: " + NEWLINE +
-                    "\tHeaders: " + paramStringHeadersResp + NEWLINE +
+//                    "\tHeaders: " + paramStringHeadersResp + NEWLINE +
                     "\tBody: " + responseBody + NEWLINE);
             writer.close();
         } catch (Exception e)
