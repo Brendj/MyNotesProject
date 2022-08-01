@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -173,199 +171,196 @@ public class MealsController extends Application {
                 body(responseResult.internalError(null, 0));
     }
 
-//    @GET
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path(value = "orders/foodbox")
-//    public Response getPersonFoodboxOrders(@Context HttpServletRequest request) {
-//        //Контроль безопасности
-//        if (!mealsService.validateAccess()) {
-//            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
-//                    entity(responseResult.errorAuth()).build();
-//        }
-//        String contractIdStr = "";
-//        String fromStr = "";
-//        String toStr = "";
-//        String sortStr = "";
-//        Long contract = null;
-//        Map<String, String> params = parseParams(request);
-//        for (Map.Entry<String, String> currParam : params.entrySet()) {
-//            if (currParam.getKey().toLowerCase().equals("from")) {
-//                fromStr = currParam.getValue();
-//                fromStr = fromStr.replace("%3A", ":");
-//                fromStr = fromStr.replace("%20", " ");
-//                continue;
-//            }
-//            if (currParam.getKey().toLowerCase().equals("to")) {
-//                toStr = currParam.getValue();
-//                toStr = toStr.replace("%3A", ":");
-//                toStr = toStr.replace("%20", " ");
-//                continue;
-//            }
-//            if (currParam.getKey().toLowerCase().equals("sort")) {
-//                sortStr = currParam.getValue();
-//                continue;
-//            }
-//            if (currParam.getKey().toLowerCase().equals("contractid")) {
-//                contractIdStr = currParam.getValue();
-//                continue;
-//            }
-//        }
-//        //Логика проверки корректности запроса
-//        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(contractIdStr, fromStr, toStr, sortStr);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//        //Логика всех проверок по клиенту
-//        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId());
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика обработки самого заказа
-//       return mealsService.getPreordersForDates(mealsPOJO.getClient(),
-//               mealsPOJO.getFrom(), mealsPOJO.getTo(), mealsPOJO.getSortDesc());
-//    }
-//
-//
-//    @GET
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path(value = "orders/foodbox/{foodboxOrderId}")
-//    public Response getPersonFoodboxOrder(@Context HttpServletRequest request, @PathParam("foodboxOrderId") String foodboxOrderId) {
-//        //Контроль безопасности
-//        if (!mealsService.validateAccess()) {
-//            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
-//                    entity(responseResult.errorAuth()).build();
-//        }
-//
-//        //Логика проверки корректности запроса
-//        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(foodboxOrderId);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика обработки самого заказа
-//        return mealsService.getPreorderById(mealsPOJO.getIsppIdFoodbox());
-//    }
-//
-//    @GET
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path(value = "menu/buffet")
-//    @Transactional
-//    public Response getPersonBuffetMenu(@Context HttpServletRequest request) {
-//        //Контроль безопасности
-//        if (!mealsService.validateAccess()) {
-//            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
-//                    entity(responseResult.errorAuth()).build();
-//        }
-//
-//        String contractIdStr = "";
-//        String onDateStr = "";
-//
-//        Map<String, String> params = parseParams(request);
-//        for (Map.Entry<String, String> currParam : params.entrySet()) {
-//            if (currParam.getKey().toLowerCase().equals("contractid")) {
-//                contractIdStr = currParam.getValue();
-//                continue;
-//            }
-//            if (currParam.getKey().toLowerCase().equals("ondate")) {
-//                {
-//                    onDateStr = currParam.getValue();
-//                    onDateStr = onDateStr.replace("%3A", ":");
-//                    onDateStr = onDateStr.replace("%20", " ");
-//                    continue;
-//                }
-//            }
-//        }
-//
-//        //Логика проверки корректности запроса
-//        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoForBuffet4(onDateStr, contractIdStr);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика всех проверок по клиенту
-//        mealsPOJO = mealsService.validateByClientInfo(mealsPOJO.getContractId(), MealsFunctions.GET_BUFET);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика запросов к бд
-//        mealsService.getDataFromDAO(mealsPOJO.getClient(), MealsFunctions.GET_BUFET);
-//
-//        //Логика получения самого меню
-//        return mealsService.getBuffetInfo();
-//    }
-//
-//    @PUT
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path(value = "clients/foodboxAllowed")
-//    public Response setPersonFoodboxAllowed(@Context HttpServletRequest request) {
-//        Result result = new Result();
-//        //Контроль безопасности
-//        if (!mealsService.validateAccess()) {
-//            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
-//                    entity(responseResult.errorAuth()).build();
-//        }
-//
-//        String contractIdStr = "";
-//        String foodBoxAvailableStr = "";
-//        Map<String, String> params = parseParams(request);
-//        for (Map.Entry<String, String> currParam : params.entrySet()) {
-//            if (currParam.getKey().toLowerCase().equals("contractid")) {
-//                contractIdStr = currParam.getValue();
-//                continue;
-//            }
-//            if (currParam.getKey().toLowerCase().equals("foodboxallowed")) {
-//                foodBoxAvailableStr = currParam.getValue();
-//                continue;
-//            }
-//        }
-//
-//        //Логика проверки корректности запроса
-//        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoClientAllowed(contractIdStr, foodBoxAvailableStr, MealsFunctions.SET_FOODBOX_ALLOWED);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//        Boolean foodAv = mealsPOJO.getFoodBoxAvailable();
-//        //Логика всех проверок по клиенту
-//        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO.getContractId());
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика установки флага
-//        return mealsService.setFoodboxAllowed(mealsPOJO.getClient(), foodAv);
-//    }
-//
-//    @GET
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path(value = "clients")
-//    public Response getClientData(@Context HttpServletRequest request) {
-//        Result result = new Result();
-//        //Контроль безопасности
-//        if (!mealsService.validateAccess()) {
-//            return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).
-//                    entity(responseResult.errorAuth()).build();
-//        }
-//        String contractIdStr = "";
-//        Map<String, String> params = parseParams(request);
-//        for (Map.Entry<String, String> currParam : params.entrySet()) {
-//            if (currParam.getKey().toLowerCase().equals("contractid")) {
-//                contractIdStr = currParam.getValue();
-//                continue;
-//            }
-//        }
-//        //Логика проверки корректности запроса
-//        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoClientAllowed(contractIdStr, null, MealsFunctions.GET_FOODBOX_ALLOWED);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика всех проверок по клиенту
-//        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO.getContractId());
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO.getResponse();
-//
-//        //Логика получения флага
-//        return mealsService.getFoodBoxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
-//    }
+    @GetMapping(value = "orders/foodbox", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getPersonFoodboxOrders(@Context HttpServletRequest request) {
+        //Контроль безопасности
+        if (!mealsService.validateAccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
+        }
+        String contractIdStr = "";
+        String fromStr = "";
+        String toStr = "";
+        String sortStr = "";
+        Long contract = null;
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("from")) {
+                fromStr = currParam.getValue();
+                fromStr = fromStr.replace("%3A", ":");
+                fromStr = fromStr.replace("%20", " ");
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("to")) {
+                toStr = currParam.getValue();
+                toStr = toStr.replace("%3A", ":");
+                toStr = toStr.replace("%20", " ");
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("sort")) {
+                sortStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+        }
+        //Логика проверки корректности запроса
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(contractIdStr, fromStr, toStr, sortStr);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+        //Логика всех проверок по клиенту
+        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId());
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика обработки самого заказа
+       return mealsService.getPreordersForDates(mealsPOJO.getClient(),
+               mealsPOJO.getFrom(), mealsPOJO.getTo(), mealsPOJO.getSortDesc());
+    }
+
+
+    @GetMapping(value = "orders/foodbox/{foodboxOrderId}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getPersonFoodboxOrder(@Context HttpServletRequest request, @PathVariable("foodboxOrderId") String foodboxOrderId) {
+        //Контроль безопасности
+        if (!mealsService.validateAccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
+        }
+
+        //Логика проверки корректности запроса
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(foodboxOrderId);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика обработки самого заказа
+        return mealsService.getPreorderById(mealsPOJO.getIsppIdFoodbox());
+    }
+
+    @GetMapping(value = "menu/buffet", produces = APPLICATION_JSON_VALUE)
+    @Transactional
+    public ResponseEntity<?> getPersonBuffetMenu(@Context HttpServletRequest request) {
+        //Контроль безопасности
+        if (!mealsService.validateAccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
+        }
+
+        String contractIdStr = "";
+        String onDateStr = "";
+
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("ondate")) {
+                {
+                    onDateStr = currParam.getValue();
+                    onDateStr = onDateStr.replace("%3A", ":");
+                    onDateStr = onDateStr.replace("%20", " ");
+                    continue;
+                }
+            }
+        }
+
+        //Получаем клиента
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+        Client client = mealsPOJO.getClient();
+
+        //Логика проверки корректности запроса
+        mealsPOJO = mealsService.validateByFormalInfoForBuffet(onDateStr, mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика всех проверок по клиенту
+        mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.GET_BUFET, mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика запросов к бд
+        mealsService.getDataFromDAO(mealsPOJO.getClient(), MealsFunctions.GET_BUFET);
+
+        //Логика получения самого меню
+        return mealsService.getBuffetInfo();
+    }
+
+    @PutMapping(value = "clients/foodboxAllowed", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> setPersonFoodboxAllowed(@Context HttpServletRequest request) {
+        Result result = new Result();
+        //Контроль безопасности
+        if (!mealsService.validateAccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
+        }
+
+        String contractIdStr = "";
+        String foodBoxAvailableStr = "";
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("foodboxallowed")) {
+                foodBoxAvailableStr = currParam.getValue();
+                continue;
+            }
+        }
+
+        //Получаем клиента
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика проверки корректности запроса
+        mealsPOJO = mealsService.validateByFormalInfoClientAllowed(foodBoxAvailableStr, MealsFunctions.SET_FOODBOX_ALLOWED, mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+        Boolean foodAv = mealsPOJO.getFoodBoxAvailable();
+        //Логика всех проверок по клиенту
+        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика установки флага
+        return mealsService.setFoodboxAllowed(mealsPOJO.getClient(), foodAv);
+    }
+
+    @GetMapping(value = "clients", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getClientData(@Context HttpServletRequest request) {
+        Result result = new Result();
+        //Контроль безопасности
+        if (!mealsService.validateAccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
+        }
+        String contractIdStr = "";
+        Map<String, String> params = parseParams(request);
+        for (Map.Entry<String, String> currParam : params.entrySet()) {
+            if (currParam.getKey().toLowerCase().equals("contractid")) {
+                contractIdStr = currParam.getValue();
+                continue;
+            }
+        }
+
+        //Получаем клиента
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика проверки корректности запроса
+        mealsPOJO = mealsService.validateByFormalInfoClientAllowed(null, MealsFunctions.GET_FOODBOX_ALLOWED, mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика всех проверок по клиенту
+        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO.getResponseEntity();
+
+        //Логика получения флага
+        return mealsService.getFoodBoxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());
+    }
 
     private Map<String, String> parseParams(HttpServletRequest httpRequest) {
         Map<String, String> map = new HashMap<>();
