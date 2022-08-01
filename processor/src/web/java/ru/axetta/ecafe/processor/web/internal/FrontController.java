@@ -1184,179 +1184,180 @@ public class FrontController extends HttpServlet {
         }
     }
 
-    @WebMethod(operationName = "registerClientsV2")
-    public List<RegisterClientResult> registerClientsV2(
-            @WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "clientDescList") List<ClientDescV2> clientDescList,
-            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness,
-            @WebParam(name = "guidStaff") String guidStaff)
-            throws FrontControllerException {
-        logger.debug("checkRequestValidity");
-        checkRequestValidity(orgId);
-
-        String notifyByPush =
-                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
-        String notifyByEmail =
-                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
-
-        ArrayList<RegisterClientResult> results = new ArrayList<RegisterClientResult>();
-        String recIdStr = null;
-        Integer recId = null;
-        for (ClientDescV2 cd : clientDescList) {
-            try {
-                logger.debug("create FieldConfig v2");
-                recIdStr = getClientParamDescValueByName("recId", cd.getClientDescParams().getParam());
-                if (recIdStr == null) {
-                    throw new FrontControllerException("Не найден обязательный параметр recId");
-                }
-                String group = getClientParamDescValueByName("group", cd.getClientDescParams().getParam());
-                recId = Integer.parseInt(recIdStr);
-                if (group == null) {
-                    throw new FrontControllerException("Не найден обязательный параметр group");
-                }
-
-                String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
-                if (orgIdForClient == null) {
-                    throw new FrontControllerException("Не найден обязательный параметр orgId");
-                }
-
-                ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
-                logger.debug("check client params v2");
-
-                String contractSurname = getClientParamDescValueByName("contractSurname",
-                        cd.getClientDescParams().getParam());
-                String contractName = getClientParamDescValueByName("contractName",
-                        cd.getClientDescParams().getParam());
-                String contractSecondName = getClientParamDescValueByName("contractSecondName",
-                        cd.getClientDescParams().getParam());
-                String contractDoc = getClientParamDescValueByName("contractDoc", cd.getClientDescParams().getParam());
-                String surname = getClientParamDescValueByName("surname", cd.getClientDescParams().getParam());
-                String name = getClientParamDescValueByName("name", cd.getClientDescParams().getParam());
-                String secondName = getClientParamDescValueByName("secondName", cd.getClientDescParams().getParam());
-                String doc = getClientParamDescValueByName("doc", cd.getClientDescParams().getParam());
-                String address = getClientParamDescValueByName("address", cd.getClientDescParams().getParam());
-                String phone = getClientParamDescValueByName("phone", cd.getClientDescParams().getParam());
-                String mobilePhone = getClientParamDescValueByName("mobilePhone", cd.getClientDescParams().getParam());
-                String email = getClientParamDescValueByName("email", cd.getClientDescParams().getParam());
-                String notifyBySms = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
-                String comments = getClientParamDescValueByName("comments", cd.getClientDescParams().getParam());
-                String cardNo = getClientParamDescValueByName("cardNo", cd.getClientDescParams().getParam());
-                String cardPrintedNo = getClientParamDescValueByName("cardPrintedNo",
-                        cd.getClientDescParams().getParam());
-                String cardType = getClientParamDescValueByName("cardType", cd.getClientDescParams().getParam());
-                String snils = getClientParamDescValueByName("snils", cd.getClientDescParams().getParam());
-                String cardExpiry = getClientParamDescValueByName("cardExpiry", cd.getClientDescParams().getParam());
-                String cardIssued = getClientParamDescValueByName("cardIssued", cd.getClientDescParams().getParam());
-                String birthDate = getClientParamDescValueByName("birthDate", cd.getClientDescParams().getParam());
-                String gender = getClientParamDescValueByName("gender", cd.getClientDescParams().getParam());
-                String middleGroup = getClientParamDescValueByName("middleGroup", cd.getClientDescParams().getParam());
-
-                fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, contractSurname == null ? " " : contractSurname);
-                if (contractName != null) {
-                    fc.setValue(ClientManager.FieldId.CONTRACT_NAME, contractName);
-                }
-                fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME,
-                        contractSecondName == null ? "" : contractSecondName);
-                if (contractDoc != null) {
-                    fc.setValue(ClientManager.FieldId.CONTRACT_DOC, contractDoc);
-                }
-                if (surname != null) {
-                    fc.setValue(ClientManager.FieldId.SURNAME, surname);
-                }
-                if (name != null) {
-                    fc.setValue(ClientManager.FieldId.NAME, name);
-                }
-                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName == null ? "" : secondName);
-                if (doc != null) {
-                    fc.setValue(ClientManager.FieldId.DOC, doc);
-                }
-                if (address != null) {
-                    fc.setValue(ClientManager.FieldId.ADDRESS, address);
-                }
-                if (phone != null) {
-                    fc.setValue(ClientManager.FieldId.PHONE, phone);
-                }
-                if (mobilePhone != null) {
-                    fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
-                }
-                if (email != null) {
-                    fc.setValue(ClientManager.FieldId.EMAIL, email);
-                }
-                if (group != null) {
-                    fc.setValue(ClientManager.FieldId.GROUP, group);
-                }
-                if (notifyBySms != null) {
-                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, notifyBySms);
-                }
-                if (notifyByEmail != null) {
-                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
-                }
-                if (notifyByPush != null) {
-                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
-                }
-                if (comments != null) {
-                    fc.setValue(ClientManager.FieldId.COMMENTS, comments);
-                }
-                if (cardNo != null) {
-                    fc.setValue(ClientManager.FieldId.CARD_ID, cardNo);
-                }
-                if (cardPrintedNo != null) {
-                    fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cardPrintedNo);
-                }
-                try {
-                    if (cardType != null) {
-                        fc.setValue(ClientManager.FieldId.CARD_TYPE, Integer.parseInt(cardType));
-                    }
-                } catch (Exception e) {
-                    if (!cardType.equals("")) {
-                        throw new FrontControllerException("Неправильный формат поля cardType");
-                    }
-                }
-                if (cardExpiry != null) {
-                    fc.setValue(ClientManager.FieldId.CARD_EXPIRY, CalendarUtils.parseDate(cardExpiry));
-                }
-                if (cardIssued != null) {
-                    fc.setValue(ClientManager.FieldId.CARD_ISSUED, CalendarUtils.parseDate(cardIssued));
-                }
-                if (snils != null) {
-                    fc.setValue(ClientManager.FieldId.SAN, snils);
-                }
-                if (birthDate != null) {
-                    fc.setValue(ClientManager.FieldId.BIRTH_DATE, birthDate);
-                }
-                if (gender != null) {
-                    fc.setValue(ClientManager.FieldId.GENDER, gender);
-                }
-                if (middleGroup != null) {
-                    fc.setValue(ClientManager.FieldId.MIDDLE_GROUP, middleGroup);
-                }
-
-                logger.debug("register client v2");
-                boolean noComment = true;
-                ClientsMobileHistory clientsMobileHistory =
-                        new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
-                if (orgId != null) {
-                    Org org = DAOReadonlyService.getInstance().findOrg(orgId);
-                    if (org != null) {
-                        clientsMobileHistory.setOrg(org);
-                    }
-                    clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-                } else {
-                    clientsMobileHistory.setShowing("АРМ");
-                }
-                if (guidStaff != null) {
-                    clientsMobileHistory.setStaffguid(guidStaff);
-                }
-                long idOfClient = ClientManager
-                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
-                                clientsMobileHistory);
-                results.add(new RegisterClientResult(idOfClient, recId, true, null));
-            } catch (Exception e) {
-                results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
-            }
-        }
-        return results;
-    }
+    // https://yt.iteco.dev/issue/ISPP-1078
+//    @WebMethod(operationName = "registerClientsV2")
+//    public List<RegisterClientResult> registerClientsV2(
+//            @WebParam(name = "orgId") Long orgId,
+//            @WebParam(name = "clientDescList") List<ClientDescV2> clientDescList,
+//            @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness,
+//            @WebParam(name = "guidStaff") String guidStaff)
+//            throws FrontControllerException {
+//        logger.debug("checkRequestValidity");
+//        checkRequestValidity(orgId);
+//
+//        String notifyByPush =
+//                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+//        String notifyByEmail =
+//                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
+//
+//        ArrayList<RegisterClientResult> results = new ArrayList<RegisterClientResult>();
+//        String recIdStr = null;
+//        Integer recId = null;
+//        for (ClientDescV2 cd : clientDescList) {
+//            try {
+//                logger.debug("create FieldConfig v2");
+//                recIdStr = getClientParamDescValueByName("recId", cd.getClientDescParams().getParam());
+//                if (recIdStr == null) {
+//                    throw new FrontControllerException("Не найден обязательный параметр recId");
+//                }
+//                String group = getClientParamDescValueByName("group", cd.getClientDescParams().getParam());
+//                recId = Integer.parseInt(recIdStr);
+//                if (group == null) {
+//                    throw new FrontControllerException("Не найден обязательный параметр group");
+//                }
+//
+//                String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
+//                if (orgIdForClient == null) {
+//                    throw new FrontControllerException("Не найден обязательный параметр orgId");
+//                }
+//
+//                ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+//                logger.debug("check client params v2");
+//
+//                String contractSurname = getClientParamDescValueByName("contractSurname",
+//                        cd.getClientDescParams().getParam());
+//                String contractName = getClientParamDescValueByName("contractName",
+//                        cd.getClientDescParams().getParam());
+//                String contractSecondName = getClientParamDescValueByName("contractSecondName",
+//                        cd.getClientDescParams().getParam());
+//                String contractDoc = getClientParamDescValueByName("contractDoc", cd.getClientDescParams().getParam());
+//                String surname = getClientParamDescValueByName("surname", cd.getClientDescParams().getParam());
+//                String name = getClientParamDescValueByName("name", cd.getClientDescParams().getParam());
+//                String secondName = getClientParamDescValueByName("secondName", cd.getClientDescParams().getParam());
+//                String doc = getClientParamDescValueByName("doc", cd.getClientDescParams().getParam());
+//                String address = getClientParamDescValueByName("address", cd.getClientDescParams().getParam());
+//                String phone = getClientParamDescValueByName("phone", cd.getClientDescParams().getParam());
+//                String mobilePhone = getClientParamDescValueByName("mobilePhone", cd.getClientDescParams().getParam());
+//                String email = getClientParamDescValueByName("email", cd.getClientDescParams().getParam());
+//                String notifyBySms = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
+//                String comments = getClientParamDescValueByName("comments", cd.getClientDescParams().getParam());
+//                String cardNo = getClientParamDescValueByName("cardNo", cd.getClientDescParams().getParam());
+//                String cardPrintedNo = getClientParamDescValueByName("cardPrintedNo",
+//                        cd.getClientDescParams().getParam());
+//                String cardType = getClientParamDescValueByName("cardType", cd.getClientDescParams().getParam());
+//                String snils = getClientParamDescValueByName("snils", cd.getClientDescParams().getParam());
+//                String cardExpiry = getClientParamDescValueByName("cardExpiry", cd.getClientDescParams().getParam());
+//                String cardIssued = getClientParamDescValueByName("cardIssued", cd.getClientDescParams().getParam());
+//                String birthDate = getClientParamDescValueByName("birthDate", cd.getClientDescParams().getParam());
+//                String gender = getClientParamDescValueByName("gender", cd.getClientDescParams().getParam());
+//                String middleGroup = getClientParamDescValueByName("middleGroup", cd.getClientDescParams().getParam());
+//
+//                fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, contractSurname == null ? " " : contractSurname);
+//                if (contractName != null) {
+//                    fc.setValue(ClientManager.FieldId.CONTRACT_NAME, contractName);
+//                }
+//                fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME,
+//                        contractSecondName == null ? "" : contractSecondName);
+//                if (contractDoc != null) {
+//                    fc.setValue(ClientManager.FieldId.CONTRACT_DOC, contractDoc);
+//                }
+//                if (surname != null) {
+//                    fc.setValue(ClientManager.FieldId.SURNAME, surname);
+//                }
+//                if (name != null) {
+//                    fc.setValue(ClientManager.FieldId.NAME, name);
+//                }
+//                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName == null ? "" : secondName);
+//                if (doc != null) {
+//                    fc.setValue(ClientManager.FieldId.DOC, doc);
+//                }
+//                if (address != null) {
+//                    fc.setValue(ClientManager.FieldId.ADDRESS, address);
+//                }
+//                if (phone != null) {
+//                    fc.setValue(ClientManager.FieldId.PHONE, phone);
+//                }
+//                if (mobilePhone != null) {
+//                    fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
+//                }
+//                if (email != null) {
+//                    fc.setValue(ClientManager.FieldId.EMAIL, email);
+//                }
+//                if (group != null) {
+//                    fc.setValue(ClientManager.FieldId.GROUP, group);
+//                }
+//                if (notifyBySms != null) {
+//                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, notifyBySms);
+//                }
+//                if (notifyByEmail != null) {
+//                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
+//                }
+//                if (notifyByPush != null) {
+//                    fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+//                }
+//                if (comments != null) {
+//                    fc.setValue(ClientManager.FieldId.COMMENTS, comments);
+//                }
+//                if (cardNo != null) {
+//                    fc.setValue(ClientManager.FieldId.CARD_ID, cardNo);
+//                }
+//                if (cardPrintedNo != null) {
+//                    fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cardPrintedNo);
+//                }
+//                try {
+//                    if (cardType != null) {
+//                        fc.setValue(ClientManager.FieldId.CARD_TYPE, Integer.parseInt(cardType));
+//                    }
+//                } catch (Exception e) {
+//                    if (!cardType.equals("")) {
+//                        throw new FrontControllerException("Неправильный формат поля cardType");
+//                    }
+//                }
+//                if (cardExpiry != null) {
+//                    fc.setValue(ClientManager.FieldId.CARD_EXPIRY, CalendarUtils.parseDate(cardExpiry));
+//                }
+//                if (cardIssued != null) {
+//                    fc.setValue(ClientManager.FieldId.CARD_ISSUED, CalendarUtils.parseDate(cardIssued));
+//                }
+//                if (snils != null) {
+//                    fc.setValue(ClientManager.FieldId.SAN, snils);
+//                }
+//                if (birthDate != null) {
+//                    fc.setValue(ClientManager.FieldId.BIRTH_DATE, birthDate);
+//                }
+//                if (gender != null) {
+//                    fc.setValue(ClientManager.FieldId.GENDER, gender);
+//                }
+//                if (middleGroup != null) {
+//                    fc.setValue(ClientManager.FieldId.MIDDLE_GROUP, middleGroup);
+//                }
+//
+//                logger.debug("register client v2");
+//                boolean noComment = true;
+//                ClientsMobileHistory clientsMobileHistory =
+//                        new ClientsMobileHistory("soap метод registerClientsV2 (фронт)");
+//                if (orgId != null) {
+//                    Org org = DAOReadonlyService.getInstance().findOrg(orgId);
+//                    if (org != null) {
+//                        clientsMobileHistory.setOrg(org);
+//                    }
+//                    clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+//                } else {
+//                    clientsMobileHistory.setShowing("АРМ");
+//                }
+//                if (guidStaff != null) {
+//                    clientsMobileHistory.setStaffguid(guidStaff);
+//                }
+//                long idOfClient = ClientManager
+//                        .registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment,
+//                                clientsMobileHistory);
+//                results.add(new RegisterClientResult(idOfClient, recId, true, null));
+//            } catch (Exception e) {
+//                results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
+//            }
+//        }
+//        return results;
+//    }
 
     private String getClientParamDescValueByName(String paramName, List<ClientDescV2.ClientDescItemParam> params) {
         for (ClientDescV2.ClientDescItemParam param : params) {
