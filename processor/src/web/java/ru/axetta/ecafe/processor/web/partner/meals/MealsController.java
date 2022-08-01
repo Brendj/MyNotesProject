@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.meals;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -12,9 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,12 +18,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgReq;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderAvailable;
-import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorderDish;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategory;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.service.CancelledFoodBoxService;
 import ru.axetta.ecafe.processor.core.service.MealsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -42,7 +32,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.*;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -93,6 +82,7 @@ public class MealsController extends Application {
     }
 
     @PostMapping(value = "orders/foodbox", produces = APPLICATION_JSON_VALUE)
+    @Transactional
     public ResponseEntity<?> addPersonFoodboxOrder(@Context HttpServletRequest request, FoodboxOrder foodboxOrders) throws InterruptedException {
         Long id = new Date().getTime();
         Long idT = Thread.currentThread().getId();
@@ -142,12 +132,12 @@ public class MealsController extends Application {
                     persistenceTransaction = persistenceSession.beginTransaction();
 
                     //Логика проверки корректности запроса
-                    mealsPOJO = mealsService.validateByFormalInfo(xrequestStr);
+                    mealsPOJO = mealsService.validateByFormalInfo(xrequestStr, mealsPOJO);
                     if (mealsPOJO.getResponseEntity() != null)
                         return mealsPOJO.getResponseEntity();
 
                     //Логика всех проверок по клиенту
-                    mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.CREATE_FOODBOX);
+                    mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.CREATE_FOODBOX, mealsPOJO);
                     if (mealsPOJO.getResponseEntity() != null)
                         return mealsPOJO.getResponseEntity();
 
@@ -155,9 +145,10 @@ public class MealsController extends Application {
                     mealsService.getDataFromDAO(client, MealsFunctions.CREATE_FOODBOX);
 
                     //Логика обработки самого заказа
-                    mealsPOJO = mealsService.mainLogicNewPreorder(persistenceSession, foodboxOrders, mealsPOJO.getClient(), xrequestStr, mealsPOJO.getAvailableMoney());
-                    if (foodBoxOrgReq != null && foodBoxOrgReq.getCurrentversion() != null)
-                        mealsService.setFoodBoxOrgReqCurr(persistenceSession, foodBoxOrgReq, foodBoxOrgReq.getCurrentversion() + 1);
+                    mealsPOJO = mealsService.mainLogicNewPreorder(persistenceSession, foodboxOrders, client, xrequestStr, mealsPOJO);
+                    if (!mealsPOJO.getCreated())
+                        return mealsPOJO.getResponseEntity();
+                    mealsService.setFoodBoxOrgReqCurr(persistenceSession, foodBoxOrgReq, foodBoxOrgReq.getCurrentversion() + 1);
                     persistenceTransaction.commit();
                     CancelledFoodBoxService.currentFoodBoxPreorders.put(mealsPOJO.getFoodBoxPreorder().getIdFoodBoxPreorder(),
                             mealsPOJO.getFoodBoxPreorder().getCreateDate());

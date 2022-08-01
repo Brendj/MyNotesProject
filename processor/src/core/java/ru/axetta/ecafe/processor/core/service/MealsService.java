@@ -86,10 +86,8 @@ public class MealsService {
     @Autowired
     private DAOService daoService;
 
-    @Transactional
-    public MealsPOJO validateByClientInfo(Client client, MealsController.MealsFunctions fun)
+    public MealsPOJO validateByClientInfo(Client client, MealsController.MealsFunctions fun, MealsPOJO mealsPOJO)
     {
-        MealsPOJO mealsPOJO = new MealsPOJO();
         boolean errorOrg = false;
         try {
             if (!client.getOrg().getUsedFoodbox()) {
@@ -221,10 +219,8 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    public MealsPOJO validateByFormalInfo(String xrequestStr)
+    public MealsPOJO validateByFormalInfo(String xrequestStr, MealsPOJO mealsPOJO)
     {
-        MealsPOJO mealsPOJO = new MealsPOJO();
-
         //Контроль времени работы
         try {
             OrderErrorInfo orderErrorInfo = validateTime();
@@ -379,9 +375,9 @@ public class MealsService {
         mealsPOJO.setContractId(contractId);
     }
 
-    public MealsPOJO mainLogicNewPreorder(Session session, FoodboxOrder foodboxOrders, Client client, String xrequestStr, Long availableMoney)
+    public MealsPOJO mainLogicNewPreorder(Session session, FoodboxOrder foodboxOrders, Client client, String xrequestStr, MealsPOJO mealsPOJO)
     {
-        MealsPOJO mealsPOJO = new MealsPOJO();
+        mealsPOJO.setCreated(false);
         //Если количество свободных ячеек не позволяет создавать новый заказ
         if (countFree <= countunlocketed) {
             mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).
@@ -498,7 +494,7 @@ public class MealsService {
                 }
             }
             if (client.getExpenditureLimit() != null && client.getExpenditureLimit() != 0) {
-                if (priceAll > availableMoney) {
+                if (priceAll > mealsPOJO.getAvailableMoney()) {
                     mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).
                             body(responseResult.moreLimitByDay(client.getExpenditureLimit())));
                     return mealsPOJO;
@@ -514,6 +510,7 @@ public class MealsService {
         }
         mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.CREATED).
                 body(currentFoodboxOrderInfo));
+        mealsPOJO.setCreated(true);
         return mealsPOJO;
     }
 
