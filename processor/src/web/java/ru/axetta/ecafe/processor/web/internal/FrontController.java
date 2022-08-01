@@ -2271,323 +2271,325 @@ public class FrontController extends HttpServlet {
         return responseItem;
     }
 
-    @WebMethod(operationName = "findClient")
-    public List<FindClientResult> findClient(@WebParam(name = "orgId") Long orgId,
-                                             @WebParam(name = "findClientFieldList") FindClientField findClientField) throws FrontControllerException {
-        checkRequestValidity(orgId);
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
+//решение для задачи https://yt.iteco.dev/issue/ISPP-1078
 
-            String mobilePhone = FrontControllerProcessor
-                    .getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, findClientField);
+//    @WebMethod(operationName = "findClient")
+//    public List<FindClientResult> findClient(@WebParam(name = "orgId") Long orgId,
+//                                             @WebParam(name = "findClientFieldList") FindClientField findClientField) throws FrontControllerException {
+//        checkRequestValidity(orgId);
+//        Session persistenceSession = null;
+//        Transaction persistenceTransaction = null;
+//        try {
+//            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+//            persistenceTransaction = persistenceSession.beginTransaction();
+//
+//            String mobilePhone = FrontControllerProcessor
+//                    .getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, findClientField);
+//
+//            if (StringUtils.isEmpty(mobilePhone)) {
+//                throw new FrontControllerException(
+//                        String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                                FindClientField.FIELD_MOBILE));
+//            }
+//
+//            mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+//            if (null == mobilePhone) {
+//                throw new FrontControllerException(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE);
+//            }
+//
+//            String groupNames = FrontControllerProcessor
+//                    .getFindClientFieldValueByName(FindClientField.FIELD_GROUP_NAMES, findClientField);
+//            if (StringUtils.isEmpty(groupNames)) {
+//                throw new FrontControllerException(
+//                        String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                                FindClientField.FIELD_GROUP_NAMES));
+//            }
+//            String[] groupNameArray = StringUtils.split(groupNames, ",");
+//            List<String> groupNameList = new LinkedList<String>();
+//            for (String groupName : groupNameArray) {
+//                groupNameList.add(StringUtils.trim(groupName));
+//            }
+//
+//            List<Client> clientList = DAOUtils
+//                    .findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone,
+//                            groupNameList);
+//            if (clientList.isEmpty()) {
+//                return null;
+//            }
+//
+//            List<FindClientResult> findClientResultList = new LinkedList<FindClientResult>();
+//
+//            for (Client client : clientList) {
+//                FindClientResult findClientResult = new FindClientResult();
+//
+//                Org org = client.getOrg();
+//                if (null != org) {
+//                    findClientResult.getFindClientDescParams().getParam()
+//                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_ID,
+//                                    org.getIdOfOrg().toString()));
+//                }
+//
+//                findClientResult.getFindClientDescParams().getParam()
+//                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_ID,
+//                                client.getIdOfClient().toString()));
+//                findClientResult.getFindClientDescParams().getParam()
+//                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_GUID,
+//                                client.getClientGUID()));
+//
+//                Person person = client.getPerson();
+//                if (null != person) {
+//                    findClientResult.getFindClientDescParams().getParam()
+//                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SURNAME,
+//                                    person.getSurname()));
+//                    findClientResult.getFindClientDescParams().getParam()
+//                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_FIRST_NAME,
+//                                    person.getFirstName()));
+//                    findClientResult.getFindClientDescParams().getParam()
+//                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SECOND_NAME,
+//                                    person.getSecondName()));
+//                }
+//
+//                ClientGroup clientGroup = client.getClientGroup();
+//                if (null != clientGroup) {
+//                    findClientResult.getFindClientDescParams().getParam()
+//                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_GROUP,
+//                                    clientGroup.getGroupName()));
+//                }
+//                findClientResult.getFindClientDescParams().getParam()
+//                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_NAME,
+//                                client.getOrg().getShortNameInfoService()));
+//
+//                findClientResultList.add(findClientResult);
+//            }
+//
+//            persistenceTransaction.commit();
+//            persistenceTransaction = null;
+//            return findClientResultList;
+//        } catch (Exception e) {
+//            logger.error("Error in findClient", e);
+//            throw new FrontControllerException("Ошибка: " + e.getMessage());
+//        } finally {
+//            HibernateUtils.rollback(persistenceTransaction, logger);
+//            HibernateUtils.close(persistenceSession, logger);
+//        }
+//    }
 
-            if (StringUtils.isEmpty(mobilePhone)) {
-                throw new FrontControllerException(
-                        String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                                FindClientField.FIELD_MOBILE));
-            }
-
-            mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-            if (null == mobilePhone) {
-                throw new FrontControllerException(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE);
-            }
-
-            String groupNames = FrontControllerProcessor
-                    .getFindClientFieldValueByName(FindClientField.FIELD_GROUP_NAMES, findClientField);
-            if (StringUtils.isEmpty(groupNames)) {
-                throw new FrontControllerException(
-                        String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                                FindClientField.FIELD_GROUP_NAMES));
-            }
-            String[] groupNameArray = StringUtils.split(groupNames, ",");
-            List<String> groupNameList = new LinkedList<String>();
-            for (String groupName : groupNameArray) {
-                groupNameList.add(StringUtils.trim(groupName));
-            }
-
-            List<Client> clientList = DAOUtils
-                    .findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone,
-                            groupNameList);
-            if (clientList.isEmpty()) {
-                return null;
-            }
-
-            List<FindClientResult> findClientResultList = new LinkedList<FindClientResult>();
-
-            for (Client client : clientList) {
-                FindClientResult findClientResult = new FindClientResult();
-
-                Org org = client.getOrg();
-                if (null != org) {
-                    findClientResult.getFindClientDescParams().getParam()
-                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_ID,
-                                    org.getIdOfOrg().toString()));
-                }
-
-                findClientResult.getFindClientDescParams().getParam()
-                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_ID,
-                                client.getIdOfClient().toString()));
-                findClientResult.getFindClientDescParams().getParam()
-                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_GUID,
-                                client.getClientGUID()));
-
-                Person person = client.getPerson();
-                if (null != person) {
-                    findClientResult.getFindClientDescParams().getParam()
-                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SURNAME,
-                                    person.getSurname()));
-                    findClientResult.getFindClientDescParams().getParam()
-                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_FIRST_NAME,
-                                    person.getFirstName()));
-                    findClientResult.getFindClientDescParams().getParam()
-                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SECOND_NAME,
-                                    person.getSecondName()));
-                }
-
-                ClientGroup clientGroup = client.getClientGroup();
-                if (null != clientGroup) {
-                    findClientResult.getFindClientDescParams().getParam()
-                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_GROUP,
-                                    clientGroup.getGroupName()));
-                }
-                findClientResult.getFindClientDescParams().getParam()
-                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_NAME,
-                                client.getOrg().getShortNameInfoService()));
-
-                findClientResultList.add(findClientResult);
-            }
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return findClientResultList;
-        } catch (Exception e) {
-            logger.error("Error in findClient", e);
-            throw new FrontControllerException("Ошибка: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
-    @WebMethod(operationName = "registerGuardian")
-    public List<RegisterGuardianResult> registerGuardian(
-            @WebParam(name = "orgId") Long orgId,
-            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList,
-            @WebParam(name = "guidStaff") String guidStaff
-    ) throws FrontControllerException {
-        checkRequestValidity(orgId);
-
-        String firstName = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
-        if (StringUtils.isEmpty(firstName)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_FIRST_NAME));
-        }
-        String secondName = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
-        String surname = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
-        if (StringUtils.isEmpty(surname)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_SURNAME));
-        }
-        String group = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
-        if (StringUtils.isEmpty(group)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_GROUP));
-        }
-        String relationDegree = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
-        if (StringUtils.isEmpty(relationDegree)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_RELATION_DEGREE));
-        }
-        String legalityStr = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
-        if (StringUtils.isEmpty(legalityStr)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_LEGALITY));
-        }
-
-        Integer legality = convertLegality(legalityStr);
-
-        String gender = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
-        if (StringUtils.isEmpty(gender)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_GENDER));
-        }
-
-        String guardianBirthDayStr = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
-        Date guardianBirthDay = null;
-        if (!StringUtils.isEmpty(guardianBirthDayStr)) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
-            try {
-                guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
-            } catch (ParseException e) {
-                logger.error("Error in registerGuardian", e);
-                throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_INCORRECT_FORMAT,
-                        GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
-            }
-        }
-
-        String mobilePhone = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_MOBILE, guardianDescList);
-
-        if (StringUtils.isEmpty(mobilePhone)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_MOBILE));
-        }
-
-        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-        if (null == mobilePhone) {
-            throw new FrontControllerException(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE);
-        }
-
-        String clientIdStr = FrontControllerProcessor
-                .getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
-        if (StringUtils.isEmpty(clientIdStr)) {
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_CLIENT_ID));
-        }
-
-        Long clientId;
-        try {
-            clientId = Long.parseLong(clientIdStr);
-        } catch (NumberFormatException e) {
-            logger.error("Error in registerGuardian", e);
-            throw new FrontControllerException(
-                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                            GuardianDesc.FIELD_CLIENT_ID));
-        }
-
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            List<String> groupNameList = new ArrayList<String>();
-            groupNameList.add(ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
-
-            Client client = DAOUtils
-                    .findClientByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone,
-                            groupNameList);
-            if (null != client) {
-
-                List<RegisterGuardianResult> registerGuardianResultList = new LinkedList<RegisterGuardianResult>();
-                RegisterGuardianResult registerGuardianResult = new RegisterGuardianResult();
-
-                Org org = client.getOrg();
-                if (null != org) {
-                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                    RegisterGuardianResult.FIELD_ORG_ID, org.getIdOfOrg().toString()));
-                }
-
-                registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                RegisterGuardianResult.FIELD_CLIENT_ID, client.getIdOfClient().toString()));
-                registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                RegisterGuardianResult.FIELD_CLIENT_GUID, client.getClientGUID()));
-
-                Person person = client.getPerson();
-                if (null != person) {
-                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                    RegisterGuardianResult.FIELD_SURNAME, person.getSurname()));
-                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                    RegisterGuardianResult.FIELD_FIRST_NAME, person.getFirstName()));
-                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                    RegisterGuardianResult.FIELD_SECOND_NAME, person.getSecondName()));
-                }
-
-                ClientGroup clientGroup = client.getClientGroup();
-                if (null != clientGroup) {
-                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
-                                    RegisterGuardianResult.FIELD_GROUP, clientGroup.getGroupName()));
-                }
-                registerGuardianResult.getRegisterGuardianDescParams().getParam()
-                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(RegisterGuardianResult.FIELD_ORG_NAME,
-                                client.getOrg().getShortNameInfoService()));
-                registerGuardianResultList.add(registerGuardianResult);
-                return registerGuardianResultList;
-            }
-
-            Org org = (Org) persistenceSession.load(Org.class, orgId);
-            if (null == org) {
-                throw new FrontControllerException(ResponseItem.ERROR_ORGANIZATION_NOT_FOUND_MESSAGE);
-            }
-
-            ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
-            fc.setValue(ClientManager.FieldId.SURNAME, surname);
-            fc.setValue(ClientManager.FieldId.NAME, firstName);
-            if (!StringUtils.isEmpty(secondName)) {
-                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
-            } else {
-                fc.setValue(ClientManager.FieldId.SECONDNAME, "");
-            }
-            fc.setValue(ClientManager.FieldId.GROUP, group);
-            fc.setValue(ClientManager.FieldId.GENDER, gender);
-            if (null != guardianBirthDay) {
-                fc.setValue(ClientManager.FieldId.BIRTH_DATE, guardianBirthDay);
-            }
-            fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
-
-            ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("soap метод registerGuardian (фронт)");
-            clientsMobileHistory.setOrg(org);
-            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
-            clientsMobileHistory.setStaffguid(guidStaff);
-            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true,
-                    clientsMobileHistory);
-
-            Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
-            //
-            MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setOrg(org);
-            clientGuardianHistory.setReason("Веб метод registerGuardian (front)");
-            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
-
-            //
-            ClientGuardian clientGuardian = ClientManager
-                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null, false,
-                            clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
-
-            clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
-            persistenceSession.merge(clientGuardian);
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return null;
-        } catch (Exception e) {
-            logger.error("Error in registerGuardian", e);
-            throw new FrontControllerException("Ошибка: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
+//    @WebMethod(operationName = "registerGuardian")
+//    public List<RegisterGuardianResult> registerGuardian(
+//            @WebParam(name = "orgId") Long orgId,
+//            @WebParam(name = "guardianDescList") GuardianDesc guardianDescList,
+//            @WebParam(name = "guidStaff") String guidStaff
+//    ) throws FrontControllerException {
+//        checkRequestValidity(orgId);
+//
+//        String firstName = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
+//        if (StringUtils.isEmpty(firstName)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_FIRST_NAME));
+//        }
+//        String secondName = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
+//        String surname = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
+//        if (StringUtils.isEmpty(surname)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_SURNAME));
+//        }
+//        String group = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
+//        if (StringUtils.isEmpty(group)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_GROUP));
+//        }
+//        String relationDegree = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
+//        if (StringUtils.isEmpty(relationDegree)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_RELATION_DEGREE));
+//        }
+//        String legalityStr = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
+//        if (StringUtils.isEmpty(legalityStr)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_LEGALITY));
+//        }
+//
+//        Integer legality = convertLegality(legalityStr);
+//
+//        String gender = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
+//        if (StringUtils.isEmpty(gender)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_GENDER));
+//        }
+//
+//        String guardianBirthDayStr = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
+//        Date guardianBirthDay = null;
+//        if (!StringUtils.isEmpty(guardianBirthDayStr)) {
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//
+//            try {
+//                guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
+//            } catch (ParseException e) {
+//                logger.error("Error in registerGuardian", e);
+//                throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_INCORRECT_FORMAT,
+//                        GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
+//            }
+//        }
+//
+//        String mobilePhone = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_MOBILE, guardianDescList);
+//
+//        if (StringUtils.isEmpty(mobilePhone)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_MOBILE));
+//        }
+//
+//        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+//        if (null == mobilePhone) {
+//            throw new FrontControllerException(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE);
+//        }
+//
+//        String clientIdStr = FrontControllerProcessor
+//                .getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
+//        if (StringUtils.isEmpty(clientIdStr)) {
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_CLIENT_ID));
+//        }
+//
+//        Long clientId;
+//        try {
+//            clientId = Long.parseLong(clientIdStr);
+//        } catch (NumberFormatException e) {
+//            logger.error("Error in registerGuardian", e);
+//            throw new FrontControllerException(
+//                    String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+//                            GuardianDesc.FIELD_CLIENT_ID));
+//        }
+//
+//        Session persistenceSession = null;
+//        Transaction persistenceTransaction = null;
+//        try {
+//            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+//            persistenceTransaction = persistenceSession.beginTransaction();
+//
+//            List<String> groupNameList = new ArrayList<String>();
+//            groupNameList.add(ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
+//
+//            Client client = DAOUtils
+//                    .findClientByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone,
+//                            groupNameList);
+//            if (null != client) {
+//
+//                List<RegisterGuardianResult> registerGuardianResultList = new LinkedList<RegisterGuardianResult>();
+//                RegisterGuardianResult registerGuardianResult = new RegisterGuardianResult();
+//
+//                Org org = client.getOrg();
+//                if (null != org) {
+//                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                    RegisterGuardianResult.FIELD_ORG_ID, org.getIdOfOrg().toString()));
+//                }
+//
+//                registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                RegisterGuardianResult.FIELD_CLIENT_ID, client.getIdOfClient().toString()));
+//                registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                RegisterGuardianResult.FIELD_CLIENT_GUID, client.getClientGUID()));
+//
+//                Person person = client.getPerson();
+//                if (null != person) {
+//                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                    RegisterGuardianResult.FIELD_SURNAME, person.getSurname()));
+//                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                    RegisterGuardianResult.FIELD_FIRST_NAME, person.getFirstName()));
+//                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                    RegisterGuardianResult.FIELD_SECOND_NAME, person.getSecondName()));
+//                }
+//
+//                ClientGroup clientGroup = client.getClientGroup();
+//                if (null != clientGroup) {
+//                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(
+//                                    RegisterGuardianResult.FIELD_GROUP, clientGroup.getGroupName()));
+//                }
+//                registerGuardianResult.getRegisterGuardianDescParams().getParam()
+//                        .add(new RegisterGuardianResult.RegisterGuardianItemParam(RegisterGuardianResult.FIELD_ORG_NAME,
+//                                client.getOrg().getShortNameInfoService()));
+//                registerGuardianResultList.add(registerGuardianResult);
+//                return registerGuardianResultList;
+//            }
+//
+//            Org org = (Org) persistenceSession.load(Org.class, orgId);
+//            if (null == org) {
+//                throw new FrontControllerException(ResponseItem.ERROR_ORGANIZATION_NOT_FOUND_MESSAGE);
+//            }
+//
+//            ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+//            fc.setValue(ClientManager.FieldId.SURNAME, surname);
+//            fc.setValue(ClientManager.FieldId.NAME, firstName);
+//            if (!StringUtils.isEmpty(secondName)) {
+//                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+//            } else {
+//                fc.setValue(ClientManager.FieldId.SECONDNAME, "");
+//            }
+//            fc.setValue(ClientManager.FieldId.GROUP, group);
+//            fc.setValue(ClientManager.FieldId.GENDER, gender);
+//            if (null != guardianBirthDay) {
+//                fc.setValue(ClientManager.FieldId.BIRTH_DATE, guardianBirthDay);
+//            }
+//            fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
+//
+//            ClientsMobileHistory clientsMobileHistory =
+//                    new ClientsMobileHistory("soap метод registerGuardian (фронт)");
+//            clientsMobileHistory.setOrg(org);
+//            clientsMobileHistory.setShowing("АРМ ОО (ид." + orgId + ")");
+//            clientsMobileHistory.setStaffguid(guidStaff);
+//            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true,
+//                    clientsMobileHistory);
+//
+//            Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
+//            //
+//            MessageContext mc = wsContext.getMessageContext();
+//            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+//            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+//            clientGuardianHistory.setOrg(org);
+//            clientGuardianHistory.setReason("Веб метод registerGuardian (front)");
+//            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+//
+//            //
+//            ClientGuardian clientGuardian = ClientManager
+//                    .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, null, false,
+//                            clientId, ClientCreatedFromType.ARM, null, clientGuardianHistory);
+//
+//            clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
+//            persistenceSession.merge(clientGuardian);
+//
+//            persistenceTransaction.commit();
+//            persistenceTransaction = null;
+//            return null;
+//        } catch (Exception e) {
+//            logger.error("Error in registerGuardian", e);
+//            throw new FrontControllerException("Ошибка: " + e.getMessage());
+//        } finally {
+//            HibernateUtils.rollback(persistenceTransaction, logger);
+//            HibernateUtils.close(persistenceSession, logger);
+//        }
+//    }
 
     private Integer convertLegality(String legality_str) {
         if (legality_str.equals("true")) {
