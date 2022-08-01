@@ -142,34 +142,31 @@ public class MealsService {
         return mealsPOJO;
     }
 
-//    @Transactional
-//    public MealsPOJO validateByClientAllowed(Long contractId)
-//    {
-//        MealsPOJO mealsPOJO = verifyClient(contractId);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO;
-//        Client client = mealsPOJO.getClient();
-//        if (!new ClientParallel().verifyParallelForClient(client))
-//        {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongParallel()).build());
-//            return mealsPOJO;
-//        }
-//        Boolean errorOrg = false;
-//        try {
-//            if (!client.getOrg().getUsedFoodbox()) {
-//                errorOrg = true;
-//            }
-//        } catch (Exception e) {
-//            errorOrg = true;
-//        }
-//        if (errorOrg) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.orgDisableFoodBox()).build());
-//            return mealsPOJO;
-//        }
-//        return mealsPOJO;
-//    }
+    @Transactional
+    public MealsPOJO validateByClientAllowed(MealsPOJO mealsPOJO)
+    {
+        Client client = mealsPOJO.getClient();
+        if (!new ClientParallel().verifyParallelForClient(client))
+        {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongParallel()));
+            return mealsPOJO;
+        }
+        Boolean errorOrg = false;
+        try {
+            if (!client.getOrg().getUsedFoodbox()) {
+                errorOrg = true;
+            }
+        } catch (Exception e) {
+            errorOrg = true;
+        }
+        if (errorOrg) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.orgDisableFoodBox()));
+            return mealsPOJO;
+        }
+        return mealsPOJO;
+    }
 
     public Org getOrgByClient(String contractId)
     {
@@ -253,108 +250,102 @@ public class MealsService {
         return mealsPOJO;
     }
 
-//    public MealsPOJO validateByFormalInfoGetFoodbox(String contractIdStr, String fromStr, String toStr, String sortStr)
-//    {
-//        MealsPOJO mealsPOJO = new MealsPOJO();
-//        Long contract = null;
-//        Date from = null;
-//        Date to = null;
-//        Boolean sortDesc = true;
-//
-//        verifyContractId(contractIdStr, mealsPOJO);
-//        if (mealsPOJO.getResponse() != null)
-//            return mealsPOJO;
-//
-//        try {
-//            from = simpleDateFormat.get().parse(fromStr);
-//        } catch (Exception e) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongFormatFrom(fromStr,e)).build());
-//            return mealsPOJO;
-//        }
-//        mealsPOJO.setFrom(from);
-//        try {
-//            to = simpleDateFormat.get().parse(toStr);
-//        } catch (Exception e) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongFormatTo(toStr,e)).build());
-//            return mealsPOJO;
-//        }
-//        mealsPOJO.setTo(to);
-//        try {
-//            if (!sortStr.isEmpty()) {
-//                if (sortStr.equals("asc"))
-//                    sortDesc = false;
-//            }
-//        } catch (Exception e) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongFormatSort(sortStr,e)).build());
-//            return mealsPOJO;
-//        }
-//        mealsPOJO.setSortDesc(sortDesc);
-//        return mealsPOJO;
-//    }
-//
-//    public MealsPOJO validateByFormalInfoGetFoodbox(String foodboxOrderId)
-//    {
-//        MealsPOJO mealsPOJO = new MealsPOJO();
-//        Long isppIdFoodbox;
-//        try {
-//            isppIdFoodbox = Long.parseLong(foodboxOrderId);
-//        } catch (Exception e) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongFormatFoodBoxOrder(foodboxOrderId,e)).build());
-//            return mealsPOJO;
-//        }
-//        mealsPOJO.setIsppIdFoodbox(isppIdFoodbox);
-//        return mealsPOJO;
-//    }
-//
-//    public MealsPOJO validateByFormalInfoForBuffet4(String onDateStr, String contractIdStr)
-//    {
-//        MealsPOJO mealsPOJO = new MealsPOJO();
-//
-//        try {
-//            if (!onDateStr.isEmpty()) {
-//                mealsPOJO.setOnDate(new SimpleDateFormat(("yyyy-MM-dd HH:mm:ss")).parse(onDateStr));
-//            }
-//            else
-//            {
-//                mealsPOJO.setOnDate(new Date());
-//            }
-//        } catch (Exception e) {
-//            mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                    entity(responseResult.wrongOnDate()).build());
-//            return mealsPOJO;
-//        }
-//        verifyContractId(contractIdStr, mealsPOJO);
-//        return mealsPOJO;
-//    }
-//
-//    public MealsPOJO validateByFormalInfoClientAllowed(String contractIdStr, String foodBoxAvailableStr, MealsController.MealsFunctions fun)
-//    {
-//        MealsPOJO mealsPOJO = new MealsPOJO();
-//
-//        if (MealsController.MealsFunctions.SET_FOODBOX_ALLOWED == fun) {
-//            if (foodBoxAvailableStr.isEmpty()) {
-//                mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                        entity(responseResult.emptyFoodBoxAvailable()).build());
-//                return mealsPOJO;
-//            }
-//
-//            Boolean foodBoxAvailable;
-//            try {
-//                foodBoxAvailable = Boolean.parseBoolean(foodBoxAvailableStr);
-//            } catch (Exception e) {
-//                mealsPOJO.setResponse(Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-//                        entity(responseResult.wrongFoodBoxAvailable()).build());
-//                return mealsPOJO;
-//            }
-//            mealsPOJO.setFoodBoxAvailable(foodBoxAvailable);
-//        }
-//        verifyContractId(contractIdStr, mealsPOJO);
-//        return mealsPOJO;
-//    }
+    public MealsPOJO validateByFormalInfoGetFoodbox(String contractIdStr, String fromStr, String toStr, String sortStr)
+    {
+        MealsPOJO mealsPOJO = new MealsPOJO();
+        Long contract = null;
+        Date from = null;
+        Date to = null;
+        Boolean sortDesc = true;
+
+        verifyContractId(contractIdStr, mealsPOJO);
+        if (mealsPOJO.getResponseEntity() != null)
+            return mealsPOJO;
+
+        try {
+            from = simpleDateFormat.get().parse(fromStr);
+        } catch (Exception e) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongFormatFrom(fromStr,e)));
+            return mealsPOJO;
+        }
+        mealsPOJO.setFrom(from);
+        try {
+            to = simpleDateFormat.get().parse(toStr);
+        } catch (Exception e) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongFormatTo(toStr,e)));
+            return mealsPOJO;
+        }
+        mealsPOJO.setTo(to);
+        try {
+            if (!sortStr.isEmpty()) {
+                if (sortStr.equals("asc"))
+                    sortDesc = false;
+            }
+        } catch (Exception e) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongFormatSort(sortStr,e)));
+            return mealsPOJO;
+        }
+        mealsPOJO.setSortDesc(sortDesc);
+        return mealsPOJO;
+    }
+
+    public MealsPOJO validateByFormalInfoGetFoodbox(String foodboxOrderId)
+    {
+        MealsPOJO mealsPOJO = new MealsPOJO();
+        Long isppIdFoodbox;
+        try {
+            isppIdFoodbox = Long.parseLong(foodboxOrderId);
+        } catch (Exception e) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongFormatFoodBoxOrder(foodboxOrderId,e)));
+            return mealsPOJO;
+        }
+        mealsPOJO.setIsppIdFoodbox(isppIdFoodbox);
+        return mealsPOJO;
+    }
+
+    public MealsPOJO validateByFormalInfoForBuffet(String onDateStr, MealsPOJO mealsPOJO)
+    {
+        try {
+            if (!onDateStr.isEmpty()) {
+                mealsPOJO.setOnDate(new SimpleDateFormat(("yyyy-MM-dd HH:mm:ss")).parse(onDateStr));
+            }
+            else
+            {
+                mealsPOJO.setOnDate(new Date());
+            }
+        } catch (Exception e) {
+            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body(responseResult.wrongOnDate()));
+            return mealsPOJO;
+        }
+        return mealsPOJO;
+    }
+
+    public MealsPOJO validateByFormalInfoClientAllowed(String foodBoxAvailableStr, MealsController.MealsFunctions fun, MealsPOJO mealsPOJO)
+    {
+        if (MealsController.MealsFunctions.SET_FOODBOX_ALLOWED == fun) {
+            if (foodBoxAvailableStr.isEmpty()) {
+                mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                        body(responseResult.emptyFoodBoxAvailable()));
+                return mealsPOJO;
+            }
+
+            Boolean foodBoxAvailable;
+            try {
+                foodBoxAvailable = Boolean.parseBoolean(foodBoxAvailableStr);
+            } catch (Exception e) {
+                mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                        body(responseResult.wrongFoodBoxAvailable()));
+                return mealsPOJO;
+            }
+            mealsPOJO.setFoodBoxAvailable(foodBoxAvailable);
+        }
+        return mealsPOJO;
+    }
 
     private void verifyContractId(String contractIdStr, MealsPOJO mealsPOJO)
     {
@@ -514,7 +505,7 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    public Response getPreordersForDates(Client client, Date from, Date to, Boolean sortDesc)
+    public ResponseEntity<?> getPreordersForDates(Client client, Date from, Date to, Boolean sortDesc)
     {
         //Структура ответа
         try {
@@ -528,30 +519,34 @@ public class MealsService {
                 Collections.sort(foodboxOrderInfos);
             else
                 Collections.reverse(foodboxOrderInfos);
-
-            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfos).build();
+            return ResponseEntity.status(HttpStatus.OK).
+                    body(foodboxOrderInfos);
         } catch (Exception e) {
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseResult.internalError(e, 2)).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body(responseResult.internalError(e, 2));
         }
     }
 
-    public Response getPreorderById(Long isppIdFoodbox)
+    public ResponseEntity<?> getPreorderById(Long isppIdFoodbox)
     {
         //Структура ответа
         DAOReadonlyService daoReadonlyService = DAOReadonlyService.getInstance();
         try {
             FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(isppIdFoodbox);
             if (foodBoxPreorder == null) {
-                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseResult.notFindPreorder(isppIdFoodbox)).build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                        body(responseResult.notFindPreorder(isppIdFoodbox));
             }
             FoodboxOrderInfo foodboxOrderInfo = convertData(foodBoxPreorder);
-            return Response.status(HttpURLConnection.HTTP_OK).entity(foodboxOrderInfo).build();
+            return ResponseEntity.status(HttpStatus.OK).
+                    body(foodboxOrderInfo);
         } catch (Exception e) {
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseResult.internalError(e, 2)).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body(responseResult.internalError(e, 2));
         }
     }
 
-    public Response getBuffetInfo()
+    public ResponseEntity<?> getBuffetInfo()
     {
         //Структура ответа
         //Раскидываем по классам
@@ -663,10 +658,11 @@ public class MealsService {
             if (corCount.equals(MAX_COUNT))
                 break;
         }
-        return Response.status(HttpURLConnection.HTTP_OK).entity(personBuffetMenu).build();
+        return ResponseEntity.status(HttpStatus.OK).
+                body(personBuffetMenu);
     }
 
-    public Response setFoodboxAllowed(Client client, Boolean foodBoxAvailable)
+    public ResponseEntity<?> setFoodboxAllowed(Client client, Boolean foodBoxAvailable)
     {
         //Структура ответа
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -681,17 +677,17 @@ public class MealsService {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(responseResult.internalError(e, 3)).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body(responseResult.internalError(e, 3));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return Response.status(HttpURLConnection.HTTP_NO_CONTENT).
-                entity(responseResult.ok()).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).
+                body(responseResult.ok());
     }
 
-    public Response getFoodBoxAllowed(Client client, Boolean foodBoxAvailable)
+    public ResponseEntity<?> getFoodBoxAllowed(Client client, Boolean foodBoxAvailable)
     {
         //Структура ответа
         ClientData clientData = new ClientData();
@@ -710,7 +706,8 @@ public class MealsService {
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
 
-        return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
+        return ResponseEntity.status(HttpStatus.OK).
+                body(clientData);
     }
 
     public void getDataFromDAO(Client client, MealsController.MealsFunctions fun)
