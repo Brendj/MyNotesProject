@@ -1,12 +1,14 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
+import org.springframework.http.ResponseEntity;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 
 import javax.ws.rs.core.Response;
 import java.util.Date;
 
 public class MealsPOJO {
-    private Response response;
+    private ResponseEntity<?> responseEntity;
     private Long contractId;
     private Client client;
     private Long availableMoney;
@@ -16,14 +18,7 @@ public class MealsPOJO {
     private Long isppIdFoodbox;
     private Date onDate;
     private Boolean foodBoxAvailable;
-
-    public Response getResponse() {
-        return response;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
-    }
+    private FoodBoxPreorder foodBoxPreorder;
 
     public Long getContractId() {
         return contractId;
@@ -95,5 +90,21 @@ public class MealsPOJO {
 
     public void setFoodBoxAvailable(Boolean foodBoxAvailable) {
         this.foodBoxAvailable = foodBoxAvailable;
+    }
+
+    public ResponseEntity<?> getResponseEntity() {
+        return responseEntity;
+    }
+
+    public void setResponseEntity(ResponseEntity<?> responseEntity) {
+        this.responseEntity = responseEntity;
+    }
+
+    public FoodBoxPreorder getFoodBoxPreorder() {
+        return foodBoxPreorder;
+    }
+
+    public void setFoodBoxPreorder(FoodBoxPreorder foodBoxPreorder) {
+        this.foodBoxPreorder = foodBoxPreorder;
     }
 }
