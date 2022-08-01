@@ -19,6 +19,7 @@ public class MealsPOJO {
     private Date onDate;
     private Boolean foodBoxAvailable;
     private FoodBoxPreorder foodBoxPreorder;
+    private Boolean created;
 
     public Long getContractId() {
         return contractId;
@@ -106,5 +107,13 @@ public class MealsPOJO {
 
     public void setFoodBoxPreorder(FoodBoxPreorder foodBoxPreorder) {
         this.foodBoxPreorder = foodBoxPreorder;
+    }
+
+    public Boolean getCreated() {
+        return created;
+    }
+
+    public void setCreated(Boolean created) {
+        this.created = created;
     }
 }
