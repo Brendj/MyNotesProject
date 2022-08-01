@@ -15,6 +15,21 @@ public class EnterEventData extends AbstractPushData {
     private String organizationName;
     private String ticketStatus;
 
+    @Override
+    public String toString() {
+        return "EnterEventData{" +
+                "actionType=" + actionType +
+                ", occurredAt='" + occurredAt + '\'' +
+                ", personId='" + personId + '\'' +
+                ", staffId=" + staffId +
+                ", admittedByStaffId=" + admittedByStaffId +
+                ", agentId=" + agentId +
+                ", organizationId=" + organizationId +
+                ", organizationName='" + organizationName + '\'' +
+                ", ticketStatus='" + ticketStatus + '\'' +
+                '}';
+    }
+
     public Integer getActionType() {
         return actionType;
     }

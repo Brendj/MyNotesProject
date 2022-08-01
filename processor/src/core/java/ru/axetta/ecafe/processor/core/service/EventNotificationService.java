@@ -479,7 +479,7 @@ public class EventNotificationService {
             balanceData.setReasonId(0);
         } else if (type.equals(MESSAGE_PAYMENT)) {
             type = getOrderNotificationType(values);
-            if (type.equals(MESSAGE_PAYMENT_BAR)) {
+            if (type.equals(MESSAGE_PAYMENT)) {
                 balanceData.setBenefitType(0);
                 balanceData.setReasonId(1);
             } else if (type.equals(MESSAGE_PAYMENT_PAY)) {
@@ -496,6 +496,11 @@ public class EventNotificationService {
         if (paySum != null && !paySum.isEmpty()) {
             balanceData.setBalanceChange(Integer.parseInt(paySum.replaceAll(",", "")));
         }
+        String amount = findValueInParams(new String[]{PARAM_AMOUNT}, values);
+        if (amount != null && !amount.isEmpty()) {
+            balanceData.setBalanceChange(Integer.parseInt(amount.replaceAll(",", "")));
+        }
+
         if (type.equals(MESSAGE_PAYMENT_PAY) || type.equals(MESSAGE_PAYMENT_FREE)) {
             String fRation = findValueInParams(new String[]{PARAM_FRATION}, values);
             if (fRation != null && !fRation.isEmpty()) {
