@@ -10,6 +10,18 @@ public class BenefitData extends AbstractPushData{
     private String account;
     private String personId;
 
+    @Override
+    public String toString() {
+        return "BenefitData{" +
+                "actionType=" + actionType +
+                ", benefitCategoryName='" + benefitCategoryName + '\'' +
+                ", occurredAt='" + occurredAt + '\'' +
+                ", endAt='" + endAt + '\'' +
+                ", account='" + account + '\'' +
+                ", personId='" + personId + '\'' +
+                '}';
+    }
+
     public Integer getActionType() {
         return actionType;
     }
