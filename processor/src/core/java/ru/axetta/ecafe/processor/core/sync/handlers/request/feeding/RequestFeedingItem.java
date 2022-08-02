@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -14,6 +15,8 @@ import org.w3c.dom.Node;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestFeedingItem {
 
@@ -32,7 +35,7 @@ public class RequestFeedingItem {
     private String applicantSecondName;
     private String applicantPhone;
     private ApplicationForFoodCreatorType creatorType;
-    private Long dtisznCode;
+    private Integer dtisznCode;
     private String idOfDocOrder;
     private Date docOrderDate;
     private Boolean isArchive;
@@ -43,11 +46,12 @@ public class RequestFeedingItem {
     private Date statusCreatedDate;
     private Date otherDiscountStartDate;
     private Date otherDiscountEndDate;
+    List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
 
     public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status,
             Integer declineReason, Date applicationCreatedDate, Long idOfClient, String applicantSurname,
             String applicantName, String applicantSecondName, String applicantPhone,
-            ApplicationForFoodCreatorType creatorType, Long dtisznCode, String idOfDocOrder, Date docOrderDate,
+            ApplicationForFoodCreatorType creatorType, Integer dtisznCode, String idOfDocOrder, Date docOrderDate,
             Boolean isArchive, Date otherDiscountStartDate, Date otherDiscountEndDate, String errorMessage) {
         this.applicationForFeedingNumber = applicationForFeedingNumber;
         this.servNumber = servNumber;
@@ -87,14 +91,14 @@ public class RequestFeedingItem {
         this.applicantName = applicationForFood.getApplicantName();
         this.applicantSecondName = applicationForFood.getApplicantSecondName();
         this.applicantPhone = applicationForFood.getMobile();
-        this.dtisznCode = applicationForFood.getDtisznCode();
+        this.dtisznCode = applicationForFood.getPriorityDtisznCode(categoryDiscountDSZNList);
         this.isArchive = applicationForFood.getArchived();
         this.version = applicationForFood.getVersion();
         this.servNumber = applicationForFood.getServiceNumber();
         this.creatorType = applicationForFood.getCreatorType();
         this.idOfDocOrder = applicationForFood.getIdOfDocOrder();
         this.docOrderDate = applicationForFood.getDocOrderDate();
-        this.hasSocialDiscount = (null != applicationForFood.getDtisznCode());
+        this.hasSocialDiscount = (applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode()).collect(Collectors.toList())).contains(null);
         this.statusCreatedDate = statusCreatedDate;
     }
 
@@ -118,7 +122,7 @@ public class RequestFeedingItem {
         String applicantName;
         String applicantSecondName;
         String applicantPhone;
-        Long dtisznDiscount;
+        Integer dtisznDiscount;
         Boolean archived;
         String serviceNumber;
         ApplicationForFoodCreatorType creatorType;
@@ -185,7 +189,7 @@ public class RequestFeedingItem {
             errorMessage.append("Attribute ApplicantPhone is incorrect ");
         }
 
-        dtisznDiscount = XMLUtils.getLongAttributeValue(itemNode, "DiscountDtszn");
+        dtisznDiscount = XMLUtils.getIntegerAttributeValue(itemNode, "DiscountDtszn");
 
         archived = XMLUtils.getBooleanAttributeValue(itemNode, "D");
 
@@ -349,14 +353,6 @@ public class RequestFeedingItem {
         this.applicantPhone = applicantPhone;
     }
 
-    public Long getDtisznCode() {
-        return dtisznCode;
-    }
-
-    public void setDtisznCode(Long dtisznCode) {
-        this.dtisznCode = dtisznCode;
-    }
-
     public Boolean getArchive() {
         return isArchive;
     }
@@ -451,5 +447,13 @@ public class RequestFeedingItem {
 
     public void setOtherDiscountEndDate(Date otherDiscountEndDate) {
         this.otherDiscountEndDate = otherDiscountEndDate;
+    }
+
+    public Integer getDtisznCode() {
+        return dtisznCode;
+    }
+
+    public void setDtisznCode(Integer dtisznCode) {
+        this.dtisznCode = dtisznCode;
     }
 }

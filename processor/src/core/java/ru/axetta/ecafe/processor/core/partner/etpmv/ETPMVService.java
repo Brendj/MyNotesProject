@@ -70,8 +70,6 @@ public class ETPMVService {
     private final String REQUEST_TIMEOUT = "com.sun.xml.internal.ws.request.timeout";
     private final String CONNECT_TIMEOUT = "com.sun.xml.internal.ws.connect.timeout";
 
-    private boolean useMeshGuid = false;
-
     @Async
     public void processIncoming(String message) {
         try {
@@ -101,7 +99,7 @@ public class ETPMVService {
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
 
         InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-        CoordinateMessage coordinateMessage = (CoordinateMessage)unmarshaller.unmarshal(stream);
+        CoordinateMessage coordinateMessage = (CoordinateMessage) unmarshaller.unmarshal(stream);
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
@@ -153,21 +151,16 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong contacts data");
             return;
         }
-        String firstName = ((RequestContact)baseDeclarant).getFirstName();
-        String lastName = ((RequestContact)baseDeclarant).getLastName();
-        String middleName = ((RequestContact)baseDeclarant).getMiddleName();
-        String mobile = Client.checkAndConvertMobile(((RequestContact)baseDeclarant).getMobilePhone());
+        String firstName = ((RequestContact) baseDeclarant).getFirstName();
+        String lastName = ((RequestContact) baseDeclarant).getLastName();
+        String middleName = ((RequestContact) baseDeclarant).getMiddleName();
+        String mobile = Client.checkAndConvertMobile(((RequestContact) baseDeclarant).getMobilePhone());
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
-                logger.error("Error in processCoordinateMessage: not enough data");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
-                return;
+            logger.error("Error in processCoordinateMessage: not enough data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
+            return;
         }
-        Client client;
-        if (useMeshGuid) {
-            client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
-        } else {
-            client = DAOReadonlyService.getInstance().getClientByGuid(guid);
-        }
+        Client client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
 
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
@@ -183,15 +176,16 @@ public class ETPMVService {
                 return;
             }
         }
-        Long _benefit;
+        List<Integer> _benefits;
         if (newFormat) {
-            _benefit = getDSZNBenefits(benefits);
+            _benefits = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefits(benefits);
         } else {
-            _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null
-                    : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefits.get(0));
+            _benefits = yavl_lgot.equals(BENEFIT_INOE) ? Arrays.asList(null)
+                    : Arrays.asList(RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefits.get(0)));
         }
+
         try {
-            daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber,
+            daoService.createApplicationForGood(client, _benefits, mobile, firstName, middleName, lastName, serviceNumber,
                     ApplicationForFoodCreatorType.PORTAL);
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
@@ -207,18 +201,6 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
         daoService.updateEtpPacketWithSuccess(serviceNumber);
-    }
-
-    private Long getDSZNBenefits(List<String> benefits) throws Exception {
-        String benefit = benefits.get(0);
-        if (benefit.equals("LargeFamily")) return 66L;
-        if (benefit.equals("LowIncomeFamily")) return 48L;
-        if (benefit.equals("WithoutParentalCare")) return 52L;
-        if (benefit.equals("DisabledChild")) return 24L;
-        if (benefit.equals("UnemployedPersons")) return 56L;
-        if (benefit.equals("Recipient")) return 41L;
-        if (benefit.equals("ChildrenWithDisabilities")) return 56L;
-        throw new Exception("Unknown benefit");
     }
 
     private BaseDeclarant getBaseDeclarant(ArrayOfBaseDeclarant contacts) {
@@ -426,19 +408,21 @@ public class ETPMVService {
         int counter = 0;
         int sent_counter = 0;
         for (ApplicationForFood applicationForFood : list) {
-            Child child = objectFactory.createChild();
-            child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
-            child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
-            children.getChild().add(child);
-            sent_counter++;
-            if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
-                counter++;
-                setBenefitsRequest.setChildren(children);
-                logger.info(String.format("Sending request %s to AIS Contingent", counter));
-                SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
-                logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
-                processResponseFromAISContingent(response);
-                children.getChild().clear();
+            for (ApplicationForFoodDiscount appDiscount: applicationForFood.getDtisznCodes()) {
+                Child child = objectFactory.createChild();
+                child.setBenefitCode(appDiscount.getDtisznCode() == null ? "0" : appDiscount.getDtisznCode().toString());
+                child.setMeshGUID(applicationForFood.getClient().getMeshGUID());
+                children.getChild().add(child);
+                sent_counter++;
+                if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
+                    counter++;
+                    setBenefitsRequest.setChildren(children);
+                    logger.info(String.format("Sending request %s to AIS Contingent", counter));
+                    SetBenefitsResponseSmall response = port.setBenefits(setBenefits, isppHeaders);
+                    logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
+                    processResponseFromAISContingent(response);
+                    children.getChild().clear();
+                }
             }
         }
         if (children.getChild().size() > 0) {
@@ -529,7 +513,6 @@ public class ETPMVService {
             case COORDINATE_MESSAGE:
                 if (jaxbConsumerContext == null) {
                     jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                    useMeshGuid = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.useMeshGuid", "false").equals("true");
                 }
                 return jaxbConsumerContext;
         }
@@ -604,3 +587,4 @@ public class ETPMVService {
         }
     }
 }
+

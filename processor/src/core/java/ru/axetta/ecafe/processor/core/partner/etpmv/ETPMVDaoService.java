@@ -113,14 +113,14 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void createApplicationForGood(Client client, Long dtisznCode, String mobile,
+    public void createApplicationForGood(Client client, List<Integer> dtisznCodes, String mobile,
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
             ApplicationForFoodCreatorType creatorType) throws Exception {
         Session session = entityManager.unwrap(Session.class);
-        DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
+        DAOUtils.createApplicationForFood(session, client, dtisznCodes, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
         DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-        if (dtisznCode == null) {
+        if (dtisznCodes == null) {
             DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
         }
     }
@@ -134,11 +134,18 @@ public class ETPMVDaoService {
     }
 
     @Transactional(readOnly = true)
-    public Long getDSZNBenefit(String benefit) {
+    public Integer getDSZNBenefit(String benefit) {
         Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPCode = :benefit");
         query.setParameter("benefit", Long.parseLong(benefit));
         query.setMaxResults(1);
-        return new Long((Integer)query.getSingleResult());
+        return (Integer)query.getSingleResult();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Integer> getDSZNBenefits(List<String> benefits) {
+        Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPTextCode in (:benefits)");
+        query.setParameter("benefits", benefits);
+        return query.getResultList();
     }
 
     @Transactional(readOnly = true)
@@ -209,7 +216,7 @@ public class ETPMVDaoService {
         ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
         for (ApplicationForFood applicationForFood : apps) {
             try {
-                if (applicationForFood.getDtisznCode() != null) {
+                if (!applicationForFood.isInoe()) {
                     result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status,
                             nextVersion, historyVersion));
                 } else {

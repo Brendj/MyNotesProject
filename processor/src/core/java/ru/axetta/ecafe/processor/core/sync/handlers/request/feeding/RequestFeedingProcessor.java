@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding> {
 
@@ -57,7 +59,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     if (null == applicationForFood) {
                         try {
                             applicationForFood = DAOUtils
-                                    .createApplicationForFood(session, client, item.getDtisznCode(),
+                                    .createApplicationForFood(session, client, Arrays.asList(item.getDtisznCode()),
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(),
                                             item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
@@ -72,7 +74,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             logger.error(String.format(
                                     "Unable to create application for food {idOfClient=%d, DTSZNCode=%d, "
                                             + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
-                                    item.getIdOfClient(), item.getDtisznCode(), item.getApplicantPhone(),
+                                    item.getIdOfClient(), item.getDtisznCode(),
+                                    item.getApplicantPhone(),
                                     item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(),
                                     item.getServNumber()), e);
                             resItem = new ResRequestFeedingItem();
@@ -85,7 +88,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     } else {
                         try {
                             ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
-                            if (!oldStatus.equals(status) && applicationForFood.getDtisznCode() == null && status
+                            if (!oldStatus.equals(status) && applicationForFood.isInoe() && status
                                     .getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
                                 //если Иное и новый статус 1075, то искусственно создаем статус 1052
                                 DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
@@ -101,7 +104,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
 
                             applicationForFood = DAOUtils
                                     .updateApplicationForFoodByServiceNumberFullWithVersion(session,
-                                            item.getServNumber(), client, item.getDtisznCode(), status,
+                                            item.getServNumber(), client, status,
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion,
                                             nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
@@ -158,7 +161,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 ApplicationForFoodHistory history = DAOUtils
                         .getLastApplicationForFoodHistory(session, applicationForFood);
                 RequestFeedingItem resItem = null;
-                if (null == applicationForFood.getDtisznCode()) { //Тип льготы - Иное
+                if (applicationForFood.isInoe()) { //Тип льготы - Иное
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(),
                                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);

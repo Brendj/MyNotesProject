@@ -159,8 +159,14 @@ public class DTSZNDiscountsReviseService {
                         transaction = session.beginTransaction();
                     }
 
-                    Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE
-                            : applicationForFood.getDtisznCode();
+                    if (applicationForFood.isNewFormat()) {
+                        //todo не обрабатываем заявления в новом формате??
+                        logger.info(String.format("Application with number = %s has new format and skipped",
+                                applicationForFood.getServiceNumber()));
+                        continue;
+                    }
+                    Long dtsznCode = (null == applicationForFood.getApplicationDiscountOldFormat().getDtisznCode()) ? OTHER_DISCOUNT_CODE
+                            : applicationForFood.getApplicationDiscountOldFormat().getDtisznCode();
 
                     info = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
@@ -306,9 +312,11 @@ public class DTSZNDiscountsReviseService {
 
             ApplicationForFood applicationForFood = DAOUtils
                     .getApplicationForFood(session, serviceNumber);
+            //todo не обрабатываем заявления в новом формате??
+            if (applicationForFood.isNewFormat()) return;
 
-            Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE
-                    : applicationForFood.getDtisznCode();
+            Long dtsznCode = (null == applicationForFood.getApplicationDiscountOldFormat().getDtisznCode()) ? OTHER_DISCOUNT_CODE
+                    : applicationForFood.getApplicationDiscountOldFormat().getDtisznCode();
 
             ClientDtisznDiscountInfo info = DAOUtils
                     .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
@@ -360,8 +368,9 @@ public class DTSZNDiscountsReviseService {
 
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
-        if (null == application || !application.getStatus()
-                .equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
+        if (null == application
+                || !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))
+                || application.isNewFormat()) {
             return;
         }
 
@@ -371,8 +380,8 @@ public class DTSZNDiscountsReviseService {
             Boolean isOk = false;
 
             for (ClientDtisznDiscountInfo info : infoList) {
-                if (((application.getDtisznCode() == null && info.getDtisznCode().equals(0L)) || application
-                        .getDtisznCode().equals(info.getDtisznCode())) && info.getStatus()
+                if (((application.getApplicationDiscountOldFormat().getDtisznCode() == null && info.getDtisznCode().equals(0L))
+                        || application.getApplicationDiscountOldFormat().getDtisznCode().equals(info.getDtisznCode())) && info.getStatus()
                         .equals(ClientDTISZNDiscountStatus.CONFIRMED) && fireTime.before(info.getDateEnd())
                         && !info.getArchived()) {
                     isOk = true;

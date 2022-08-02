@@ -4583,18 +4583,18 @@ public class DAOUtils {
         return (ApplicationForFood) criteria.uniqueResult();
     }
 
-    public static ApplicationForFood createApplicationForFood(Session session, Client client, Long dtisznCode,
+    public static ApplicationForFood createApplicationForFood(Session session, Client client, List<Integer> dtisznCodes,
             String mobile, String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
             ApplicationForFoodCreatorType creatorType) throws Exception {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         Long historyVersion = nextVersionByApplicationForFoodHistory(session);
-        return createApplicationForFoodWithVersion(session, client, dtisznCode, mobile, guardianName,
+        return createApplicationForFoodWithVersion(session, client, dtisznCodes, mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, applicationForFoodVersion,
                 historyVersion);
     }
 
     public static ApplicationForFood createApplicationForFoodWithVersion(Session session, Client client,
-            Long dtisznCode, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
+            List<Integer> dtisznCodes, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
             String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) throws Exception {
         //Дополнительно проверяем на существование заявления перед созданием нового
         List<ApplicationForFood> existingApps = getApplicationForFoodByClient(session, client);
@@ -4602,10 +4602,15 @@ public class DAOUtils {
             throw new ApplicationForFoodExistsException("Существует ранее поданное заявление");
         }
 
-        ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
+        ApplicationForFood applicationForFood = new ApplicationForFood(client,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version);
         session.save(applicationForFood);
+        for (Integer code: dtisznCodes) {
+            ApplicationForFoodDiscount obj = new ApplicationForFoodDiscount(code == null ? null : code.intValue());
+            obj.setApplicationForFood(applicationForFood);
+            session.save(obj);
+        }
 
         addApplicationForFoodHistoryWithVersion(session, applicationForFood,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), historyVersion);
@@ -4829,7 +4834,8 @@ public class DAOUtils {
 
     public static List<ApplicationForFood> getApplicationForFoodListByClient(Session session, Long idOfClient) {
         Query query = session.createQuery(
-                "select a from ApplicationForFood a where a.client.idOfClient = :idOfClient order by a.serviceNumber");
+                "select a from ApplicationForFood a where a.client.idOfClient = :idOfClient " +
+                        "order by a.serviceNumber");
         query.setParameter("idOfClient", idOfClient);
         return query.list();
     }
@@ -5010,7 +5016,7 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession,
-            String serviceNumber, Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile,
+            String serviceNumber, Client client, ApplicationForFoodStatus status, String mobile,
             String applicantName, String applicantSecondName, String applicantSurname, Long version,
             Long historyVersion, Date docOrderDate, String idOfDocOrder) throws Exception {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession,
@@ -5020,7 +5026,6 @@ public class DAOUtils {
             return null;
         }
         applicationForFood.setClient(client);
-        applicationForFood.setDtisznCode(dtisznCode);
         applicationForFood.setStatus(status);
         applicationForFood.setMobile(mobile);
         applicationForFood.setApplicantName(applicantName);

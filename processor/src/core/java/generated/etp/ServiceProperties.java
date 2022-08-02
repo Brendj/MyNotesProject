@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- *
+ * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -45,8 +45,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -70,7 +70,7 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the isLegalRepresentative property.
-     *
+     * 
      */
     public boolean isIsLegalRepresentative() {
         return isLegalRepresentative;
@@ -78,7 +78,7 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the isLegalRepresentative property.
-     *
+     * 
      */
     public void setIsLegalRepresentative(boolean value) {
         this.isLegalRepresentative = value;
@@ -86,11 +86,11 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the validity property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link Boolean }
-     *
+     *     
      */
     public Boolean isValidity() {
         return validity;
@@ -98,11 +98,11 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the validity property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *
+     *     
      */
     public void setValidity(Boolean value) {
         this.validity = value;
@@ -110,7 +110,7 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the validationGuardianship property.
-     *
+     * 
      */
     public boolean isValidationGuardianship() {
         return validationGuardianship;
@@ -118,7 +118,7 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the validationGuardianship property.
-     *
+     * 
      */
     public void setValidationGuardianship(boolean value) {
         this.validationGuardianship = value;
@@ -126,11 +126,11 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the eduName property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getEduName() {
         return eduName;
@@ -138,11 +138,11 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the eduName property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setEduName(String value) {
         this.eduName = value;
@@ -150,11 +150,11 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the idLink property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getIDLink() {
         return idLink;
@@ -162,11 +162,11 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the idLink property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setIDLink(String value) {
         this.idLink = value;
@@ -174,11 +174,11 @@ public class ServiceProperties {
 
     /**
      * Gets the value of the preferentialCategory property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link ServiceProperties.PreferentialCategory }
-     *
+     *     
      */
     public ServiceProperties.PreferentialCategory getPreferentialCategory() {
         return preferentialCategory;
@@ -186,11 +186,11 @@ public class ServiceProperties {
 
     /**
      * Sets the value of the preferentialCategory property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link ServiceProperties.PreferentialCategory }
-     *
+     *     
      */
     public void setPreferentialCategory(ServiceProperties.PreferentialCategory value) {
         this.preferentialCategory = value;
@@ -199,9 +199,9 @@ public class ServiceProperties {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * 
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * 
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
@@ -219,18 +219,18 @@ public class ServiceProperties {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-            "largeFamily",
-            "lowIncomeFamily",
-            "withoutParentalCare",
-            "disabledChild",
-            "unemployedPersons",
-            "recipient",
-            "childrenWithDisabilities"
+        "largeFamily",
+        "lowIncomeFamily",
+        "withoutParentalCare",
+        "disabledChild",
+        "unemployedPersons",
+        "recipient",
+        "childrenWithDisabilities"
     })
     public static class PreferentialCategory {
 
@@ -251,11 +251,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the largeFamily property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isLargeFamily() {
             return largeFamily;
@@ -263,11 +263,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the largeFamily property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setLargeFamily(Boolean value) {
             this.largeFamily = value;
@@ -275,11 +275,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the lowIncomeFamily property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isLowIncomeFamily() {
             return lowIncomeFamily;
@@ -287,11 +287,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the lowIncomeFamily property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setLowIncomeFamily(Boolean value) {
             this.lowIncomeFamily = value;
@@ -299,11 +299,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the withoutParentalCare property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isWithoutParentalCare() {
             return withoutParentalCare;
@@ -311,11 +311,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the withoutParentalCare property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setWithoutParentalCare(Boolean value) {
             this.withoutParentalCare = value;
@@ -323,11 +323,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the disabledChild property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isDisabledChild() {
             return disabledChild;
@@ -335,11 +335,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the disabledChild property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setDisabledChild(Boolean value) {
             this.disabledChild = value;
@@ -347,11 +347,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the unemployedPersons property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isUnemployedPersons() {
             return unemployedPersons;
@@ -359,11 +359,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the unemployedPersons property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setUnemployedPersons(Boolean value) {
             this.unemployedPersons = value;
@@ -371,11 +371,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the recipient property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isRecipient() {
             return recipient;
@@ -383,11 +383,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the recipient property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setRecipient(Boolean value) {
             this.recipient = value;
@@ -395,11 +395,11 @@ public class ServiceProperties {
 
         /**
          * Gets the value of the childrenWithDisabilities property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public Boolean isChildrenWithDisabilities() {
             return childrenWithDisabilities;
@@ -407,11 +407,11 @@ public class ServiceProperties {
 
         /**
          * Sets the value of the childrenWithDisabilities property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setChildrenWithDisabilities(Boolean value) {
             this.childrenWithDisabilities = value;

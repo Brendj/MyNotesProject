@@ -4,15 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class ApplicationForFood {
     private Long idOfApplicationForFood;
     private Client client;
-    private Long dtisznCode;
     private Date createdDate;
     private Date discountDateStart;
     private Date discountDateEnd;
@@ -31,12 +33,12 @@ public class ApplicationForFood {
     private Boolean sendToAISContingent;
     private Date archiveDate;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
+    private Set<ApplicationForFoodDiscount> dtisznCodes;
 
-    public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
+    public ApplicationForFood(Client client, ApplicationForFoodStatus status, String mobile, String applicantName,
             String applicantSecondName, String applicantSurname, String serviceNumber, ApplicationForFoodCreatorType creatorType,
             String idOfDocOrder, Date docOrderDate, Long version) {
         this.client = client;
-        this.dtisznCode = dtisznCode;
         this.createdDate = CalendarUtils.truncateToSecond(new Date()).getTime();
         this.status = status;
         this.mobile = mobile;
@@ -57,6 +59,45 @@ public class ApplicationForFood {
 
     }
 
+    public boolean isInoe() {
+        //Если льгота одна и она Иное, то true
+        return (dtisznCodes != null && dtisznCodes.size() == 1
+                && ((ApplicationForFoodDiscount)dtisznCodes.toArray()[0]).getDtisznCode() == null);
+    }
+
+    public Integer getPriorityDtisznCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        Integer prio = null;
+        Integer code = null;
+        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+            CategoryDiscountDSZN categoryDiscountDSZN = getCategoryDiscountDSZNByCode(categoryDiscountDSZNList, discount.getDtisznCode());
+            if (prio == null) {
+                prio = categoryDiscountDSZN.getPriority();
+                code = categoryDiscountDSZN.getCode();
+            }
+            if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio) {
+                prio = categoryDiscountDSZN.getPriority();
+                code = categoryDiscountDSZN.getCode();
+            }
+        }
+        return code;
+    }
+
+    private CategoryDiscountDSZN getCategoryDiscountDSZNByCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList, Integer code) {
+        for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
+            if (categoryDiscountDSZN.getCode() != null && code != null && categoryDiscountDSZN.getCode().equals(code)) return categoryDiscountDSZN;
+            if (categoryDiscountDSZN.getCode() == null && code == null) return categoryDiscountDSZN;
+        }
+        return null;
+    }
+
+    public ApplicationForFoodDiscount getApplicationDiscountOldFormat() {
+        return (ApplicationForFoodDiscount)dtisznCodes.toArray()[0];
+    }
+
+    public boolean isNewFormat() {
+        return serviceNumber.contains(ETPMVService.NEW_ISPP_ID);
+    }
+
     public Long getIdOfApplicationForFood() {
         return idOfApplicationForFood;
     }
@@ -71,14 +112,6 @@ public class ApplicationForFood {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public Long getDtisznCode() {
-        return dtisznCode;
-    }
-
-    public void setDtisznCode(Long dtisznCode) {
-        this.dtisznCode = dtisznCode;
     }
 
     public Date getCreatedDate() {
@@ -224,5 +257,13 @@ public class ApplicationForFood {
 
     public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
+    }
+
+    public Set<ApplicationForFoodDiscount> getDtisznCodes() {
+        return dtisznCodes;
+    }
+
+    public void setDtisznCodes(Set<ApplicationForFoodDiscount> dtisznCodes) {
+        this.dtisznCodes = dtisznCodes;
     }
 }
