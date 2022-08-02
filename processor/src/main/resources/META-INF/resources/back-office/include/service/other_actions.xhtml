@@ -363,6 +363,21 @@
                                       rendered="#{otherActionsPage.showProcessedMeshGuids}"/>
                     </h:panelGrid>
                 </rich:panel>
+                <rich:panel id="replaceMeshTypesForGuardiansPanel">
+                    <h:panelGrid columns="1">
+                        <h:outputText escape="true" value="Удаление значений степени родства"
+                                      styleClass="output-text"/><br/>
+                        <h:outputText value="Ид. опекаемого:"/>
+                        <h:inputText value="#{otherActionsPage.kid}" size="20"/>
+
+                        <h:outputText value="Ид. опекуна:"/>
+                        <h:inputText value="#{otherActionsPage.guardian}" size="20"/>
+
+                        <a4j:commandButton value="Запустить удаление (Доверенный представитель, Опекун)"
+                                           action="#{otherActionsPage.runDeleteRelationGuardians}"
+                                           styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                    </h:panelGrid>
+                </rich:panel>
             </h:panelGrid>
 
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
@@ -381,8 +396,10 @@
             </f:facet>
         </a4j:status>
 
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
+            <h:panelGrid styleClass="borderless-grid">
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
+        </h:panelGrid>
     </h:panelGrid>
-</h:panelGrid>
 </ui:composition>
