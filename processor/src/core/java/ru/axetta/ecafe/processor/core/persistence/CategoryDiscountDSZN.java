@@ -19,13 +19,14 @@ public class CategoryDiscountDSZN {
     private Boolean deleted;
     private Long ETPCode;
     private String ETPTextCode;
+    private Integer priority;
     private String guid;
 
     public CategoryDiscountDSZN() {
     }
 
     public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long ETPCode, String ETPTextCode,
-            Long version, String guid) {
+            Integer priority, Long version, String guid) {
         this.code = code;
         this.description = description;
         this.categoryDiscount = categoryDiscount;
@@ -33,6 +34,7 @@ public class CategoryDiscountDSZN {
         this.deleted = false;
         this.ETPCode = ETPCode;
         this.ETPTextCode = ETPTextCode;
+        this.priority = priority;
         this.guid = guid;
     }
 
@@ -139,5 +141,13 @@ public class CategoryDiscountDSZN {
 
     public void setETPTextCode(String ETPTextCode) {
         this.ETPTextCode = ETPTextCode;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

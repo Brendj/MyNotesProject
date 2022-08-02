@@ -28,6 +28,8 @@ alter table cf_applications_for_food drop column dtiszncode;
 CREATE INDEX cf_applications_for_food_discount_app_idx ON cf_applications_for_food_discount USING btree (idofapplicationforfood);
 
 alter table cf_categorydiscounts_dszn
-    add column etptextcode character varying(32);
+    add column etptextcode character varying(32),
+    add column priority integer;
 
 comment on column cf_categorydiscounts_dszn.etptextcode is 'Новый текстовый код льготы от ЕТП';
+comment on column cf_categorydiscounts_dszn.priority is 'Приоритет льготы';

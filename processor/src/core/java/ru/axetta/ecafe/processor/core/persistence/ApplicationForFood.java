@@ -5,9 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class ApplicationForFood {
@@ -61,6 +63,31 @@ public class ApplicationForFood {
         //Если льгота одна и она Иное, то true
         return (dtisznCodes != null && dtisznCodes.size() == 1
                 && ((ApplicationForFoodDiscount)dtisznCodes.toArray()[0]).getDtisznCode() == null);
+    }
+
+    public Integer getPriorityDtisznCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        Integer prio = null;
+        Integer code = null;
+        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+            CategoryDiscountDSZN categoryDiscountDSZN = getCategoryDiscountDSZNByCode(categoryDiscountDSZNList, discount.getDtisznCode());
+            if (prio == null) {
+                prio = categoryDiscountDSZN.getPriority();
+                code = categoryDiscountDSZN.getCode();
+            }
+            if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio) {
+                prio = categoryDiscountDSZN.getPriority();
+                code = categoryDiscountDSZN.getCode();
+            }
+        }
+        return code;
+    }
+
+    private CategoryDiscountDSZN getCategoryDiscountDSZNByCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList, Integer code) {
+        for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
+            if (categoryDiscountDSZN.getCode() != null && code != null && categoryDiscountDSZN.getCode().equals(code)) return categoryDiscountDSZN;
+            if (categoryDiscountDSZN.getCode() == null && code == null) return categoryDiscountDSZN;
+        }
+        return null;
     }
 
     public ApplicationForFoodDiscount getApplicationDiscountOldFormat() {

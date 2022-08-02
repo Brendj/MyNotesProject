@@ -18,6 +18,7 @@
                   not-null="true"/>
         <property name="ETPCode" column="etpcode" type="long"/>
         <property name="ETPTextCode" column="etptextcode" type="string" length="32"/>
+        <property name="priority" column="priority" type="integer"/>
         <property name="guid" column="guid" type="string" length="80" not-null="true" unique="true"/>
     </class>
 </hibernate-mapping>

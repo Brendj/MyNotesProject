@@ -38,6 +38,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
     private String categoryName;
     private String ETPCode = "";
     private String ETPTextCode = "";
+    private Integer priority;
 
     @Override
     public void onShow() throws Exception {
@@ -117,7 +118,8 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
                 guid = UUID.randomUUID().toString();
-                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode, StringUtils.isEmpty(ETPTextCode) ? null : ETPTextCode, nextVersion, guid);
+                categoryDiscountDSZN = new CategoryDiscountDSZN(convertCode, description, categoryDiscount, convertETPCode,
+                        StringUtils.isEmpty(ETPTextCode) ? null : ETPTextCode, priority, nextVersion, guid);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;
@@ -177,5 +179,13 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
 
     public void setETPTextCode(String ETPTextCode) {
         this.ETPTextCode = ETPTextCode;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

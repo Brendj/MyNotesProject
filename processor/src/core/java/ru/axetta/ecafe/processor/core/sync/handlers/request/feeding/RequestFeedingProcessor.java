@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     if (null == applicationForFood) {
                         try {
                             applicationForFood = DAOUtils
-                                    .createApplicationForFood(session, client, item.getDtisznCodes(),
+                                    .createApplicationForFood(session, client, Arrays.asList(item.getDtisznCode()),
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(),
                                             item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
@@ -73,7 +74,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             logger.error(String.format(
                                     "Unable to create application for food {idOfClient=%d, DTSZNCode=%d, "
                                             + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
-                                    item.getIdOfClient(), item.getDtisznCodes().stream().map(d -> d.toString()).collect(Collectors.joining(",")),
+                                    item.getIdOfClient(), item.getDtisznCode(),
                                     item.getApplicantPhone(),
                                     item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(),
                                     item.getServNumber()), e);
@@ -181,7 +182,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
     }
 
     private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client, ApplicationForFood applicationForFood) {
-        if (!item.isInoe() && (null == item.getOtherDiscountStartDate() || null == item
+        if (null != item.getDtisznCode() && (null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) || null == item.getOtherDiscountStartDate() || null == item
                 .getOtherDiscountEndDate()) {
             return;
