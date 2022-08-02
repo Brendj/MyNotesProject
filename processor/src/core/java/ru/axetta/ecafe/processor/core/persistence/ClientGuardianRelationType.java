@@ -21,7 +21,8 @@ public enum ClientGuardianRelationType {
     BROTHER(10, "Брат"),
     SISTER(11, "Сестра"),
     GRANDMOTHER(12, "Бабушка"),
-    GRANDFATHER(13, "Дедушка");
+    GRANDFATHER(13, "Дедушка"),
+    UNDEFINED (16, "Не определено");
 
     //Старые типы представителей, значения конвертируем в новые
     private static final int ADOPTIVE_PARENT = 4;

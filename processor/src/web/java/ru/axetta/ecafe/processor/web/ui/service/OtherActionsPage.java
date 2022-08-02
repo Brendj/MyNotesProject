@@ -8,6 +8,8 @@ import org.hibernate.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshAgentResponse;
+import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
@@ -44,6 +46,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.faces.el.MethodBinding;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -82,6 +87,8 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     protected String orgItemsPreorderFilter = "Не выбрано";
     protected String orgItemsRemoveDupFilter = "Не выбрано";
     protected String orgItemsLoadMeshFilter = "Не выбрано";
+    private String guardian;
+    private String kid;
 
     private static class OrgItem {
         protected final Long idOfOrg;
@@ -1052,6 +1059,73 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
         }
     }
+    public void runDeleteRelationGuardians() {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            MeshGuardiansService meshGuardiansService = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
+            String additional = "";
+
+            if ((!kid.isEmpty() && guardian.isEmpty()) || (kid.isEmpty() && !guardian.isEmpty())) {
+                throw new Exception("Не заполнено поле \"Ид. опекаемого\" или \"Ид. опекуна\"");
+            }
+
+            if (!kid.isEmpty())
+                additional = " and idofchildren = :kid and idofguardian = :guardian";
+
+            Query sql = session.createSQLQuery("update cf_client_guardian " +
+                    "set relation = 16, islegalrepresent = case when islegalrepresent = -1 then 0 else islegalrepresent end " +
+                    "where relation = 2 " + additional);
+
+            if (!additional.isEmpty()) {
+                sql.setParameter("kid", Long.parseLong(kid));
+                sql.setParameter("guardian", Long.parseLong(guardian));
+            }
+            sql.executeUpdate();
+
+            sql = session.createSQLQuery(
+                    "select client.meshguid as kid, guardian.meshguid as guardian " +
+                            "from cf_client_guardian g " +
+                            "inner join cf_clients client on g.idofchildren = client.idofclient " +
+                            "inner join cf_clients guardian on g.idofguardian = guardian.idofclient " +
+                            "where relation = 3 " + additional);
+            if (!additional.isEmpty()) {
+                sql.setParameter("kid", Long.parseLong(kid));
+                sql.setParameter("guardian", Long.parseLong(guardian));
+            }
+            List<Object[]> clientGuardians = sql.list();
+
+            for (Object[] clientGuardian : clientGuardians) {
+                if (clientGuardian[0] != null && clientGuardian[1] != null) {
+                    MeshAgentResponse meshAgentResponse = meshGuardiansService
+                            .changeGuardianToClient(clientGuardian[0].toString(),
+                                    clientGuardian[1].toString(), 2);
+                    if (!meshAgentResponse.getCode().equals(0)) {
+                        logger.error(String.format("Error change agentTypeId to AgentMeshGuid: %s ChildMeshGuid: %s due to :%s",
+                                clientGuardian[0].toString(), clientGuardian[1].toString(), meshAgentResponse.getMessage()));
+                    }
+                }
+            }
+
+            sql = session.createSQLQuery("update cf_client_guardian set relation = 16 where relation = 3 " + additional);
+            if (!additional.isEmpty()) {
+                sql.setParameter("kid", Long.parseLong(kid));
+                sql.setParameter("guardian", Long.parseLong(guardian));
+            }
+            sql.executeUpdate();
+
+            transaction.commit();
+            transaction = null;
+
+        } catch (Exception e) {
+            logger.error("Error in runDeleteRelationGuardians: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -1185,5 +1259,21 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public void setOrgItemsLoadMeshFilter(String orgItemsLoadMeshFilter) {
         this.orgItemsLoadMeshFilter = orgItemsLoadMeshFilter;
+    }
+
+    public String getGuardian() {
+        return guardian;
+    }
+
+    public void setGuardian(String guardian) {
+        this.guardian = guardian;
+    }
+
+    public String getKid() {
+        return kid;
+    }
+
+    public void setKid(String kid) {
+        this.kid = kid;
     }
 }

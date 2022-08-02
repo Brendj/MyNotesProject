@@ -654,6 +654,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
                     id = agentResponse.getAgentId();
             }
+            if (id == 0) {
+                return new MeshAgentResponse().internalErrorResponse("Agent not found");
+            }
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = new PersonAgent();
             personAgent.setAgentTypeId(agentTypeId);
