@@ -28,6 +28,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import javax.annotation.Resource;
 import java.io.StringReader;
@@ -391,7 +392,7 @@ public class EventNotificationService {
         }
     }
 
-    private void sendPushToMK(Client destClient, Client dataClient, String type,
+    public void sendPushToMK(Client destClient, Client dataClient, String type,
                               String[] values, Date eventTime, Integer passDirection, Client guardian) {
         if (dataClient != null) {
             return;
@@ -439,7 +440,7 @@ public class EventNotificationService {
                 return null;
             if ((passDirection == 0 || passDirection == 6))
                 enterEventData.setActionType(0);
-            else if ((passDirection == 2 || passDirection == 7))
+            else if ((passDirection == 1 || passDirection == 7))
                 enterEventData.setActionType(1);
             else return null;
             if (guardian != null)
@@ -447,11 +448,11 @@ public class EventNotificationService {
         } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
             enterEventData.setTicketStatus("0");
             enterEventData.setOrganizationName(findValueInParams
-                    (new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values));
+                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
         } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
             enterEventData.setTicketStatus("1");
             enterEventData.setOrganizationName(findValueInParams
-                    (new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values));
+                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
         } else {
             return null;
         }
@@ -500,6 +501,10 @@ public class EventNotificationService {
         if (amount != null && !amount.isEmpty()) {
             balanceData.setBalanceChange(Integer.parseInt(amount.replaceAll(",", "")));
         }
+        String balance = findValueInParams(new String[]{"balance"}, values);
+        if (balance != null && !balance.isEmpty()) {
+            balanceData.setBalance(CurrencyStringUtils.rublesToCopecksTwoDigitAfterComma(balance));
+        }
 
         if (type.equals(MESSAGE_PAYMENT_PAY) || type.equals(MESSAGE_PAYMENT_FREE)) {
             String fRation = findValueInParams(new String[]{PARAM_FRATION}, values);
@@ -512,7 +517,6 @@ public class EventNotificationService {
         balanceData.setOrganizationId(destClient.getOrg().getIdOfOrg());
         balanceData.setPersonId(destClient.getMeshGUID());
         balanceData.setOccurredAt(simpleDateFormat.format(eventTime));
-        balanceData.setBalance(destClient.getBalance().intValue());
         return balanceData;
     }
 
