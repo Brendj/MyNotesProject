@@ -4791,7 +4791,7 @@ public class DAOUtils {
         condition +=
                 benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
-        condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
+        condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber = :number";
         condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery(
                 "select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
@@ -4812,8 +4812,7 @@ public class DAOUtils {
             query.setParameterList("idOfClientList", idOfClientList);
         }
         if (!StringUtils.isEmpty(number)) {
-            query.setParameter("number",
-                    number.length() == 30 ? number : "%" + ETPMVService.ISPP_ID + getProperNumber(number) + "%");
+            query.setParameter("number", number);
         }
         return query.list();
     }
