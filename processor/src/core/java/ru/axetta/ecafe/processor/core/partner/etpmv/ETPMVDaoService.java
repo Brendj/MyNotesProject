@@ -115,10 +115,10 @@ public class ETPMVDaoService {
     @Transactional
     public void createApplicationForGood(Client client, List<Integer> dtisznCodes, String mobile,
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) throws Exception {
+            ApplicationForFoodCreatorType creatorType, Boolean validDoc, Boolean validGuardianship) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         DAOUtils.createApplicationForFood(session, client, dtisznCodes, mobile,
-                guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
+                guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType, validDoc, validGuardianship);
         DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
         if (dtisznCodes == null) {
             DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));

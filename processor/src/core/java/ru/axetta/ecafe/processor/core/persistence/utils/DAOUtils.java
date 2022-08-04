@@ -4585,17 +4585,18 @@ public class DAOUtils {
 
     public static ApplicationForFood createApplicationForFood(Session session, Client client, List<Integer> dtisznCodes,
             String mobile, String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) throws Exception {
+            ApplicationForFoodCreatorType creatorType, Boolean validDoc, Boolean validGuardianship) throws Exception {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         Long historyVersion = nextVersionByApplicationForFoodHistory(session);
         return createApplicationForFoodWithVersion(session, client, dtisznCodes, mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, applicationForFoodVersion,
-                historyVersion);
+                historyVersion, validDoc, validGuardianship);
     }
 
     public static ApplicationForFood createApplicationForFoodWithVersion(Session session, Client client,
             List<Integer> dtisznCodes, String mobile, String guardianName, String guardianSecondName, String guardianSurname,
-            String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) throws Exception {
+            String serviceNumber, ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion,
+            Boolean validDoc, Boolean validGuardianship) throws Exception {
         //Дополнительно проверяем на существование заявления перед созданием нового
         List<ApplicationForFood> existingApps = getApplicationForFoodByClient(session, client);
         if (!allowedCreateNewApplicationForFood(existingApps)) {
@@ -4604,7 +4605,8 @@ public class DAOUtils {
 
         ApplicationForFood applicationForFood = new ApplicationForFood(client,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
-                guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version);
+                guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version,
+                validDoc, validGuardianship);
         session.save(applicationForFood);
         for (Integer code: dtisznCodes) {
             ApplicationForFoodDiscount obj = new ApplicationForFoodDiscount(code == null ? null : code.intValue());
@@ -4798,7 +4800,7 @@ public class DAOUtils {
         condition +=
                 benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
-        condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
+        condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber = :number";
         condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery(
                 "select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
@@ -4819,8 +4821,7 @@ public class DAOUtils {
             query.setParameterList("idOfClientList", idOfClientList);
         }
         if (!StringUtils.isEmpty(number)) {
-            query.setParameter("number",
-                    number.length() == 30 ? number : "%" + ETPMVService.ISPP_ID + getProperNumber(number) + "%");
+            query.setParameter("number", number);
         }
         return query.list();
     }
@@ -4922,17 +4923,22 @@ public class DAOUtils {
 
     public static List<ApplicationForFood> getApplicationForFoodListByStatus(Session session,
             ApplicationForFoodStatus status, Boolean isOthers, String guid) {
-        Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.add(Restrictions.eq("status", status));
-        criteria.add(Restrictions.eq("archived", false));
+        String str = "select a from ApplicationForFood a " +
+                "join a.dtisznCodes codes join a.client cl " +
+                "where a.status = :status and a.archived = false ";
         if (isOthers) {
-            criteria.add(Restrictions.isNull("dtisznCode"));
+            str += "and codes.dtisznCode is null ";
         }
         if (!StringUtils.isEmpty(guid)) {
-            criteria.createAlias("client", "cl", JoinType.INNER_JOIN);
-            criteria.add(Restrictions.or(Restrictions.eq("cl.clientGUID", guid), Restrictions.eq("cl.meshGUID", guid)));
+            str += "and clmeshGUID = :guid";
         }
-        return criteria.list();
+        Query query = session.createQuery(str);
+        query.setParameter("status", status);
+        if (!StringUtils.isEmpty(guid)) {
+            query.setParameter("guid", guid);
+        }
+
+        return query.list();
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByStatusAndServiceNumber(Session session,

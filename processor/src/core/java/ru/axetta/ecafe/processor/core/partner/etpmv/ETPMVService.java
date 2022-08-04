@@ -117,6 +117,8 @@ public class ETPMVService {
         String guid;
         List<String> benefits;
         String yavl_lgot = "";
+        Boolean validDoc = null;
+        Boolean validGuardianship = null;
         if (newFormat) {
             guid = getServicePropertiesValue(serviceProperties, "IDLink");
             benefits = getBenefitsFromServiceProperties(serviceProperties);
@@ -126,11 +128,15 @@ public class ETPMVService {
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not legal represent");
                 return;
             }
-            if (benefits.size() == 0) {
+            if (benefits.size() == 0 || wrongBenefits(benefits)) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
                 return;
             }
+            String strValidDoc = getServicePropertiesValue(serviceProperties, "Validity");
+            String strValidGuardianship = getServicePropertiesValue(serviceProperties, "ValidationGuardianship");
+            if (!StringUtils.isEmpty(strValidDoc)) validDoc = Boolean.parseBoolean(strValidDoc);
+            if (!StringUtils.isEmpty(strValidGuardianship)) validGuardianship = Boolean.parseBoolean(strValidGuardianship);
         } else {
             guid = getServicePropertiesValue(serviceProperties, "guid");
             yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
@@ -186,7 +192,7 @@ public class ETPMVService {
 
         try {
             daoService.createApplicationForGood(client, _benefits, mobile, firstName, middleName, lastName, serviceNumber,
-                    ApplicationForFoodCreatorType.PORTAL);
+                    ApplicationForFoodCreatorType.PORTAL, validDoc, validGuardianship);
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
@@ -201,6 +207,11 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
         daoService.updateEtpPacketWithSuccess(serviceNumber);
+    }
+
+    private boolean wrongBenefits(List<String> benefits) {
+        return RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                .getDSZNBenefits(benefits).size() != benefits.size();
     }
 
     private BaseDeclarant getBaseDeclarant(ArrayOfBaseDeclarant contacts) {

@@ -23,7 +23,9 @@ comment on column cf_applications_for_food_discount.dtiszncode is 'Код льг
 insert into cf_applications_for_food_discount(idofapplicationforfood, dtiszncode)
 select idofapplicationforfood, dtiszncode from cf_applications_for_food;
 
-alter table cf_applications_for_food drop column dtiszncode;
+alter table cf_applications_for_food drop column dtiszncode,
+    add column validdoc integer,
+    add column validguardianship integer;
 
 CREATE INDEX cf_applications_for_food_discount_app_idx ON cf_applications_for_food_discount USING btree (idofapplicationforfood);
 
