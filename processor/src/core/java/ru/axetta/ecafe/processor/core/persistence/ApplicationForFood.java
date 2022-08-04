@@ -32,12 +32,14 @@ public class ApplicationForFood {
     private Long version;
     private Boolean sendToAISContingent;
     private Date archiveDate;
+    private Boolean validDoc;
+    private Boolean validGuardianShip;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
     private Set<ApplicationForFoodDiscount> dtisznCodes;
 
     public ApplicationForFood(Client client, ApplicationForFoodStatus status, String mobile, String applicantName,
             String applicantSecondName, String applicantSurname, String serviceNumber, ApplicationForFoodCreatorType creatorType,
-            String idOfDocOrder, Date docOrderDate, Long version) {
+            String idOfDocOrder, Date docOrderDate, Long version, Boolean validDoc, Boolean validGuardianship) {
         this.client = client;
         this.createdDate = CalendarUtils.truncateToSecond(new Date()).getTime();
         this.status = status;
@@ -53,6 +55,8 @@ public class ApplicationForFood {
         this.idOfDocOrder = idOfDocOrder;
         this.docOrderDate = docOrderDate;
         this.sendToAISContingent = false;
+        this.validDoc = validDoc;
+        this.validGuardianShip = validGuardianship;
     }
 
     public ApplicationForFood() {
@@ -265,5 +269,21 @@ public class ApplicationForFood {
 
     public void setDtisznCodes(Set<ApplicationForFoodDiscount> dtisznCodes) {
         this.dtisznCodes = dtisznCodes;
+    }
+
+    public Boolean getValidDoc() {
+        return validDoc;
+    }
+
+    public void setValidDoc(Boolean validDoc) {
+        this.validDoc = validDoc;
+    }
+
+    public Boolean getValidGuardianShip() {
+        return validGuardianShip;
+    }
+
+    public void setValidGuardianShip(Boolean validGuardianShip) {
+        this.validGuardianShip = validGuardianShip;
     }
 }

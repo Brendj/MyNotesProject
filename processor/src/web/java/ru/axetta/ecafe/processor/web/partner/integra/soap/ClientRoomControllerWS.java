@@ -10863,7 +10863,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             DAOUtils.createApplicationForFood(persistenceSession, client, Arrays.asList(otherDiscount ? null : categoryDiscount.intValue()),
                     mobilePhone, guardianName, guardianSecondName, guardianSurname, serviceNumber,
-                    ApplicationForFoodCreatorType.PORTAL);
+                    ApplicationForFoodCreatorType.PORTAL, null, null);
             DAOUtils.updateApplicationForFood(persistenceSession, client,
                     new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
 
