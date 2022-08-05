@@ -14,8 +14,6 @@ public enum ClientGuardianRelationType {
 
     MOTHER(0, "Мать"),
     FATHER(1, "Отец"),
-    REPRESENTATIVE(2, "Доверенный представитель"),
-    GUARDIAN(3, "Опекун"),
     UNCLE(8, "Дядя"),
     AUNT(9, "Тётя"),
     BROTHER(10, "Брат"),
@@ -54,11 +52,11 @@ public enum ClientGuardianRelationType {
             return null;
         ClientGuardianRelationType relType = map.get(value);
         if (relType != null) return relType;
-        if (value.equals(ADOPTIVE_PARENT)) return GUARDIAN;
-        if (value.equals(ADOPTIVE_FATHER)) return GUARDIAN;
-        if (value.equals(FOSTER_PARENT)) return REPRESENTATIVE;
-        if (value.equals(OTHER)) return REPRESENTATIVE;
-        return REPRESENTATIVE;
+        if (value.equals(ADOPTIVE_PARENT)) return UNDEFINED;
+        if (value.equals(ADOPTIVE_FATHER)) return UNDEFINED;
+        if (value.equals(FOSTER_PARENT)) return UNDEFINED;
+        if (value.equals(OTHER)) return UNDEFINED;
+        return UNDEFINED;
     }
 
     //todo Использовался в сверке с реестрами, удалить.
