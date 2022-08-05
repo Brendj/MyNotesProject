@@ -2792,17 +2792,20 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (documentItem== null || documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
             Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
 
             if (client == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            if (documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
-                    || documentItem.getNumber() == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
-            }
+
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             MeshDocumentResponse meshDocumentResponse = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
@@ -2839,12 +2842,12 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if (documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
+            if (documentItem == null || documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
                     || documentItem.getNumber() == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
-            if (persistenceSession.load(DulDetail.class, documentItem.getIdDocument()) == null) {
+            if (persistenceSession.get(DulDetail.class, documentItem.getIdDocument()) == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
                         DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
             }
@@ -3328,16 +3331,14 @@ public class FrontController extends HttpServlet {
     }
 
     private DulDetail fillingDulDetail(Session session, DocumentItem documentItem) {
-        DulDetail dulDetail;
+        DulDetail dulDetail = new DulDetail();
         Date currentDate = new Date();
-        if (documentItem.getIdDocument() == null) {
-            dulDetail = new DulDetail();
-            dulDetail.setCreateDate(currentDate);
-            dulDetail.setDeleteState(false);
-        } else
+        if (documentItem.getIdDocument() != null) {
             dulDetail = session.get(DulDetail.class, documentItem.getIdDocument());
-        if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L)
+        }
+        if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L) {
             dulDetail.setIdOfClient(documentItem.getIdOfClient());
+        }
         dulDetail.setDocumentTypeId(documentItem.getDocumentTypeId());
         dulDetail.setSeries(documentItem.getSeries());
         dulDetail.setNumber(documentItem.getNumber());
