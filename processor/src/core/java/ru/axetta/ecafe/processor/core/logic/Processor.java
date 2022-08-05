@@ -7140,6 +7140,7 @@ public class Processor implements SyncProcessor {
                                         .attachEventDirectionToValues(e.getPassDirection(), values);
 
                                 List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
+                                Client guardianFromEnterEvent = DAOReadonlyService.getInstance().findClientById(guardianId);
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
@@ -7157,7 +7158,7 @@ public class Processor implements SyncProcessor {
                                 }
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(),
-                                        e.getEvtDateTime());
+                                        guardianFromEnterEvent, e.getEvtDateTime());
                             }
                             break;
                             case KINDERGARTEN: {
