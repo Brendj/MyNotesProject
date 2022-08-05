@@ -36,6 +36,8 @@
         <property name="version" column="Version" type="long" not-null="true"/>
         <property name="validDoc" column="validdoc" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="validGuardianShip" column="validguardianship" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="docConfirmed" column="docconfirmed" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="guardianshipConfirmed" column="guardianshipconfirmed" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <set name="applicationForFoodHistories" inverse="true" cascade="all">
             <key column="idOfApplicationForFood"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodHistory"/>

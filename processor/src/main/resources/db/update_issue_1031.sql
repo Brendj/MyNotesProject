@@ -25,7 +25,9 @@ select idofapplicationforfood, dtiszncode from cf_applications_for_food;
 
 alter table cf_applications_for_food drop column dtiszncode,
     add column validdoc integer,
-    add column validguardianship integer;
+    add column validguardianship integer,
+    add column docconfirmed integer,
+    add column guardianshipconfirmed integer;
 
 CREATE INDEX cf_applications_for_food_discount_app_idx ON cf_applications_for_food_discount USING btree (idofapplicationforfood);
 

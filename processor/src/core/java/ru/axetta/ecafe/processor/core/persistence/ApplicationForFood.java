@@ -34,6 +34,8 @@ public class ApplicationForFood {
     private Date archiveDate;
     private Boolean validDoc;
     private Boolean validGuardianShip;
+    private Boolean docConfirmed;
+    private Boolean guardianshipConfirmed;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
     private Set<ApplicationForFoodDiscount> dtisznCodes;
 
@@ -285,5 +287,21 @@ public class ApplicationForFood {
 
     public void setValidGuardianShip(Boolean validGuardianShip) {
         this.validGuardianShip = validGuardianShip;
+    }
+
+    public Boolean getDocConfirmed() {
+        return docConfirmed;
+    }
+
+    public void setDocConfirmed(Boolean docConfirmed) {
+        this.docConfirmed = docConfirmed;
+    }
+
+    public Boolean getGuardianshipConfirmed() {
+        return guardianshipConfirmed;
+    }
+
+    public void setGuardianshipConfirmed(Boolean guardianshipConfirmed) {
+        this.guardianshipConfirmed = guardianshipConfirmed;
     }
 }

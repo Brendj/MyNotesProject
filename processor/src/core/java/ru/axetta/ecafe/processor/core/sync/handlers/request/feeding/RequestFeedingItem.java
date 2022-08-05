@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
+import org.apache.commons.lang.StringUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
@@ -81,9 +82,9 @@ public class RequestFeedingItem {
     public RequestFeedingItem(ApplicationForFood applicationForFood, Date statusCreatedDate) {
         this.applicationForFeedingNumber = applicationForFood.getIdOfApplicationForFood();
         ApplicationForFoodStatus status = applicationForFood.getStatus();
-        this.status = status.getApplicationForFoodState().getCode();
-        if (null != status.getDeclineReason()) {
-            this.declineReason = status.getDeclineReason().getCode();
+        this.status = status.getApplicationForFoodState().getPureCode();
+        if (null != status.getApplicationForFoodState().getReason()) {
+            this.declineReason = Integer.valueOf(status.getApplicationForFoodState().getReason());
         }
         this.applicationCreatedDate = applicationForFood.getCreatedDate();
         this.idOfClient = applicationForFood.getClient().getIdOfClient();
@@ -136,23 +137,18 @@ public class RequestFeedingItem {
         applicationForFeedingNumber = XMLUtils.getLongAttributeValue(itemNode, "Number");
 
         state = XMLUtils.getIntegerAttributeValue(itemNode, "State");
-        if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) && !ApplicationForFoodState.REGISTERED
+        /*if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) && !ApplicationForFoodState.REGISTERED
                 .getCode().equals(state) && !ApplicationForFoodState.PAUSED.getCode().equals(state)
                 && !ApplicationForFoodState.RESUME.getCode().equals(state) && !ApplicationForFoodState.OK.getCode()
                 .equals(state) && !ApplicationForFoodState.DENIED.getCode().equals(state)
+                && !ApplicationForFoodState.DENIED.getCode().equals(state)
+                && !ApplicationForFoodState.DENIED.getCode().equals(state)
                 && !ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode().equals(state)
                 && !ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode().equals(state)) {
             errorMessage.append("Attribute State is incorrect ");
-        }
+        }*/
 
         declineReason = XMLUtils.getIntegerAttributeValue(itemNode, "DeclineReason");
-        if (null == declineReason && ApplicationForFoodState.DENIED.getCode().equals(state)
-                || ApplicationForFoodState.DENIED.getCode().equals(state) && !ApplicationForFoodDeclineReason.NO_DOCS
-                .getCode().equals(declineReason) && !ApplicationForFoodDeclineReason.NO_APPROVAL.getCode()
-                .equals(declineReason) && !ApplicationForFoodDeclineReason.INFORMATION_CONFLICT.getCode()
-                .equals(declineReason)) {
-            errorMessage.append("Attribute DeclineReason is incorrect ");
-        }
 
         try {
             regDate = XMLUtils.getDateTimeAttributeValue(itemNode, "RegDate");

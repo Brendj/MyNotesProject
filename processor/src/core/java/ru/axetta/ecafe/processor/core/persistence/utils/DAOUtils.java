@@ -4595,7 +4595,7 @@ public class DAOUtils {
         }
 
         ApplicationForFood applicationForFood = new ApplicationForFood(client,
-                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER), mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version,
                 validDoc, validGuardianship);
         session.save(applicationForFood);
@@ -4606,7 +4606,7 @@ public class DAOUtils {
         }
 
         addApplicationForFoodHistoryWithVersion(session, applicationForFood,
-                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), historyVersion);
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER), historyVersion);
 
         return applicationForFood;
     }
@@ -4762,11 +4762,9 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ne("status",
-                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS)));
-        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                ApplicationForFoodDeclineReason.NO_APPROVAL)));
-        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT)));
+                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD)));
         criteria.add(Restrictions.or(Restrictions.isNull("archived"), Restrictions.eq("archived", false)));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();

@@ -62,7 +62,7 @@ public class ApplicationForFoodProcessingService {
             session = context.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            ApplicationForFoodStatus pausedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null);
+            ApplicationForFoodStatus pausedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED);
 
             List<ApplicationForFood> applicationForFoodList =
                     DAOUtils.getApplicationForFoodListByStatus(session, pausedStatus, true, null);
@@ -83,9 +83,8 @@ public class ApplicationForFoodProcessingService {
 
             Date fireDate = new Date();
 
-            ApplicationForFoodStatus resumeStatus = new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null);
-            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                    ApplicationForFoodDeclineReason.NO_DOCS);
+            ApplicationForFoodStatus resumeStatus = new ApplicationForFoodStatus(ApplicationForFoodState.RESUME);
+            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
 
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
@@ -118,13 +117,11 @@ public class ApplicationForFoodProcessingService {
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, resumeStatus, applicationVersion,
                             historyVersion);
                     service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
-                            application.getStatus().getApplicationForFoodState(),
-                            application.getStatus().getDeclineReason());
+                            application.getStatus().getApplicationForFoodState());
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);
                     service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
-                            application.getStatus().getApplicationForFoodState(),
-                            application.getStatus().getDeclineReason());
+                            application.getStatus().getApplicationForFoodState());
                 }
 
                 transaction.commit();

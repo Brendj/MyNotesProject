@@ -119,9 +119,9 @@ public class ETPMVDaoService {
         Session session = entityManager.unwrap(Session.class);
         DAOUtils.createApplicationForFood(session, client, dtisznCodes, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType, validDoc, validGuardianship);
-        DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+        DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
         if (dtisznCodes == null) {
-            DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
+            DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED));
         }
     }
 
@@ -184,8 +184,8 @@ public class ETPMVDaoService {
         Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c where a.sendToAISContingent = false "
                 + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe)) "
                 + " and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :group_employees or c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :group_displaced)");
-        query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-        query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
+        query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK));
         query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
         query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         return query.getResultList();
@@ -213,14 +213,16 @@ public class ETPMVDaoService {
             query.setParameter("guid", meshGuid);
         }
         List<ApplicationForFood> apps = query.getResultList();
-        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED);
         for (ApplicationForFood applicationForFood : apps) {
             try {
                 if (!applicationForFood.isInoe()) {
                     result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status,
                             nextVersion, historyVersion));
                 } else {
-                    if (ApplicationForFoodState.DENIED != applicationForFood.getStatus().getApplicationForFoodState()) {
+                    if (ApplicationForFoodState.DENIED_BENEFIT != applicationForFood.getStatus().getApplicationForFoodState()
+                    && ApplicationForFoodState.DENIED_GUARDIANSHIP != applicationForFood.getStatus().getApplicationForFoodState()
+                    && ApplicationForFoodState.DENIED_OLD != applicationForFood.getStatus().getApplicationForFoodState()) {
                         DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
                     }
                 }

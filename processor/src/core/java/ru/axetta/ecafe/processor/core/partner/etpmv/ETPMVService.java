@@ -125,12 +125,12 @@ public class ETPMVService {
             Boolean isLegal = Boolean.parseBoolean(getServicePropertiesValue(serviceProperties, "IsLegalRepresentative"));
             if (!isLegal) {
                 logger.error("Error in processCoordinateMessage: not legal represent");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not legal represent");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not legal represent");
                 return;
             }
             if (benefits.size() == 0 || wrongBenefits(benefits)) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
                 return;
             }
             String strValidDoc = getServicePropertiesValue(serviceProperties, "Validity");
@@ -145,7 +145,7 @@ public class ETPMVService {
 
             if (wrongBenefits(yavl_lgot, benefits.get(0))) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
                 return;
             }
         }
@@ -154,7 +154,7 @@ public class ETPMVService {
         BaseDeclarant baseDeclarant = getBaseDeclarant(contacts);
         if (baseDeclarant == null) {
             logger.error("Error in processCoordinateMessage: wrong contacts data");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong contacts data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
             return;
         }
         String firstName = ((RequestContact) baseDeclarant).getFirstName();
@@ -163,14 +163,14 @@ public class ETPMVService {
         String mobile = Client.checkAndConvertMobile(((RequestContact) baseDeclarant).getMobilePhone());
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
             logger.error("Error in processCoordinateMessage: not enough data");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR,  "not enough data");
             return;
         }
         Client client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
 
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "client not found");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "client not found");
             return;
         }
         ApplicationForFood applicationForFood = daoService.findApplicationForFood(guid);
@@ -178,7 +178,7 @@ public class ETPMVService {
         if (applicationForFood != null) {
             if (!testForApplicationForFoodStatus(applicationForFood)) {
                 logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
                 return;
             }
         }
@@ -195,7 +195,7 @@ public class ETPMVService {
                     ApplicationForFoodCreatorType.PORTAL, validDoc, validGuardianship);
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
             return;
         }
 
@@ -237,25 +237,24 @@ public class ETPMVService {
     public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
-        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED)
-                && (applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_DOCS)
-                || applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_APPROVAL)
-                || applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) return true; //1080.1, 1080.2, 1080.3
+        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_BENEFIT)
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_GUARDIANSHIP)
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_OLD)) return true; //1080.1, 1080.2, 1080.3
         return false;
     }
 
     @Async
-    public void sendStatusAsync(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
-        sendStatus(begin_time, serviceNumber, status, reason);
+    public void sendStatusAsync(long begin_time, String serviceNumber, ApplicationForFoodState status) throws Exception {
+        sendStatus(begin_time, serviceNumber, status);
     }
 
-    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
-        sendStatus(begin_time, serviceNumber, status, reason, null);
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status) throws Exception {
+        sendStatus(begin_time, serviceNumber, status, null);
     }
 
-    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason, String errorMessage) throws Exception {
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, String errorMessage) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
-        String message = createStatusMessage(serviceNumber, status, reason);
+        String message = createStatusMessage(serviceNumber, status);
         boolean success = false;
         try {
             if (System.currentTimeMillis() - begin_time < PAUSE_IN_MILLIS) {
@@ -267,7 +266,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status, reason));
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status));
     }
 
     private void sendToBK(String message) {
@@ -281,12 +280,12 @@ public class ETPMVService {
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
     }
 
-    private String createStatusMessage(String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+    private String createStatusMessage(String serviceNumber, ApplicationForFoodState status) throws Exception {
         ObjectFactory objectFactory = new ObjectFactory();
         CoordinateStatusMessage coordinateStatusMessage = objectFactory.createCoordinateStatusMessage();
         CoordinateStatusData coordinateStatusData = objectFactory.createCoordinateStatusData();
         StatusType statusType = objectFactory.createStatusType();
-        statusType.setStatusCode(status.getCode());
+        statusType.setStatusCode(status.getPureCode());
         statusType.setStatusTitle(status.getDescription());
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
@@ -295,19 +294,13 @@ public class ETPMVService {
         coordinateStatusData.setStatus(statusType);
         coordinateStatusData.setServiceNumber(serviceNumber);
         coordinateStatusMessage.setCoordinateStatusDataMessage(coordinateStatusData);
-        if (reason != null) {
+        if (status.getReason() != null) {
             DictionaryItem dictionaryItem = objectFactory.createDictionaryItem();
-            dictionaryItem.setCode(reason.getCode().toString());
-            dictionaryItem.setName(reason.getDescription());
+            dictionaryItem.setCode(status.getReason());
+            dictionaryItem.setName(status.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
-        if (!status.getCode().equals(ApplicationForFoodState.DENIED.getCode())) {
-            coordinateStatusData.setNote(status.getNote());
-        } else {
-            if (null != reason) {
-                coordinateStatusData.setNote(reason.getDescription());
-            }
-        }
+        coordinateStatusData.setNote(status.getNote());
 
         JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();
@@ -384,7 +377,7 @@ public class ETPMVService {
             try {
                 logger.info(String.format("Resend status %s from %s", counter, list.size()));
                 long begin_time = System.currentTimeMillis();
-                sendStatus(begin_time, history.getApplicationForFood().getServiceNumber(), history.getStatus().getApplicationForFoodState(), history.getStatus().getDeclineReason(), null);
+                sendStatus(begin_time, history.getApplicationForFood().getServiceNumber(), history.getStatus().getApplicationForFoodState(), null);
                 counter++;
             } catch (Exception e) {
                 logger.error(String.format("Error in resendApplicationForFood status, serviceNumber = %s:", history.getApplicationForFood().getServiceNumber()), e);
@@ -550,7 +543,7 @@ public class ETPMVService {
 
     public void sendStatus(ETPMVScheduledStatus status) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + status.getServiceNumber() + ". Status = " + status.getState().getCode());
-        String message = createStatusMessage(status.getServiceNumber(), status.getState(), status.getReason());
+        String message = createStatusMessage(status.getServiceNumber(), status.getState());
         boolean success = false;
         try {
             Thread.sleep(PAUSE_IN_MILLIS);
@@ -560,7 +553,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null, new ApplicationForFoodStatus(status.getState(), status.getReason()));
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null, new ApplicationForFoodStatus(status.getState()));
     }
 
     public void scheduleSync() throws Exception {
