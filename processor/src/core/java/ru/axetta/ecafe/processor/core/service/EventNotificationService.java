@@ -401,8 +401,8 @@ public class EventNotificationService {
             AbstractPushData data = getBalanceData(destClient, type, values, eventTime);
             if (data == null)
                 data = getEnterEventData(destClient, type, values, eventTime, passDirection, guardian);
-            if (data == null)
-                data = getBenefitData(destClient, type, values, eventTime);
+//            if (data == null)
+//                data = getBenefitData(destClient, type, values, eventTime);
             if (data != null)
                 RuntimeContext.getAppContext().getBean(KafkaService.class).sendMessage(data);
         } catch (Exception e) {

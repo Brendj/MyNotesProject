@@ -22,7 +22,7 @@ public class LoggingListenableFutureCallback implements ListenableFutureCallback
             onFailure(new NullPointerException("SendResult is null"));
             return;
         }
-        log.info("Kafka message: " + message + ", Partition: " + result.getRecordMetadata().partition());
+        log.info("Send kafka message: " + message + ", Partition: " + result.getRecordMetadata().partition());
     }
 
     @Override
