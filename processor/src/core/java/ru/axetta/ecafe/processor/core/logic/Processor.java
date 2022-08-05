@@ -5281,51 +5281,8 @@ public class Processor implements SyncProcessor {
                             logger.error("Can't send to Vendor JSON with Purchases", exc);
                         }
                     }
+                    String[] values = generateNotificationValues(idOfOrg, payment, persistenceSession, client, totalPurchaseRSum, totalLunchRSum, rations);
 
-                    String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
-                    if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.DEFAULT) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.VENDING) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.FOODBOX)) {
-                        values = EventNotificationService.attachToValues("isBarOrder", "true", values);
-                    } else if (payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
-                        values = EventNotificationService.attachToValues("isPayOrder", "true", values);
-                    } else if (payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN) || payment
-                            .getOrderType().equals(OrderTypeEnumType.DAILY_SAMPLE) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.CORRECTION_TYPE) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.WATER_ACCOUNTING) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE) || payment.getOrderType()
-                            .equals(OrderTypeEnumType.RECYCLING_RETIONS)) {
-                        values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
-                    }
-                    if (rations.size() > 0) {
-                        values = EventNotificationService
-                                .attachToValues(EventNotificationService.PARAM_FRATION, StringUtils.join(rations, ","), values);
-                    }
-                    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(payment.getTime());
-                    values = EventNotificationService
-                            .attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
-                    values = EventNotificationService
-                            .attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getRationName(payment),
-                                    values);
-                    values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
-                    values = EventNotificationService
-                            .attachSourceOrgIdToValues(idOfOrg, values); //РѕСЂРіР°РЅРёР·Р°С†РёСЏ РёР· РїР°РєРµС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
-                    long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
-                    long totalRSum = totalBuffetRSum + totalLunchRSum;
-                    long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
-                    values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
-                    values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
-                    values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
-                    if (client.getBalance() != null) {
-                        values = EventNotificationService.attachToValues("balance",
-                                Long.toString(client.getBalance() / 100) + ',' + Long
-                                        .toString(Math.abs(client.getBalance()) % 100), values);
-                    }
-                    values = EventNotificationService.attachGenderToValues(client.getGender(), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT, values,
                                     payment.getOrderDate());
@@ -5359,6 +5316,17 @@ public class Processor implements SyncProcessor {
                     }
                     // Update client balance
                     RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order, payment);
+
+                    Client client = null;
+                    Long idOfClient = payment.getIdOfClient();
+                    if (null != idOfClient)
+                        client = DAOReadonlyService.getInstance().findClientById(idOfClient);
+
+                    String[] values = generateNotificationValues(idOfOrg, payment, persistenceSession, client, payment.getRSum(), 0, null);
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendPushToMK(client,
+                                    null, EventNotificationService.NOTIFICATION_CANCEL_PREORDER, values,
+                            payment.getOrderDate(), null, null);
+
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -5374,6 +5342,54 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private String[] generateNotificationValues(Long idOfOrg, Payment payment, Session persistenceSession, Client client, long totalPurchaseRSum, long totalLunchRSum, Set<String> rations) {
+        String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
+        if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) || payment.getOrderType()
+                .equals(OrderTypeEnumType.DEFAULT) || payment.getOrderType()
+                .equals(OrderTypeEnumType.VENDING) || payment.getOrderType()
+                .equals(OrderTypeEnumType.FOODBOX)) {
+            values = EventNotificationService.attachToValues("isBarOrder", "true", values);
+        } else if (payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) || payment.getOrderType()
+                .equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
+            values = EventNotificationService.attachToValues("isPayOrder", "true", values);
+        } else if (payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN) || payment
+                .getOrderType().equals(OrderTypeEnumType.DAILY_SAMPLE) || payment.getOrderType()
+                .equals(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE) || payment.getOrderType()
+                .equals(OrderTypeEnumType.CORRECTION_TYPE) || payment.getOrderType()
+                .equals(OrderTypeEnumType.WATER_ACCOUNTING) || payment.getOrderType()
+                .equals(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE) || payment.getOrderType()
+                .equals(OrderTypeEnumType.RECYCLING_RETIONS)) {
+            values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
+        }
+        if (rations != null && rations.size() > 0) {
+            values = EventNotificationService
+                    .attachToValues(EventNotificationService.PARAM_FRATION, StringUtils.join(rations, ","), values);
+        }
+        String date = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(payment.getTime());
+        values = EventNotificationService
+                .attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
+        values = EventNotificationService
+                .attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getRationName(payment),
+                        values);
+        values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
+        values = EventNotificationService
+                .attachSourceOrgIdToValues(idOfOrg, values); //РѕСЂРіР°РЅРёР·Р°С†РёСЏ РёР· РїР°РєРµС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+        long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
+        long totalRSum = totalBuffetRSum + totalLunchRSum;
+        long totalAmountBuyAll = totalBuffetRSum + totalLunchRSum;
+        values = EventNotificationService.attachMoneyToValues(totalBuffetRSum, values, EventNotificationService.PARAM_AMOUNT_PRICE);
+        values = EventNotificationService.attachMoneyToValues(totalLunchRSum, values, EventNotificationService.PARAM_AMOUNT_LUNCH);
+        values = EventNotificationService.attachMoneyToValues(totalRSum, values, EventNotificationService.PARAM_AMOUNT);
+        values = EventNotificationService.attachMoneyToValues(totalAmountBuyAll, values, EventNotificationService.PARAM_AMOUNT_BUY_ALL);
+        if (client.getBalance() != null) {
+            values = EventNotificationService.attachToValues("balance",
+                    Long.toString(client.getBalance() / 100) + ',' + Long
+                            .toString(Math.abs(client.getBalance()) % 100), values);
+        }
+        values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+        return values;
     }
 
     private ResMenuSupplier processMenuSupplier(MenuSupplier menuSupplier)
@@ -7124,6 +7140,7 @@ public class Processor implements SyncProcessor {
                                         .attachEventDirectionToValues(e.getPassDirection(), values);
 
                                 List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
+                                Client guardianFromEnterEvent = DAOReadonlyService.getInstance().findClientById(guardianId);
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
@@ -7141,7 +7158,7 @@ public class Processor implements SyncProcessor {
                                 }
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(),
-                                        e.getEvtDateTime());
+                                        guardianFromEnterEvent, e.getEvtDateTime());
                             }
                             break;
                             case KINDERGARTEN: {
@@ -7573,12 +7590,17 @@ public class Processor implements SyncProcessor {
                 }
             }
         }
-        return new String[]{
+        String[] result = new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
                 guardianName, "empTime", empTime, "childPassCheckerMark", childPassCheckerMark, "childPassCheckerName",
                 childPassCheckerName, EventNotificationService.ENTER_WITH_CHECKER_VALUES_KEY, enterWithChecker};
+        if (childPassCheckerId != null) {
+            result = EventNotificationService
+                    .attachToValues("childPassCheckerId", event.getChildPassCheckerId().toString(), result);
+        }
+        return result;
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {

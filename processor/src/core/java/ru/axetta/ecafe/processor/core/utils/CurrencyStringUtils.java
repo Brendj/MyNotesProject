@@ -59,4 +59,26 @@ public final class CurrencyStringUtils {
         return stringBuilder.toString();
     }
 
+    public static Integer rublesToCopecksTwoDigitAfterComma(String sum) {
+        String result = "";
+        if (sum == null || sum.isEmpty()) {
+            return null;
+        }
+        if (!sum.contains(",")) {
+            return Integer.parseInt(sum+"00");
+        }
+        String[] digit = sum.split(",");
+        if (digit[1].length() == 1) {
+            result = digit[0] + digit[1] + "0";
+        } else if (digit[1].length() == 2) {
+            result = digit[0] + digit[1];
+        } else if (digit[1].length() > 2) {
+            result = digit[0] + digit[1].substring(0, 2);
+        }
+        if (!result.isEmpty()) {
+            return Integer.parseInt(result);
+        }
+        return null;
+    }
+
 }
