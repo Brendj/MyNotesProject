@@ -393,17 +393,21 @@ public class EventNotificationService {
     }
 
     public void sendPushToMK(Client destClient, Client dataClient, String type,
-                              String[] values, Date eventTime, Integer passDirection, Client guardian) {
-        if (dataClient != null) {
-            return;
+                             String[] values, Date eventTime, Integer passDirection, Client guardian) {
+        try {
+            if (dataClient != null) {
+                return;
+            }
+            AbstractPushData data = getBalanceData(destClient, type, values, eventTime);
+            if (data == null)
+                data = getEnterEventData(destClient, type, values, eventTime, passDirection, guardian);
+            if (data == null)
+                data = getBenefitData(destClient, type, values, eventTime);
+            if (data != null)
+                RuntimeContext.getAppContext().getBean(KafkaService.class).sendMessage(data);
+        } catch (Exception e) {
+            logger.error("Failed method sendPushToMK", e);
         }
-        AbstractPushData data = getBalanceData(destClient, type, values, eventTime);
-        if (data == null)
-            data = getEnterEventData(destClient, type, values, eventTime, passDirection, guardian);
-        if (data == null)
-            data = getBenefitData(destClient, type, values, eventTime);
-        if (data != null)
-            RuntimeContext.getAppContext().getBean(KafkaService.class).sendMessage(data);
     }
 
     private AbstractPushData getBenefitData(Client destClient, String type, String[] values, Date eventTime) {
@@ -476,6 +480,15 @@ public class EventNotificationService {
         BalanceData balanceData = new BalanceData();
         balanceData.setActionType(0);
 
+        String amount = findValueInParams(new String[]{PARAM_AMOUNT}, values);
+        if (amount != null && !amount.isEmpty()) {
+            balanceData.setBalanceChange(Integer.parseInt(amount.replaceAll(",", "")));
+        }
+        String balance = findValueInParams(new String[]{"balance"}, values);
+        if (balance != null && !balance.isEmpty()) {
+            balanceData.setBalance(CurrencyStringUtils.rublesToCopecksTwoDigitAfterComma(balance));
+        }
+
         if (type.equals(NOTIFICATION_BALANCE_TOPUP)) {
             balanceData.setReasonId(0);
         } else if (type.equals(MESSAGE_PAYMENT)) {
@@ -490,20 +503,14 @@ public class EventNotificationService {
             }
         } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
             balanceData.setActionType(1);
-        } else if (!type.equals(NOTIFICATION_CANCEL_PREORDER))
-            return null;
+        } else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+            if (balanceData.getBalance() != null && balanceData.getBalanceChange() != null)
+                balanceData.setBalance(balanceData.getBalance() + balanceData.getBalanceChange());
+        } else return null;
 
         String paySum = findValueInParams(new String[]{"paySum"}, values);
         if (paySum != null && !paySum.isEmpty()) {
             balanceData.setBalanceChange(Integer.parseInt(paySum.replaceAll(",", "")));
-        }
-        String amount = findValueInParams(new String[]{PARAM_AMOUNT}, values);
-        if (amount != null && !amount.isEmpty()) {
-            balanceData.setBalanceChange(Integer.parseInt(amount.replaceAll(",", "")));
-        }
-        String balance = findValueInParams(new String[]{"balance"}, values);
-        if (balance != null && !balance.isEmpty()) {
-            balanceData.setBalance(CurrencyStringUtils.rublesToCopecksTwoDigitAfterComma(balance));
         }
 
         if (type.equals(MESSAGE_PAYMENT_PAY) || type.equals(MESSAGE_PAYMENT_FREE)) {
