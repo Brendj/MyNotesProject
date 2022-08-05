@@ -415,6 +415,7 @@ public class SyncResponse {
             private final String parallel;
             private final String ssoId;
             private final Long expenditureLimit;
+            private final Boolean dontShowToExternal;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -465,6 +466,7 @@ public class SyncResponse {
                 this.parallel = client.getParallel();
                 this.ssoId = client.getSsoid();
                 this.expenditureLimit = client.getExpenditureLimit();
+                this.dontShowToExternal = client.isDontShowToExternal();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -676,6 +678,9 @@ public class SyncResponse {
                 }
                 if (this.expenditureLimit != null) {
                     element.setAttribute("MaxDailyLimit", String.valueOf(expenditureLimit));
+                }
+                if (this.dontShowToExternal != null) {
+                    element.setAttribute("DontShowToExternal", this.dontShowToExternal ? "1" : "0");
                 }
                 return element;
             }
