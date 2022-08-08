@@ -7140,7 +7140,9 @@ public class Processor implements SyncProcessor {
                                         .attachEventDirectionToValues(e.getPassDirection(), values);
 
                                 List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
-                                Client guardianFromEnterEvent = DAOReadonlyService.getInstance().findClientById(guardianId);
+                                Client guardianFromEnterEvent = null;
+                                if (guardianId != null)
+                                    guardianFromEnterEvent = DAOReadonlyService.getInstance().findClientById(guardianId);
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
