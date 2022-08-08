@@ -20,6 +20,8 @@ public enum ClientGuardianRelationType {
     SISTER(11, "Сестра"),
     GRANDMOTHER(12, "Бабушка"),
     GRANDFATHER(13, "Дедушка"),
+    OTHER_RELATIVE(14, "Другой родственник"),
+    NOT_RELATIVE(15, "Не родственник"),
     UNDEFINED (16, "Не определено");
 
     //Старые типы представителей, значения конвертируем в новые
