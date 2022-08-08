@@ -33,7 +33,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public <T> KafkaTemplate<String, T> kafkaStringJsonTemplate() {
+    public KafkaTemplate<String, Object> kafkaStringJsonTemplate() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
