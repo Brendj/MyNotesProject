@@ -54,7 +54,7 @@ public class DulDetailService {
         }
         validateDul(session, dulDetail, client);
         dulDetail.setLastUpdate(new Date());
-        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (client.getMeshGUID() != null) {
             documentResponse = getMeshGuardiansService().modifyPersonDocument(client.getMeshGUID(), dulDetail);
             if (documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE))
@@ -63,7 +63,7 @@ public class DulDetailService {
                 return documentResponse;
         }
         session.merge(dulDetail);
-        return documentResponse.okResponse();
+        return documentResponse;
     }
 
     private boolean isChange(DulDetail dulDetail, Client client) {
@@ -85,7 +85,7 @@ public class DulDetailService {
         dulDetail.setLastUpdate(currentDate);
         dulDetail.setCreateDate(currentDate);
         dulDetail.setDeleteState(false);
-        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (client.getMeshGUID() != null) {
             documentResponse = getMeshGuardiansService().createPersonDocument(client.getMeshGUID(), dulDetail);
             if (documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE))
@@ -94,19 +94,18 @@ public class DulDetailService {
                 return documentResponse;
         }
         session.save(dulDetail);
-        return documentResponse.okResponse();
+        return documentResponse;
     }
 
     public MeshDocumentResponse deleteDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
         dulDetail.setLastUpdate(new Date());
         dulDetail.setDeleteState(true);
-        MeshDocumentResponse documentResponse = new MeshDocumentResponse();
+        MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (client.getMeshGUID() != null) {
             documentResponse = getMeshGuardiansService().deletePersonDocument(client.getMeshGUID(), dulDetail);
         }
         session.merge(dulDetail);
-        return documentResponse.okResponse();
-
+        return documentResponse;
     }
 
     public void validateDulList(Session session, List<DulDetail> dulDetail, Client client) throws Exception {
