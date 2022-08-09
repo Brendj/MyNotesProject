@@ -802,39 +802,39 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
-            ClientManager.validateSan(persistenceSession, this.san, null);
+            if (!ClientManager.checkSanNumber(this.san))
+                throw new Exception("Неверный номер СНИЛС");
         }
         client.setSan(this.san);
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
 
-        RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                .validateDulList(persistenceSession, this.dulDetail, null);
-
-        Date currentDate = new Date();
-        for (DulDetail dul : this.dulDetail) {
-            if (dul.getNumber().isEmpty() || dul.getNumber() == null)
-                throw new Exception("Не заполнено поле \"Номер\" документа");
-            dul.setIdOfClient(client.getIdOfClient());
-            dul.setCreateDate(currentDate);
-            dul.setLastUpdate(currentDate);
-            dul.setDeleteState(false);
-            persistenceSession.save(dul);
-        }
+        DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
+        dulDetailService.validateDulList(persistenceSession, this.dulDetail, null);
+        dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
 
         if (isParentGroup()) {
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
-            PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
-                    person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                    client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
+            checkSnils(persistenceSession, this.san);
+            checkDuls(persistenceSession, this.dulDetail);
+            addGuardianToClient(persistenceSession, clientGuardianHistory, client);
+
+            MeshAgentResponse personResponse = getMeshGuardiansService()
+                    .createPersonWithEducation(this.org.getIdOfOrg(), this.person.getFirstName(), this.person.getSecondName(),
+                            this.person.getSurname(), this.gender, this.birthDate, this.san, this.mobile, this.email,
+                            this.clientWardItems.get(0).getMeshGuid(), this.dulDetail, this.clientWardItems.get(0).getRole(),
+                            this.clientWardItems.get(0).getRelation(), this.clientWardItems.get(0).getRepresentativeType(),
+                            true);
+
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-                client.setMeshGUID(personResponse.getResponse().getMeshGuid());
+                client.setMeshGUID(personResponse.getAgentPerson().getMeshGuid());
             else
                 throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-            addGuardianToClient(persistenceSession, clientGuardianHistory, client);
+
         }
+
         persistenceSession.update(client);
         if (autoContractId)
             RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(persistenceSession, this.contractId, org.getIdOfOrg());
@@ -854,27 +854,22 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     private void addGuardianToClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory, Client client) throws Exception {
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
+            if (clientWardItems.size() > 1) {
+                throw new Exception("Не может быть больше одного опекаемого");
+            }
+            for (ClientGuardianItem clientWardItem : clientWardItems) {
+                if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
+                    throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
+                }
+                if (clientWardItem.getRole() == -1)
+                    throw new Exception("У опекаемого не заполнено поле \"Вид представительства\"");
+            }
+            clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
                     client.getIdOfClient()));
             addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
+
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");
-
-        MeshAgentResponse personResponse;
-        for (ClientGuardianItem clientWardItem : clientWardItems) {
-            if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
-                throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
-            }
-            if (clientWardItem.getRole() == -1)
-                throw new Exception("У опекаемого не заполнено поле \"Вид представительства\"");
-            personResponse = getMeshGuardiansService().addGuardianToClient(client.getMeshGUID(),
-                    clientWardItem.getMeshGuid(), clientWardItem.getRole());
-            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                logger.error(String.format("%s: %s", personResponse.getCode(), personResponse.getMessage()));
-                throw new Exception(String.format("Ошибка создания связи с обучающимся idOfClient = %s : %s",
-                        clientWardItem.getIdOfClient(), personResponse.getMessage()));
-            }
-        }
     }
 
     private void checkSnils(Session session, String san) throws Exception {
