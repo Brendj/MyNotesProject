@@ -371,11 +371,18 @@
 
 
             <f:facet name="footer">
-                <h:panelGrid id="searchPersonPanel" styleClass="borderless-grid">
+                <h:panelGrid id="searchPersonPanel" columns="2" styleClass="borderless-grid">
                     <a4j:commandButton
                             value="Зарегистрировать нового клиента" action="#{mainPage.createClient()}"
                             render="clientCreatePanel,foundClientPanel" styleClass="command-button"/>
+
+                    <a4j:status>
+                        <f:facet name="start">
+                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                        </f:facet>
+                    </a4j:status>
                 </h:panelGrid>
+
             </f:facet>
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">

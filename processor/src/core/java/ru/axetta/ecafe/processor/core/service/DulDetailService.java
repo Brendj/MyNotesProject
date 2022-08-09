@@ -120,6 +120,8 @@ public class DulDetailService {
                 throw new DocumentExistsException("У клиента уже есть документ этого типа");
         if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
             throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
+        if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
+            throw new Exception("Не заполнено поле \"Номер\" документа");
         checkAnotherClient(session, dulDetail, client);
     }
 
@@ -226,6 +228,8 @@ public class DulDetailService {
                 dulDetail.setCreateDate(currentDate);
             if (dulDetail.getLastUpdate() == null)
                 dulDetail.setLastUpdate(currentDate);
+            if (dulDetail.getDeleteState() == null)
+                dulDetail.setDeleteState(false);
             dulDetail.setIdOfClient(idOfClient);
             session.save(dulDetail);
         }
