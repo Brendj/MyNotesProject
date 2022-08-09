@@ -1100,8 +1100,8 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             for (Object[] clientGuardian : clientGuardians) {
                 if (clientGuardian[0] != null && clientGuardian[1] != null) {
                     MeshAgentResponse meshAgentResponse = meshGuardiansService
-                            .changeGuardianToClient(clientGuardian[0].toString(),
-                                    clientGuardian[1].toString(), 2);
+                            .changeGuardianToClient(clientGuardian[1].toString(),
+                                    clientGuardian[0].toString(), 2);
                     if (!meshAgentResponse.getCode().equals(0)) {
                         logger.error(String.format("Error change agentTypeId to AgentMeshGuid: %s ChildMeshGuid: %s due to :%s",
                                 clientGuardian[0].toString(), clientGuardian[1].toString(), meshAgentResponse.getMessage()));
