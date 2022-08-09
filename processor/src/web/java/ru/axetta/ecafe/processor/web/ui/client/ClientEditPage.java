@@ -1271,26 +1271,26 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.setMeshGUID(personListResponse.getResponse().get(0).getMeshGuid());
 
             //Создание представителя в МК
-            if (client.getMeshGUID() == null) {
-                PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
-                        person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
-                        client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
-                if (personResponse.getCode().equals(PersonResponse.OK_CODE))
-                    client.setMeshGUID(personResponse.getResponse().getMeshGuid());
-                else {
-                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
-                    throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-                }
-            } else {
-                //Изменение представителя в МК
-                PersonResponse personResponse = getMeshGuardiansService()
-                        .changePerson(this.meshGUID, this.person.firstName, this.person.secondName,
-                                this.person.surname, this.gender, this.birthDate, this.san);
-                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
-                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
-                    throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));
-                }
-            }
+//            if (client.getMeshGUID() == null) {
+//                PersonResponse personResponse = getMeshGuardiansService().createPerson(person.getFirstName(),
+//                        person.getSecondName(), person.getSurname(), client.getGender(), client.getBirthDate(),
+//                        client.getSan(), client.getMobile(), client.getEmail(), this.dulDetail);
+//                if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+//                    client.setMeshGUID(personResponse.getResponse().getMeshGuid());
+//                else {
+//                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
+//                    throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
+//                }
+//            } else {
+//                //Изменение представителя в МК
+//                PersonResponse personResponse = getMeshGuardiansService()
+//                        .changePerson(this.meshGUID, this.person.firstName, this.person.secondName,
+//                                this.person.surname, this.gender, this.birthDate, this.san);
+//                if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
+//                    logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
+//                    throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));
+//                }
+//            }
         }
 
         //Опекуны

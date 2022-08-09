@@ -817,17 +817,18 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
-            checkSnils(persistenceSession, this.san);
-            checkDuls(persistenceSession, this.dulDetail);
+            if (this.san != null && !this.san.isEmpty()) {
+                checkSnils(persistenceSession, this.san, client);
+            }
+            if (this.dulDetail != null && !this.dulDetail.isEmpty()) {
+                checkDuls(persistenceSession, this.dulDetail);
+            }
             addGuardianToClient(persistenceSession, clientGuardianHistory, client);
 
             MeshAgentResponse personResponse = getMeshGuardiansService()
-                    .createPersonWithEducation(this.org.getIdOfOrg(), this.person.getFirstName(), this.person.getSecondName(),
+                    .createPersonOnlyMK(this.person.getFirstName(), this.person.getSecondName(),
                             this.person.getSurname(), this.gender, this.birthDate, this.san, this.mobile, this.email,
-                            this.clientWardItems.get(0).getMeshGuid(), this.dulDetail, this.clientWardItems.get(0).getRole(),
-                            this.clientWardItems.get(0).getRelation(), this.clientWardItems.get(0).getRepresentativeType(),
-                            true);
-
+                            this.dulDetail, this.clientWardItems.get(0).getRole(), this.clientWardItems.get(0).getMeshGuid());
             if (personResponse.getCode().equals(PersonResponse.OK_CODE))
                 client.setMeshGUID(personResponse.getAgentPerson().getMeshGuid());
             else
@@ -872,11 +873,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             throw new Exception("Не выбраны \"Опекаемые\"");
     }
 
-    private void checkSnils(Session session, String san) throws Exception {
+    private void checkSnils(Session session, String san, Client client) throws Exception {
         Query query = session.createQuery("select c from Client c join fetch c.person where c.san = :san");
         query.setParameter("san", san);
         List<Client> result = query.list();
-        if (result.size() > 0) {
+        if (result.size() > 1 || (result.size() == 1 && !client.getIdOfClient().equals(result.get(0).getIdOfClient()))) {
+            result.removeIf(client1 -> client1.getIdOfClient().equals(client.getIdOfClient()));
             setFoundValues(result.get(0));
             throw new Exception("Уже существует клиент с указанным СНИЛС");
         } else {

@@ -680,35 +680,37 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    public PersonResponse createPerson(String firstName,
-                                       String patronymic,
-                                       String lastName,
-                                       Integer genderId,
-                                       Date birthDate,
-                                       String snils,
-                                       String mobile,
-                                       String email,
-                                       List<DulDetail> dulDetail) {
+    public MeshAgentResponse createPersonOnlyMK(String firstName,
+                                                String patronymic,
+                                                String lastName,
+                                                Integer genderId,
+                                                Date birthDate,
+                                                String snils,
+                                                String mobile,
+                                                String email,
+                                                List<DulDetail> dulDetail,
+                                                Integer agentTypeId,
+                                                String childMeshGuid) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            ResponsePersons responsePersons = buildResponsePerson(null, firstName, patronymic,
-                    lastName, genderId, birthDate, snils, mobile, email, dulDetail);
-            String json = objectMapper.writeValueAsString(responsePersons);
-            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(PERSONS_CREATE_URL, json);
+            PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
+                    email, dulDetail, agentTypeId);
+            String json = objectMapper.writeValueAsString(personAgent);
+            MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreatePersonUrl(childMeshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
-                ResponsePersons personResult = objectMapper.readValue(result.getResponse(), ResponsePersons.class);
-                return new PersonResponse(getMeshGuardianConverter().toDTO(personResult)).okResponse();
+                PersonAgent personResult = objectMapper.readValue(result.getResponse(), PersonAgent.class);
+                return getMeshGuardianConverter().toAgentDTO(personResult).okResponse();
             } else if (result.getCode() >= 500) {
-                return new PersonResponse().internalErrorResponse("" + result.getCode());
+                return new MeshAgentResponse().internalErrorResponse("" + result.getCode());
             } else {
-                return getPersonResponse(objectMapper, result);
+                return getMeshAgentResponse(objectMapper, result);
             }
         } catch (ConnectTimeoutException te) {
-            logger.error("Connection timeout in createPerson: ", te);
-            return new PersonResponse().internalErrorResponse("Mesh service connection timeout");
+            logger.error("Connection timeout in createPersonOnlyMK: ", te);
+            return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
-            logger.error("Error in createPerson: ", e);
-            return new PersonResponse().internalErrorResponse();
+            logger.error("Error in createPersonOnlyMK: ", e);
+            return new MeshAgentResponse().internalErrorResponse();
         }
     }
 
