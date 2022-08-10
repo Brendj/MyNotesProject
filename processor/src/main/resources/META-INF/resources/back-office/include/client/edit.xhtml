@@ -359,7 +359,7 @@
                                                  styleClass="output-text"/>
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                        <h:outputText escape="true" value="Полномочия:" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Роль представителя:" styleClass="output-text"/>
                         <h:selectOneMenu value="#{clientGuardian.representativeType}" styleClass="input-text">
                             <f:selectItems value="#{mainPage.clientEditPage.representativeList}"/>
                         </h:selectOneMenu>
@@ -476,7 +476,13 @@
                                                  styleClass="output-text"/>
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                        <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Роль представителя:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.representativeType}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientEditPage.representativeList}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Степень родства:" styleClass="output-text"/>
                         <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
                             <f:selectItems value="#{mainPage.clientEditPage.relations}"
                             />

@@ -1515,7 +1515,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
         }
         if (notValidRepresentative.length() > 0) {
-            throw new Exception("У следующих опекунов не указаны полномочия: " + notValidRepresentative.toString());
+            throw new Exception("У следующих опекунов не указана роль представителя: " + notValidRepresentative.toString());
         }
         if (notValidGuardianRoleSB.length() > 0) {
             throw new Exception("У следующих опекунов не указан вид представительства: " + notValidRepresentative.toString());

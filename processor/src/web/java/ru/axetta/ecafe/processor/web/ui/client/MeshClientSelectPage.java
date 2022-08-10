@@ -58,7 +58,7 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(session, this.san, null);
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null);
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null, true);
         ClientManager.validateFio(this.surname, this.firstName, this.secondName);
         this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
 
