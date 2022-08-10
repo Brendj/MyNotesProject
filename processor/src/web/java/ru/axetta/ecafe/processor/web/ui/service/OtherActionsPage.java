@@ -1082,7 +1082,7 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                 additional = " and idofchildren = :kid and idofguardian = :guardian";
 
             Query sql = session.createSQLQuery("update cf_client_guardian " +
-                    "set relation = 16, islegalrepresent = case when islegalrepresent = -1 then 0 else islegalrepresent end " +
+                    "set relation = 16, version = version + 1, islegalrepresent = case when islegalrepresent = -1 then 0 else islegalrepresent end " +
                     "where relation = 2 " + additional);
 
             if (!additional.isEmpty()) {
@@ -1115,7 +1115,7 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                 }
             }
 
-            sql = session.createSQLQuery("update cf_client_guardian set relation = 16, idofrole = 2 where relation = 3 " + additional);
+            sql = session.createSQLQuery("update cf_client_guardian set relation = 16, version = version + 1, idofrole = 2 where relation = 3 " + additional);
             if (!additional.isEmpty()) {
                 sql.setParameter("kid", Long.parseLong(kid));
                 sql.setParameter("guardian", Long.parseLong(guardian));
