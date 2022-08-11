@@ -52,7 +52,7 @@ public class DulDetailService {
         if (!isChange(dulDetail, client)) {
             return new MeshDocumentResponse().okResponse();
         }
-        validateDul(session, dulDetail, client);
+        validateDul(session, dulDetail, client, true);
         dulDetail.setLastUpdate(new Date());
         MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (client.getMeshGUID() != null) {
@@ -80,7 +80,7 @@ public class DulDetailService {
     }
 
     public MeshDocumentResponse saveDulDetail(Session session, DulDetail dulDetail, Client client) throws Exception {
-        validateDul(session, dulDetail, client);
+        validateDul(session, dulDetail, client, true);
         Date currentDate = new Date();
         dulDetail.setLastUpdate(currentDate);
         dulDetail.setCreateDate(currentDate);
@@ -108,13 +108,13 @@ public class DulDetailService {
         return documentResponse;
     }
 
-    public void validateDulList(Session session, List<DulDetail> dulDetail, Client client) throws Exception {
+    public void validateDulList(Session session, List<DulDetail> dulDetail, Client client, boolean checkAnotherClient) throws Exception {
         for (DulDetail detail : dulDetail) {
-            validateDul(session, detail, client);
+            validateDul(session, detail, client, checkAnotherClient);
         }
     }
 
-    private void validateDul(Session session, DulDetail dulDetail, Client client) throws Exception {
+    private void validateDul(Session session, DulDetail dulDetail, Client client, boolean checkAnotherClient) throws Exception {
         if (client != null)
             if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
                 throw new DocumentExistsException("У клиента уже есть документ этого типа");
@@ -122,7 +122,8 @@ public class DulDetailService {
             throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
         if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
             throw new Exception("Не заполнено поле \"Номер\" документа");
-        checkAnotherClient(session, dulDetail, client);
+        if (checkAnotherClient)
+            checkAnotherClient(session, dulDetail, client);
     }
 
     private void checkAnotherClient(Session session, DulDetail dulDetail, Client client) throws DocumentExistsException {
@@ -145,15 +146,8 @@ public class DulDetailService {
                 return;
             if (client != null && idOfClients.size() == 1 && idOfClients.get(0).equals(client.getIdOfClient()))
                 return;
-            if (idOfClients.size() > 1) {
-                Long id = client == null ? null : client.getIdOfClient();
-                StringBuilder ids = new StringBuilder();
-                for (Long idOfClient : idOfClients) {
-                    if (!idOfClient.equals(id))
-                        ids.append(idOfClient);
-                }
-                throw new DocumentExistsException(String.format("Персона c данным документом уже существует, идентификатор клиента: %s", ids));
-            }
+            throw new DocumentExistsException(String
+                    .format("Персона c данным документом уже существует, идентификатор клиента: %s", idOfClients.get(0)));
         }
     }
 

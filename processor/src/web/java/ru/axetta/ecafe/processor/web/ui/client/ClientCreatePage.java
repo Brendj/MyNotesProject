@@ -810,7 +810,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         ClientParallel.addFoodBoxModifire(client);
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-        dulDetailService.validateDulList(persistenceSession, this.dulDetail, null);
+        dulDetailService.validateDulList(persistenceSession, this.dulDetail, null, false);
         dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
 
         if (isParentGroup()) {
@@ -1038,6 +1038,16 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     private MeshGuardiansService getMeshGuardiansService() {
         return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
+    }
+
+    public SelectItem[] getRepresentativeList() {
+        SelectItem[] result = new SelectItem[ClientGuardianRepresentType.values().length];
+        int i = 0;
+        for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+            result[i] = new SelectItem(type.getCode(), type.getDescription());
+            i++;
+        }
+        return result;
     }
 
 }
