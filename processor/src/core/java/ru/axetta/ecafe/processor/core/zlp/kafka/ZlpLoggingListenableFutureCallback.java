@@ -1,0 +1,55 @@
+package ru.axetta.ecafe.processor.core.zlp.kafka;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.lang.NonNull;
+import org.springframework.messaging.Message;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
+import ru.axetta.ecafe.processor.core.persistence.AppMezhvedRequestType;
+import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
+import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+
+public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
+    private final Logger log = LoggerFactory.getLogger(ZlpLoggingListenableFutureCallback.class);
+    private final Message<AbstractPushData> message;
+    private final ApplicationForFood applicationForFood;
+
+    public ZlpLoggingListenableFutureCallback(Message<AbstractPushData> message, ApplicationForFood applicationForFood) {
+        this.message = message;
+        this.applicationForFood = applicationForFood;
+    }
+
+    @Override
+    public void onSuccess(SendResult<String, Object> result) {
+        if (result == null) {
+            onFailure(new NullPointerException("SendResult is null"));
+            return;
+        }
+        String jsonString = requestToJsonString(message.getPayload());
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonString, applicationForFood);
+        log.info("Send kafka message: " + jsonString + ", Partition: " + result.getRecordMetadata().partition());
+    }
+
+    @Override
+    public void onFailure(@NonNull Throwable e) {
+        log.error(String.format("Failed to send message to kafka: %s", message), e);
+    }
+
+
+
+    private String requestToJsonString(AbstractPushData request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String res;
+        try {
+            res = objectMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            res = "Cannot deserialize payload to string";
+        }
+        return res;
+    }
+}

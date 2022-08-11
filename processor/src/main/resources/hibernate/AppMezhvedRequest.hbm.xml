@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.AppMezhvedRequest" table="cf_app_mezhved_request">
+        <id name="idOfMezhvedRequest" column="idofmezhvedrequest" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="applicationForFood" class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFood" column="idofapplicationforfood"
+                     not-null="true" fetch="select"/>
+        <property name="requestId" column="requestid" type="string" not-null="true"/>
+        <property name="requestPayload" column="requestpayload" type="string"/>
+        <property name="responsePayload" column="responsepayload" type="string"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="requestType" column="requesttype" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.AppMezhvedRequestType</param>
+            </type>
+        </property>
+        <property name="responseType" column="responsetype" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseType</param>
+            </type>
+        </property>
+        <property name="responseDate" column="responsedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

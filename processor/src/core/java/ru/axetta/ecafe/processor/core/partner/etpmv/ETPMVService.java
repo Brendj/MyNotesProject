@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
+import ru.axetta.ecafe.processor.core.zlp.kafka.GuardianshipValidationData;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -73,17 +75,8 @@ public class ETPMVService {
     @Async
     public void processIncoming(String message) {
         try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-            switch (type) {
-                case COORDINATE_MESSAGE:
-                    processCoordinateMessage(unmarshaller, message);
-                    break;
-            }
-
+            CoordinateMessage coordinateMessage = getCoordinateMessage(message);
+            if (coordinateMessage != null) processCoordinateMessage(coordinateMessage, message);
         } catch (Exception e) {
             logger.error("Error in process incoming ETP message: ", e);
             sendToBK(message);
@@ -94,12 +87,29 @@ public class ETPMVService {
         return message.contains(NEW_ISPP_ID);
     }
 
-    private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
+    public CoordinateMessage getCoordinateMessage(String message) throws Exception {
+        try {
+            int type = getMessageType(message);
+
+            JAXBContext jaxbContext = getJAXBContext(type);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            switch (type) {
+                case COORDINATE_MESSAGE:
+                    InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
+                    return (CoordinateMessage) unmarshaller.unmarshal(stream);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in getCoordinateMessage: ", e);
+        }
+        return null;
+    }
+
+    private void processCoordinateMessage(CoordinateMessage coordinateMessage, String message) throws Exception {
         long begin_time = System.currentTimeMillis();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
 
-        InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-        CoordinateMessage coordinateMessage = (CoordinateMessage) unmarshaller.unmarshal(stream);
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
@@ -470,6 +480,19 @@ public class ETPMVService {
         messageDigest.update(source.getBytes(Charset.forName("UTF8")));
         final byte[] resultByte = messageDigest.digest();
         return new String(Hex.encodeHex(resultByte));
+    }
+
+    public void sendRequestForGuardianshipValidation(ApplicationForFood applicationForFood) {
+        if (applicationForFood.getValidGuardianShip()) return;
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
+        try {
+            ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_REQUEST_SENDED);
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .updateApplicationForFoodWithStatus(applicationForFood, status);
+            sendStatus(System.currentTimeMillis(), applicationForFood.getServiceNumber(), status.getApplicationForFoodState());
+        } catch (Exception e) {
+            logger.error("Error in sendRequestForGuardianshipValidation: ", e);
+        }
     }
 
     private void initAISContingentService() throws Exception {

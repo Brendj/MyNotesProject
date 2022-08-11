@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -192,6 +194,17 @@ public class ETPMVDaoService {
     }
 
     @Transactional
+    public void updateApplicationForFoodWithStatus(ApplicationForFood applicationForFood,
+                                                   ApplicationForFoodStatus status) throws Exception  {
+        Session session = entityManager.unwrap(Session.class);
+        Long applicationVersion = getApplicationForFoodNextVersion();
+        Long historyVersion = getApplicationForFoodHistoryNextVersion();
+        applicationForFood = DAOUtils
+                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                        applicationVersion, historyVersion, true);
+    }
+
+    @Transactional
     public Long getApplicationForFoodNextVersion() {
         Session session = entityManager.unwrap(Session.class);
         return DAOUtils.nextVersionByApplicationForFood(session);
@@ -231,6 +244,29 @@ public class ETPMVDaoService {
             }
         }
         return result;
+    }
+
+    @Transactional
+    public String getOriginalMessageFromApplicationForFood(ApplicationForFood applicationForFood) {
+        List<String> list = entityManager.createQuery("select m.etpMessagePayload from EtpIncomingMessage m where m.etpMessageId = :messageId")
+                .setParameter("messageId", applicationForFood.getServiceNumber())
+                .getResultList();
+        return list.get(0);
+    }
+
+    @Transactional
+    public void saveMezhvedRequest(AbstractPushData request, String jsonString, ApplicationForFood applicationForFood) {
+        AppMezhvedRequest appMezhvedRequest = new AppMezhvedRequest(request, jsonString, applicationForFood);
+        entityManager.persist(appMezhvedRequest);
+        if (request instanceof GuardianshipValidationRequest) {
+            applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }
+        //todo uncomment
+        //if (request instanceof DocValidationRequest) {
+        //    applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+        //    entityManager.merge(applicationForFood);
+        //}
     }
 
 }

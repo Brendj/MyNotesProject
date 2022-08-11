@@ -38,11 +38,11 @@ public class KafkaProducerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+        /*props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
         props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
         props.put(SaslConfigs.SASL_JAAS_CONFIG,
                 String.format("org.apache.kafka.common.security.plain.PlainLoginModule required " +
-                        "username=\"%s\" password=\"%s\";", getServiceLogin(), getServicePassword()));
+                        "username=\"%s\" password=\"%s\";", getServiceLogin(), getServicePassword()));*/
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(props));
     }
 

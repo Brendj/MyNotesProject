@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
@@ -34,8 +33,8 @@ public class ApplicationForFood {
     private Date archiveDate;
     private Boolean validDoc;
     private Boolean validGuardianShip;
-    private Boolean docConfirmed;
-    private Boolean guardianshipConfirmed;
+    private ApplicationForFoodMezhvedState docConfirmed;
+    private ApplicationForFoodMezhvedState guardianshipConfirmed;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
     private Set<ApplicationForFoodDiscount> dtisznCodes;
 
@@ -59,6 +58,16 @@ public class ApplicationForFood {
         this.sendToAISContingent = false;
         this.validDoc = validDoc;
         this.validGuardianShip = validGuardianship;
+        if (validDoc == null || !validDoc) {
+            this.docConfirmed = ApplicationForFoodMezhvedState.NO_INFO;
+        } else {
+            this.docConfirmed = ApplicationForFoodMezhvedState.CONFIRMED;
+        }
+        if (validGuardianship == null || !validGuardianship) {
+            this.guardianshipConfirmed = ApplicationForFoodMezhvedState.NO_INFO;
+        } else {
+            this.guardianshipConfirmed = ApplicationForFoodMezhvedState.CONFIRMED;
+        }
     }
 
     public ApplicationForFood() {
@@ -289,19 +298,19 @@ public class ApplicationForFood {
         this.validGuardianShip = validGuardianShip;
     }
 
-    public Boolean getDocConfirmed() {
+    public ApplicationForFoodMezhvedState getDocConfirmed() {
         return docConfirmed;
     }
 
-    public void setDocConfirmed(Boolean docConfirmed) {
+    public void setDocConfirmed(ApplicationForFoodMezhvedState docConfirmed) {
         this.docConfirmed = docConfirmed;
     }
 
-    public Boolean getGuardianshipConfirmed() {
+    public ApplicationForFoodMezhvedState getGuardianshipConfirmed() {
         return guardianshipConfirmed;
     }
 
-    public void setGuardianshipConfirmed(Boolean guardianshipConfirmed) {
+    public void setGuardianshipConfirmed(ApplicationForFoodMezhvedState guardianshipConfirmed) {
         this.guardianshipConfirmed = guardianshipConfirmed;
     }
 }
