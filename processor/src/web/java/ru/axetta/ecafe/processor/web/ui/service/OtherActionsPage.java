@@ -84,9 +84,11 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     private List<OrgItem> orgItemsPreorder = new ArrayList<>(0);
     private List<OrgItem> orgItemsRemoveDup = new ArrayList<>(0);
     private List<OrgItem> orgItemsLoadMesh = new ArrayList<>(0);
+    private List<OrgItem> orgItemsRemoveRelation = new ArrayList<>(0);
     protected String orgItemsPreorderFilter = "Не выбрано";
     protected String orgItemsRemoveDupFilter = "Не выбрано";
     protected String orgItemsLoadMeshFilter = "Не выбрано";
+    protected String orgItemsRemoveRelationFilter = "Не выбрано";
     private String guardian;
     private String kid;
     private String idOfOrg;
@@ -1067,13 +1069,15 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             MeshGuardiansService meshGuardiansService = RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
+            List<Long> orgList = orgItemsRemoveRelation.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
+
             String additional = "";
 
             if ((!this.kid.isEmpty() && this.guardian.isEmpty()) || (this.kid.isEmpty() && !this.guardian.isEmpty())) {
                 throw new Exception("Не заполнено поле \"Ид. опекаемого\" или \"Ид. опекуна\"");
             }
-            if (this.idOfOrg == null || this.idOfOrg.isEmpty()) {
-                throw new Exception("Не заполнено поле \"Ид. юр. лица\"");
+            if (orgList.isEmpty()) {
+                throw new Exception("Не заполнено поле \"Список организаций\"");
             }
 
             if (!kid.isEmpty())
@@ -1084,13 +1088,13 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                     "where relation = 2 " +
                     "and idofguardian in ( " +
                     "select idofclient from cf_clients where idoforg in (" +
-                    "select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)) " + additional);
+                    "select friendlyorg from cf_friendly_organization where currentorg in :orgList)) " + additional);
 
             if (!additional.isEmpty()) {
                 sql.setParameter("kid", Long.parseLong(this.kid));
                 sql.setParameter("guardian", Long.parseLong(this.guardian));
             }
-            sql.setParameter("idOfOrg", Long.parseLong(this.idOfOrg));
+            sql.setParameter("orgList", orgList);
             sql.executeUpdate();
 
             sql = session.createSQLQuery(
@@ -1101,12 +1105,12 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                             "where relation = 3 " +
                             "and idofguardian in ( " +
                             "select idofclient from cf_clients where idoforg in (" +
-                            "select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)) " + additional);
+                            "select friendlyorg from cf_friendly_organization where currentorg in :orgList)) " + additional);
             if (!additional.isEmpty()) {
                 sql.setParameter("kid", Long.parseLong(this.kid));
                 sql.setParameter("guardian", Long.parseLong(this.guardian));
             }
-            sql.setParameter("idOfOrg", Long.parseLong(this.idOfOrg));
+            sql.setParameter("orgList", orgList);
             List<Object[]> clientGuardians = sql.list();
 
             for (Object[] clientGuardian : clientGuardians) {
@@ -1125,12 +1129,12 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                     "where relation = 3 " +
                     "and idofguardian in ( " +
                     "select idofclient from cf_clients where idoforg in (" +
-                    "select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)) " + additional);
+                    "select friendlyorg from cf_friendly_organization where currentorg in :orgList)) " + additional);
             if (!additional.isEmpty()) {
                 sql.setParameter("kid", Long.parseLong(kid));
                 sql.setParameter("guardian", Long.parseLong(guardian));
             }
-            sql.setParameter("idOfOrg", Long.parseLong(idOfOrg));
+            sql.setParameter("orgList", orgList);
             sql.executeUpdate();
 
             transaction.commit();
@@ -1162,6 +1166,11 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                 orgItemsLoadMeshFilter = setOrgListFilter(orgItemsLoadMesh);
             }
             break;
+            case ORG_LIST_REMOVE_RELATION: {
+                orgItemsRemoveRelation = setOrgListSection(orgMap, orgItemsRemoveRelation);
+                orgItemsRemoveRelationFilter = setOrgListFilter(orgItemsRemoveRelation);
+            }
+            break;
         }
     }
 
@@ -1186,6 +1195,8 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                 return orgItemsRemoveDup.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
             case ORG_LIST_LOAD_MESH:
                 return orgItemsLoadMesh.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
+            case ORG_LIST_REMOVE_RELATION:
+                return orgItemsRemoveRelation.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
         }
         return "";
     }
@@ -1204,6 +1215,12 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public Object showOrgListSelectLoadMeshPage() {
         selectOrgType = SelectedOrgListType.ORG_LIST_LOAD_MESH;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectRemoveRelationPage() {
+        selectOrgType = SelectedOrgListType.ORG_LIST_REMOVE_RELATION;
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
     }
@@ -1274,6 +1291,14 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public void setOrgItemsRemoveDupFilter(String orgItemsRemoveDupFilter) {
         this.orgItemsRemoveDupFilter = orgItemsRemoveDupFilter;
+    }
+
+    public String getOrgItemsRemoveRelationFilter() {
+        return orgItemsRemoveRelationFilter;
+    }
+
+    public void setOrgItemsRemoveRelationFilter(String orgItemsRemoveRelationFilter) {
+        this.orgItemsRemoveRelationFilter = orgItemsRemoveRelationFilter;
     }
 
     public String getOrgItemsLoadMeshFilter() {

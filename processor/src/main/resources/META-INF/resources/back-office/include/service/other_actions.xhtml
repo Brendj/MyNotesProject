@@ -375,8 +375,19 @@
                     <h:panelGrid columns="1">
                         <h:outputText escape="true" value="Удаление значений степени родства"
                                       styleClass="output-text"/><br/>
-                        <h:outputText value="Ид. юр. лица:"/>
-                        <h:inputText value="#{otherActionsPage.idOfOrg}" size="20"/>
+                        <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                        <h:panelGroup>
+                            <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectRemoveRelationPage}"
+                                               render="modalOrgListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="3" target="#{otherActionsPage.selectOrgType}"/>
+                                <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                            </a4j:commandButton>
+                            <h:outputText styleClass="output-text" escape="true"
+                                          value=" {#{otherActionsPage.orgItemsRemoveRelationFilter}}"/>
+                        </h:panelGroup>
 
                         <h:outputText value="Ид. опекаемого:"/>
                         <h:inputText value="#{otherActionsPage.kid}" size="20"/>
