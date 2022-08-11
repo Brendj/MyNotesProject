@@ -46,7 +46,7 @@ public class BenefitKafkaService extends KafkaService {
         }
     }
 
-    private GuardianshipValidationData getBenefitData(ApplicationForFood applicationForFood) throws Exception {
+    public GuardianshipValidationData getBenefitData(ApplicationForFood applicationForFood) throws Exception {
         String message = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                 .getOriginalMessageFromApplicationForFood(applicationForFood);
         CoordinateMessage coordinateMessage = RuntimeContext.getAppContext().getBean(ETPMVService.class).getCoordinateMessage(message);

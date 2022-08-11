@@ -76,7 +76,11 @@ public class ETPMVService {
     public void processIncoming(String message) {
         try {
             CoordinateMessage coordinateMessage = getCoordinateMessage(message);
-            if (coordinateMessage != null) processCoordinateMessage(coordinateMessage, message);
+            if (coordinateMessage != null) {
+                processCoordinateMessage(coordinateMessage, message);
+            } else {
+                sendToBK(message);
+            }
         } catch (Exception e) {
             logger.error("Error in process incoming ETP message: ", e);
             sendToBK(message);
@@ -115,6 +119,15 @@ public class ETPMVService {
         String serviceNumber = requestService.getServiceNumber();
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
+        try {
+            //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
+            GuardianshipValidationData data = new GuardianshipValidationData(coordinateMessage, null);
+        } catch (Exception e) {
+            logger.error("Error in valid application data: ", e);
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not enough data");
+            sendToBK(message);
+            return;
+        }
 
         boolean newFormat = getCoordinateMessageFormat(message);
 
@@ -136,11 +149,13 @@ public class ETPMVService {
             if (!isLegal) {
                 logger.error("Error in processCoordinateMessage: not legal represent");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not legal represent");
+                sendToBK(message);
                 return;
             }
             if (benefits.size() == 0 || wrongBenefits(benefits)) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
+                sendToBK(message);
                 return;
             }
             String strValidDoc = getServicePropertiesValue(serviceProperties, "Validity");
@@ -156,6 +171,7 @@ public class ETPMVService {
             if (wrongBenefits(yavl_lgot, benefits.get(0))) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
+                sendToBK(message);
                 return;
             }
         }
@@ -165,6 +181,7 @@ public class ETPMVService {
         if (baseDeclarant == null) {
             logger.error("Error in processCoordinateMessage: wrong contacts data");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
+            sendToBK(message);
             return;
         }
         String firstName = ((RequestContact) baseDeclarant).getFirstName();
@@ -174,6 +191,7 @@ public class ETPMVService {
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
             logger.error("Error in processCoordinateMessage: not enough data");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR,  "not enough data");
+            sendToBK(message);
             return;
         }
         Client client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
@@ -181,6 +199,7 @@ public class ETPMVService {
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "client not found");
+            sendToBK(message);
             return;
         }
         ApplicationForFood applicationForFood = daoService.findApplicationForFood(guid);
@@ -189,6 +208,7 @@ public class ETPMVService {
             if (!testForApplicationForFoodStatus(applicationForFood)) {
                 logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
+                sendToBK(message);
                 return;
             }
         }
@@ -206,6 +226,7 @@ public class ETPMVService {
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
+            sendToBK(message);
             return;
         }
 
