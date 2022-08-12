@@ -2609,8 +2609,13 @@ public class ClientManager {
 
     //todo уточнить как найти представителя
     public static boolean isClientGuardian(Session session, Client client) {
-        if (client.getIdOfClientGroup() < 1000000000L)
+        if (client.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
             return false;
+        if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
+            return false;
+        if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_DELETED.getValue()))
+            return false;
+
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
         criteria.add(Restrictions.ne("deletedState", true));

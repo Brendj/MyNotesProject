@@ -2839,7 +2839,8 @@ public class FrontController extends HttpServlet {
             }
 
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .saveDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2885,7 +2886,8 @@ public class FrontController extends HttpServlet {
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .updateDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2925,7 +2927,8 @@ public class FrontController extends HttpServlet {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .deleteDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
