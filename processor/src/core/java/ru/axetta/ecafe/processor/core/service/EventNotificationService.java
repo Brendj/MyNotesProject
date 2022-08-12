@@ -450,10 +450,12 @@ public class EventNotificationService {
             if (guardian != null)
                 enterEventData.setAgentId(guardian.getIdOfClient().intValue());
         } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
+            enterEventData.setActionType(2);
             enterEventData.setTicketStatus("0");
             enterEventData.setOrganizationName(findValueInParams
                     (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
         } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
+            enterEventData.setActionType(2);
             enterEventData.setTicketStatus("1");
             enterEventData.setOrganizationName(findValueInParams
                     (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
@@ -498,27 +500,15 @@ public class EventNotificationService {
                 balanceData.setReasonId(1);
             } else if (type.equals(MESSAGE_PAYMENT_PAY)) {
                 balanceData.setBenefitType(0);
-            } else if (type.equals(MESSAGE_PAYMENT_FREE)) {
-                balanceData.setBenefitType(1);
+                balanceData.setReasonId(2);
             }
         } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
             balanceData.setActionType(1);
-        } else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
-            if (balanceData.getBalance() != null && balanceData.getBalanceChange() != null)
-                balanceData.setBalance(balanceData.getBalance() + balanceData.getBalanceChange());
         } else return null;
 
         String paySum = findValueInParams(new String[]{"paySum"}, values);
         if (paySum != null && !paySum.isEmpty()) {
             balanceData.setBalanceChange(Integer.parseInt(paySum.replaceAll(",", "")));
-        }
-
-        if (type.equals(MESSAGE_PAYMENT_PAY) || type.equals(MESSAGE_PAYMENT_FREE)) {
-            String fRation = findValueInParams(new String[]{PARAM_FRATION}, values);
-            if (fRation != null && !fRation.isEmpty()) {
-                Integer keyFRation = OrderDetailFRationTypeWTdiet.getCode(fRation);
-                balanceData.setReasonId(keyFRation + 1);
-            }
         }
         balanceData.setAccount(destClient.getContractId().toString());
         balanceData.setOrganizationId(destClient.getOrg().getIdOfOrg());
