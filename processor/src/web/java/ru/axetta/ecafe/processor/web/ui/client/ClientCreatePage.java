@@ -813,7 +813,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         dulDetailService.validateDulList(persistenceSession, this.dulDetail, null, false);
         dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
 
+
         if (isParentGroup()) {
+            if (!this.clientWardItems.isEmpty()) {
+                if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+                    throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
+                }
+            }
+
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
