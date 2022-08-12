@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import javax.persistence.EntityManager;
@@ -112,6 +113,12 @@ public class ETPMVDaoService {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Transactional
+    public ApplicationForFood findApplicationForFoodByServiceNumber(String serviceNumber) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findApplicationForFoodByServiceNumber(session, serviceNumber);
     }
 
     @Transactional
@@ -259,6 +266,10 @@ public class ETPMVDaoService {
         AppMezhvedRequest appMezhvedRequest = new AppMezhvedRequest(request, jsonString, applicationForFood);
         entityManager.persist(appMezhvedRequest);
         if (request instanceof GuardianshipValidationRequest) {
+            applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }
+        if (request instanceof BenefitValidationRequest) {
             applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
             entityManager.merge(applicationForFood);
         }

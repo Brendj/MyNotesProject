@@ -5,7 +5,8 @@ import java.util.Map;
 
 public enum AppMezhvedRequestType {
     DOCS(0, "Подтверждение паспорта"),
-    GUARDIANSHIP(1, "Подтверждение родства");
+    GUARDIANSHIP(1, "Подтверждение родства"),
+    BENEFITS(2, "Подтверждение льготных категорий");
 
     private final Integer code;
     private final String description;

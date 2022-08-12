@@ -1,6 +1,6 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka.request;
 
-import ru.axetta.ecafe.processor.core.zlp.kafka.GuardianshipValidationData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 
 public class ParentPassportInfo {
     private String passport_series;
@@ -11,7 +11,7 @@ public class ParentPassportInfo {
 
     }
 
-    public ParentPassportInfo(GuardianshipValidationData data) {
+    public ParentPassportInfo(RequestValidationData data) {
         this.passport_series = data.getParentPassportSeries();
         this.passport_number = data.getParentPassportNumber();
         this.passport_issue_date = data.getParentPassportIssueDate();

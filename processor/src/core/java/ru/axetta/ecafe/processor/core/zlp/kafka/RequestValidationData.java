@@ -8,7 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class GuardianshipValidationData {
+public class RequestValidationData {
     private String childLastName;
     private String childFirstName;
     private String childBirthDate;
@@ -31,7 +31,7 @@ public class GuardianshipValidationData {
     public static final String TYPE_CODE_SVIDETELSTVO = "10";
     public static final String TYPE_CODE_PASSPORT = "1";
 
-    public GuardianshipValidationData(CoordinateMessage coordinateMessage, ApplicationForFood applicationForFood) {
+    public RequestValidationData(CoordinateMessage coordinateMessage, ApplicationForFood applicationForFood) {
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();

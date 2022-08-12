@@ -9,9 +9,14 @@ import org.springframework.messaging.Message;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.AppMezhvedRequestType;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
+import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
+import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodStatus;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
@@ -33,6 +38,15 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
         String jsonString = requestToJsonString(message.getPayload());
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonString, applicationForFood);
         log.info("Send kafka message: " + jsonString + ", Partition: " + result.getRecordMetadata().partition());
+        try {
+            ApplicationForFoodStatus status = getApplicationForFoodStatus();
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .updateApplicationForFoodWithStatus(applicationForFood, status);
+            RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                    .sendStatus(System.currentTimeMillis(), applicationForFood.getServiceNumber(), status.getApplicationForFoodState());
+        } catch (Exception e) {
+            log.error("Error in sendRequestForGuardianshipValidation when sending status: ", e);
+        }
     }
 
     @Override
@@ -40,7 +54,19 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
         log.error(String.format("Failed to send message to kafka: %s", message), e);
     }
 
+    private ApplicationForFoodStatus getApplicationForFoodStatus() throws Exception {
+        if (message.getPayload() instanceof GuardianshipValidationRequest) {
+            return new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_VALIDITY_REQUEST_SENDED);
+        }
+        if (message.getPayload() instanceof BenefitValidationRequest) {
+            return new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED);
+        }
+        if (message.getPayload() instanceof DocValidationRequest) {
+            return new ApplicationForFoodStatus(ApplicationForFoodState.DOC_VALIDITY_REQUEST_SENDED);
+        }
 
+        throw new Exception("Unknown message type");
+    }
 
     private String requestToJsonString(AbstractPushData request) {
         ObjectMapper objectMapper = new ObjectMapper();

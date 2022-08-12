@@ -4,6 +4,7 @@ create table cf_applications_for_food_discount(
     idofappdiscount bigserial not null,
     idofapplicationforfood bigint not null,
     dtiszncode integer,
+    confirmed integer not null default 0,
     CONSTRAINT cf_applications_for_food_discount_pk PRIMARY KEY (idofappdiscount),
     CONSTRAINT cf_applications_for_food_discount_app FOREIGN KEY (idofapplicationforfood)
         REFERENCES cf_applications_for_food (idofapplicationforfood) MATCH SIMPLE

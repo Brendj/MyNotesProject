@@ -26,7 +26,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
-import ru.axetta.ecafe.processor.core.zlp.kafka.GuardianshipValidationData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -121,7 +123,7 @@ public class ETPMVService {
         if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
         try {
             //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
-            GuardianshipValidationData data = new GuardianshipValidationData(coordinateMessage, null);
+            RequestValidationData data = new RequestValidationData(coordinateMessage, null);
         } catch (Exception e) {
             logger.error("Error in valid application data: ", e);
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not enough data");
@@ -237,6 +239,9 @@ public class ETPMVService {
             begin_time = System.currentTimeMillis();
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
+
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendBenefitValidationRequest(serviceNumber);
+
         daoService.updateEtpPacketWithSuccess(serviceNumber);
     }
 
@@ -504,16 +509,20 @@ public class ETPMVService {
     }
 
     public void sendRequestForGuardianshipValidation(ApplicationForFood applicationForFood) {
-        if (applicationForFood.getValidGuardianShip()) return;
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
-        try {
-            ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_REQUEST_SENDED);
-            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
-                    .updateApplicationForFoodWithStatus(applicationForFood, status);
-            sendStatus(System.currentTimeMillis(), applicationForFood.getServiceNumber(), status.getApplicationForFoodState());
-        } catch (Exception e) {
-            logger.error("Error in sendRequestForGuardianshipValidation: ", e);
+        if (applicationForFood.getValidGuardianShip()) {
+            //todo исполнение заявления?
+            return;
         }
+        //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+    }
+
+    public void sendRequestForDocValidation(ApplicationForFood applicationForFood) {
+        if (applicationForFood.getValidDoc()) {
+            sendRequestForGuardianshipValidation(applicationForFood);
+            return;
+        }
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
     }
 
     private void initAISContingentService() throws Exception {

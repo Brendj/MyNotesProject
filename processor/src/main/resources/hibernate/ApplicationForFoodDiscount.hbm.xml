@@ -13,5 +13,6 @@
         <many-to-one name="applicationForFood" class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFood" column="idofapplicationforfood"
                      not-null="true" fetch="join"/>
         <property name="dtisznCode" column="DTISZNCode" type="integer"/>
+        <property name="confirmed" column="confirmed" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
     </class>
 </hibernate-mapping>

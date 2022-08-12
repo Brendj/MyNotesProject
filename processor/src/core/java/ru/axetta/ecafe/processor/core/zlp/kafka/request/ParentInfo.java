@@ -1,6 +1,6 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka.request;
 
-import ru.axetta.ecafe.processor.core.zlp.kafka.GuardianshipValidationData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 
 public class ParentInfo {
     private String last_name;
@@ -12,7 +12,7 @@ public class ParentInfo {
 
     }
 
-    public ParentInfo(GuardianshipValidationData data) {
+    public ParentInfo(RequestValidationData data) {
         this.last_name = data.getParentLastName();
         this.first_name = data.getParentFirstName();
         this.birth_date = data.getParentBirthDate();

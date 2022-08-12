@@ -8,6 +8,7 @@ public class ApplicationForFoodDiscount {
     private Long idOfAppDiscount;
     private ApplicationForFood applicationForFood;
     private Integer dtisznCode;
+    private Boolean confirmed;
 
     public ApplicationForFoodDiscount() {
 
@@ -15,6 +16,7 @@ public class ApplicationForFoodDiscount {
 
     public ApplicationForFoodDiscount(Integer dtisznCode) {
         this.dtisznCode = dtisznCode;
+        this.confirmed = false;
     }
 
     @Override
@@ -56,5 +58,13 @@ public class ApplicationForFoodDiscount {
 
     public void setDtisznCode(Integer dtisznCode) {
         this.dtisznCode = dtisznCode;
+    }
+
+    public Boolean getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(Boolean confirmed) {
+        this.confirmed = confirmed;
     }
 }

@@ -1,46 +1,19 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka.request;
 
-//"relatedness_checking_2_request"
-public class RelatednessChecking2Request {
-    private String request_id;
-    private String requesting_system;
-    private String requested_method;
-    private String state_service_variety_code;
+import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
+
+public class RelatednessChecking2Request extends RequestHeader {
     private LearnerInfo learnerInfo;
     private LearnerDocumentInfo learner_document_info;
     private ParentInfo parent_info;
     private ParentPassportInfo parent_passport_info;
 
-    public String getRequest_id() {
-        return request_id;
+    public RelatednessChecking2Request() {
+
     }
 
-    public void setRequest_id(String request_id) {
-        this.request_id = request_id;
-    }
-
-    public String getRequesting_system() {
-        return requesting_system;
-    }
-
-    public void setRequesting_system(String requesting_system) {
-        this.requesting_system = requesting_system;
-    }
-
-    public String getRequested_method() {
-        return requested_method;
-    }
-
-    public void setRequested_method(String requested_method) {
-        this.requested_method = requested_method;
-    }
-
-    public String getState_service_variety_code() {
-        return state_service_variety_code;
-    }
-
-    public void setState_service_variety_code(String state_service_variety_code) {
-        this.state_service_variety_code = state_service_variety_code;
+    public RelatednessChecking2Request(RequestValidationData data) {
+        super(data);
     }
 
     public LearnerInfo getLearnerInfo() {
