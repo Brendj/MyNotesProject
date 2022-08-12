@@ -501,7 +501,7 @@ public class EventNotificationService {
             } else if (type.equals(MESSAGE_PAYMENT_PAY)) {
                 balanceData.setBenefitType(0);
                 balanceData.setReasonId(2);
-            }
+            } else return null;
         } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
             balanceData.setActionType(1);
         } else return null;
