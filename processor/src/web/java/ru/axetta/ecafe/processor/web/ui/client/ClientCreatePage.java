@@ -17,12 +17,9 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ContactPerson;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
-import ru.axetta.ecafe.processor.web.ui.dul.DulViewPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -33,11 +30,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.context.FacesContext;
-import javax.faces.el.MethodBinding;
 import javax.faces.model.SelectItem;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClient;
 
@@ -52,7 +46,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
         ClientSelectPage.CompleteHandler,
-        DulSelectPage.CompleteHandler{
+        DulSelectPage.CompleteHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientCreatePage.class);
 
@@ -726,6 +720,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (StringUtils.isEmpty(this.person.surname) || StringUtils.isEmpty(this.person.firstName)) {
             throw new Exception("Укажите фамилия и имя обслуживаемого лица");
         }
+        if (this.email != null && !this.email.isEmpty()) {
+            ClientManager.validateEmail(this.email);
+        }
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
 //        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, null, this.person.surname,
 //                this.person.firstName, this.mobile, this.email);
@@ -810,9 +807,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         ClientParallel.addFoodBoxModifire(client);
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
-        dulDetailService.validateDulList(persistenceSession, this.dulDetail, null, false);
-        dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
-
+        if (this.dulDetail != null && !this.dulDetail.isEmpty()) {
+            dulDetailService.validateDulList(persistenceSession, this.dulDetail, false);
+            if (isParentGroup())
+                checkDuls(persistenceSession, this.dulDetail, client.getIdOfClient());
+            dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
+        }
 
         if (isParentGroup()) {
             if (!this.clientWardItems.isEmpty()) {
@@ -820,15 +820,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
                 }
             }
-
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
             if (this.san != null && !this.san.isEmpty()) {
                 checkSnils(persistenceSession, this.san, client);
-            }
-            if (this.dulDetail != null && !this.dulDetail.isEmpty()) {
-                checkDuls(persistenceSession, this.dulDetail);
             }
             addGuardianToClient(persistenceSession, clientGuardianHistory, client);
 
@@ -893,10 +889,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
     }
 
-    private void checkDuls(Session session, List<DulDetail> dulDetails) throws Exception {
+    private void checkDuls(Session session, List<DulDetail> dulDetails, Long currentIdOfClient) throws Exception {
         for (DulDetail detail : dulDetails) {
-            Client client = RuntimeContext.getAppContext().getBean(DulDetailService.class).findClientByDulDetail(session, detail);
-            if (client != null) {
+            List<Long> clientIds = RuntimeContext.getAppContext().getBean(DulDetailService.class).checkAnotherClient(session, detail);
+            if (clientIds.isEmpty())
+                continue;
+            Client client = session.load(Client.class, clientIds.get(0));
+            if (client != null && !client.getIdOfClient().equals(currentIdOfClient)) {
                 setFoundValues(client);
                 throw new Exception("Уже существует клиент с указанным документом № " + detail.getNumber());
             }

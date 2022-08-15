@@ -533,7 +533,7 @@ public class SchoolApiService implements ISchoolApiService {
 
             if(dulDetailPassport != null) {
                 dulDetailPassport.setIdOfClient(iacClient.getIdOfClient());
-                dulDetailService.validateAndSaveDulDetails(persistanceSession, Collections.singletonList(dulDetailPassport), iacClient.getIdOfClient());
+                dulDetailService.saveDulOnlyISPP(persistanceSession, Collections.singletonList(dulDetailPassport), iacClient.getIdOfClient());
             }
             persistanceSession.update(clientPerson);
             persistanceSession.update(iacClient);

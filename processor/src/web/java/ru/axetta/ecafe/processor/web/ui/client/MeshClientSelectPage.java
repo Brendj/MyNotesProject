@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardianPerson;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.PersonListResponse;
@@ -41,9 +40,9 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
     private List<MeshGuardianPerson> meshGuardianPersonList;
     private List<DulDetail> dulDetail = new ArrayList<>();
-    private Boolean disableCreatePersonKey = true;
     private MeshGuardianPerson meshGuardianPerson;
 
+    @SuppressWarnings("unchecked")
     public void searchMeshPerson(Session session) throws Exception {
         if ((this.san == null || this.san.isEmpty()) && (this.dulDetail == null || this.dulDetail.isEmpty())) {
             throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
@@ -58,7 +57,7 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(session, this.san, null);
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, null, true);
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail,  true);
         ClientManager.validateFio(this.surname, this.firstName, this.secondName);
         this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
 
@@ -72,15 +71,9 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
             throw new Exception(personListResponse.getMessage());
 
         this.meshGuardianPersonList = personListResponse.getResponse()
-                .stream().filter(m -> m.getDegree() > 71).collect(Collectors.toList());
+                .stream().filter(m -> m.getDegree() > 70).collect(Collectors.toList());
 
         if (!this.meshGuardianPersonList.isEmpty()) {
-            this.disableCreatePersonKey = true;
-        } else {
-            this.meshGuardianPersonList = personListResponse.getResponse();
-            this.disableCreatePersonKey = false;
-        }
-        if (this.meshGuardianPersonList != null && !this.meshGuardianPersonList.isEmpty()) {
             List<String> meshGuidList = this.meshGuardianPersonList
                     .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
             Query query = session.createQuery("select c.meshGUID from Client c "
@@ -88,7 +81,14 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
             query.setParameter("meshGuidList", meshGuidList);
             List<String> list = query.getResultList();
             this.meshGuardianPersonList.forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
-        }
+
+            List<MeshGuardianPerson> startWithAlreadyInISPP = this.meshGuardianPersonList
+                    .stream().filter(MeshGuardianPerson::getAlreadyInISPP).collect(Collectors.toList());
+            startWithAlreadyInISPP.addAll(this.meshGuardianPersonList
+                    .stream().filter(p -> !p.getAlreadyInISPP()).collect(Collectors.toList()));
+            this.meshGuardianPersonList = startWithAlreadyInISPP;
+        } else
+            throw new Exception("Представитель не найден. Для регистрации нового клиента необходимо перейти в раздел Клиенты/Регистрация");
     }
 
     public String getMeshGuardianPersonStr() {
@@ -120,7 +120,6 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
         this.mobileNumber = null;
         this.meshGuardianPersonList = new ArrayList<>();
         this.dulDetail = new ArrayList<>();
-        this.disableCreatePersonKey = true;
         this.meshGuardianPerson = null;
         return null;
     }
@@ -216,14 +215,6 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
 
     public void setDulDetail(List<DulDetail> dulDetail) {
         this.dulDetail = dulDetail;
-    }
-
-    public Boolean getDisableCreatePersonKey() {
-        return disableCreatePersonKey;
-    }
-
-    public void setDisableCreatePersonKey(Boolean disableCreatePersonKey) {
-        this.disableCreatePersonKey = disableCreatePersonKey;
     }
 
     public MeshGuardianPerson getMeshGuardianPerson() {

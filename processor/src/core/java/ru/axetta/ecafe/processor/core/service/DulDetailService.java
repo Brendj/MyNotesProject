@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class DulDetailService {
 
     private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
+    //Не должно быть двух персон с одинаковыми действующими документами следующих типов:
+    private final List<Long> dulTypes = Arrays.asList(3L, 124L, 17L, 9L, 1L, 189L, 15L, 900L, 902L, 11L, 13L);
 
     public void validateAndSaveDulDetails(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
         Client client = session.get(Client.class, idOfClient);
@@ -52,7 +54,7 @@ public class DulDetailService {
         if (!isChange(dulDetail, client)) {
             return new MeshDocumentResponse().okResponse();
         }
-        validateDul(session, dulDetail, client, true);
+        validateDul(session, dulDetail, true);
         dulDetail.setLastUpdate(new Date());
         MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (saveToMK && client.getMeshGUID() != null) {
@@ -80,7 +82,9 @@ public class DulDetailService {
     }
 
     public MeshDocumentResponse saveDulDetail(Session session, DulDetail dulDetail, Client client, boolean saveToMK) throws Exception {
-        validateDul(session, dulDetail, client, true);
+        if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
+            throw new DocumentExistsException("У клиента уже есть документ этого типа");
+        validateDul(session, dulDetail, true);
         Date currentDate = new Date();
         dulDetail.setLastUpdate(currentDate);
         dulDetail.setCreateDate(currentDate);
@@ -108,47 +112,46 @@ public class DulDetailService {
         return documentResponse;
     }
 
-    public void validateDulList(Session session, List<DulDetail> dulDetail, Client client, boolean checkAnotherClient) throws Exception {
+    public void validateDulList(Session session, List<DulDetail> dulDetail, boolean checkAnotherClient) throws Exception {
         for (DulDetail detail : dulDetail) {
-            validateDul(session, detail, client, checkAnotherClient);
+            validateDul(session, detail, checkAnotherClient);
         }
     }
 
-    private void validateDul(Session session, DulDetail dulDetail, Client client, boolean checkAnotherClient) throws Exception {
-        if (client != null)
-            if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
-                throw new DocumentExistsException("У клиента уже есть документ этого типа");
+    private void validateDul(Session session, DulDetail dulDetail, boolean checkAnotherClient) throws Exception {
         if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
             throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
         if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
             throw new Exception("Не заполнено поле \"Номер\" документа");
-        if (checkAnotherClient)
-            checkAnotherClient(session, dulDetail, client);
+        if (checkAnotherClient) {
+            List<Long> ids = checkAnotherClient(session, dulDetail);
+            if (!ids.isEmpty())
+                throw new DocumentExistsException(String
+                        .format("Персона c данным документом уже существует, идентификатор клиента: %s", ids.get(0)));
+        }
     }
 
-    private void checkAnotherClient(Session session, DulDetail dulDetail, Client client) throws DocumentExistsException {
-        //Не должно быть двух персон с одинаковыми действующими документами следующих типов:
-        List<Long> dulTypes = Arrays.asList(3L, 124L, 17L, 9L, 1L, 189L, 15L, 900L);
-
-        if (dulTypes.contains(dulDetail.getDocumentTypeId())) {
-            String query_str = "select d.idOfClient from DulDetail d where d.documentTypeId = :documentTypeId " +
-                    "and d.deleteState = false and d.number = :number ";
-            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty())
-                query_str += " and d.series = :series";
-            Query query = session.createQuery(query_str);
-            query.setParameter("number", dulDetail.getNumber());
-            query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
-            if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) {
-                query.setParameter("series", dulDetail.getSeries());
-            }
-            List<Long> idOfClients = query.getResultList();
-            if (idOfClients == null || idOfClients.isEmpty())
-                return;
-            if (client != null && idOfClients.size() == 1 && idOfClients.get(0).equals(client.getIdOfClient()))
-                return;
-            throw new DocumentExistsException(String
-                    .format("Персона c данным документом уже существует, идентификатор клиента: %s", idOfClients.get(0)));
+    @SuppressWarnings("unchecked")
+    public List<Long> checkAnotherClient(Session session, DulDetail dulDetail) {
+        if (!this.dulTypes.contains(dulDetail.getDocumentTypeId())) {
+            return new ArrayList<>();
         }
+        String query_str = "select d.idOfClient from DulDetail d where d.documentTypeId = :documentTypeId " +
+                "and d.deleteState = false and d.number = :number ";
+        if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty())
+            query_str += " and d.series = :series";
+        Query query = session.createQuery(query_str);
+        query.setParameter("number", dulDetail.getNumber());
+        query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
+        if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) {
+            query.setParameter("series", dulDetail.getSeries());
+        }
+        List<Long> idOfClients = query.getResultList();
+        if (idOfClients == null || idOfClients.isEmpty())
+            return new ArrayList<>();
+        if (idOfClients.size() == 1 && idOfClients.get(0).equals(dulDetail.getIdOfClient()))
+            return new ArrayList<>();
+        return idOfClients;
     }
 
     private boolean documentExists(Session session, Client client, Long documentTypeId, Long id) {
@@ -175,26 +178,6 @@ public class DulDetailService {
         return null;
     }
 
-    public Client findClientByDulDetail(Session session, DulDetail dulDetail) {
-        String query_str = "select dd.idOfClient from DulDetail dd where dd.documentTypeId = :typeId " +
-                "and dd.number = :number";
-        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
-            query_str += " and dd.series = :series";
-        }
-        Query query = session.createQuery(query_str);
-        query.setParameter("typeId", dulDetail.getDocumentTypeId());
-        query.setParameter("number", dulDetail.getNumber());
-        if (!StringUtils.isEmpty(dulDetail.getSeries())) {
-            query.setParameter("series", dulDetail.getSeries());
-        }
-        List<Long> list = query.getResultList();
-        if (list.size() == 0) return null;
-        List<Client> list2 = session.createQuery("select c from Client c join fetch c.person where c.idOfClient = :id")
-                .setParameter("id", list.get(0))
-                .getResultList();
-        return list2.get(0);
-    }
-
     private MeshGuardiansService getMeshGuardiansService() {
         return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
@@ -207,7 +190,8 @@ public class DulDetailService {
     }
 
     @SuppressWarnings("unchecked")
-    public void saveDulOnlyISPP(Session session, List<DulDetail> dulDetails, Long idOfClient) {
+    public void saveDulOnlyISPP(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
+        validateDulList(session, dulDetails, true);
         //проверка на случай отсутсвия типа документа из мк в испп
         Criteria criteria = session.createCriteria(DulGuide.class);
         List<DulGuide> allDulGuides = (List<DulGuide>) criteria.list();
