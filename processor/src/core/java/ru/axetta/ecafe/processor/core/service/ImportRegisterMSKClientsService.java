@@ -1253,7 +1253,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         dulDetails.add(document.getDulDetail());
                     }
                     RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                            .validateAndSaveDulDetails(session, dulDetails, guardian.getIdOfClient());
+                            .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
                 }
                 guardian.setMobile(guardianPerson.getMobile());
                 guardian.setEmail(guardianPerson.getEmail());

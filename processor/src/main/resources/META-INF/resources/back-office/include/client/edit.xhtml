@@ -407,14 +407,7 @@
                     </a4j:commandLink>
                 </rich:column>
                 <f:facet name="footer">
-                    <a4j:commandButton value="Добавить представителя" action="#{mainPage.showClientSelectPage}"
-                                       render="modalClientSelectorPanel" style="margin-right: 2px;"
-                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                                       styleClass="command-link">
-                        <f:setPropertyActionListener value="guardian"
-                                                     target="#{mainPage.clientEditPage.typeAddClient}"/>
-                    </a4j:commandButton>
-                    <a4j:commandButton value="Добавить представителя МК"
+                    <a4j:commandButton value="Добавить представителя"
                                        action="#{mainPage.showMeshClientSelectPage}"
                                        render="modalMeshClientSelectorPanel" style="margin-left: 2px;"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.show();"
@@ -632,6 +625,11 @@
                                render="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"
                                styleClass="command-button"
                                rendered="#{!mainPage.clientEditPage.predefined()}"/>
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
         </h:panelGrid>
 
         <h:panelGrid styleClass="borderless-grid">

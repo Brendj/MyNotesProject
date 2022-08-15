@@ -5810,7 +5810,7 @@ public class Processor implements SyncProcessor {
                 dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
                 RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                        .validateAndSaveDulDetails(persistenceSession, Collections.singletonList(dulDetail), client.getIdOfClient());
+                        .saveDulOnlyISPP(persistenceSession, Collections.singletonList(dulDetail), client.getIdOfClient());
             }
             persistenceSession.flush();
             persistenceTransaction.commit();

@@ -193,11 +193,6 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             guardian.setBirthDate(birthDate);
             session.update(guardian);
 
-            if (dulDetails != null && !dulDetails.isEmpty()) {
-                dulDetails = dulDetails.stream().peek(d -> d.setDeleteState(false)).collect(Collectors.toList());
-                RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                        .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
-            }
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("soap метод createMeshPerson");
             clientGuardianHistory.setGuardian(mobile);

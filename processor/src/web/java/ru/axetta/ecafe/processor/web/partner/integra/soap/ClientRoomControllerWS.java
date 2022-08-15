@@ -8887,7 +8887,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
                 RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                        .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), guardian.getIdOfClient());
+                        .saveDulOnlyISPP(session, Collections.singletonList(dulDetail), guardian.getIdOfClient());
             }
 
             ClientGuardian clientGuardian = DAOUtils

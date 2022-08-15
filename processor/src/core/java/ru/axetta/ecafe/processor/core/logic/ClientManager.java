@@ -1156,7 +1156,7 @@ public class ClientManager {
             dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
             RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                    .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+                    .saveDulOnlyISPP(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
         }
 
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
@@ -2040,7 +2040,7 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), false);
         }
     }
 
@@ -2754,6 +2754,12 @@ public class ClientManager {
         Criteria clientCriteria = session.createCriteria(Client.class);
         clientCriteria.add(Restrictions.eq("meshGUID", meshGUID));
         return (Client) clientCriteria.uniqueResult();
+    }
+
+    public static void validateEmail(String email) throws Exception {
+        if (!Pattern.matches("(^;|^,|\\S){1,}@([a-z0-9\\-\\_.]|[а-я]){1,}.([a-z]{2,6}|рф|рус|бел|москва|укр|онлайн|ею|бг|сайт|срб|дети|каз|мкд|мон|орг|ком|католик)", email)) {
+            throw new Exception("Неверный формат электронной почты");
+        }
     }
 
 }
