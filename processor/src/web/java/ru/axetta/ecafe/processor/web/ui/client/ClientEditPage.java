@@ -63,6 +63,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private static final Logger logger = LoggerFactory.getLogger(ClientEditPage.class);
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
+    public static final String HISTORY_LABEL = "Удаление последнего опекаемого у представителя";
+
     private String fax;
 
     public ClientEditPage() {
@@ -1363,6 +1365,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         persistenceSession.update(client);
 
+        //todo
+        //Перенос в группу выбывшие в случае удаления связок с опекунами
+//        if (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+//            guardianToLeaving(persistenceSession, client);
+//        }
+
         fill(persistenceSession, client);
 
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
@@ -1433,12 +1441,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
                     client.getIdOfClient()));
             removeWardsByClient(persistenceSession, client.getIdOfClient(), this.removeListWardItems, clientGuardianHistory);
-
-            if (clientWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-                client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                persistenceSession.update(client);
-                updateClientToMK();
-            }
         }
     }
 
@@ -1488,13 +1490,28 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     continue;
                 }
                 List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, idsOfGuardian, true);
-                if (guardianWards.stream().noneMatch(g -> g.getIdOfClient().equals(idsOfGuardian))) {
-                    guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                    long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-                    guardian.setClientRegistryVersion(clientRegistryVersion);
-                    persistenceSession.update(guardian);
-                }
+                //todo
+//                if (guardianWards.stream().noneMatch(g -> g.getIdOfClient().equals(idsOfGuardian))) {
+//                    guardianToLeaving(persistenceSession, guardian);
+//                }
             }
+        }
+    }
+
+    private void guardianToLeaving(Session session, Client guardian) throws Exception {
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason(HISTORY_LABEL);
+
+        if (!guardian.isDeletedOrLeaving()) {
+            ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            guardian.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
+            session.update(guardian);
+            logger.info(String.format("Deleted client id = %s", guardian.getIdOfClient()));
         }
     }
 
