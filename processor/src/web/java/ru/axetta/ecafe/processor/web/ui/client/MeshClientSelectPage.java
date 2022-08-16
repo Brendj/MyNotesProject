@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MeshClientSelectPage extends BasicPage implements DulSelectPage.CompleteHandler{
+public class MeshClientSelectPage extends BasicPage implements DulSelectPage.CompleteHandler {
 
     @Override
     public void completeDulSelection(Session session, DulGuide dulGuide) throws Exception {
@@ -55,9 +55,12 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
         }
         if (this.san != null && !this.san.isEmpty()) {
             this.san = this.san.replaceAll("[\\D]", "");
-            ClientManager.validateSan(session, this.san, null);
+            if (!ClientManager.checkSanNumber(san))
+                throw new Exception("Неверный номер СНИЛС");
+        } else {
+            throw new Exception("Не заполнено поле \"СНИЛС\"");
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail,  true);
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, true);
         ClientManager.validateFio(this.surname, this.firstName, this.secondName);
         this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
 
@@ -127,7 +130,7 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
     private MeshGuardiansService getMeshGuardiansService() {
         return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
-    
+
     private final Stack<MeshClientSelectPage.CompleteHandler> completeHandlers = new Stack<>();
 
     public void pushCompleteHandler(MeshClientSelectPage.CompleteHandler handler) {
