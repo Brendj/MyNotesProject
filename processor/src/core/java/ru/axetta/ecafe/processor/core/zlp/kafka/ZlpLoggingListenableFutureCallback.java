@@ -22,11 +22,13 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRe
 public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
     private final Logger log = LoggerFactory.getLogger(ZlpLoggingListenableFutureCallback.class);
     private final Message<AbstractPushData> message;
-    private final ApplicationForFood applicationForFood;
+    private final Long idOfApplicationForFood;
+    private final String serviceNumber;
 
-    public ZlpLoggingListenableFutureCallback(Message<AbstractPushData> message, ApplicationForFood applicationForFood) {
+    public ZlpLoggingListenableFutureCallback(Message<AbstractPushData> message, Long idOfApplicationForFood, String serviceNumber) {
         this.message = message;
-        this.applicationForFood = applicationForFood;
+        this.idOfApplicationForFood = idOfApplicationForFood;
+        this.serviceNumber = serviceNumber;
     }
 
     @Override
@@ -36,14 +38,14 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
             return;
         }
         String jsonString = requestToJsonString(message.getPayload());
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonString, applicationForFood);
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonString, idOfApplicationForFood);
         log.info("Send kafka message: " + jsonString + ", Partition: " + result.getRecordMetadata().partition());
         try {
             ApplicationForFoodStatus status = getApplicationForFoodStatus();
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
-                    .updateApplicationForFoodWithStatus(applicationForFood, status);
+                    .updateApplicationForFoodWithStatus(idOfApplicationForFood, status);
             RuntimeContext.getAppContext().getBean(ETPMVService.class)
-                    .sendStatus(System.currentTimeMillis(), applicationForFood.getServiceNumber(), status.getApplicationForFoodState());
+                    .sendStatus(System.currentTimeMillis(), serviceNumber, status.getApplicationForFoodState());
         } catch (Exception e) {
             log.error("Error in sendRequestForGuardianshipValidation when sending status: ", e);
         }

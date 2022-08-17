@@ -1,6 +1,8 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import java.util.Date;
@@ -22,8 +24,15 @@ public class AppMezhvedRequest {
     }
 
     public AppMezhvedRequest(AbstractPushData request, String jsonString, ApplicationForFood applicationForFood) {
-        if (request instanceof GuardianshipValidationRequest)
-        this.requestId = ((GuardianshipValidationRequest)request).getRelatedness_checking_2_request().getRequest_id();
+        if (request instanceof GuardianshipValidationRequest) {
+            this.requestId = ((GuardianshipValidationRequest) request).getRelatedness_checking_2_request().getRequest_id();
+        }
+        if (request instanceof DocValidationRequest) {
+            this.requestId = ((DocValidationRequest) request).getPassportBySerieNumberValidityCheckingRequest().getRequest_id();
+        }
+        if (request instanceof BenefitValidationRequest) {
+            this.requestId = ((BenefitValidationRequest) request).getActive_benefit_categories_getting_request().getRequest_id();
+        }
         this.requestPayload = jsonString;
         this.createdDate = new Date();
         this.requestType = getAppMezhvedRequestTypeByMessage(request);
@@ -32,7 +41,8 @@ public class AppMezhvedRequest {
 
     private AppMezhvedRequestType getAppMezhvedRequestTypeByMessage(AbstractPushData request) {
         if (request instanceof GuardianshipValidationRequest) return AppMezhvedRequestType.GUARDIANSHIP;
-        // todo uncomment -- if (request instanceof DocValidationRequest) return AppMezhvedRequestType.DOCS;
+        if (request instanceof DocValidationRequest) return AppMezhvedRequestType.DOCS;
+        if (request instanceof BenefitValidationRequest) return AppMezhvedRequestType.BENEFITS;
         return null;
     }
 

@@ -24,14 +24,14 @@ public class RequestValidationData {
     private String parentPassportNumber;
     private String parentPassportIssueDate;
 
-    private ApplicationForFood applicationForFood;
+    private Long idOfApplicationForFood;
 
     public static final String DOC_KIND_SVIDETELSTVO = "20017";
     public static final String DOC_KIND_PASSPORT = "20001";
     public static final String TYPE_CODE_SVIDETELSTVO = "10";
     public static final String TYPE_CODE_PASSPORT = "1";
 
-    public RequestValidationData(CoordinateMessage coordinateMessage, ApplicationForFood applicationForFood) {
+    public RequestValidationData(CoordinateMessage coordinateMessage, Long idOfApplicationForFood) {
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();
@@ -58,7 +58,7 @@ public class RequestValidationData {
         this.parentPassportSeries = serviceDocument2.getDocSerie();
         this.parentPassportIssueDate = df.format(getDate(serviceDocument2.getDocDate().getValue()));
 
-        this.applicationForFood = applicationForFood;
+        this.idOfApplicationForFood = idOfApplicationForFood;
     }
 
     private Date getDate(XMLGregorianCalendar cal) {
@@ -180,11 +180,11 @@ public class RequestValidationData {
         this.parentPassportIssueDate = parentPassportIssueDate;
     }
 
-    public ApplicationForFood getApplicationForFood() {
-        return applicationForFood;
+    public Long getIdOfApplicationForFood() {
+        return idOfApplicationForFood;
     }
 
-    public void setApplicationForFood(ApplicationForFood applicationForFood) {
-        this.applicationForFood = applicationForFood;
+    public void setIdOfApplicationForFood(Long idOfApplicationForFood) {
+        this.idOfApplicationForFood = idOfApplicationForFood;
     }
 }

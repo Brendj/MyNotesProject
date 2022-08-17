@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import javax.persistence.EntityManager;
@@ -101,6 +102,19 @@ public class ETPMVDaoService {
         etpBKMessage.setCreatedDate(new Date());
         etpBKMessage.setIsSent(isSent);
         entityManager.persist(etpBKMessage);
+    }
+
+    public List<ApplicationForFood> findApplicationsForFoodSendedMezhvedRequest(Session session) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.status in (:status1, :status2) and a.archived = false ");
+        query.setParameter("status1", new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_VALIDITY_REQUEST_SENDED));
+        query.setParameter("status2", new ApplicationForFoodStatus(ApplicationForFoodState.DOC_VALIDITY_REQUEST_SENDED));
+        return query.getResultList();
+    }
+
+    public List<ApplicationForFood> findApplicationsForFoodSendedBenefitRequest(Session session) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.status = :status and a.archived = false");
+        query.setParameter("status", new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED));
+        return query.getResultList();
     }
 
     @Transactional(readOnly = true)
@@ -201,13 +215,13 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void updateApplicationForFoodWithStatus(ApplicationForFood applicationForFood,
+    public void updateApplicationForFoodWithStatus(Long idOfApplicationForFood,
                                                    ApplicationForFoodStatus status) throws Exception  {
         Session session = entityManager.unwrap(Session.class);
         Long applicationVersion = getApplicationForFoodNextVersion();
         Long historyVersion = getApplicationForFoodHistoryNextVersion();
-        applicationForFood = DAOUtils
-                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+        ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+        DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
                         applicationVersion, historyVersion, true);
     }
 
@@ -262,7 +276,8 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void saveMezhvedRequest(AbstractPushData request, String jsonString, ApplicationForFood applicationForFood) {
+    public void saveMezhvedRequest(AbstractPushData request, String jsonString, Long idOfApplicationForFood) {
+        ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
         AppMezhvedRequest appMezhvedRequest = new AppMezhvedRequest(request, jsonString, applicationForFood);
         entityManager.persist(appMezhvedRequest);
         if (request instanceof GuardianshipValidationRequest) {
@@ -273,11 +288,10 @@ public class ETPMVDaoService {
             applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
             entityManager.merge(applicationForFood);
         }
-        //todo uncomment
-        //if (request instanceof DocValidationRequest) {
-        //    applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
-        //    entityManager.merge(applicationForFood);
-        //}
+        if (request instanceof DocValidationRequest) {
+            applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }
     }
 
 }

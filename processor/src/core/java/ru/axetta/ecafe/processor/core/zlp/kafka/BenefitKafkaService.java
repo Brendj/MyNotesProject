@@ -59,7 +59,7 @@ public class BenefitKafkaService extends KafkaService {
             Message<AbstractPushData> message = MessageBuilder.withPayload(request).build();
             ListenableFuture<SendResult<String, Object>> future = kafkaTemplate
                     .send(getTopicFromConfig(request), message);
-            future.addCallback(new ZlpLoggingListenableFutureCallback(message, data.getApplicationForFood()));
+            future.addCallback(new ZlpLoggingListenableFutureCallback(message, data.getIdOfApplicationForFood(), applicationForFood.getServiceNumber()));
         } catch (Exception e) {
             logger.error(String.format("Error in sendGuardianshipValidationRequest for serviceNumber = %s", applicationForFood.getServiceNumber()), e);
         }
@@ -69,7 +69,7 @@ public class BenefitKafkaService extends KafkaService {
         String message = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                 .getOriginalMessageFromApplicationForFood(applicationForFood);
         CoordinateMessage coordinateMessage = RuntimeContext.getAppContext().getBean(ETPMVService.class).getCoordinateMessage(message);
-        return new RequestValidationData(coordinateMessage, applicationForFood);
+        return new RequestValidationData(coordinateMessage, applicationForFood.getIdOfApplicationForFood());
     }
 
     public GuardianshipValidationRequest getGuardianshipValidationRequest(RequestValidationData benefitData) {

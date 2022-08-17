@@ -240,7 +240,9 @@ public class ETPMVService {
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
 
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendBenefitValidationRequest(serviceNumber);
+        if (newFormat) {
+            RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendBenefitValidationRequest(serviceNumber);
+        }
 
         daoService.updateEtpPacketWithSuccess(serviceNumber);
     }
