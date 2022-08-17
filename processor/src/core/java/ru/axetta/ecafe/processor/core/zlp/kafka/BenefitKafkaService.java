@@ -29,6 +29,10 @@ public class BenefitKafkaService extends KafkaService {
     public static final String STATE_SERVICE_VARIETY_CODE_DEFAULT = "77060601";
     public static final String STATE_SERVICE_VARIETY_CODE_PROPERTY = "ecafe.processing.zlp.service.code";
 
+    public static final String RESPONSE_METHOD_BENEFIT = "active_benefit_categories_getting_response";
+    public static final String RESPONSE_METHOD_DOC = "passport_by_serie_number_validity_checking_response";
+    public static final String RESPONSE_METHOD_GUARDIANSHIP = "relatedness_checking_2_response";
+
     public BenefitKafkaService(KafkaTemplate<String, Object> kafkaTemplate) {
         super(kafkaTemplate);
     }

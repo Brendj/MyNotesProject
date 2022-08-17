@@ -294,4 +294,11 @@ public class ETPMVDaoService {
         }
     }
 
+    @Transactional
+    public AppMezhvedRequest getMezhvedData(String requestid) {
+        Query query = entityManager.createQuery("select a from AppMezhvedRequest a where a.requestid = :requestid");
+        query.setParameter("requestid", requestid);
+        return (AppMezhvedRequest)query.getSingleResult();
+    }
+
 }
