@@ -12,12 +12,12 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChe
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
 
 @Service
-public class KafkaService {
+public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
     private final KafkaServiceImpl kafkaService;
 
-    public KafkaService(ObjectMapper objectMapper,
+    public KafkaListenerService(ObjectMapper objectMapper,
                         KafkaServiceImpl kafkaService) {
         this.objectMapper = objectMapper;
         this.kafkaService = kafkaService;
