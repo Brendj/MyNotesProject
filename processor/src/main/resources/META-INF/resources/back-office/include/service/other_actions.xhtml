@@ -383,6 +383,31 @@
                 <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
             </rich:panel>
 
+            <rich:panel id="deleteIrrelevantPersonsPanel">
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Удаление неактуальных записей в cf_mh_persons"
+                                  styleClass="output-text"/><br/>
+                    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+                    <h:panelGroup>
+                        <a4j:commandButton value="..." action="#{otherActionsPage.showOrgListSelectRemoveIrrPersonsPage}"
+                                           render="modalOrgListSelectorPanel"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                           styleClass="command-link" style="width: 25px;">
+                            <f:setPropertyActionListener value="1" target="#{otherActionsPage.selectOrgType}"/>
+                            <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                        </a4j:commandButton>
+                        <h:outputText styleClass="output-text" escape="true"
+                                      value=" {#{otherActionsPage.orgItemsRemoveDupFilter}}"/>
+                    </h:panelGroup>
+
+                    <a4j:commandButton value="Запустить удаление по выбранным ОО"
+                                       action="#{otherActionsPage.runDeleteIrrelevantPersons()}"
+                                       id="deleteIrrelevantPersonsButtons"
+                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                </h:panelGrid>
+            </rich:panel>
+
             <a4j:status>
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>

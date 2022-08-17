@@ -3582,4 +3582,11 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public List<Long> getOrgIdFromNSIbyOrgsId(List<Long> orgList) {
+        Query query = entityManager.createQuery("SELECT o.orgIdFromNsi from Org o " +
+                "where o.idOfOrg in (:orgList)");
+        query.setParameter("orgList", orgList);
+        return query.getResultList();
+    }
 }

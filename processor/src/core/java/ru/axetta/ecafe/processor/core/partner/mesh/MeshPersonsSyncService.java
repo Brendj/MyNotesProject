@@ -21,15 +21,16 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by nuc on 12.08.2020.
@@ -39,6 +40,7 @@ import java.util.*;
 @Component("meshPersonsSyncService")
 public class MeshPersonsSyncService {
     private static final Logger logger = LoggerFactory.getLogger(MeshPersonsSyncService.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String MESH_REST_PERSONS_URL = "/persons?";
     public static final String MESH_REST_PERSONS_EXPAND = "education,categories";
@@ -102,7 +104,6 @@ public class MeshPersonsSyncService {
         String parameters = String.format("filter=%s&expand=%s&top=%s", URLEncoder
                 .encode(getFilter(idOfOrg, meshId, lastName, firstName, patronymic), "UTF-8"), getExpand(), getTop());
         byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
-        ObjectMapper objectMapper = new ObjectMapper();
         TypeFactory typeFactory = objectMapper.getTypeFactory();
         CollectionType collectionType = typeFactory.constructCollectionType(
                 List.class, ResponsePersons.class);
@@ -251,6 +252,46 @@ public class MeshPersonsSyncService {
         }
     }
 
+    public void deleteIrrelevantPersons(Long orgId){
+        Transaction transaction = null;
+        Session session = null;
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<MeshSyncPerson> personList = DAOUtils.getMeshPersonsByOrg(session, orgId);
+            List<String> personsIds = personList.stream().map(MeshSyncPerson::getPersonguid).collect(Collectors.toList());
+            List<MeshSyncPerson> forDelete = new LinkedList<>();
+
+            String parameters = String.format("filter=%stop=%s",URLEncoder
+                    .encode(getFilter(personsIds), "UTF-8"), getTop());
+            byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
+            CollectionType collectionType = typeFactory.constructCollectionType(
+                    List.class, ResponsePersons.class);
+            List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+
+            for(MeshSyncPerson person : personList){
+                if(meshResponses.stream().noneMatch(mh -> mh.getPersonId().equals(person.getPersonguid()))){
+                    forDelete.add(person);
+                }
+            }
+
+            for(MeshSyncPerson d : forDelete){
+                session.delete(d);
+            }
+
+            transaction.commit();
+            transaction = null;
+            session.close();
+        } catch (Exception e){
+            logger.error("Error in deleteIrrelevantPersons: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     protected String searchByMeshGuid(String guid) {
         try {
             Client client = DAOReadonlyService.getInstance().getClientByGuid(guid);
@@ -349,50 +390,65 @@ public class MeshPersonsSyncService {
 
     private String getFilter(long idOfOrg, String meshIds, String lastName, String firstName, String patronymic) throws
             Exception {
-        List<And> list = new ArrayList<>();
+        List<OpContainer> list = new ArrayList<>();
         MeshJsonFilter filter = new MeshJsonFilter();
 
         if (meshIds.equals("null")) {
             Long meshId = DAOReadonlyService.getInstance().getMeshIdByOrg(idOfOrg);
             if (meshId == null)
                 throw new Exception("У организации не указан МЭШ ид.");
-            And andOrg = new And();
-            andOrg.setField(FILTER_VALUE_ORG);
-            andOrg.setOp(FILTER_VALUE_EQUALS);
-            andOrg.setValue(meshId.toString());
-            list.add(andOrg);
+            OpContainer opContainerOrg = new OpContainer();
+            opContainerOrg.setField(FILTER_VALUE_ORG);
+            opContainerOrg.setOp(FILTER_VALUE_EQUALS);
+            opContainerOrg.setValue(meshId.toString());
+            list.add(opContainerOrg);
         } else {
             if (!StringUtils.isEmpty(meshIds)) {
-                And andOrg = new And();
-                andOrg.setField("person_id");
-                andOrg.setOp(FILTER_VALUE_EQUALS);
-                andOrg.setValue(meshIds);
-                list.add(andOrg);
+                OpContainer opContainerOrg = new OpContainer();
+                opContainerOrg.setField("person_id");
+                opContainerOrg.setOp(FILTER_VALUE_EQUALS);
+                opContainerOrg.setValue(meshIds);
+                list.add(opContainerOrg);
             }
         }
         if (!StringUtils.isEmpty(lastName)) {
-            And andLastname = new And();
-            andLastname.setField(FILTER_VALUE_LASTNAME);
-            andLastname.setOp(FILTER_VALUE_EQUALS);
-            andLastname.setValue(lastName);
-            list.add(andLastname);
+            OpContainer opContainerLastname = new OpContainer();
+            opContainerLastname.setField(FILTER_VALUE_LASTNAME);
+            opContainerLastname.setOp(FILTER_VALUE_EQUALS);
+            opContainerLastname.setValue(lastName);
+            list.add(opContainerLastname);
         }
         if (!StringUtils.isEmpty(firstName)) {
-            And andFirstname = new And();
-            andFirstname.setField(FILTER_VALUE_FIRSTNAME);
-            andFirstname.setOp(FILTER_VALUE_EQUALS);
-            andFirstname.setValue(firstName);
-            list.add(andFirstname);
+            OpContainer opContainerFirstname = new OpContainer();
+            opContainerFirstname.setField(FILTER_VALUE_FIRSTNAME);
+            opContainerFirstname.setOp(FILTER_VALUE_EQUALS);
+            opContainerFirstname.setValue(firstName);
+            list.add(opContainerFirstname);
         }
         if (!StringUtils.isEmpty(patronymic)) {
-            And andPatronymic = new And();
-            andPatronymic.setField(FILTER_VALUE_PATRONYMIC);
-            andPatronymic.setOp(FILTER_VALUE_EQUALS);
-            andPatronymic.setValue(patronymic);
-            list.add(andPatronymic);
+            OpContainer opContainerPatronymic = new OpContainer();
+            opContainerPatronymic.setField(FILTER_VALUE_PATRONYMIC);
+            opContainerPatronymic.setOp(FILTER_VALUE_EQUALS);
+            opContainerPatronymic.setValue(patronymic);
+            list.add(opContainerPatronymic);
         }
         filter.setAnd(list);
-        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(filter);
+    }
+
+    private String getFilter(List<String> personsIds) throws Exception {
+        List<OpContainer> list = new ArrayList<>(personsIds.size());
+        MeshJsonFilter filter = new MeshJsonFilter();
+
+        for(String personId : personsIds){
+            OpContainer op = new OpContainer();
+            op.setField("person_id");
+            op.setOp(FILTER_VALUE_EQUALS);
+            op.setValue(personId);
+            list.add(op);
+        }
+
+        filter.setOr(list);
         return objectMapper.writeValueAsString(filter);
     }
 
@@ -407,5 +463,4 @@ public class MeshPersonsSyncService {
         if (key.equals("")) throw new Exception("MESH API key not specified");
         return key;
     }
-
 }
