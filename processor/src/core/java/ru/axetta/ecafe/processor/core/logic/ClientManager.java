@@ -2498,7 +2498,7 @@ public class ClientManager {
         session.save(clientGroupMigrationHistory);
         if (full) {
             disableGuardianshipIfClientLeaving(session, client, idOfClientGroup, clientGuardianHistory);
-            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+//            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
         }
     }
 
@@ -2610,8 +2610,6 @@ public class ClientManager {
     //todo уточнить как найти представителя
     public static boolean isClientGuardian(Session session, Client client) {
         if (client.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
-            return false;
-        if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
             return false;
         if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_DELETED.getValue()))
             return false;

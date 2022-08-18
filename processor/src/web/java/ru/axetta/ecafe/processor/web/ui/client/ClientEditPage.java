@@ -171,7 +171,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     "", ClientCreatedFromType.BACK_OFFICE, clientsMobileHistory);
         }
         if (!guardianExists(client.getIdOfClient())) {
-            clientGuardianItem = new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
+            clientGuardianItem = new ClientGuardianItem(client, meshGuardianPerson.getAlreadyInISPP(), null, ClientManager.getNotificationSettings(),
                     ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
                     DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false,
                     ClientGuardianRepresentType.UNKNOWN, false, null);
@@ -1227,7 +1227,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
         if (!this.clientWardItems.isEmpty()) {
-            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty() || isDulRemoved(dulDetail))) {
                 throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
@@ -1366,13 +1366,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
-        persistenceSession.update(client);
+         persistenceSession.update(client);
 
-        //todo
         //Перенос в группу выбывшие в случае удаления связок с опекунами
-//        if (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-//            guardianToLeaving(persistenceSession, client);
-//        }
+        if (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+            guardianToLeaving(persistenceSession, client);
+        }
 
         fill(persistenceSession, client);
 
@@ -1380,6 +1379,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private boolean isDulRemoved(List<DulDetail> dulDetail) {
+        for (DulDetail detail : dulDetail) {
+            if (detail.getDeleteState() == null || !detail.getDeleteState()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void updateClientToMK() throws Exception {
@@ -1492,11 +1500,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
                     continue;
                 }
+                //Перенос в группу выбывшие в случае удаления связок с опекунами
                 List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, idsOfGuardian, true);
-                //todo
-//                if (guardianWards.stream().noneMatch(g -> g.getIdOfClient().equals(idsOfGuardian))) {
-//                    guardianToLeaving(persistenceSession, guardian);
-//                }
+                if (guardianWards.stream().noneMatch(g -> g.getIdOfClient().equals(idsOfGuardian))) {
+                    guardianToLeaving(persistenceSession, guardian);
+                }
             }
         }
     }
@@ -1856,8 +1864,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     private boolean isGuardianGroup(Client client) {
         if (client.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
-            return false;
-        if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
             return false;
         return !Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_DELETED.getValue());
     }
