@@ -55,7 +55,7 @@ public class ApplicationForFoodProcessingService {
         return true;
     }
 
-    public void runMezhvedTaskForDoc_GuradianshipDates() {
+    public void runMezhvedTaskForDoc_GuardianshipDates() {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -267,6 +267,8 @@ public class ApplicationForFoodProcessingService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        runMezhvedTaskForBenefitsDates();
+        runMezhvedTaskForDoc_GuardianshipDates();
     }
 
     public Date getTriggerDateByProductionCalendar(Session session, Date statusCreatedDate, Integer daysCount) {

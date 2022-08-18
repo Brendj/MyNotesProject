@@ -204,13 +204,15 @@ public class ETPMVDaoService {
 
     @Transactional
     public List<ApplicationForFood> getDataForAISContingent() {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c where a.sendToAISContingent = false "
-                + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe)) "
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join a.dtisznCodes codes "
+                + " where a.sendToAISContingent = false and a.serviceNumber like :old_format "
+                + " and ((codes.dtisznCode <> null and a.status = :statusDtiszn) or (codes.dtisznCode = null and a.status = :statusInoe)) "
                 + " and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :group_employees or c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :group_displaced)");
         query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
         query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK));
         query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
         query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        query.setParameter("old_format", "%" + ETPMVService.ISPP_ID + "%");
         return query.getResultList();
     }
 
