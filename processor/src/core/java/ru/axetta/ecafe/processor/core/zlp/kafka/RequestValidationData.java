@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka;
 
 import generated.etp.*;
+import org.apache.commons.lang.StringUtils;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -59,6 +60,23 @@ public class RequestValidationData {
         this.parentPassportIssueDate = df.format(getDate(serviceDocument2.getDocDate().getValue()));
 
         this.idOfApplicationForFood = idOfApplicationForFood;
+    }
+
+    public void testForData() throws Exception {
+        if (StringUtils.isEmpty(childLastName)
+                || StringUtils.isEmpty(childFirstName)
+                || StringUtils.isEmpty(childDocumentTypeCode)
+                || StringUtils.isEmpty(childBirthDate)
+                || StringUtils.isEmpty(childDocumentSeries)
+                || StringUtils.isEmpty(childDocumentNumber)
+                || StringUtils.isEmpty(childDocumentIssueDate)
+                || StringUtils.isEmpty(parentLastName)
+                || StringUtils.isEmpty(parentFirstName)
+                || StringUtils.isEmpty(parentBirthDate)
+                || StringUtils.isEmpty(parentPassportSeries)
+                || StringUtils.isEmpty(parentPassportNumber)
+                || StringUtils.isEmpty(parentPassportIssueDate)
+        ) throw new Exception("No enough data in application for food");
     }
 
     private Date getDate(XMLGregorianCalendar cal) {

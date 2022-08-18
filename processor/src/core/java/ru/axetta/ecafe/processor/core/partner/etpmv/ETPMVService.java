@@ -124,6 +124,7 @@ public class ETPMVService {
         try {
             //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
             RequestValidationData data = new RequestValidationData(coordinateMessage, null);
+            data.testForData();
         } catch (Exception e) {
             logger.error("Error in valid application data: ", e);
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not enough data");
