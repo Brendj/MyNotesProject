@@ -1402,7 +1402,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
 
-                    session.flush();
                     processClientGuardians(afterSaveClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, null);
                     break;
@@ -1427,7 +1426,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
 
-                    session.flush();
                     processClientGuardians(dbClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, null);
                     break;
@@ -1471,7 +1469,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
 
-                    session.flush();
                     processClientGuardians(dbClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, beforeMigrateOrg.getIdOfOrg());
                     break;
