@@ -2617,7 +2617,6 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
         criteria.add(Restrictions.ne("deletedState", true));
-        criteria.add(Restrictions.eq("disabled", false));
         return !criteria.list().isEmpty();
     }
 
