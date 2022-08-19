@@ -38,6 +38,7 @@ public class OrgFilter {
     private String guid;
     private Long ekisId;
     private Long orgIdFromNsi;
+    private String shortAddress;
 
 
     /**
@@ -88,6 +89,9 @@ public class OrgFilter {
         }
         if (StringUtils.isNotEmpty(guid)) {
             criteria.add(Restrictions.like("guid", guid, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (StringUtils.isNotEmpty(shortAddress)) {
+            criteria.add(Restrictions.like("shortAddress", shortAddress, MatchMode.ANYWHERE).ignoreCase());
         }
         if(ekisId != null && ekisId.compareTo(Long.parseLong("-1")) > 0){
             criteria.add(Restrictions.eq("ekisId",ekisId));
@@ -142,6 +146,7 @@ public class OrgFilter {
         this.guid = null;
         this.ekisId = null;
         this.orgIdFromNsi = null;
+        this.shortAddress = null;
     }
 
     public String getOfficialName() {
@@ -182,6 +187,14 @@ public class OrgFilter {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     public Long getIdOfOrg() {

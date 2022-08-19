@@ -288,10 +288,6 @@ public class ImportRegisterOrgsService {
                         org.setBtiUnad(orgRegistryChangeItem.getUnad());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INN)))
                         org.setINN(orgRegistryChangeItem.getInn());
-                    if (!RuntimeContext.getInstance().isNSI3()) {
-                        if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
-                            org.setGuid(orgRegistryChange.getGuid());
-                    }
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_NSI_ID)))
                         org.setOrgIdFromNsi(orgRegistryChange.getGlobalId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))

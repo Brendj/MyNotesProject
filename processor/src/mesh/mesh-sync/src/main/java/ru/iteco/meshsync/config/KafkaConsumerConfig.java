@@ -56,6 +56,7 @@ class KafkaConsumerConfig {
         props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
         props.put(SaslConfigs.SASL_JAAS_CONFIG,
                 String.format("org.apache.kafka.common.security.plain.PlainLoginModule required username=\"%s\" password=\"%s\";", login, password));
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
         return new DefaultKafkaConsumerFactory<>(props);
     }
 

@@ -60,6 +60,23 @@ public class SecurityConfiguration {
         }
     }
 
+    /*@Order(2)
+    @Configuration
+    public static class InternalRestConfiguration extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(HttpSecurity security) throws Exception {
+            security
+                    .authorizeRequests()
+                    .antMatchers("/mash-controller/**")
+                    .permitAll()
+                    .and()
+                    .cors()
+                    .and()
+                    .csrf().disable();
+        }
+    }*/
+
 
     @Order(3)
     @Configuration
