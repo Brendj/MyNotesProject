@@ -76,3 +76,23 @@ comment on column cf_app_mezhved_request.lastupdate is 'Последнее из�
 comment on column cf_app_mezhved_request.requesttype is 'Тип запроса: 0 - Подтверждение паспорта, 1 - Подтверждение родства';
 comment on column cf_app_mezhved_request.responsetype is 'Тип ответа: 0, - Не подтверждено, 1 - Подтверждено';
 comment on column cf_app_mezhved_request.responsedate is 'Дата ответа';
+
+-- 1080
+CREATE TABLE public.cf_mezhved_response_document (
+                                                     idofmezhvedresponse bigserial NOT NULL,
+                                                     requestid varchar(36) NOT NULL,
+                                                     benefit_category_id int8 NULL,
+                                                     "name" varchar NULL,
+                                                     series varchar NULL,
+                                                     "number" varchar NULL,
+                                                     issue_date int8 NULL,
+                                                     issuer varchar NULL,
+                                                     "type" int4 null,
+                                                     createdate int8 NULL,
+                                                     CONSTRAINT cf_mezhved_response_document_pk PRIMARY KEY (idofmezhvedresponse)
+);
+CREATE INDEX cf_mezhved_response_document_id_idx ON public.cf_mezhved_response_document (requestid);
+
+
+ALTER TABLE public.cf_applications_for_food_discount ADD startdate int8 NULL;
+ALTER TABLE public.cf_applications_for_food_discount ADD enddate int8 NULL;
