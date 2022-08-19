@@ -206,6 +206,14 @@ public class DAOUtils {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
+    public static Client findClientByMeshGuidAsGuardian(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("meshGUID", guid));
+        criteria.add(Restrictions.eq("idOfClientGroup", ClientGroup.Predefined.CLIENT_PARENTS));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
@@ -5888,4 +5896,11 @@ public class DAOUtils {
         }
     }
 
+    public static DulGuide getDulGuideByType(Session session, Integer documentType) {
+        Query q = session.createQuery("SELECT dg from DulGuide dg where dg.documentTypeId = :documentType");
+        q.setParameter("documentType", documentType.longValue());
+        q.setMaxResults(1);
+
+        return (DulGuide) q.getSingleResult();
+    }
 }

@@ -89,4 +89,16 @@ public class RestEasyInterceptor implements ContainerRequestFilter {
                     .build());
         }
     }
+
+    private void processInternalRestRequest(ContainerRequestContext requestContext) {
+        String apiKey = RuntimeContext.getInstance().getInternalRestApiKey();
+
+        String requestHeaderKey = requestContext.getHeaderString("X-Api-Key");
+
+        if (StringUtils.isEmpty(requestHeaderKey) || !requestHeaderKey.equals(apiKey)){
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
+                    .entity(ErrorResult.unauthorized())
+                    .build());
+        }
+    }
 }
