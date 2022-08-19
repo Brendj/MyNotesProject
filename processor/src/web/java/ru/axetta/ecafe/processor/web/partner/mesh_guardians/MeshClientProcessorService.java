@@ -222,7 +222,7 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client c = DAOUtils.findClientByMeshGuid(session, personGuid);
+            Client c = DAOUtils.findClientByMeshGuidAsGuardian(session, personGuid);
             if (c == null) {
                 throw new NotFoundException("Not found client by MESH-GUID: " + personGuid);
             }
