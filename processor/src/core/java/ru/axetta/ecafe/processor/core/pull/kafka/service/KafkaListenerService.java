@@ -1,12 +1,21 @@
 package ru.axetta.ecafe.processor.core.pull.kafka.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
+import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
@@ -16,6 +25,7 @@ public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
     private final KafkaServiceImpl kafkaService;
+    private static final Logger logger = LoggerFactory.getLogger(KafkaListenerService.class);
 
     public KafkaListenerService(ObjectMapper objectMapper,
                         KafkaServiceImpl kafkaService) {
@@ -37,20 +47,34 @@ public class KafkaListenerService {
 
     @Async
     public void parseResponseMessage(AbstractPullData data, String message) {
-        if (data instanceof ActiveBenefitCategoriesGettingResponse)
+        try {
+            if (data instanceof ActiveBenefitCategoriesGettingResponse) {
+                //Обработка информации о льготных категориях
+                ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
+                if (applicationForFood != null) {
+                    //Отправка запроса на проверку паспорта заявителя
+                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+                }
+            }
+            if (data instanceof PassportBySerieNumberValidityCheckingResponse) {
+                //Обработка информации о подтверждении паспорта
+                ApplicationForFood applicationForFood = kafkaService.processingPassportValidation(data, message);
+                if (applicationForFood != null) {
+                    //Отправка запроса на проверку родства
+                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                }
+            }
+            if (data instanceof RelatednessChecking2Response) {
+                //Обработка информации о подтверждении родства
+                ApplicationForFood applicationForFood = kafkaService.processingGuardianValidation(data, message);
+                if (applicationForFood != null) {
+                    //Исполнение заявления
+                    RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                }
+            }
+        } catch (Exception e)
         {
-            //Обработка информации о льготных категориях
-            kafkaService.processingActiveBenefitCategories(data, message);
-        }
-        if (data instanceof PassportBySerieNumberValidityCheckingResponse)
-        {
-            //Обработка информации о подтверждении паспорта
-            kafkaService.processingPassportValidation(data, message);
-        }
-        if (data instanceof RelatednessChecking2Response)
-        {
-            //Обработка информации о подтверждении родства
-            kafkaService.processingGuardianValidation(data, message);
+            logger.error("Error in parse Response for ZLP");
         }
     }
 }

@@ -18,14 +18,19 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitDocument
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class KafkaServiceImpl {
 
+    private static final ThreadLocal<SimpleDateFormat> format = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); }
+    };
+
     private final Logger logger = LoggerFactory.getLogger(KafkaServiceImpl.class);
 
-    public void processingActiveBenefitCategories(AbstractPullData data, String message)
+    public ApplicationForFood processingActiveBenefitCategories(AbstractPullData data, String message)
     {
         Session session = null;
         Transaction transaction = null;
@@ -37,7 +42,8 @@ public class KafkaServiceImpl {
 
             //Заполнение полей таблицы AppMezhvedRequest
             AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message, session);
-
+            //Флаг того, что хотябы один ЛК был подтвержден
+            boolean confirm = false;
             //Проставление статуса подтверждения для ЛК
             for (ApplicationForFoodDiscount applicationForFoodDiscount: appMezhvedRequest.getApplicationForFood().getDtisznCodes())
             {
@@ -46,7 +52,10 @@ public class KafkaServiceImpl {
                     if (Objects.equals(applicationForFoodDiscount.getDtisznCode(), Integer.valueOf(benefitCategoryInfo.getBenefit_category_id())))
                     {
                         applicationForFoodDiscount.setConfirmed(true);
+                        applicationForFoodDiscount.setStartDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_from()));
+                        applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_to()));
                         session.save(applicationForFoodDiscount);
+                        confirm = true;
                         break;
                     }
                 }
@@ -66,15 +75,19 @@ public class KafkaServiceImpl {
             }
             transaction.commit();
             transaction = null;
+            if (confirm)
+                return appMezhvedRequest.getApplicationForFood();
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
 
-    public void processingPassportValidation(AbstractPullData data, String message)
+    public ApplicationForFood processingPassportValidation(AbstractPullData data, String message)
     {
         Session session = null;
         Transaction transaction = null;
@@ -82,37 +95,43 @@ public class KafkaServiceImpl {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             PassportBySerieNumberValidityCheckingResponse passport = (PassportBySerieNumberValidityCheckingResponse) data;
-
             AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message, session);
-
+            ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
             {
                 //Если прошло более 5 дней с подачи запроса
-                appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                applicationForFood.setStatus(new ApplicationForFoodStatus(
                         ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
             }
             else {
                 if (passport.getPassportValidityInfo() != null &&
                         Objects.equals(passport.getPassportValidityInfo().getPassport_status_info().getPassport_status(), "Действителен")) {
-                    appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                    applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT));
+                    applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
-                    appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                    applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                    applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
             }
-            session.save(appMezhvedRequest.getApplicationForFood());
+            session.save(applicationForFood);
             transaction.commit();
             transaction = null;
+            if (applicationForFood.getDocConfirmed().equals(ApplicationForFoodMezhvedState.CONFIRMED))
+                return applicationForFood;
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
 
-    public void processingGuardianValidation(AbstractPullData data, String message)
+    public ApplicationForFood processingGuardianValidation(AbstractPullData data, String message)
     {
         Session session = null;
         Transaction transaction = null;
@@ -123,28 +142,36 @@ public class KafkaServiceImpl {
 
             AppMezhvedRequest appMezhvedRequest =
                     updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message, session);
-
+            ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
             {
                 //Если прошло более 5 дней с подачи запроса
-                appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                applicationForFood.setStatus(new ApplicationForFoodStatus(
                         ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
+
             }
             else {
                 if (relatednessChecking2Response.getRelatednessInfo() != null &&
                         relatednessChecking2Response.getRelatednessInfo().getRelatedness_confirmation().toLowerCase().equals("да")) {
-                    appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                    applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.INFORMATION_RESPONSE_GUARDIAN));
+                    applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
-                    appMezhvedRequest.getApplicationForFood().setStatus(new ApplicationForFoodStatus(
+                    applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                    applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
             }
-            session.save(appMezhvedRequest.getApplicationForFood());
+            session.save(applicationForFood);
             transaction.commit();
             transaction = null;
+            if (applicationForFood.getGuardianshipConfirmed().equals(ApplicationForFoodMezhvedState.CONFIRMED))
+                return applicationForFood;
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

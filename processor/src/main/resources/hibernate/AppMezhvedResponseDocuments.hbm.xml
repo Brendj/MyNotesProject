@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseDocument" table="cf_app_mezhved_request">
+    <class name="ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseDocument" table="cf_mezhved_response_document">
         <id name="idofmezhvedresponse" column="idofmezhvedresponse" type="long">
             <generator class="identity"/>
         </id>

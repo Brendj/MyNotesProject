@@ -300,6 +300,90 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
+    public void updateApplicationsForFoodKafkaService(ApplicationForFood applicationForFood) {
+        //Обновление заявления
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+            LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
+            //1052
+            ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING);
+            statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                    status.getApplicationForFoodState()));
+
+            //Назначение новых ЛК
+            Date fireTime = new Date();
+            Client client = applicationForFood.getClient();
+            Set<CategoryDiscount> oldDiscounts = client.getCategories();
+            Set<CategoryDiscount> newDiscounts;
+
+            List<Long> categoryDiscountsList = new ArrayList<Long>();
+
+            List<Long> discountCodes = new ArrayList<Long>(categoryDiscountsList);
+            Date min = new Date(0);
+            Date max = new Date(0);
+            for (ApplicationForFoodDiscount info : applicationForFood.getDtisznCodes()) {
+                if (!info.getConfirmed() || !CalendarUtils
+                        .betweenOrEqualDate(fireTime, info.getStartDate(), info.getEndDate())) {
+                    continue;
+                }
+
+                CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                        .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode().longValue());
+
+                if (null != categoryDiscountDSZN && null != categoryDiscountDSZN.getCategoryDiscount()) {
+                    if (!discountCodes.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
+                        discountCodes.add(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount());
+                        if (info.getStartDate().before(min))
+                            min = info.getStartDate();
+                        if (info.getEndDate().after(max))
+                            max = info.getEndDate();
+                    }
+                }
+            }
+
+            newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
+            Integer oldDiscountMode = client.getDiscountMode();
+            Integer newDiscountMode =
+                    newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+
+            if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                try {
+                    DiscountManager.renewDiscounts(session, client, newDiscounts, oldDiscounts,
+                            DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                } catch (Exception e) {
+                    logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()),
+                            e);
+                }
+            }
+
+            //1075
+            status = new ApplicationForFoodStatus(ApplicationForFoodState.OK);
+            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            applicationForFood = DAOUtils
+                    .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                            applicationVersion, historyVersion, true);
+            statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                    status.getApplicationForFoodState()));
+            applicationForFood.setDiscountDateStart(min);
+            applicationForFood.setDiscountDateEnd(max);
+            session.update(applicationForFood);
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+            service.sendStatusesAsync(statusList);
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in update ApplicationsForFoodKafkaService", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public void updateApplicationsForFoodTaskServiceNotification(String serviceNumber)
             throws Exception {
         Session session = null;
