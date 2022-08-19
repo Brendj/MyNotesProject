@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum EntityType {
     PERSON("person", null),
-    PERSON_AGENT("person_agent", "agent"),
+    PERSON_AGENT("person_agent", "agents"),
     PERSON_ADDRESS("person_address", "addresses"),
     PERSON_CONTACT("person_contact", "contacts"),
     PERSON_DOCUMENT("person_document", "documents"),

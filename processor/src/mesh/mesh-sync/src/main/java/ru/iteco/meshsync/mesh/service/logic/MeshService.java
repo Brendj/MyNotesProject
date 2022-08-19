@@ -160,7 +160,8 @@ public class MeshService {
             return CompletableFuture.completedFuture(true);
         }
 
-        if (entityChanges.getAction().equals(ActionType.create) || entityChanges.getAction().equals(ActionType.merge)) {
+        if (entityChanges.getEntity().equals(EntityType.PERSON) &&
+                (entityChanges.getAction().equals(ActionType.create) || entityChanges.getAction().equals(ActionType.merge))) {
             return CompletableFuture.completedFuture(true);
         }
 
@@ -171,18 +172,11 @@ public class MeshService {
         }
 
         try {
-            switch (entityChanges.getAction()) {
-                case update:
-                    PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
-                    internalGuardianService.updateClient(info);
-
-                    break;
-                case delete:
-                    internalGuardianService.deleteClient(entityChanges.getPersonGUID());
-
-                    break;
-                default:
-                    throw new UnknownActionTypeException();
+            if(entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
+                internalGuardianService.deleteClient(entityChanges.getPersonGUID());
+            } else {
+                PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
+                internalGuardianService.updateClient(info);
             }
 
             return CompletableFuture.completedFuture(true);
