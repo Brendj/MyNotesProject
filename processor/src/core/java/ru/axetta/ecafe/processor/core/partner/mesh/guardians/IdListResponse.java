@@ -6,6 +6,7 @@ public class IdListResponse extends MeshGuardianResponse {
 
     private List<AgentIdResponse> agentResponse;
     private List<DocumentIdResponse> documentResponse;
+    private List<ContactsIdResponse> contactResponse;
 
 
     public IdListResponse() {
@@ -58,5 +59,13 @@ public class IdListResponse extends MeshGuardianResponse {
 
     public void setDocumentResponse(List<DocumentIdResponse> documentResponse) {
         this.documentResponse = documentResponse;
+    }
+
+    public List<ContactsIdResponse> getContactResponse() {
+        return contactResponse;
+    }
+
+    public void setContactResponse(List<ContactsIdResponse> contactResponse) {
+        this.contactResponse = contactResponse;
     }
 }

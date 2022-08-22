@@ -70,4 +70,20 @@ public class MeshGuardianConverter {
                 .stream().map(a -> new DocumentIdResponse(a.getId(), a.getDocumentTypeId()))
                 .collect(Collectors.toList());
     }
+
+    public List<ContactsIdResponse> contactIdToDTO(ResponsePersons responsePersons) {
+        if (responsePersons.getDocuments() == null || responsePersons.getDocuments().isEmpty())
+            return new ArrayList<>();
+        return responsePersons.getContacts()
+                .stream().map(a -> new ContactsIdResponse(a.getId(), a.getTypeId()))
+                .collect(Collectors.toList());
+    }
+
+    public MeshContactResponse toContactDTO(Contact contact) {
+        return new MeshContactResponse(contact);
+    }
+
+    public MeshContactResponse toContactErrorDTO(ErrorResponse errorResponse) {
+        return new MeshContactResponse(new Integer(errorResponse.getErrorCode()), errorResponse.getErrorDescription());
+    }
 }
