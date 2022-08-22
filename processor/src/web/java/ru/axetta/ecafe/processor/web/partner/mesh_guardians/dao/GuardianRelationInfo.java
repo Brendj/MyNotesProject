@@ -5,7 +5,7 @@ import java.util.List;
 
 public class GuardianRelationInfo  implements IDAOEntity {
     private String childrenPersonGuid;
-    private List<String> guardianPersonGuids = new LinkedList<>();
+    private List<ClientInfo> guardianPersonGuids = new LinkedList<>();
 
     public String getChildrenPersonGuid() {
         return childrenPersonGuid;
@@ -15,11 +15,11 @@ public class GuardianRelationInfo  implements IDAOEntity {
         this.childrenPersonGuid = childrenPersonGuid;
     }
 
-    public List<String> getGuardianPersonGuids() {
+    public List<ClientInfo> getGuardianPersonGuids() {
         return guardianPersonGuids;
     }
 
-    public void setGuardianPersonGuids(List<String> guardianPersonGuids) {
+    public void setGuardianPersonGuids(List<ClientInfo> guardianPersonGuids) {
         this.guardianPersonGuids = guardianPersonGuids;
     }
 }

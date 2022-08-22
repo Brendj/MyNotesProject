@@ -8,15 +8,16 @@ import java.util.List;
 
 public class GuardianRelationDTO implements Serializable {
     private String childrenPersonGuid;
-    private List<String> guardianPersonGuids = new LinkedList<>();
+    private List<ClientRestDTO> guardianPersonGuids = new LinkedList<>();
 
-    public static GuardianRelationDTO build(String childrenPersonGuid, List<PersonAgent> guardians) {
+    public static GuardianRelationDTO build(String childrenPersonGuid, List<PersonAgent> guardians) throws Exception {
         GuardianRelationDTO dto = new GuardianRelationDTO();
 
         dto.childrenPersonGuid = childrenPersonGuid;
 
         for(PersonAgent g : guardians){
-            dto.guardianPersonGuids.add(g.getPersonId().toString());
+            ClientRestDTO clientDTO = ClientRestDTO.build(g.getAgentPerson());
+            dto.guardianPersonGuids.add(clientDTO);
         }
 
         return dto;
@@ -30,11 +31,11 @@ public class GuardianRelationDTO implements Serializable {
         this.childrenPersonGuid = childrenPersonGuid;
     }
 
-    public List<String> getGuardianPersonGuids() {
+    public List<ClientRestDTO> getGuardianPersonGuids() {
         return guardianPersonGuids;
     }
 
-    public void setGuardianPersonGuids(List<String> guardianPersonGuids) {
+    public void setGuardianPersonGuids(List<ClientRestDTO> guardianPersonGuids) {
         this.guardianPersonGuids = guardianPersonGuids;
     }
 }
