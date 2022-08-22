@@ -443,14 +443,10 @@ public class MeshService {
     }
 
     public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
-        if (!internalGuardianService.clientExist(personGUID)) {
-            log.warn("Children PersonGUID: " + personGUID + " not exists in ISPP DB!");
-            return;
-        }
         for (PersonAgent a : agents) {
             if (!internalGuardianService.clientExist(a.getPersonId().toString())) {
                 try {
-                    PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getPersonId().toString(), GUARDIAN_EXPAND);
+                    PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
                     internalGuardianService.createClientGuardian(personGUID, guardInfo);
                 } catch (Exception e) {
                     log.error("Exception> when try create guardian as client ISPP, personID: " + a.getPersonId(), e);
