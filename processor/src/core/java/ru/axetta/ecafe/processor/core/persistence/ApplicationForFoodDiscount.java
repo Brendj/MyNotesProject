@@ -12,6 +12,7 @@ public class ApplicationForFoodDiscount {
     private Boolean confirmed;
     private Date startDate;
     private Date endDate;
+    private Boolean appointedMSP;
 
     public ApplicationForFoodDiscount() {
 
@@ -85,5 +86,13 @@ public class ApplicationForFoodDiscount {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Boolean getAppointedMSP() {
+        return appointedMSP;
+    }
+
+    public void setAppointedMSP(Boolean appointedMSP) {
+        this.appointedMSP = appointedMSP;
     }
 }

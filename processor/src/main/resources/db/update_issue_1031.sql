@@ -5,6 +5,9 @@ create table cf_applications_for_food_discount(
     idofapplicationforfood bigint not null,
     dtiszncode integer,
     confirmed integer not null default 0,
+    startdate int8 NULL,
+    enddate int8 NULL,
+    appointedMSP integer NOT NULL DEFAULT 0,
     CONSTRAINT cf_applications_for_food_discount_pk PRIMARY KEY (idofappdiscount),
     CONSTRAINT cf_applications_for_food_discount_app FOREIGN KEY (idofapplicationforfood)
         REFERENCES cf_applications_for_food (idofapplicationforfood) MATCH SIMPLE
@@ -20,6 +23,10 @@ comment on table cf_applications_for_food_discount is 'Льготы по ЗЛП'
 comment on column cf_applications_for_food_discount.idofappdiscount is 'Первичный ключ';
 comment on column cf_applications_for_food_discount.idofapplicationforfood is 'Ссылка на заявление';
 comment on column cf_applications_for_food_discount.dtiszncode is 'Код льготы ДТиСЗН';
+comment on column cf_applications_for_food_discount.confirmed is 'Флаг подтвержденности льготы';
+comment on column cf_applications_for_food_discount.startdate is 'Начало действия';
+comment on column cf_applications_for_food_discount.enddate is 'Окончание действия';
+comment on column cf_applications_for_food_discount.appointedMSP is 'По льготе назначена МСП';
 
 insert into cf_applications_for_food_discount(idofapplicationforfood, dtiszncode)
 select idofapplicationforfood, dtiszncode from cf_applications_for_food;
@@ -93,6 +100,3 @@ CREATE TABLE public.cf_mezhved_response_document (
 );
 CREATE INDEX cf_mezhved_response_document_id_idx ON public.cf_mezhved_response_document (requestid);
 
-
-ALTER TABLE public.cf_applications_for_food_discount ADD startdate int8 NULL;
-ALTER TABLE public.cf_applications_for_food_discount ADD enddate int8 NULL;
