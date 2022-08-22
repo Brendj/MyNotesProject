@@ -249,7 +249,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
      */
     public MeshContactResponse savePersonContact(String meshGuid, Map<Integer, String> contacts) {
         IdListResponse contactListResponse = searchIdByMeshGuid(meshGuid);
-        MeshContactResponse meshContactResponse = new MeshContactResponse();
+        MeshContactResponse meshContactResponse = new MeshContactResponse().okResponse();
         if (!contactListResponse.getCode().equals(PersonListResponse.OK_CODE))
             return new MeshContactResponse(contactListResponse.getCode(), contactListResponse.message);
         for (Map.Entry<Integer, String> contact: contacts.entrySet()) {
