@@ -1037,7 +1037,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
 
-                    processClientGuardians(afterSaveClient, change.getOperation(),
+                    processClientGuardians(session, afterSaveClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, null);
                     break;
                 case DELETE_OPERATION:
@@ -1061,7 +1061,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
 
-                    processClientGuardians(dbClient, change.getOperation(),
+                    processClientGuardians(session, dbClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, null);
                     break;
                 case MOVE_OPERATION:
@@ -1104,7 +1104,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     dbClient.setUpdateTime(new Date());
                     session.save(dbClient);
 
-                    processClientGuardians(dbClient, change.getOperation(),
+                    processClientGuardians(session, dbClient, change.getOperation(),
                             clientsMobileHistory, clientGuardianHistory, beforeMigrateOrg.getIdOfOrg());
                     break;
                 case MODIFY_OPERATION:
@@ -1162,13 +1162,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public void processClientGuardians(
-            Client child, Integer operation, ClientsMobileHistory clientsMobileHistory,
+            Session session, Client child, Integer operation, ClientsMobileHistory clientsMobileHistory,
             ClientGuardianHistory clientGuardianHistory, Long beforeMigrateOrgId){
-        Session session = null;
-        Transaction transaction = null;
+
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
             if (operation.equals(CREATE_OPERATION)) {
                 processCreateOperationForGuardian(session, child, clientsMobileHistory, clientGuardianHistory);
             }
@@ -1197,15 +1194,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
             }
-            transaction.commit();
-            transaction = null;
         }
         catch (Exception ex) {
             logger.error("Error in processClientGuardians() : ", ex);
-        }
-        finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
         }
     }
 

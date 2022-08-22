@@ -1,6 +1,7 @@
 package ru.iteco.meshsync.mesh.service.logic.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.commons.collections4.CollectionUtils;
 import ru.iteco.client.model.PersonContact;
 import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
@@ -38,7 +39,11 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
-        dto.address = info.getAddresses().get(0).getAddress().getAddress();
+        if(CollectionUtils.isEmpty(info.getAddresses())){
+            throw new IllegalArgumentException("Addresses is empty, but this required parameter");
+        } else {
+            dto.address = info.getAddresses().get(0).getAddress().getAddress();
+        }
 
         PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
         dto.phone = phone == null ? null : phone.getData();
