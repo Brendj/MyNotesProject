@@ -118,7 +118,7 @@ public class DulDetailService {
         }
     }
 
-    private void validateDul(Session session, DulDetail dulDetail, boolean checkAnotherClient) throws Exception {
+    public void validateDul(Session session, DulDetail dulDetail, boolean checkAnotherClient) throws Exception {
         if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
             throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
         if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
@@ -127,7 +127,7 @@ public class DulDetailService {
             List<Long> ids = checkAnotherClient(session, dulDetail);
             if (!ids.isEmpty())
                 throw new DocumentExistsException(String
-                        .format("Персона c данным документом уже существует, идентификатор клиента: %s", ids.get(0)));
+                        .format("Персона c данным документом уже существует, идентификатор клиента: %s", ids.get(0)), ids.get(0));
         }
     }
 

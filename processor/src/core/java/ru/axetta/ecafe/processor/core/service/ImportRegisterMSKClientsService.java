@@ -1602,14 +1602,34 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         !guardian.getPerson().getSecondName().equals(guardianPerson.getSecondName())) {
                     guardian.getPerson().setFirstName(guardianPerson.getFirstName());
                     guardian.getPerson().setSurname(guardianPerson.getSurname());
-                    guardian.getPerson().setSecondName(guardianPerson.getSecondName());
+                    if(StringUtils.isNotEmpty(guardianPerson.getSecondName())) {
+                        guardian.getPerson().setSecondName(guardianPerson.getSecondName());
+                    }
+                    else {
+                        guardian.getPerson().setSecondName("");
+                    }
                 }
                 guardian.setSan(guardianPerson.getSnils());
                 guardian.setGender(guardianPerson.getIsppGender());
                 List<DulDetail> dulDetails = new ArrayList<>();
                 if (!guardianPerson.getDocument().isEmpty()) {
                     for (MeshDocumentResponse document : guardianPerson.getDocument()) {
-                        dulDetails.add(document.getDulDetail());
+                        DulDetail dulDetail = document.getDulDetail();
+                        try {
+                            RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                                    validateDul(session, dulDetail, true);
+                        }
+                        catch (DocumentExistsException ex) {
+                            if(!ex.getIdOfClient().equals(guardian.getIdOfClient())) {
+                                logger.error(ex.getMessage());
+                            }
+                            continue;
+                        }
+                        catch (Exception ex) {
+                            logger.error(ex.getMessage());
+                            continue;
+                        }
+                        dulDetails.add(dulDetail);
                     }
                     RuntimeContext.getAppContext().getBean(DulDetailService.class)
                             .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
