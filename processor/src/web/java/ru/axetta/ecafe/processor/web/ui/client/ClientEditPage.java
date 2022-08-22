@@ -1320,6 +1320,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             } else {
                 //Изменение представителя в МК
                 updateClientToMK();
+                //Изменение контактов представителя в МК
+                updateContactToMK();
             }
         }
 
@@ -1394,6 +1396,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
             logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
             throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));
+        }
+    }
+
+    private void updateContactToMK() throws Exception {
+        Map<Integer, String> contacts = new HashMap<>();
+        contacts.put(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, this.mobile);
+        contacts.put(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, this.email);
+        MeshContactResponse meshContactResponse = getMeshGuardiansService()
+                .savePersonContact(this.meshGUID, contacts);
+        if (meshContactResponse != null && !meshContactResponse.getCode().equals(GuardianResponse.OK)) {
+            logger.error(String.format("code: %s message: %s", meshContactResponse.getCode(), meshContactResponse.getMessage()));
+            throw new Exception(String.format("Ошибка изменения контактов представителя в МК: %s", meshContactResponse.getMessage()));
         }
     }
 

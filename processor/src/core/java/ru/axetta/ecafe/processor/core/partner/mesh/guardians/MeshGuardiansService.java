@@ -45,10 +45,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String DOCUMENT_CREATE_URL = "/persons/%s/documents";
     private static final String DOCUMENT_DELETE_URL = "/persons/%s/documents/%s";
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
-    private static final String CONTACT_DELETE_URL = "/persons/%s/contacts/%s";
+    private static final String CONTACT_CHANGE_URL = "/persons/%s/contacts/%s";
     public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
     public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,children";
-    public static final String ID_SEARCH_EXPAND = "agents,documents";
+    public static final String ID_SEARCH_EXPAND = "agents,documents,contacts";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
@@ -56,8 +56,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final Integer PASSPORT_TYPE_ID = 15;
     public static final String MK_ERROR = "Ошибка в МЭШ Контингент: %s";
     public static final Integer CONTACT_MOBILE_TYPE_ID = 1;
-    //todo проверить что CONTACT_EMAIL_TYPE_ID = 2
-    public static final Integer CONTACT_EMAIL_TYPE_ID = 2;
+    public static final Integer CONTACT_EMAIL_TYPE_ID = 3;
 
 
     private MeshGuardianConverter getMeshGuardianConverter() {
@@ -243,24 +242,106 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return guardian;
     }
 
-    public MeshGuardianResponse createPersonContact(String meshGuid, Integer typeId, String data, boolean defaultFlag) {
+    /**
+     * Принимаем контакты -> приходит пустой контакт или null?
+     * Нет. Ищем контакт (по типу) у персоны -> если контакт есть - меняем, иначе - создаем (изменение, создание)
+     * Да. Ищем контакт у персоны (по типу) -> если контакт есть - удаляем, иначе - ничего не делаем (удаление)
+     */
+    public MeshContactResponse savePersonContact(String meshGuid, Map<Integer, String> contacts) {
+        IdListResponse contactListResponse = searchIdByMeshGuid(meshGuid);
+        MeshContactResponse meshContactResponse = new MeshContactResponse();
+        if (!contactListResponse.getCode().equals(PersonListResponse.OK_CODE))
+            return new MeshContactResponse(contactListResponse.getCode(), contactListResponse.message);
+        for (Map.Entry<Integer, String> contact: contacts.entrySet()) {
+            contact.setValue(validateContact(contact.getKey(), contact.getValue()));
+            boolean isKeyAlreadyInMk = false;
+            for (ContactsIdResponse contactsIdResponse : contactListResponse.getContactResponse()) {
+                if (contactsIdResponse.getContactType().equals(contact.getKey())) {
+                    if (contact.getValue() == null || contact.getValue().isEmpty()) {
+                        meshContactResponse = deletePersonContact(meshGuid, contactsIdResponse.getContactId());
+                    } else {
+                        meshContactResponse = modifyPersonContact(meshGuid, contact.getKey(), contact.getValue(),
+                                contactsIdResponse.getContactId());
+                    }
+                    isKeyAlreadyInMk = true;
+                    break;
+                }
+            }
+            if (!isKeyAlreadyInMk && contact.getValue() != null && !contact.getValue().isEmpty()) {
+                meshContactResponse = createPersonContact(meshGuid, contact.getKey(), contact.getValue(),
+                        MeshGuardiansService.CONTACT_MOBILE_TYPE_ID.equals(contact.getKey()));
+            }
+            if (!meshContactResponse.getCode().equals(PersonListResponse.OK_CODE))
+                return new MeshContactResponse(meshContactResponse.getCode(), meshContactResponse.message);
+        }
+        return new MeshContactResponse().okResponse();
+    }
+
+    private String validateContact(Integer key, String value) {
+        if (Objects.equals(key, MeshGuardiansService.CONTACT_MOBILE_TYPE_ID)) {
+            if (value != null && !value.isEmpty()) {
+                return convertMobileToMK(value);
+            }
+        }
+        return value;
+    }
+
+    public MeshContactResponse createPersonContact(String meshGuid, Integer typeId, String data, boolean defaultFlag) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Contact parameter = buildPersonContact(meshGuid, typeId, data, defaultFlag);
             String json = objectMapper.writeValueAsString(parameter);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreateContactUrl(meshGuid), json);
-
             if (result.getCode() == HttpStatus.SC_OK) {
-                PersonDocument personDocument = objectMapper.readValue(result.getResponse(), PersonDocument.class);
-                return getMeshGuardianConverter().toDTO(personDocument).okResponse();
+                Contact contact = objectMapper.readValue(result.getResponse(), Contact.class);
+                return getMeshGuardianConverter().toContactDTO(contact).okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
-                return getMeshGuardianConverter().toDTO(errorResponse);
+                return getMeshGuardianConverter().toContactErrorDTO(errorResponse);
             }
         } catch (Exception e) {
             logger.error("Error in createPersonContact: ", e);
-            return new MeshDocumentResponse().internalErrorResponse();
+            return new MeshContactResponse().internalErrorResponse();
         }
+    }
+
+    public MeshContactResponse modifyPersonContact(String meshGuid, Integer typeId, String data, Integer id) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Contact parameter = buildEditPersonContact(meshGuid, typeId, data, id);
+            String json = objectMapper.writeValueAsString(parameter);
+            MeshResponseWithStatusCode result = meshRestClient.executePutMethod(buildChangeContactUrl(meshGuid, id), json);
+            if (result.getCode() == HttpStatus.SC_OK) {
+                Contact contact = objectMapper.readValue(result.getResponse(), Contact.class);
+                return getMeshGuardianConverter().toContactDTO(contact).okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toContactErrorDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in modifyPersonContact: ", e);
+            return new MeshContactResponse().internalErrorResponse();
+        }
+    }
+
+    public MeshContactResponse deletePersonContact(String meshGuid, Integer id) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildChangeContactUrl(meshGuid, id));
+            if (result.getCode() == HttpStatus.SC_OK) {
+                return new MeshContactResponse().okResponse();
+            } else {
+                ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);
+                return getMeshGuardianConverter().toContactErrorDTO(errorResponse);
+            }
+        } catch (Exception e) {
+            logger.error("Error in deletePersonContact: ", e);
+            return new MeshContactResponse().internalErrorResponse();
+        }
+    }
+
+    private String buildChangeContactUrl(String meshGuid, Integer id) {
+        return String.format(CONTACT_CHANGE_URL, meshGuid, id);
     }
 
     public MeshDocumentResponse createPersonDocument(String meshGuid, DulDetail dulDetail) {
@@ -340,7 +421,16 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         }
     }
 
-    Contact buildPersonContact(String personId, Integer typeId, String data, Boolean defaultFlag) {
+    private Contact buildEditPersonContact(String meshGuid, Integer typeId, String data, Integer id) {
+        Contact contact = new Contact();
+        contact.setId(id);
+        contact.setPersonId(meshGuid);
+        contact.setTypeId(typeId);
+        contact.setData(data);
+        return contact;
+    }
+
+    private Contact buildPersonContact(String personId, Integer typeId, String data, Boolean defaultFlag) {
         Contact contact = new Contact();
         contact.setId(0);
         contact.setPersonId(personId);
@@ -473,6 +563,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         contact.setPersonId(PERSON_ID_STUB);
         contact.setTypeId(typeId);
         contact.setData(value);
+        contact.setDefault(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID.equals(typeId));
         return contact;
     }
 
@@ -570,6 +661,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 IdListResponse idListResponse = new IdListResponse();
                 idListResponse.setAgentResponse(getMeshGuardianConverter().agentIdToDTO(responsePersons));
                 idListResponse.setDocumentResponse(getMeshGuardianConverter().documentIdToDTO(responsePersons));
+                idListResponse.setContactResponse(getMeshGuardianConverter().contactIdToDTO(responsePersons));
                 return idListResponse.okResponse();
             } else {
                 ErrorResponse errorResponse = objectMapper.readValue(result.getResponse(), ErrorResponse.class);

@@ -3120,7 +3120,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "patronymic") String patronymic,
             @WebParam(name = "birthDate") Date birthDate,
             @WebParam(name = "snils") String snils,
-            @WebParam(name = "genderId") Integer genderId) {
+            @WebParam(name = "genderId") Integer genderId,
+            @WebParam(name = "mobile") String mobile) {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3142,6 +3143,7 @@ public class FrontController extends HttpServlet {
             client.setSan(snils);
             client.setGender(genderId);
             client.setBirthDate(birthDate);
+            client.setMobile(mobile);
             persistenceSession.update(client);
 
             if (client.getMeshGUID() != null) {
@@ -3149,6 +3151,17 @@ public class FrontController extends HttpServlet {
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
                 if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                     return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                }
+
+                //Обновление контактов в мк
+                Map<Integer, String> contacts = new HashMap<>();
+                if (mobile != null && !mobile.isEmpty()) {
+                    contacts.put(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, mobile);
+                }
+                MeshContactResponse meshContactResponse = getMeshGuardiansService()
+                        .savePersonContact(client.getMeshGUID(), contacts);
+                if (!meshContactResponse.getCode().equals(MeshGuardianResponse.OK_CODE)) {
+                    return new GuardianResponse(meshContactResponse.getCode(), meshContactResponse.getMessage());
                 }
             }
             persistenceTransaction.commit();
