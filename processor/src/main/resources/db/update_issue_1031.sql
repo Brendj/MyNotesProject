@@ -100,3 +100,5 @@ CREATE TABLE public.cf_mezhved_response_document (
 );
 CREATE INDEX cf_mezhved_response_document_id_idx ON public.cf_mezhved_response_document (requestid);
 
+alter table cf_client_dtiszn_discount_info
+  add column appointedMSP integer;

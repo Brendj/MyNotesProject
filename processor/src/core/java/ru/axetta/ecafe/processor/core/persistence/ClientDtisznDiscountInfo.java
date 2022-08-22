@@ -26,6 +26,7 @@ public class ClientDtisznDiscountInfo {
     private String source;
     private Boolean sendnotification;
     private Date archiveDate;
+    private Date appointedMSP;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
             Date dateStart, Date dateEnd, Date createdDate, String source, Long version) {
@@ -182,5 +183,13 @@ public class ClientDtisznDiscountInfo {
 
     public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
+    }
+
+    public Date getAppointedMSP() {
+        return appointedMSP;
+    }
+
+    public void setAppointedMSP(Date appointedMSP) {
+        this.appointedMSP = appointedMSP;
     }
 }
