@@ -72,7 +72,7 @@ public class MeshGuardianConverter {
     }
 
     public List<ContactsIdResponse> contactIdToDTO(ResponsePersons responsePersons) {
-        if (responsePersons.getDocuments() == null || responsePersons.getDocuments().isEmpty())
+        if (responsePersons.getContacts() == null || responsePersons.getContacts().isEmpty())
             return new ArrayList<>();
         return responsePersons.getContacts()
                 .stream().map(a -> new ContactsIdResponse(a.getId(), a.getTypeId()))
