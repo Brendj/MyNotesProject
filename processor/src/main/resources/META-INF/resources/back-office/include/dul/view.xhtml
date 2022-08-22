@@ -8,13 +8,20 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <rich:popupPanel modal="true" id="modalDulViewPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:popupPanel modal="true" id="modalDulViewPanel" autosized="true" minHeight="300" headerClass="modal-panel-header">
         <rich:hotKey key="esc" handler="#{rich:component('modalDulViewPanel')}.hide();return false;"/>
         <f:facet name="header">
-            <h:outputText escape="true" value="Список документов"/>
+            <h:outputText escape="true" value="#{mainPage.dulViewPage.header}"/>
         </f:facet>
         <h:form id="modalDulViewForm"
                 styleClass="borderless-form" eventsQueue="modalDulViewFormEventsQueue">
+            <h:panelGrid columns="3" styleClass="borderless-grid">
+                <h:outputText escape="true" value="СНИЛС" styleClass="output-text-strong"/>
+                <h:outputText escape="true" value="#{mainPage.dulViewPage.meshGuardianPerson.snils}" converter="dulNumberConverter"
+                              styleClass="output-text-strong"/>
+                <h:graphicImage value="/images/taloons/applied.png"
+                                rendered="#{mainPage.dulViewPage.meshGuardianPerson.validationStateId == 1}"/>
+            </h:panelGrid>
             <table class="borderless-grid" width="100%">
                 <tr>
                     <td style="text-align: center;">
@@ -32,20 +39,20 @@
                                 <f:facet name="header">
                                     <h:outputText escape="true" styleClass="" value="Документ"/>
                                 </f:facet>
-                                <h:outputText escape="true" value="#{item.documentTypeId}" converter="dulTypeConverter"
+                                <h:outputText escape="true" value="#{item.documentName}"
                                               styleClass="output-text"/>
                             </rich:column>
                             <rich:column headerClass="column-header">
                                 <f:facet name="header">
                                     <h:outputText escape="true" styleClass="" value="Серия документа"/>
                                 </f:facet>
-                                <h:outputText escape="true" value="#{item.series}" styleClass="output-text"/>
+                                <h:outputText escape="true" value="#{item.series}" converter="dulNumberConverter" styleClass="output-text"/>
                             </rich:column>
                             <rich:column headerClass="column-header">
                                 <f:facet name="header">
                                     <h:outputText escape="true" styleClass="" value="Номер документа"/>
                                 </f:facet>
-                                <h:outputText escape="true" value="#{item.number}" styleClass="output-text"/>
+                                <h:outputText escape="true" value="#{item.number}" converter="dulNumberConverter" styleClass="output-text"/>
                             </rich:column>
                             <rich:column headerClass="column-header">
                                 <f:facet name="header">
@@ -55,7 +62,7 @@
                             </rich:column>
                             <rich:column headerClass="column-header">
                                 <f:facet name="header">
-                                    <h:outputText escape="true" styleClass="" value="Истечение срока деуйствия"/>
+                                    <h:outputText escape="true" styleClass="" value="Истечение срока действия"/>
                                 </f:facet>
                                 <h:outputText escape="true" value="#{item.expiration}" converter="dateConverter"
                                               styleClass="output-text"/>
@@ -100,7 +107,6 @@
                 <tr>
                     <td style="text-align: right;">
                         <h:panelGroup styleClass="borderless-div">
-
                             <a4j:commandButton value="Закрыть" action="#{mainPage.completeDulViewSelection}"
                                                render="#{mainPage.topMostPage.pageComponent.id}"
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulViewPanel')}.hide();"

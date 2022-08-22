@@ -1156,7 +1156,7 @@ public class ClientManager {
             dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
 
             RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                    .validateAndSaveDulDetails(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
+                    .saveDulOnlyISPP(session, Collections.singletonList(dulDetail), clientGuardianToSave.getIdOfClient());
         }
 
         RuntimeContext.getInstance().getClientContractIdGenerator().updateUsedContractId(session, contractIdGuardian, org.getIdOfOrg());
@@ -2040,7 +2040,7 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), false);
         }
     }
 
@@ -2498,7 +2498,7 @@ public class ClientManager {
         session.save(clientGroupMigrationHistory);
         if (full) {
             disableGuardianshipIfClientLeaving(session, client, idOfClientGroup, clientGuardianHistory);
-            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+//            archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
         }
     }
 
@@ -2609,11 +2609,15 @@ public class ClientManager {
 
     //todo уточнить как найти представителя
     public static boolean isClientGuardian(Session session, Client client) {
+        if (client.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
+            return false;
+        if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_DELETED.getValue()))
+            return false;
+
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", client.getIdOfClient()));
         criteria.add(Restrictions.ne("deletedState", true));
-        criteria.add(Restrictions.eq("disabled", false));
-        return !criteria.list().isEmpty() || client.getIdOfClientGroup() > 1000000000L;
+        return !criteria.list().isEmpty();
     }
 
     @SuppressWarnings("unchecked")
@@ -2669,6 +2673,7 @@ public class ClientManager {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.createAlias("person","p", JoinType.INNER_JOIN);
         criteria.add(Restrictions.gt("idOfClientGroup", 1000000000L));
+        criteria.add(Restrictions.eq("dontShowToExternal", false));
         criteria.add(Restrictions.isNotNull("meshGUID"));
         Conjunction conjunction = Restrictions.conjunction();
         Disjunction disjunction = Restrictions.disjunction();
@@ -2681,8 +2686,9 @@ public class ClientManager {
         if (patronymic != null) {
             conjunction.add(Restrictions.ilike("p.secondName", patronymic, MatchMode.ANYWHERE));
         }
-        disjunction.add(conjunction);
-
+        if (firstName != null || lastName != null || patronymic != null) {
+            disjunction.add(conjunction);
+        }
         if (mobile != null) {
             disjunction.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobile), MatchMode.ANYWHERE));
         }
@@ -2736,6 +2742,20 @@ public class ClientManager {
                 return;
             throw new Exception("Сочетание Фамилия + имя + телефон должны быть уникальными. " +
                     "Сочетание Фамилия + Имя + электронная почта должны быть уникальными");
+        }
+    }
+
+    public static Client findClientByMeshGuid(Session session, String meshGUID) {
+        if (meshGUID == null || meshGUID.isEmpty())
+            return null;
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.eq("meshGUID", meshGUID));
+        return (Client) clientCriteria.uniqueResult();
+    }
+
+    public static void validateEmail(String email) throws Exception {
+        if (!Pattern.matches("(^;|^,|\\S){1,}@([a-z0-9\\-\\_.]|[а-я]){1,}.([a-z]{2,6}|рф|рус|бел|москва|укр|онлайн|ею|бг|сайт|срб|дети|каз|мкд|мон|орг|ком|католик)", email)) {
+            throw new Exception("Неверный формат электронной почты");
         }
     }
 

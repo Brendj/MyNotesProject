@@ -180,7 +180,13 @@
                                                  styleClass="output-text"/>
                     </h:panelGrid>
                     <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                        <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text"/>
+                        <h:outputText escape="true" value="Роль представителя:" styleClass="output-text"/>
+                        <h:selectOneMenu value="#{clientWard.representativeType}" styleClass="input-text">
+                            <f:selectItems value="#{mainPage.clientCreatePage.representativeList}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                        <h:outputText escape="true" value="Степень родства:" styleClass="output-text"/>
                         <h:selectOneMenu value="#{clientWard.relation}"
                                          disabled="#{!mainPage.clientCreatePage.isParentGroup()}"
                                          styleClass="input-text">
@@ -369,132 +375,20 @@
                                  styleClass="input-text"/>
             </h:panelGrid>
 
-            <h:panelGrid rendered="#{mainPage.clientCreatePage.isParentGroup()}" styleClass="borderless-grid">
-                <h:outputText escape="true" value="Представители" styleClass="output-text"/>
-            </h:panelGrid>
 
-            <h:panelGrid id="meshPersonSelectorPanel" rendered="#{mainPage.clientCreatePage.isParentGroup()}"
-                         styleClass="borderless-grid">
-                <rich:dataTable width="100%" align="center" id="meshPersonSelectorTable"
-                                value="#{mainPage.clientCreatePage.meshGuardianPersonList}" var="item" rows="20"
-                                footerClass="data-table-footer" columnClasses="left-aligned-column, left-aligned-column,
-                        left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
-                        left-aligned-column, center-aligned-column, center-aligned-column"
-                                rowClasses="select-panel-row" onrowmouseover="this.style.backgroundColor='#e6e6e6'"
-                                onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
-                                onrowclick="#{rich:element('detail')}.click();">
-
-                    <rich:column width="1">
-                        <f:facet name="header">
-                            <h:outputText escape="true" value=""/>
-                        </f:facet>
-                        <a4j:commandButton id="detail" execute="@this" value="" style="display: none;"
-                                           render="meshPersonSelectorTable">
-                            <f:setPropertyActionListener value="#{item}"
-                                                         target="#{mainPage.clientCreatePage.meshGuardianPerson}"/>
-                        </a4j:commandButton>
-                    </rich:column>
-
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Фамилия"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.surname}" styleClass="output-text"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Имя"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.firstName}" styleClass="output-text"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Отчество"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.secondName}" styleClass="output-text"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Пол"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.meshGender}" styleClass="output-text"
-                                      converter="genderTypeConverter"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Дата рождения"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.birthDate}" datePattern="dd.MM.yyyy"
-                                      converter="dateConverter" styleClass="output-text" showWeeksBar="false"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Номер телефона"/>
-                        </f:facet>
-                        <h:outputText escape="true" value="#{item.mobile}" styleClass="output-text"
-                                      showWeeksBar="false"/>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Документы"/>
-                        </f:facet>
-                        <a4j:commandButton value="Открыть" action="#{mainPage.showDulViewPage}"
-                                           render="modalDulViewPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulViewPanel')}.show();"
-                                           styleClass="command-link">
-                            <f:setPropertyActionListener value="#{item}"
-                                                         target="#{mainPage.dulViewPage.meshGuardianPerson}"/>
-                        </a4j:commandButton>
-                    </rich:column>
-                    <rich:column headerClass="column-header">
-                        <f:facet name="header">
-                            <h:outputText escape="true" styleClass="" value="Наличие в ИСПП"/>
-                        </f:facet>
-                        <h:graphicImage value="/images/taloons/applied.png"
-                                        rendered="#{item.alreadyInISPP}"/>
-                    </rich:column>
-
-                    <f:facet name="footer">
-                        <div align="center">
-                            <h:panelGrid columns="1" id="selectedMeshPerson">
-                                <h:outputText styleClass="text" escape="true"
-                                              value="#{mainPage.clientCreatePage.meshGuardianPersonStr}"/>
-                            </h:panelGrid>
-                            <h:panelGrid columns="3">
-                                <a4j:commandButton disabled="#{mainPage.clientCreatePage.disableLinkPersonKey}"
-                                                   value="Сделать представителем"
-                                                   action="#{mainPage.addGuardianToClient()}"
-                                                   render="clientCreatePanel"
-                                                   styleClass="command-link">
-                                </a4j:commandButton>
-                                <a4j:commandButton value="Обратиться в ТП"
-                                                   render="clientCreatePanel"
-                                                   styleClass="command-link">
-                                </a4j:commandButton>
-                                <a4j:commandButton disabled="#{mainPage.clientCreatePage.disableCreatePersonKey}"
-                                                   value="Создать представителя" action="#{mainPage.createClient()}"
-                                                   render="clientCreatePanel"
-                                                   styleClass="command-link">
-                                </a4j:commandButton>
-                            </h:panelGrid>
-                        </div>
-                    </f:facet>
-                </rich:dataTable>
-            </h:panelGrid>
             <f:facet name="footer">
-                <h:panelGrid id="searchPersonPanel" styleClass="borderless-grid">
+                <h:panelGrid id="searchPersonPanel" columns="2" styleClass="borderless-grid">
                     <a4j:commandButton
-                            value="Найти представителя в МК" rendered="#{mainPage.clientCreatePage.isParentGroup()}"
-                            action="#{mainPage.searchMeshPerson()}"
-                            render="meshPersonSelectorTable, meshPersonSelectorPanel"
-                            styleClass="command-link">
-                    </a4j:commandButton>
-
-                    <a4j:commandButton
-                            rendered="#{!mainPage.clientCreatePage.isParentGroup()}"
                             value="Зарегистрировать нового клиента" action="#{mainPage.createClient()}"
                             render="clientCreatePanel,foundClientPanel" styleClass="command-button"/>
+
+                    <a4j:status>
+                        <f:facet name="start">
+                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                        </f:facet>
+                    </a4j:status>
                 </h:panelGrid>
+
             </f:facet>
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">

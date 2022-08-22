@@ -450,8 +450,16 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(session));
             List<DulDetail> dulDetails = new ArrayList<>(client.getDulDetail());
             dulDetails.forEach(d -> d.setDeleteState(true));
+            if (ClientManager.isClientGuardian(session, client)) {
+                for (DulDetail dulDetail : dulDetails) {
+                    dulDetailService.deleteDulDetail(session, dulDetail, client, true);
+                }
+            } else {
+                for (DulDetail dulDetail : dulDetails) {
+                    dulDetailService.deleteDulDetail(session, dulDetail, client, false);
+                }
+            }
             session.update(client);
-            dulDetailService.validateAndSaveDulDetails(session, dulDetails, client.getIdOfClient());
             tr.commit();
             tr = null;
         } catch (Exception ex) {

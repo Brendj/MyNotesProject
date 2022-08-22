@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
-import org.opensaml.xml.signature.G;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
@@ -2793,19 +2792,23 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (documentItem== null || documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
+                    || documentItem.getNumber() == null) {
+                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+
             Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
 
             if (client == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            if (documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
-                    || documentItem.getNumber() == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
-            }
+
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.saveDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .saveDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2840,18 +2843,19 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if (documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
+            if (documentItem == null || documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
                     || documentItem.getNumber() == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
-            if (persistenceSession.load(DulDetail.class, documentItem.getIdDocument()) == null) {
+            if (persistenceSession.get(DulDetail.class, documentItem.getIdDocument()) == null) {
                 return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
                         DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.updateDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .updateDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2891,7 +2895,8 @@ public class FrontController extends HttpServlet {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
-            MeshDocumentResponse meshDocumentResponse = dulDetailService.deleteDulDetail(persistenceSession, dulDetail, client);
+            MeshDocumentResponse meshDocumentResponse = dulDetailService
+                    .deleteDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -3021,7 +3026,8 @@ public class FrontController extends HttpServlet {
     private boolean checkSearchMeshPerson(String firstName, String lastName, Integer genderId,
                                           Date birthDate, String snils, List<DocumentItem> documents) {
         return StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || (snils == null && (documents == null || documents.isEmpty()));
+                || birthDate == null || (snils == null && (documents == null || documents.isEmpty() ||
+                checkDocumentsForRequiredFields(documents)));
     }
 
     @WebMethod(operationName = "createMeshPerson")
@@ -3042,7 +3048,7 @@ public class FrontController extends HttpServlet {
                                                      @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
         try {
             if (checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
-                    relation, typeOfLegalRepresent, informing)) {
+                    relation, typeOfLegalRepresent, informing, documents)) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             List<DulDetail> dulDetails = new ArrayList<>();
@@ -3051,7 +3057,7 @@ public class FrontController extends HttpServlet {
                     dulDetails.add(getDulDetailFromDocumentItem(item));
                 }
             }
-            if (DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
+            if (snils != null && !snils.isEmpty() && DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
             MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
@@ -3276,10 +3282,19 @@ public class FrontController extends HttpServlet {
 
     private boolean checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                     Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
-                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing) throws FrontControllerException {
+                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing, List<DocumentItem> documents) throws FrontControllerException {
         return idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
-                || birthDate == null || StringUtils.isEmpty(snils) || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
-                || relation == null || typeOfLegalRepresent == null || informing == null;
+                || birthDate == null || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
+                || relation == null || typeOfLegalRepresent == null || informing == null ||
+                (StringUtils.isEmpty(snils) && (documents == null || documents.isEmpty() ||
+                        checkDocumentsForRequiredFields(documents)));
+    }
+
+    private boolean checkDocumentsForRequiredFields(List<DocumentItem> documents) {
+        for (DocumentItem document : documents)
+            if (document.getDocumentTypeId() == null || document.getNumber() == null)
+                return true;
+        return false;
     }
 
     private List<GuardianItem> fillingGuardianResponse(PersonListResponse personListResponse) {
@@ -3289,7 +3304,7 @@ public class FrontController extends HttpServlet {
             guardianItem.setLastName(r.getSurname());
             guardianItem.setFirstName(r.getFirstName());
             guardianItem.setPatronymic(r.getSecondName());
-            guardianItem.setGender(r.getIsppGender());
+            guardianItem.setGender(r.getMeshGender());
             guardianItem.setBirthDate(r.getBirthDate());
             guardianItem.setSnils(r.getSnils());
             guardianItem.setMobile(r.getMobile());
@@ -3319,16 +3334,14 @@ public class FrontController extends HttpServlet {
     }
 
     private DulDetail fillingDulDetail(Session session, DocumentItem documentItem) {
-        DulDetail dulDetail;
+        DulDetail dulDetail = new DulDetail();
         Date currentDate = new Date();
-        if (documentItem.getIdDocument() == null) {
-            dulDetail = new DulDetail();
-            dulDetail.setCreateDate(currentDate);
-            dulDetail.setDeleteState(false);
-        } else
+        if (documentItem.getIdDocument() != null) {
             dulDetail = session.get(DulDetail.class, documentItem.getIdDocument());
-        if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L)
+        }
+        if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L) {
             dulDetail.setIdOfClient(documentItem.getIdOfClient());
+        }
         dulDetail.setDocumentTypeId(documentItem.getDocumentTypeId());
         dulDetail.setSeries(documentItem.getSeries());
         dulDetail.setNumber(documentItem.getNumber());

@@ -332,7 +332,7 @@
                 <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
             </h:panelGrid>
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                <h:outputText escape="true" value="Полномочия:" styleClass="output-text" />
+                <h:outputText escape="true" value="Роль представителя:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientGuardian.representativeStr}" styleClass="output-text" />
             </h:panelGrid>
 
@@ -405,12 +405,16 @@
                 <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
             </h:panelGrid>
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
-                <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text" />
+                <h:outputText escape="true" value="Роль представителя:" styleClass="output-text"/>
+                <h:outputText escape="true" value="#{clientWard.representativeStr}" styleClass="output-text" />
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Степень родства:" styleClass="output-text" />
                 <h:outputText escape="true" value="#{clientWard.relationStr}" styleClass="output-text" />
             </h:panelGrid>
             <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
                 <h:outputText escape="true" value="Вид представительства:" styleClass="output-text" />
-                <h:outputText escape="true" value="#{clientGuardian.roleStr}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{clientWard.roleStr}" styleClass="output-text" />
             </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">
