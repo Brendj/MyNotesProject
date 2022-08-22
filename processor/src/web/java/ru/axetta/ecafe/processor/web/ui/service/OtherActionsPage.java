@@ -412,11 +412,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
                 RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class)
                         .loadNSIFile();
             }
-            if (mode.equals(MODE_SYMMETRIC)) {
-                RuntimeContext.getAppContext()
-                        .getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class)
-                        .loadClientsFromSymmetric();
-            }
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load NSI file: ", e);

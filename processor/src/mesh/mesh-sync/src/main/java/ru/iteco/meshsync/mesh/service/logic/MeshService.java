@@ -442,7 +442,7 @@ public class MeshService {
         return allEdu.get(0);
     }
 
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
+    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
         for (PersonAgent a : agents) {
             if (!internalGuardianService.clientExist(a.getPersonId().toString())) {
                 try {

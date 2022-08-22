@@ -125,7 +125,7 @@ public class InternalGuardianService {
         }
     }
 
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
+    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
         GuardianRelationDTO dto = GuardianRelationDTO.build(personGUID, agents);
 
         HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);

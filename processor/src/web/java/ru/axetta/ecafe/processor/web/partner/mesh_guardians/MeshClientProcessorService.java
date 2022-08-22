@@ -262,11 +262,11 @@ public class MeshClientProcessorService {
                 throw new NotFoundException("Not found client by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             }
 
-            for(String guardianMeshGuid : guardianRelationInfo.getGuardianPersonGuids()) {
-                Client guardian = DAOUtils.findClientByMeshGuid(session, guardianMeshGuid);
+            for(ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
+                Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
                 if(guardian == null){
-                    log.error("Not found guardian by MESH-GUID: " + guardianMeshGuid);
+                    this.registryClient(meshGuardian, session, clientGuardianHistory);
                     continue;
                 }
 
