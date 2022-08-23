@@ -2782,7 +2782,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "createDocumentForClient")
-    public DocumentResponse createDocumentForClient(
+    public DocumentCreateResponse createDocumentForClient(
             @WebParam(name = "documentItem") DocumentItem documentItem) {
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
@@ -2795,22 +2795,19 @@ public class FrontController extends HttpServlet {
 
             if (documentItem== null || documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
                     || documentItem.getNumber() == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentCreateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
-
             Client client = persistenceSession.get(Client.class, documentItem.getIdOfClient());
-
             if (client == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_CLIENT_NOT_FOUND,
-                        DocumentResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .saveDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
-                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+                return new DocumentCreateResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
             idOfDocument = meshDocumentResponse.getId();
             persistenceTransaction.commit();
@@ -2819,22 +2816,20 @@ public class FrontController extends HttpServlet {
         } catch (Exception e) {
             logger.error("Error in createDocumentForClient", e);
             if (e instanceof DocumentExistsException) {
-                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
             } else {
-                return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                        DocumentResponse.ERROR_INTERNAL_MESSAGE);
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_INTERNAL,
+                        DocumentCreateResponse.ERROR_INTERNAL_MESSAGE);
             }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        DocumentItem documentResponse = new DocumentItem();
-        documentResponse.setIdDocument(idOfDocument);
-        return new DocumentResponse(Collections.singletonList(documentResponse));
+        return new DocumentCreateResponse(idOfDocument);
     }
 
     @WebMethod(operationName = "updateDocumentForClient")
-    public DocumentResponse updateDocumentForClient(
+    public DocumentUpdateResponse updateDocumentForClient(
             @WebParam(name = "documentItem") DocumentItem documentItem) {
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
@@ -2845,36 +2840,36 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
             if (documentItem == null || documentItem.getIdDocument() == null || documentItem.getDocumentTypeId() == null
                     || documentItem.getNumber() == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentUpdateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             if (persistenceSession.get(DulDetail.class, documentItem.getIdDocument()) == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
-                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_DOCUMENT_NOT_FOUND,
+                        DocumentUpdateResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .updateDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
-                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+                return new DocumentUpdateResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in updateDocumentForClient", e);
-            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                    DocumentResponse.ERROR_INTERNAL_MESSAGE);
+            return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_INTERNAL,
+                    DocumentUpdateResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+        return new DocumentUpdateResponse().okResponse();
     }
 
     @WebMethod(operationName = "deleteDocumentForClient")
-    public DocumentResponse deleteDocumentForClient(
+    public DocumentDeleteResponse deleteDocumentForClient(
             @WebParam(name = "idDocument") Long idDocument) {
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
@@ -2884,13 +2879,13 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (idDocument == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
-                        DocumentResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+                return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                        DocumentDeleteResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             DulDetail dulDetail = persistenceSession.get(DulDetail.class, idDocument);
             if (dulDetail == null) {
-                return new DocumentResponse(DocumentResponse.ERROR_DOCUMENT_NOT_FOUND,
-                        DocumentResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
+                return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_DOCUMENT_NOT_FOUND,
+                        DocumentDeleteResponse.ERROR_DOCUMENT_NOT_FOUND_MESSAGE);
             }
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
@@ -2898,20 +2893,20 @@ public class FrontController extends HttpServlet {
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .deleteDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
-                return new DocumentResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
+                return new DocumentDeleteResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in deleteDocumentForClient", e);
-            return new DocumentResponse(DocumentResponse.ERROR_INTERNAL,
-                    DocumentResponse.ERROR_INTERNAL_MESSAGE);
+            return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_INTERNAL,
+                    DocumentDeleteResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
+        return new DocumentDeleteResponse().okResponse();
     }
 
     @WebMethod(operationName = "getDocumentForClient")

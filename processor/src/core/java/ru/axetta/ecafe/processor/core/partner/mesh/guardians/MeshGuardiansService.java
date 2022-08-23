@@ -371,6 +371,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             if (!idListResponse.getCode().equals(IdListResponse.OK_CODE))
                 return new MeshDocumentResponse(idListResponse.code, idListResponse.message);
             Integer id = idListResponse.getDocumentResponse().get(0).getDocumentId();
+            if (id == 0)
+                return new MeshDocumentResponse().okResponse();
             MeshResponseWithStatusCode result = meshRestClient.executeDeleteMethod(buildDeleteAndModifyDocumentUrl(meshGuid, id));
             if (result.getCode() == HttpStatus.SC_OK) {
                 return new MeshDocumentResponse().okResponse();
@@ -711,6 +713,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                 if (agentResponse.getAgentMeshGuid().equals(agentMeshGuid))
                     id = agentResponse.getAgentId();
             }
+            if (id == 0)
+                return new MeshAgentResponse().okResponse();
             MeshResponseWithStatusCode result = meshRestClient
                     .executeDeleteMethod(buildDeleteGuardianToClientUrl(childMeshGuid, id.toString()));
             if (result.getCode() == HttpStatus.SC_OK) {
