@@ -10,7 +10,7 @@ public class EnterEventData extends AbstractPushData {
     private String personId;
     private Integer staffId;
     private Integer admittedByStaffId;
-    private Integer agentId;
+    private String agentId;
     private Integer organizationId;
     private String organizationName;
     private String ticketStatus;
@@ -70,11 +70,11 @@ public class EnterEventData extends AbstractPushData {
         this.admittedByStaffId = admittedByStaffId;
     }
 
-    public Integer getAgentId() {
+    public String getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(Integer agentId) {
+    public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
 
