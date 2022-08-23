@@ -1615,21 +1615,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (!guardianPerson.getDocument().isEmpty()) {
                     for (MeshDocumentResponse document : guardianPerson.getDocument()) {
                         DulDetail dulDetail = document.getDulDetail();
-                        try {
-                            RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                                    validateDul(session, dulDetail, true);
+                        if(!RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                                .documentExists(session, guardian, dulDetail)) {
+                            dulDetails.add(dulDetail);
                         }
-                        catch (DocumentExistsException ex) {
-                            if(!ex.getIdOfClient().equals(guardian.getIdOfClient())) {
-                                logger.error(ex.getMessage());
-                            }
-                            continue;
-                        }
-                        catch (Exception ex) {
-                            logger.error(ex.getMessage());
-                            continue;
-                        }
-                        dulDetails.add(dulDetail);
                     }
                     RuntimeContext.getAppContext().getBean(DulDetailService.class)
                             .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
