@@ -69,8 +69,7 @@ public class MeshService {
     private static final List<EntityType> acceptablyChangesForGuardian = Arrays.asList(
             EntityType.PERSON,
             EntityType.PERSON_CONTACT,
-            EntityType.PERSON_DOCUMENT,
-            EntityType.PERSON_ADDRESS
+            EntityType.PERSON_DOCUMENT
     );
 
     private final PersonRepo personRepo;
