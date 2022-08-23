@@ -1642,7 +1642,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         session, child.getIdOfClient(), guardian.getIdOfClient());
                 if (clientGuardian == null) {
                     clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
-                            session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(), ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                            session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
+                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
                             ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
                 }
                 else {
@@ -1674,7 +1675,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         clientsMobileHistory);
 
                 ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
-                        session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(), ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                        session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
+                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
                         ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
             }
         }
