@@ -4070,6 +4070,11 @@ public class DAOUtils {
         }
     }
 
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoFullList(Session session) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        return criteria.list();
+    }
+
     public static ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(Session session, Client client,
             Long code) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
@@ -4919,7 +4924,7 @@ public class DAOUtils {
             str += "and codes.dtisznCode is null ";
         }
         if (!StringUtils.isEmpty(guid)) {
-            str += "and clmeshGUID = :guid";
+            str += "and cl.meshGUID = :guid";
         }
         Query query = session.createQuery(str);
         query.setParameter("status", status);

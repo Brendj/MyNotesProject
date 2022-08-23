@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -17,10 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DiscountManager {
 
@@ -29,6 +27,7 @@ public class DiscountManager {
     public static final String DELETE_INOE_COMMENT = "Удалено по причине окончания периода";
     public static final String RESERV_DISCOUNT = "Резерв";
     private static final String PROPERTY_DOU_DISCOUNT_DELETE = "ecafe.processor.clientMigrationHistory.dou.discountDelete";
+    private static Map<Integer, Integer> discountPriorityMap = null;
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
@@ -173,6 +172,35 @@ public class DiscountManager {
             if (null != food) {
                 archiveApplicationForFood(session, food, applicationForFoodVersion);
             }
+        }
+    }
+
+    public static Integer getDiscountPriority(Long dsznCode) {
+        if (discountPriorityMap == null) {
+            discountPriorityMap = new HashMap<>();
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
+            for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
+                discountPriorityMap.put(categoryDiscountDSZN.getCode(), categoryDiscountDSZN.getPriority());
+            }
+        }
+        return discountPriorityMap.get(dsznCode.intValue()) == null ? 0 : discountPriorityMap.get(dsznCode.intValue());
+    }
+
+    public static void rebuildAppointedMSPByClient(Session session, Client client) {
+        List<ClientDtisznDiscountInfo> list = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+        if (list.size() == 0) return;
+        ClientDtisznDiscountInfo oldAppointedMSP = list.stream()
+                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP()).findFirst().orElse(null);
+        Collections.sort(list);
+        ClientDtisznDiscountInfo newAppointedMSP = list.get(list.size()-1);
+        if (oldAppointedMSP == null) {
+            newAppointedMSP.setAppointedMSP(true);
+            session.update(newAppointedMSP);
+        } else if (!oldAppointedMSP.equals(newAppointedMSP)) {
+            oldAppointedMSP.setAppointedMSP(false);
+            newAppointedMSP.setAppointedMSP(true);
+            session.update(oldAppointedMSP);
+            session.update(newAppointedMSP);
         }
     }
 

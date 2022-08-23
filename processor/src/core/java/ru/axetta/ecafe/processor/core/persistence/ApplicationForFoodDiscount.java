@@ -21,6 +21,7 @@ public class ApplicationForFoodDiscount {
     public ApplicationForFoodDiscount(Integer dtisznCode) {
         this.dtisznCode = dtisznCode;
         this.confirmed = false;
+        this.appointedMSP = false;
     }
 
     @Override

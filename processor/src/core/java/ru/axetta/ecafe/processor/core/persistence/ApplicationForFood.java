@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -83,18 +84,41 @@ public class ApplicationForFood {
     public Integer getPriorityDtisznCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
         Integer prio = null;
         Integer code = null;
-        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+        Date endDate = new Date(0L);
+        Date zeroDate = new Date(0L);
+        List<ApplicationForFoodDiscount> list = getConfirmedList();
+        if (list.size() == 0) list.addAll(dtisznCodes);
+
+        for (ApplicationForFoodDiscount discount : list) {
             CategoryDiscountDSZN categoryDiscountDSZN = getCategoryDiscountDSZNByCode(categoryDiscountDSZNList, discount.getDtisznCode());
+            if (discount.getAppointedMSP()) {
+                code = categoryDiscountDSZN.getCode();
+                break;
+            }
             if (prio == null) {
                 prio = categoryDiscountDSZN.getPriority();
                 code = categoryDiscountDSZN.getCode();
+                if (discount.getEndDate() != null) endDate = discount.getEndDate();
             }
-            if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio) {
+            if (discount.getEndDate() != null && discount.getEndDate().after(endDate)) {
+                code = categoryDiscountDSZN.getCode();
+                endDate = discount.getEndDate();
+            } else if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio && endDate.equals(zeroDate)) {
                 prio = categoryDiscountDSZN.getPriority();
                 code = categoryDiscountDSZN.getCode();
             }
         }
         return code;
+    }
+
+    private List<ApplicationForFoodDiscount> getConfirmedList() {
+        List<ApplicationForFoodDiscount> list = new ArrayList<>();
+        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+            if (discount.getConfirmed() != null && discount.getConfirmed()) {
+                list.add(discount);
+            }
+        }
+        return list;
     }
 
     private CategoryDiscountDSZN getCategoryDiscountDSZNByCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList, Integer code) {

@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.BenefitService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
@@ -690,6 +692,18 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
+    /*private ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(List<ClientDtisznDiscountInfo> discountInfoList,
+                                                                          Client client, Long dtisznCode) {
+        return discountInfoList.stream()
+                .filter(i -> i.getClient().equals(client) && i.getDtisznCode().equals(dtisznCode)).findFirst().orElse(null);
+    }
+
+    private List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoByClient(List<ClientDtisznDiscountInfo> discountInfoList,
+                                                                          Client client) {
+        return discountInfoList.stream()
+                .filter(i -> i.getClient().equals(client)).collect(Collectors.toList());
+    }*/
+
     public void runTaskDB(String guid) throws Exception {
         ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
         ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
@@ -767,8 +781,8 @@ public class DTSZNDiscountsReviseService {
                     continue;
                 }
 
-                ClientDtisznDiscountInfo discountInfo = DAOUtils
-                        .getDTISZNDiscountInfoByClientAndCode(session, client, item.getDsznCode().longValue());
+                ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client,
+                        item.getDsznCode().longValue());
 
                 if (null == discountInfo) {
                     discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(), item.getTitle(),
@@ -843,6 +857,8 @@ public class DTSZNDiscountsReviseService {
                         logger.info("Archived old and created new ClientDtisznDiscountInfo");
                     }
                 }
+                session.flush();
+                DiscountManager.rebuildAppointedMSPByClient(session, discountInfo.getClient());
                 if (0 == counter++ % maxRecords) {
                     transaction.commit();
                     transaction = null;

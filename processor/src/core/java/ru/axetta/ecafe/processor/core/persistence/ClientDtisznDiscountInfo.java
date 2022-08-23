@@ -5,11 +5,12 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 
 import java.util.Date;
 
-public class ClientDtisznDiscountInfo {
+public class ClientDtisznDiscountInfo implements Comparable {
     private Long idOfClientDTISZNDiscountInfo;
     private Client client;
     private Long dtisznCode;
@@ -26,7 +27,7 @@ public class ClientDtisznDiscountInfo {
     private String source;
     private Boolean sendnotification;
     private Date archiveDate;
-    private Date appointedMSP;
+    private Boolean appointedMSP;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
             Date dateStart, Date dateEnd, Date createdDate, String source, Long version) {
@@ -47,6 +48,23 @@ public class ClientDtisznDiscountInfo {
 
     public ClientDtisznDiscountInfo() {
 
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        ClientDtisznDiscountInfo item = (ClientDtisznDiscountInfo) o;
+        int res = this.dateEnd.compareTo(item.getDateEnd());
+        if (res == 0) {
+            return DiscountManager.getDiscountPriority(this.dtisznCode).compareTo(item.getDtisznCode().intValue());
+        } else {
+            return res;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ClientDtisznDiscountInfo)) return false;
+        return this.idOfClientDTISZNDiscountInfo.equals(((ClientDtisznDiscountInfo)o).getIdOfClientDTISZNDiscountInfo());
     }
 
     public boolean isInoe() {
@@ -185,11 +203,11 @@ public class ClientDtisznDiscountInfo {
         this.archiveDate = archiveDate;
     }
 
-    public Date getAppointedMSP() {
+    public Boolean getAppointedMSP() {
         return appointedMSP;
     }
 
-    public void setAppointedMSP(Date appointedMSP) {
+    public void setAppointedMSP(Boolean appointedMSP) {
         this.appointedMSP = appointedMSP;
     }
 }
