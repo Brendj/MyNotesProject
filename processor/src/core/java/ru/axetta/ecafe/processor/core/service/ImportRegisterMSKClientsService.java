@@ -1250,21 +1250,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (!guardianPerson.getDocument().isEmpty()) {
                     for (MeshDocumentResponse document : guardianPerson.getDocument()) {
                         DulDetail dulDetail = document.getDulDetail();
-                        try {
-                            RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                                    validateDul(session, dulDetail, true);
+                        if(!RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                                .documentExists(session, guardian, dulDetail)) {
+                            dulDetails.add(dulDetail);
                         }
-                        catch (DocumentExistsException ex) {
-                            if(!ex.getIdOfClient().equals(guardian.getIdOfClient())) {
-                                logger.error(ex.getMessage());
-                            }
-                            continue;
-                        }
-                        catch (Exception ex) {
-                            logger.error(ex.getMessage());
-                            continue;
-                        }
-                        dulDetails.add(dulDetail);
                     }
                     RuntimeContext.getAppContext().getBean(DulDetailService.class)
                             .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
@@ -1277,7 +1266,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         session, child.getIdOfClient(), guardian.getIdOfClient());
                 if (clientGuardian == null) {
                     clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
-                            session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(), ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                            session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
+                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
                             ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
                 }
                 else {
@@ -1287,11 +1277,14 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
 
+                /*
                 if (guardian.isActiveAdultGroup()) {
                     if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                         createMigrateRequestForGuardian(session,guardian, child.getOrg());
                     }
-                } else if (guardian.isLeaving()){
+                } else
+                */
+                if (guardian.isLeaving()){
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
                     guardian.setOrg(child.getOrg());
                 }
@@ -1309,7 +1302,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         clientsMobileHistory);
 
                 ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
-                        session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(), ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                        session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
+                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
                         ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
             }
         }

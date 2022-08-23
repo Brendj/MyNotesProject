@@ -167,6 +167,21 @@ public class DulDetailService {
         return query.getResultList().size() > 0;
     }
 
+    public boolean documentExists(Session session, Client client, DulDetail dulDetail) {
+        String query_str = "select d.id from DulDetail d where d.idOfClient = :idOfClient " +
+                "and d.documentTypeId = :documentTypeId and d.deleteState = false and d.number = :number";
+        if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty())
+            query_str += " and d.series = :series";
+        Query query = session.createQuery(query_str);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("number", dulDetail.getNumber());
+        query.setParameter("documentTypeId", dulDetail.getDocumentTypeId());
+        if (dulDetail.getSeries() != null && !dulDetail.getSeries().isEmpty()) {
+            query.setParameter("series", dulDetail.getSeries());
+        }
+        return query.getResultList().size() > 0;
+    }
+
     //todo на переходный период (пока толстый клиент не доработался)
     public DulDetail getPassportDulDetailByClient(Client client, Long type) {
         if (client.getDulDetail() != null) {
