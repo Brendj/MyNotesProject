@@ -448,7 +448,7 @@ public class EventNotificationService {
                 enterEventData.setActionType(1);
             else return null;
             if (guardian != null)
-                enterEventData.setAgentId(guardian.getIdOfClient().intValue());
+                enterEventData.setAgentId(guardian.getMeshGUID());
         } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
             enterEventData.setActionType(2);
             enterEventData.setTicketStatus("0");

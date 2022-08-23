@@ -35,10 +35,10 @@ public class KafkaService {
     @Async
     public void sendMessage(AbstractPushData data) {
 //        try {
-            Message<AbstractPushData> message = MessageBuilder.withPayload(data)
-                    .setHeader("correlationId", UUID.randomUUID())
-                    .setHeader("createdAt", System.currentTimeMillis())
-                    .build();
+        Message<AbstractPushData> message = MessageBuilder.withPayload(data)
+                .setHeader("correlationId", UUID.randomUUID())
+                .setHeader("createdAt", System.currentTimeMillis())
+                .build();
 //            ListenableFuture<SendResult<String, Object>> future = kafkaTemplate
 //                    .send(getTopicFromConfig(data), message);
 //            future.addCallback(new LoggingListenableFutureCallback(message));
