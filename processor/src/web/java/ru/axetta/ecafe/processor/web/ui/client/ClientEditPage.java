@@ -1279,7 +1279,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         removeWardsISPP(persistenceSession, client);
 
         //Явялется ли клиент представителем
-        if (!this.clientWardItems.isEmpty() && isGuardianGroup(client)) {
+        if (!this.clientWardItems.isEmpty() && isGuardianGroup(client) ||
+                (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && isGuardianGroup(client))) {
 
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
