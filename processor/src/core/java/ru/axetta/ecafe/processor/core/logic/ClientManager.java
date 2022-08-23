@@ -1077,6 +1077,10 @@ public class ClientManager {
                                                        String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
                                                        String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
                                                        String ssoid, String guid, ClientsMobileHistory clientsMobileHistory) throws Exception {
+
+        if(StringUtils.isEmpty(secondName)) {
+            secondName = "";
+        }
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
