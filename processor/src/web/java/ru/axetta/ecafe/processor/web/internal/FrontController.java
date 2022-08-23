@@ -2809,7 +2809,7 @@ public class FrontController extends HttpServlet {
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentCreateResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
-            idOfDocument = meshDocumentResponse.getId();
+            idOfDocument = dulDetail.getId();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
@@ -2825,6 +2825,9 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        if (idOfDocument == null)
+            return new DocumentCreateResponse(DocumentCreateResponse.ERROR_INTERNAL,
+                    DocumentCreateResponse.ERROR_INTERNAL_MESSAGE);
         return new DocumentCreateResponse(idOfDocument);
     }
 
@@ -3344,7 +3347,7 @@ public class FrontController extends HttpServlet {
     private DulDetail fillingDulDetail(Session session, DocumentItem documentItem) {
         DulDetail dulDetail = new DulDetail();
         Date currentDate = new Date();
-        if (documentItem.getIdDocument() != null) {
+        if (documentItem.getIdDocument() != null && documentItem.getIdDocument() != 0L) {
             dulDetail = session.get(DulDetail.class, documentItem.getIdDocument());
         }
         if (documentItem.getIdOfClient() != null && documentItem.getIdOfClient() != 0L) {
