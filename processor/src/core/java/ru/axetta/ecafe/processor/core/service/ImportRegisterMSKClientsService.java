@@ -1653,11 +1653,14 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
 
+                /*
                 if (guardian.isActiveAdultGroup()) {
                     if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                         createMigrateRequestForGuardian(session,guardian, child.getOrg());
                     }
-                } else if (guardian.isLeaving()){
+                } else
+                */
+                if (guardian.isLeaving()){
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
                     guardian.setOrg(child.getOrg());
                 }
