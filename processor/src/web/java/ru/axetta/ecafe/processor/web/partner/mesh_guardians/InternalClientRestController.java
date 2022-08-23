@@ -159,8 +159,6 @@ public class InternalClientRestController extends Application {
             throw new IllegalArgumentException("GenderId is empty");
         } else if (info.getBirthdate() == null) {
             throw new IllegalArgumentException("Birthdate is empty");
-        } else if (StringUtils.isBlank(info.getAddress())) {
-            throw new IllegalArgumentException("Address is empty");
         }
         if (CollectionUtils.isEmpty(info.getDocuments())) {
             for (DocumentInfo di : info.getDocuments()) {

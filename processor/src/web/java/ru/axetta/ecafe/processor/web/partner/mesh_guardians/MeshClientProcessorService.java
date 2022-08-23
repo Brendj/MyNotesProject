@@ -84,7 +84,7 @@ public class MeshClientProcessorService {
         Client client = new Client(org, p, p, 0, notifyViaEmail, true, notifyViaPUSH, contractId,
                 new Date(), 0, contractId.toString(), 1, nextVersion, limit, expenditureLimit);
 
-        client.setAddress(info.getAddress());
+        client.setAddress("");
         client.setPhone(info.getPhone());
         session.save(client);
 
@@ -148,7 +148,6 @@ public class MeshClientProcessorService {
             c.setClientRegistryVersion(nextClientVersion);
             c.setBirthDate(info.getBirthdate());
             c.setGender(info.getGenderId());
-            c.setAddress(info.getAddress());
             c.setPhone(info.getPhone());
             c.setMobile(info.getMobile());
             c.setEmail(info.getEmail());

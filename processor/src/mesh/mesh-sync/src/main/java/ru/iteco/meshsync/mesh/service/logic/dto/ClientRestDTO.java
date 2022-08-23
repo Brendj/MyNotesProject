@@ -24,7 +24,6 @@ public class ClientRestDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
 
-    private String address;
     private String phone;
     private String mobile;
     private String email;
@@ -39,11 +38,6 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
-        if(CollectionUtils.isEmpty(info.getAddresses())){
-            throw new IllegalArgumentException("Addresses is empty, but this required parameter");
-        } else {
-            dto.address = info.getAddresses().get(0).getAddress().getAddress();
-        }
 
         PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
         dto.phone = phone == null ? null : phone.getData();
@@ -111,14 +105,6 @@ public class ClientRestDTO implements Serializable {
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getPhone() {
