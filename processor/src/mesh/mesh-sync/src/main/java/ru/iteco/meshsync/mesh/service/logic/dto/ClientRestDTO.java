@@ -48,8 +48,10 @@ public class ClientRestDTO implements Serializable {
             dto.email = email == null ? "" : email.getData();
         }
 
-        for(PersonDocument pd : info.getDocuments()){
-            dto.documents.add(DocumentDTO.build(pd));
+        if(CollectionUtils.isNotEmpty(info.getDocuments())) {
+            for (PersonDocument pd : info.getDocuments()) {
+                dto.documents.add(DocumentDTO.build(pd));
+            }
         }
 
         return dto;

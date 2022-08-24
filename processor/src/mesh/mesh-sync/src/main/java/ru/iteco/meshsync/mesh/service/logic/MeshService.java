@@ -315,7 +315,7 @@ public class MeshService {
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
-            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID());
+            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID(), e);
             return CompletableFuture.completedFuture(false);
         }
     }
