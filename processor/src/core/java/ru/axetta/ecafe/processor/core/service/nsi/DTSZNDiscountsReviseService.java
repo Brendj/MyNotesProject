@@ -327,12 +327,14 @@ public class DTSZNDiscountsReviseService {
             List<Long> discountCodes = new ArrayList<Long>(categoryDiscountsList);
             Date min = new Date(0);
             Date max = new Date(0);
+            ApplicationForFoodDiscount infomax = null;
             for (ApplicationForFoodDiscount info : applicationForFood.getDtisznCodes()) {
                 if (!info.getConfirmed() || !CalendarUtils
                         .betweenOrEqualDate(fireTime, info.getStartDate(), info.getEndDate())) {
                     continue;
                 }
-
+                //Далее алгоритм определения самой приоритетной льготы
+                infomax = getMaxPriorityDiscount(session, info, infomax);
                 CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
                         .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode().longValue());
 
@@ -346,7 +348,10 @@ public class DTSZNDiscountsReviseService {
                     }
                 }
             }
-
+            if (infomax != null) {
+                infomax.setAppointedMSP(true);
+                session.save(infomax);
+            }
             newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
             Integer oldDiscountMode = client.getDiscountMode();
             Integer newDiscountMode =
@@ -384,6 +389,35 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public ApplicationForFoodDiscount getMaxPriorityDiscount(Session session, ApplicationForFoodDiscount applicationForFoodDiscount, ApplicationForFoodDiscount applicationForFoodDiscountActive)
+    {
+        CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, applicationForFoodDiscount.getDtisznCode().longValue());
+        Integer prior = categoryDiscountDSZN.getPriority();
+        if (applicationForFoodDiscountActive == null)
+        {
+            applicationForFoodDiscountActive = applicationForFoodDiscount;
+        } else
+        {
+            if (applicationForFoodDiscountActive.getEndDate().equals(applicationForFoodDiscount.getEndDate()))
+            {
+                //Сравниваем приоритеты
+                CategoryDiscountDSZN categoryDiscountDSZN1 =
+                        DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, applicationForFoodDiscountActive.getDtisznCode().longValue());
+                if (categoryDiscountDSZN1 != null) {
+                    if (prior > categoryDiscountDSZN1.getPriority()) {
+                        applicationForFoodDiscountActive = applicationForFoodDiscount;
+                    }
+                }
+            }
+            else {
+                if (applicationForFoodDiscountActive.getEndDate().before(applicationForFoodDiscount.getEndDate())) {
+                    applicationForFoodDiscountActive = applicationForFoodDiscount;
+                }
+            }
+        }
+        return applicationForFoodDiscountActive;
     }
 
     public void updateApplicationsForFoodTaskServiceNotification(String serviceNumber)

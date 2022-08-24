@@ -9,7 +9,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
@@ -24,11 +23,11 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySeri
 public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
-    private final KafkaServiceImpl kafkaService;
+    private final KafkaListenerServiceImpl kafkaService;
     private static final Logger logger = LoggerFactory.getLogger(KafkaListenerService.class);
 
     public KafkaListenerService(ObjectMapper objectMapper,
-                        KafkaServiceImpl kafkaService) {
+                        KafkaListenerServiceImpl kafkaService) {
         this.objectMapper = objectMapper;
         this.kafkaService = kafkaService;
     }
