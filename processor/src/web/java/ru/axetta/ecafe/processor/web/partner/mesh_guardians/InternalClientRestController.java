@@ -160,7 +160,7 @@ public class InternalClientRestController extends Application {
         } else if (info.getBirthdate() == null) {
             throw new IllegalArgumentException("Birthdate is empty");
         }
-        if (CollectionUtils.isEmpty(info.getDocuments())) {
+        if (!CollectionUtils.isEmpty(info.getDocuments())) {
             for (DocumentInfo di : info.getDocuments()) {
                 if (di.getIdMKDocument() == null) {
                     throw new IllegalArgumentException("IdMKDocument in documents is empty");
