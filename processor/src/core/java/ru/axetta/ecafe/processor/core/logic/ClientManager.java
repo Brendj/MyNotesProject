@@ -2065,7 +2065,7 @@ public class ClientManager {
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
             clientGuardian.setRoleType(roleType);
-            clientGuardian.setDisabled(!informing);
+            clientGuardian.setDisabled(informing);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
