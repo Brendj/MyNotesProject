@@ -3059,7 +3059,7 @@ public class FrontController extends HttpServlet {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
             MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
+                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, !informing);
 
             if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                 logger.error(personResponse.getMessage());
