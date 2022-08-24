@@ -52,12 +52,7 @@ public class ApplicationForFoodStatusType implements EnhancedUserType {
         if (resultSet.wasNull()) {
             return null;
         }
-        if (value.contains(".")) {
-            String[] valueArray = StringUtils.split(value, ".");
-            return new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(Integer.parseInt(valueArray[0])),
-                    ApplicationForFoodDeclineReason.fromInteger(Integer.parseInt(valueArray[1])));
-        }
-        return new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(Integer.parseInt(value)), null);
+        return new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(value));
     }
 
     public void nullSafeSet(PreparedStatement statement, Object value, int index)

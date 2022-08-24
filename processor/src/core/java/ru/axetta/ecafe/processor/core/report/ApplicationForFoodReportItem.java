@@ -69,14 +69,13 @@ public class ApplicationForFoodReportItem {
     }
 
     public String getApplicationForFoodStateString() {
-        return applicationForFoodStatus.getApplicationForFoodState().getCode().toString()
-                + (applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? "." + applicationForFoodStatus.getDeclineReason().getCode() : "");
+        return applicationForFoodStatus.getApplicationForFoodState().getCode();
     }
 
     public String getStatusTitle() {
         String description = applicationForFoodStatus.getApplicationForFoodState().getDescription();
-        String declineReasonDescription = applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? applicationForFoodStatus.getDeclineReason().getDescription() : "";
-        return description + ". " + declineReasonDescription;
+        String reasonDescription = applicationForFoodStatus.getApplicationForFoodState().getNote();
+        return description + ". " + reasonDescription;
     }
 
     public Boolean getIsPaused() {

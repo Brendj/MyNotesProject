@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +34,8 @@ public class ApplicationForFood {
     private Date archiveDate;
     private Boolean validDoc;
     private Boolean validGuardianShip;
+    private ApplicationForFoodMezhvedState docConfirmed;
+    private ApplicationForFoodMezhvedState guardianshipConfirmed;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
     private Set<ApplicationForFoodDiscount> dtisznCodes;
 
@@ -57,6 +59,16 @@ public class ApplicationForFood {
         this.sendToAISContingent = false;
         this.validDoc = validDoc;
         this.validGuardianShip = validGuardianship;
+        if (validDoc == null || !validDoc) {
+            this.docConfirmed = ApplicationForFoodMezhvedState.NO_INFO;
+        } else {
+            this.docConfirmed = ApplicationForFoodMezhvedState.CONFIRMED;
+        }
+        if (validGuardianship == null || !validGuardianship) {
+            this.guardianshipConfirmed = ApplicationForFoodMezhvedState.NO_INFO;
+        } else {
+            this.guardianshipConfirmed = ApplicationForFoodMezhvedState.CONFIRMED;
+        }
     }
 
     public ApplicationForFood() {
@@ -72,18 +84,41 @@ public class ApplicationForFood {
     public Integer getPriorityDtisznCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
         Integer prio = null;
         Integer code = null;
-        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+        Date endDate = new Date(0L);
+        Date zeroDate = new Date(0L);
+        List<ApplicationForFoodDiscount> list = getConfirmedList();
+        if (list.size() == 0) list.addAll(dtisznCodes);
+
+        for (ApplicationForFoodDiscount discount : list) {
             CategoryDiscountDSZN categoryDiscountDSZN = getCategoryDiscountDSZNByCode(categoryDiscountDSZNList, discount.getDtisznCode());
+            if (discount.getAppointedMSP()) {
+                code = categoryDiscountDSZN.getCode();
+                break;
+            }
             if (prio == null) {
                 prio = categoryDiscountDSZN.getPriority();
                 code = categoryDiscountDSZN.getCode();
+                if (discount.getEndDate() != null) endDate = discount.getEndDate();
             }
-            if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio) {
+            if (discount.getEndDate() != null && discount.getEndDate().after(endDate)) {
+                code = categoryDiscountDSZN.getCode();
+                endDate = discount.getEndDate();
+            } else if (categoryDiscountDSZN.getPriority() != null && categoryDiscountDSZN.getPriority() > prio && endDate.equals(zeroDate)) {
                 prio = categoryDiscountDSZN.getPriority();
                 code = categoryDiscountDSZN.getCode();
             }
         }
         return code;
+    }
+
+    private List<ApplicationForFoodDiscount> getConfirmedList() {
+        List<ApplicationForFoodDiscount> list = new ArrayList<>();
+        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+            if (discount.getConfirmed() != null && discount.getConfirmed()) {
+                list.add(discount);
+            }
+        }
+        return list;
     }
 
     private CategoryDiscountDSZN getCategoryDiscountDSZNByCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList, Integer code) {
@@ -285,5 +320,21 @@ public class ApplicationForFood {
 
     public void setValidGuardianShip(Boolean validGuardianShip) {
         this.validGuardianShip = validGuardianShip;
+    }
+
+    public ApplicationForFoodMezhvedState getDocConfirmed() {
+        return docConfirmed;
+    }
+
+    public void setDocConfirmed(ApplicationForFoodMezhvedState docConfirmed) {
+        this.docConfirmed = docConfirmed;
+    }
+
+    public ApplicationForFoodMezhvedState getGuardianshipConfirmed() {
+        return guardianshipConfirmed;
+    }
+
+    public void setGuardianshipConfirmed(ApplicationForFoodMezhvedState guardianshipConfirmed) {
+        this.guardianshipConfirmed = guardianshipConfirmed;
     }
 }

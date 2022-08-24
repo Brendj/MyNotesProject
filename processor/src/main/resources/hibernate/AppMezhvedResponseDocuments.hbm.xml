@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseDocument" table="cf_mezhved_response_document">
+        <id name="idofmezhvedresponse" column="idofmezhvedresponse" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="requestId" column="requestid" type="string" not-null="true"/>
+        <property name="benefit_category_id" column="benefit_category_id" type="long"/>
+        <property name="name" column="name" type="string"/>
+        <property name="series" column="series" type="string"/>
+        <property name="number" column="number" type="string"/>
+        <property name="issue_date" column="issue_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="issuer" column="issuer" type="string"/>
+        <property name="type" column="type" type="integer">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseDocDirection</param>
+            </type>
+        </property>
+        <property name="createdate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

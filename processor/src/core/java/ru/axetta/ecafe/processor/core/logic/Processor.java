@@ -8502,8 +8502,7 @@ public class Processor implements SyncProcessor {
             for (ResRequestFeedingETPStatuses etpStatus : resRequestFeeding.getStatuses()) {
                 RuntimeContext.getAppContext().getBean(ETPMVService.class)
                         .sendStatusAsync(time, etpStatus.getApplicationForFood().getServiceNumber(),
-                                etpStatus.getStatus().getApplicationForFoodState(),
-                                etpStatus.getStatus().getDeclineReason());
+                                etpStatus.getStatus().getApplicationForFoodState());
                 time += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
             }
         } finally {

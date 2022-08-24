@@ -65,7 +65,7 @@ public class ApplicationForFoodConfirmCommand {
         requestFeedingItem.setIdOfDocOrder(docOrderId);
         requestFeedingItem.setOtherDiscountStartDate(discountStartDate);
         requestFeedingItem.setOtherDiscountEndDate(discountEndDate);
-        requestFeedingItem.setStatus(ApplicationForFoodState.OK.getCode());
+        requestFeedingItem.setStatus(Integer.valueOf(ApplicationForFoodState.OK.getCode()));
         requestFeedingItem.setDeclineReason(null);
         requestFeedingItem.setResCode(RequestFeedingItem.ERROR_CODE_ALL_OK);
         return requestFeedingItem;

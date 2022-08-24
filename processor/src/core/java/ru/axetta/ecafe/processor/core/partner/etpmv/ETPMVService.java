@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
+import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -73,17 +77,12 @@ public class ETPMVService {
     @Async
     public void processIncoming(String message) {
         try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-            switch (type) {
-                case COORDINATE_MESSAGE:
-                    processCoordinateMessage(unmarshaller, message);
-                    break;
+            CoordinateMessage coordinateMessage = getCoordinateMessage(message);
+            if (coordinateMessage != null) {
+                processCoordinateMessage(coordinateMessage, message);
+            } else {
+                sendToBK(message);
             }
-
         } catch (Exception e) {
             logger.error("Error in process incoming ETP message: ", e);
             sendToBK(message);
@@ -94,17 +93,44 @@ public class ETPMVService {
         return message.contains(NEW_ISPP_ID);
     }
 
-    private void processCoordinateMessage(Unmarshaller unmarshaller, String message) throws Exception {
+    public CoordinateMessage getCoordinateMessage(String message) throws Exception {
+        try {
+            int type = getMessageType(message);
+
+            JAXBContext jaxbContext = getJAXBContext(type);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            switch (type) {
+                case COORDINATE_MESSAGE:
+                    InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
+                    return (CoordinateMessage) unmarshaller.unmarshal(stream);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in getCoordinateMessage: ", e);
+        }
+        return null;
+    }
+
+    private void processCoordinateMessage(CoordinateMessage coordinateMessage, String message) throws Exception {
         long begin_time = System.currentTimeMillis();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
 
-        InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-        CoordinateMessage coordinateMessage = (CoordinateMessage) unmarshaller.unmarshal(stream);
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
+        try {
+            //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
+            RequestValidationData data = new RequestValidationData(coordinateMessage, null);
+            data.testForData();
+        } catch (Exception e) {
+            logger.error("Error in valid application data: ", e);
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not enough data");
+            sendToBK(message);
+            return;
+        }
 
         boolean newFormat = getCoordinateMessageFormat(message);
 
@@ -125,12 +151,14 @@ public class ETPMVService {
             Boolean isLegal = Boolean.parseBoolean(getServicePropertiesValue(serviceProperties, "IsLegalRepresentative"));
             if (!isLegal) {
                 logger.error("Error in processCoordinateMessage: not legal represent");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not legal represent");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not legal represent");
+                sendToBK(message);
                 return;
             }
             if (benefits.size() == 0 || wrongBenefits(benefits)) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
+                sendToBK(message);
                 return;
             }
             String strValidDoc = getServicePropertiesValue(serviceProperties, "Validity");
@@ -145,7 +173,8 @@ public class ETPMVService {
 
             if (wrongBenefits(yavl_lgot, benefits.get(0))) {
                 logger.error("Error in processCoordinateMessage: wrong benefits in packet");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong benefits in packet");
+                sendToBK(message);
                 return;
             }
         }
@@ -154,7 +183,8 @@ public class ETPMVService {
         BaseDeclarant baseDeclarant = getBaseDeclarant(contacts);
         if (baseDeclarant == null) {
             logger.error("Error in processCoordinateMessage: wrong contacts data");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong contacts data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
+            sendToBK(message);
             return;
         }
         String firstName = ((RequestContact) baseDeclarant).getFirstName();
@@ -163,14 +193,16 @@ public class ETPMVService {
         String mobile = Client.checkAndConvertMobile(((RequestContact) baseDeclarant).getMobilePhone());
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
             logger.error("Error in processCoordinateMessage: not enough data");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR,  "not enough data");
+            sendToBK(message);
             return;
         }
         Client client = DAOReadonlyService.getInstance().getClientByMeshGuid(guid);
 
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "client not found");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "client not found");
+            sendToBK(message);
             return;
         }
         ApplicationForFood applicationForFood = daoService.findApplicationForFood(guid);
@@ -178,7 +210,8 @@ public class ETPMVService {
         if (applicationForFood != null) {
             if (!testForApplicationForFoodStatus(applicationForFood)) {
                 logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
+                sendToBK(message);
                 return;
             }
         }
@@ -195,7 +228,8 @@ public class ETPMVService {
                     ApplicationForFoodCreatorType.PORTAL, validDoc, validGuardianship);
         } catch (ApplicationForFoodExistsException e) {
             logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "ApplicationForFood found but status is incorrect");
+            sendToBK(message);
             return;
         }
 
@@ -206,6 +240,11 @@ public class ETPMVService {
             begin_time = System.currentTimeMillis();
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
         }
+
+        if (newFormat) {
+            RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendBenefitValidationRequest(serviceNumber);
+        }
+
         daoService.updateEtpPacketWithSuccess(serviceNumber);
     }
 
@@ -237,25 +276,24 @@ public class ETPMVService {
     public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
-        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED)
-                && (applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_DOCS)
-                || applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_APPROVAL)
-                || applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) return true; //1080.1, 1080.2, 1080.3
+        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_BENEFIT)
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_GUARDIANSHIP)
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_OLD)) return true; //1080.1, 1080.2, 1080.3
         return false;
     }
 
     @Async
-    public void sendStatusAsync(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
-        sendStatus(begin_time, serviceNumber, status, reason);
+    public void sendStatusAsync(long begin_time, String serviceNumber, ApplicationForFoodState status) throws Exception {
+        sendStatus(begin_time, serviceNumber, status);
     }
 
-    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
-        sendStatus(begin_time, serviceNumber, status, reason, null);
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status) throws Exception {
+        sendStatus(begin_time, serviceNumber, status, null);
     }
 
-    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason, String errorMessage) throws Exception {
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, String errorMessage) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
-        String message = createStatusMessage(serviceNumber, status, reason);
+        String message = createStatusMessage(serviceNumber, status);
         boolean success = false;
         try {
             if (System.currentTimeMillis() - begin_time < PAUSE_IN_MILLIS) {
@@ -267,7 +305,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status, reason));
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status));
     }
 
     private void sendToBK(String message) {
@@ -281,12 +319,12 @@ public class ETPMVService {
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
     }
 
-    private String createStatusMessage(String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+    private String createStatusMessage(String serviceNumber, ApplicationForFoodState status) throws Exception {
         ObjectFactory objectFactory = new ObjectFactory();
         CoordinateStatusMessage coordinateStatusMessage = objectFactory.createCoordinateStatusMessage();
         CoordinateStatusData coordinateStatusData = objectFactory.createCoordinateStatusData();
         StatusType statusType = objectFactory.createStatusType();
-        statusType.setStatusCode(status.getCode());
+        statusType.setStatusCode(status.getPureCode());
         statusType.setStatusTitle(status.getDescription());
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
@@ -295,19 +333,13 @@ public class ETPMVService {
         coordinateStatusData.setStatus(statusType);
         coordinateStatusData.setServiceNumber(serviceNumber);
         coordinateStatusMessage.setCoordinateStatusDataMessage(coordinateStatusData);
-        if (reason != null) {
+        if (status.getReason() != null) {
             DictionaryItem dictionaryItem = objectFactory.createDictionaryItem();
-            dictionaryItem.setCode(reason.getCode().toString());
-            dictionaryItem.setName(reason.getDescription());
+            dictionaryItem.setCode(status.getReason());
+            dictionaryItem.setName(status.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
-        if (!status.getCode().equals(ApplicationForFoodState.DENIED.getCode())) {
-            coordinateStatusData.setNote(status.getNote());
-        } else {
-            if (null != reason) {
-                coordinateStatusData.setNote(reason.getDescription());
-            }
-        }
+        coordinateStatusData.setNote(status.getNote());
 
         JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();
@@ -384,7 +416,7 @@ public class ETPMVService {
             try {
                 logger.info(String.format("Resend status %s from %s", counter, list.size()));
                 long begin_time = System.currentTimeMillis();
-                sendStatus(begin_time, history.getApplicationForFood().getServiceNumber(), history.getStatus().getApplicationForFoodState(), history.getStatus().getDeclineReason(), null);
+                sendStatus(begin_time, history.getApplicationForFood().getServiceNumber(), history.getStatus().getApplicationForFoodState(), null);
                 counter++;
             } catch (Exception e) {
                 logger.error(String.format("Error in resendApplicationForFood status, serviceNumber = %s:", history.getApplicationForFood().getServiceNumber()), e);
@@ -479,6 +511,23 @@ public class ETPMVService {
         return new String(Hex.encodeHex(resultByte));
     }
 
+    public void sendRequestForGuardianshipValidation(ApplicationForFood applicationForFood) {
+        if (applicationForFood.getValidGuardianShip()) {
+            //todo исполнение заявления?
+            return;
+        }
+        //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+    }
+
+    public void sendRequestForDocValidation(ApplicationForFood applicationForFood) {
+        if (applicationForFood.getValidDoc()) {
+            sendRequestForGuardianshipValidation(applicationForFood);
+            return;
+        }
+        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+    }
+
     private void initAISContingentService() throws Exception {
         if (port == null) {
             service = new IsppWebServiceService();
@@ -550,7 +599,7 @@ public class ETPMVService {
 
     public void sendStatus(ETPMVScheduledStatus status) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + status.getServiceNumber() + ". Status = " + status.getState().getCode());
-        String message = createStatusMessage(status.getServiceNumber(), status.getState(), status.getReason());
+        String message = createStatusMessage(status.getServiceNumber(), status.getState());
         boolean success = false;
         try {
             Thread.sleep(PAUSE_IN_MILLIS);
@@ -560,7 +609,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null, new ApplicationForFoodStatus(status.getState(), status.getReason()));
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null, new ApplicationForFoodStatus(status.getState()));
     }
 
     public void scheduleSync() throws Exception {

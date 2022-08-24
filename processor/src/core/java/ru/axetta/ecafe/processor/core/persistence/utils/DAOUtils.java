@@ -4087,6 +4087,11 @@ public class DAOUtils {
         }
     }
 
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoFullList(Session session) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        return criteria.list();
+    }
+
     public static ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(Session session, Client client,
             Long code) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
@@ -4612,7 +4617,7 @@ public class DAOUtils {
         }
 
         ApplicationForFood applicationForFood = new ApplicationForFood(client,
-                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), mobile, guardianName,
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER), mobile, guardianName,
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version,
                 validDoc, validGuardianship);
         session.save(applicationForFood);
@@ -4623,7 +4628,7 @@ public class DAOUtils {
         }
 
         addApplicationForFoodHistoryWithVersion(session, applicationForFood,
-                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), historyVersion);
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER), historyVersion);
 
         return applicationForFood;
     }
@@ -4779,11 +4784,9 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ne("status",
-                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS)));
-        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                ApplicationForFoodDeclineReason.NO_APPROVAL)));
-        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT)));
+                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD)));
         criteria.add(Restrictions.or(Restrictions.isNull("archived"), Restrictions.eq("archived", false)));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();
@@ -4806,12 +4809,12 @@ public class DAOUtils {
         condition += (idOfOrgs.size() == 0 ? "" : "and a.client.org.idOfOrg in :idOfOrgs");
         condition += status == null ? "" : " and a.status = :status";
         condition +=
-                benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
+                benefit == null ? "" : (benefit.equals(0L) ? " and codes.dtisznCode is null" : " and codes.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
         condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber = :number";
         condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery(
-                "select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
+                "select a from ApplicationForFood a join a.dtisznCodes codes " + condition + " order by a.createdDate, a.serviceNumber");
         if (showPeriod) {
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
@@ -4823,7 +4826,7 @@ public class DAOUtils {
             query.setParameter("status", status);
         }
         if (benefit != null && benefit > 0L) {
-            query.setParameter("code", benefit);
+            query.setParameter("code", benefit.intValue());
         }
         if (idOfClientList.size() > 0) {
             query.setParameterList("idOfClientList", idOfClientList);
@@ -4938,7 +4941,7 @@ public class DAOUtils {
             str += "and codes.dtisznCode is null ";
         }
         if (!StringUtils.isEmpty(guid)) {
-            str += "and clmeshGUID = :guid";
+            str += "and cl.meshGUID = :guid";
         }
         Query query = session.createQuery(str);
         query.setParameter("status", status);
@@ -5349,19 +5352,18 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodInoeByClient(Session session, Client client) {
-        Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.add(Restrictions.eq("client", client));
-        criteria.add(Restrictions.isNull("dtisznCode"));
-        criteria.add(Restrictions.eq("archived", false));
-        return criteria.list();
+        Query query = session.createQuery("select a from ApplicationForFood a join a.dtisznCodes codes " +
+                "where a.client = :client and codes.dtisznCode is null and a.archived = false");
+        query.setParameter("client", client);
+        return query.list();
     }
 
     public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
-        Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.add(Restrictions.eq("client", client));
-        criteria.add(Restrictions.eq("dtisznCode", code));
-        criteria.add(Restrictions.eq("archived", false));
-        return (ApplicationForFood) criteria.uniqueResult();
+        Query query = session.createQuery("select a from ApplicationForFood a join a.dtisznCodes codes " +
+                "where a.client = :client and codes.dtisznCode = :code and a.archived = false");
+        query.setParameter("client", client);
+        query.setParameter("code", code);
+        return (ApplicationForFood)query.uniqueResult();
     }
 
     public static List<ApplicationForFood> getApplicationForFoodByClient(Session session, Client client) {

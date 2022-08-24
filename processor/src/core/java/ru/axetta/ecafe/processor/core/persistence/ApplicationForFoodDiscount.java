@@ -2,12 +2,17 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class ApplicationForFoodDiscount {
     private Long idOfAppDiscount;
     private ApplicationForFood applicationForFood;
     private Integer dtisznCode;
+    private Boolean confirmed;
+    private Date startDate;
+    private Date endDate;
+    private Boolean appointedMSP;
 
     public ApplicationForFoodDiscount() {
 
@@ -15,6 +20,8 @@ public class ApplicationForFoodDiscount {
 
     public ApplicationForFoodDiscount(Integer dtisznCode) {
         this.dtisznCode = dtisznCode;
+        this.confirmed = false;
+        this.appointedMSP = false;
     }
 
     @Override
@@ -56,5 +63,37 @@ public class ApplicationForFoodDiscount {
 
     public void setDtisznCode(Integer dtisznCode) {
         this.dtisznCode = dtisznCode;
+    }
+
+    public Boolean getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(Boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Boolean getAppointedMSP() {
+        return appointedMSP;
+    }
+
+    public void setAppointedMSP(Boolean appointedMSP) {
+        this.appointedMSP = appointedMSP;
     }
 }

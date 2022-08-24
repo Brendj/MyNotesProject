@@ -58,8 +58,8 @@ public class ApplicationForFoodDeclineCommand {
                 new Date(System.currentTimeMillis()));
         requestFeedingItem.setDocOrderDate(docOrderDate);
         requestFeedingItem.setIdOfDocOrder(docOrderId);
-        requestFeedingItem.setStatus(ApplicationForFoodState.DENIED.getCode());
-        requestFeedingItem.setDeclineReason(ApplicationForFoodDeclineReason.NO_APPROVAL.getCode());
+        requestFeedingItem.setStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP.getPureCode());
+        requestFeedingItem.setDeclineReason(Integer.valueOf(ApplicationForFoodState.DENIED_GUARDIANSHIP.getReason()));
         requestFeedingItem.setResCode(RequestFeedingItem.ERROR_CODE_ALL_OK);
         return requestFeedingItem;
     }

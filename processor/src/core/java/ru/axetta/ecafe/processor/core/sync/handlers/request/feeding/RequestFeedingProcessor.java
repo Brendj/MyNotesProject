@@ -53,9 +53,11 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                         continue;
                     }
 
-                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(
-                            ApplicationForFoodState.fromCode(item.getStatus()),
-                            ApplicationForFoodDeclineReason.fromInteger(item.getDeclineReason()));
+                    String strStatus = item.getStatus().toString();
+                    if (item.getDeclineReason() != null && item.getDeclineReason() > 0) {
+                        strStatus += "." + item.getDeclineReason().toString();
+                    }
+                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(strStatus));
                     if (null == applicationForFood) {
                         try {
                             applicationForFood = DAOUtils
@@ -66,7 +68,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                     applicationForFood.getStatus()));
                             ApplicationForFoodStatus st = new ApplicationForFoodStatus(
-                                    ApplicationForFoodState.REGISTERED, null);
+                                    ApplicationForFoodState.REGISTERED);
                             applicationForFood = DAOUtils
                                     .updateApplicationForFoodByServiceNumber(session, item.getServNumber(), st);
                             etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, st));
@@ -92,11 +94,10 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                     .getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
                                 //если Иное и новый статус 1075, то искусственно создаем статус 1052
                                 DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING),
                                         nextHistoryVersion);
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING,
-                                                status.getDeclineReason())));
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING)));
                                 if (CalendarUtils.betweenDate(new Date(), item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate())) {
                                     DiscountManager.addOtherDiscountForClient(session, client);
                                 }
@@ -110,8 +111,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                             nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
                             if (!oldStatus.equals(status)) {
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
-                                        new ApplicationForFoodStatus(status.getApplicationForFoodState(),
-                                                status.getDeclineReason())));
+                                        new ApplicationForFoodStatus(status.getApplicationForFoodState())));
                             }
                         } catch (ApplicationForFoorStatusExistsException e) {
                             logger.error("Error in processing entity: " + e.getMessage());

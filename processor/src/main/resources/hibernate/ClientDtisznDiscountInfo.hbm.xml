@@ -31,5 +31,6 @@
         <property name="sendnotification" column="sendnotification" type="java.lang.Boolean"/>
         <property name="archiveDate" column="archiveDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="updatedAt" column="updated_at" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="appointedMSP" column="appointedMSP" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
     </class>
 </hibernate-mapping>
