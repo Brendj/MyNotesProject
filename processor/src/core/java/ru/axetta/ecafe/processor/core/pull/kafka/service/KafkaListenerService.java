@@ -51,16 +51,32 @@ public class KafkaListenerService {
                 //Обработка информации о льготных категориях
                 ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
                 if (applicationForFood != null) {
-                    //Отправка запроса на проверку паспорта заявителя
-                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+                    Boolean validDoc = applicationForFood.getValidDoc();
+                    //Если в заявлении уже был флаг, то запрос на проверку не отправляем
+                    if (validDoc == null || !validDoc) {
+                        //Отправка запроса на проверку паспорта заявителя
+                        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+                    } else
+                    {
+                        //Исполнение заявления
+                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    }
                 }
             }
             if (data instanceof PassportBySerieNumberValidityCheckingResponse) {
                 //Обработка информации о подтверждении паспорта
                 ApplicationForFood applicationForFood = kafkaService.processingPassportValidation(data, message);
                 if (applicationForFood != null) {
-                    //Отправка запроса на проверку родства
-                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                    Boolean validGuard = applicationForFood.getValidGuardianShip();
+                    //Если в заявлении уже был флаг, то запрос на проверку не отправляем
+                    if (validGuard == null || !validGuard) {
+                        //Отправка запроса на проверку родства
+                        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                    } else
+                    {
+                        //Исполнение заявления
+                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    }
                 }
             }
             if (data instanceof RelatednessChecking2Response) {
