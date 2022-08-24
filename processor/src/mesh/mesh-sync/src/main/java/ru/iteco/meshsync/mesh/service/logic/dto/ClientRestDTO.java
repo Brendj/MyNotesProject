@@ -7,6 +7,7 @@ import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,9 +25,9 @@ public class ClientRestDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
 
-    private String phone;
-    private String mobile;
-    private String email;
+    private String phone = "";
+    private String mobile = "";
+    private String email = "";
     private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
 
@@ -39,14 +40,18 @@ public class ClientRestDTO implements Serializable {
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
 
-        PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
-        dto.phone = phone == null ? null : phone.getData();
+        if(CollectionUtils.isNotEmpty(info.getContacts())) {
+            PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
+            dto.phone = phone == null ? "" : phone.getData();
 
-        PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
-        dto.email = email == null ? null : email.getData();
+            PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
+            dto.email = email == null ? "" : email.getData();
+        }
 
-        for(PersonDocument pd : info.getDocuments()){
-            dto.documents.add(DocumentDTO.build(pd));
+        if(CollectionUtils.isNotEmpty(info.getDocuments())) {
+            for (PersonDocument pd : info.getDocuments()) {
+                dto.documents.add(DocumentDTO.build(pd));
+            }
         }
 
         return dto;

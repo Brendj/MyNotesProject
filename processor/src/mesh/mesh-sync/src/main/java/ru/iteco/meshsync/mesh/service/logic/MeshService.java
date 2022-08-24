@@ -315,7 +315,7 @@ public class MeshService {
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
-            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID());
+            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID(), e);
             return CompletableFuture.completedFuture(false);
         }
     }
@@ -452,7 +452,7 @@ public class MeshService {
                     PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
                     internalGuardianService.createClientGuardian(personGUID, guardInfo);
                 } catch (Exception e) {
-                    log.error("Exception> when try create guardian as client ISPP, personID: " + a.getPersonId(), e);
+                    log.error("Exception when try create guardian as client ISPP, personID: " + a.getAgentPersonId(), e);
                 }
             }
         }
