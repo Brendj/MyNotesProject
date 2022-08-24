@@ -3091,7 +3091,7 @@ public class FrontController extends HttpServlet {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
             MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, informing);
+                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, !informing);
 
             if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                 logger.error(personResponse.getMessage());
@@ -3249,7 +3249,7 @@ public class FrontController extends HttpServlet {
             ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
                     true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
                     ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
-                    ClientGuardianRoleType.fromInteger(agentTypeId), informing);
+                    ClientGuardianRoleType.fromInteger(agentTypeId), !informing);
 
             MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {

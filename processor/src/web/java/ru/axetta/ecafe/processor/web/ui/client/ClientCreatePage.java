@@ -287,8 +287,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private DulDetail dulForRemove;
     private List<MeshGuardianPerson> meshGuardianPersonList;
     private MeshGuardianPerson meshGuardianPerson;
-    private Boolean disableCreatePersonKey = true;
-    private Boolean disableLinkPersonKey = true;
 
 
     public String getTypeAddClient() {
@@ -631,22 +629,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setMeshGuardianPersonList(List<MeshGuardianPerson> meshGuardianPersonList) {
         this.meshGuardianPersonList = meshGuardianPersonList;
-    }
-
-    public Boolean getDisableCreatePersonKey() {
-        return disableCreatePersonKey;
-    }
-
-    public void setDisableCreatePersonKey(Boolean disableCreatePersonKey) {
-        this.disableCreatePersonKey = disableCreatePersonKey;
-    }
-
-    public Boolean getDisableLinkPersonKey() {
-        return disableLinkPersonKey;
-    }
-
-    public void setDisableLinkPersonKey(Boolean disableLinkPersonKey) {
-        this.disableLinkPersonKey = disableLinkPersonKey;
     }
 
     public void fill(Session session) throws HibernateException {

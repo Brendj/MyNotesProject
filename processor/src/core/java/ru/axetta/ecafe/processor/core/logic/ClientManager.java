@@ -2060,7 +2060,6 @@ public class ClientManager {
         if (clientGuardian == null) {
             clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
             clientGuardian.setVersion(version);
-            clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
@@ -2245,7 +2244,7 @@ public class ClientManager {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), true);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), false);
         }
     }
 
