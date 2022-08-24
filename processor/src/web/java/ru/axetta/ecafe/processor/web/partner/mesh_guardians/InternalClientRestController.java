@@ -54,10 +54,10 @@ public class InternalClientRestController extends Application {
     @GET
     @Path(value = "client")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response checkClient(@QueryParam(value = "guardianMeshGuid") String personGuid){
+    public Response checkClient(@QueryParam(value = "personGuid") String personGuid){
         try {
-            checkParameter("guardianMeshGuid", personGuid);
-            ClientInfo clientInfo = service.getClientGuardianByMeshGUID(personGuid);
+            checkParameter("personGuid", personGuid);
+            ClientInfo clientInfo = service.getClientByMeshGUID(personGuid);
 
             return generateResponse(HttpURLConnection.HTTP_OK, clientInfo);
         } catch (IllegalArgumentException e) {

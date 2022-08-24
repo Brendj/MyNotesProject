@@ -44,7 +44,7 @@ public class MeshClientProcessorService {
         limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
     }
 
-    public ClientInfo getClientGuardianByMeshGUID(String personGuid) {
+    public ClientInfo getClientByMeshGUID(String personGuid) {
         return service.getClientGuardianByMeshGUID(personGuid);
     }
 
