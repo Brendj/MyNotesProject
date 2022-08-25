@@ -99,7 +99,7 @@ public class RequestFeedingItem {
         this.creatorType = applicationForFood.getCreatorType();
         this.idOfDocOrder = applicationForFood.getIdOfDocOrder();
         this.docOrderDate = applicationForFood.getDocOrderDate();
-        this.hasSocialDiscount = (applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode()).collect(Collectors.toList())).contains(null);
+        this.hasSocialDiscount = !(applicationForFood.getDtisznCodes().stream().map(d -> d.getDtisznCode()).collect(Collectors.toList())).contains(null);
         this.statusCreatedDate = statusCreatedDate;
     }
 
