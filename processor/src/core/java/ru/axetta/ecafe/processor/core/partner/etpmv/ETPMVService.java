@@ -221,7 +221,7 @@ public class ETPMVService {
         if (newFormat) {
             _benefits = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefits(benefits);
         } else {
-            _benefits = yavl_lgot.equals(BENEFIT_INOE) ? Arrays.asList(null)
+            _benefits = yavl_lgot.equals(BENEFIT_INOE) ? null
                     : Arrays.asList(RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefits.get(0)));
         }
 

@@ -4604,10 +4604,17 @@ public class DAOUtils {
                 guardianSecondName, guardianSurname, serviceNumber, creatorType, null, null, version,
                 validDoc, validGuardianship);
         session.save(applicationForFood);
-        for (Integer code: dtisznCodes) {
-            ApplicationForFoodDiscount obj = new ApplicationForFoodDiscount(code == null ? null : code.intValue());
+        ApplicationForFoodDiscount obj;
+        if (dtisznCodes == null) {
+            obj = new ApplicationForFoodDiscount(null);
             obj.setApplicationForFood(applicationForFood);
             session.save(obj);
+        } else {
+            for (Integer code : dtisznCodes) {
+                obj = new ApplicationForFoodDiscount(code == null ? null : code.intValue());
+                obj.setApplicationForFood(applicationForFood);
+                session.save(obj);
+            }
         }
 
         addApplicationForFoodHistoryWithVersion(session, applicationForFood,
