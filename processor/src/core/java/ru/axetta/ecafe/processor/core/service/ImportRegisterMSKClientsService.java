@@ -1730,7 +1730,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         if (guardianHasOtherChildrenInOldOrg) {
             if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                if (MigrantsUtils.findActiveMigrant(
+                        session, beforeMigrateOrgId, guardian.getIdOfClient()) != null){
+                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                }
             }
         }
         else {
@@ -1740,7 +1743,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     session.merge(guardian);
                 }
                 else if (guardian.isActiveAdultGroup()) {
-                    createMigrateRequestForGuardian(session,guardian, child.getOrg());
+                    if (MigrantsUtils.findActiveMigrant(
+                            session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
+                        createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                    }
                 }
 
             }
@@ -1749,7 +1755,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         session, beforeMigrateOrgId, guardian.getIdOfClient());
 
                 if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                    if (MigrantsUtils.findActiveMigrant(
+                            session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
+                        createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                    }
                 }
             }
         }
