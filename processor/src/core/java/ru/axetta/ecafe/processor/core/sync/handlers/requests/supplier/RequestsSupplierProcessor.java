@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier;
 
+import org.apache.commons.lang.time.DateUtils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -263,7 +264,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                 requestsSupplier.getIdOfOrgOwner(), requestsSupplier.getMaxVersion());
         for (GoodRequest goodRequest : list) {
             if (goodRequest != null) {
-                if (goodRequest.getDoneDate() == null || goodRequest.getDoneDate().after(new Date())) {
+                if (goodRequest.getDoneDate() == null || goodRequest.getDoneDate().after(DateUtils.addDays(new Date(), -7))) {
                     resItem = new ResRequestsSupplierItem(goodRequest);
                     List<GoodRequestPosition> details = DAOUtils
                             .getGoodRequestPositionsByGoodRequest(session, goodRequest);
