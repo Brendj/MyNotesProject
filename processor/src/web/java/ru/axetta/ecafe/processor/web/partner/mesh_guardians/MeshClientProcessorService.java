@@ -44,7 +44,7 @@ public class MeshClientProcessorService {
         limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
     }
 
-    public ClientInfo getClientGuardianByMeshGUID(String personGuid) {
+    public ClientInfo getClientByMeshGUID(String personGuid) {
         return service.getClientGuardianByMeshGUID(personGuid);
     }
 
@@ -77,14 +77,14 @@ public class MeshClientProcessorService {
 
         Long nextVersion = DAOUtils.updateClientRegistryVersion(session);
 
-        Person p = new Person(info.getFirstname(), info.getPatronymic(), info.getLastname());
+        Person p = new Person(info.getFirstname(), info.getLastname(), info.getPatronymic());
         session.save(p);
 
         // Copy from ClientCreatePage
         Client client = new Client(org, p, p, 0, notifyViaEmail, true, notifyViaPUSH, contractId,
                 new Date(), 0, contractId.toString(), 1, nextVersion, limit, expenditureLimit);
 
-        client.setAddress(info.getAddress());
+        client.setAddress("");
         client.setPhone(info.getPhone());
         session.save(client);
 
@@ -139,8 +139,8 @@ public class MeshClientProcessorService {
 
             Person p = c.getPerson();
             p.setFirstName(info.getFirstname());
-            p.setSurname(info.getPatronymic());
-            p.setSecondName(info.getLastname());
+            p.setSurname(info.getLastname());
+            p.setSecondName(info.getPatronymic());
             session.update(p);
 
             processDocuments(c.getDulDetail(), info.getDocuments(), session, c.getIdOfClient());
@@ -148,7 +148,6 @@ public class MeshClientProcessorService {
             c.setClientRegistryVersion(nextClientVersion);
             c.setBirthDate(info.getBirthdate());
             c.setGender(info.getGenderId());
-            c.setAddress(info.getAddress());
             c.setPhone(info.getPhone());
             c.setMobile(info.getMobile());
             c.setEmail(info.getEmail());
@@ -182,6 +181,8 @@ public class MeshClientProcessorService {
                 d.setIssuer(di.getIssuer());
                 d.setIssued(di.getIssuedDate());
                 d.setLastUpdate(new Date());
+                d.setExpiration(di.getExpiration());
+                d.setSubdivisionCode(di.getSubdivisionCode());
             }
         }
 
@@ -211,6 +212,8 @@ public class MeshClientProcessorService {
         d.setIssued(di.getIssuedDate());
         d.setIssuer(di.getIssuer());
         d.setDeleteState(false);
+        d.setExpiration(di.getExpiration());
+        d.setSubdivisionCode(di.getSubdivisionCode());
 
         session.save(d);
     }
@@ -262,11 +265,11 @@ public class MeshClientProcessorService {
                 throw new NotFoundException("Not found client by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             }
 
-            for(String guardianMeshGuid : guardianRelationInfo.getGuardianPersonGuids()) {
-                Client guardian = DAOUtils.findClientByMeshGuid(session, guardianMeshGuid);
+            for(ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
+                Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
                 if(guardian == null){
-                    log.error("Not found guardian by MESH-GUID: " + guardianMeshGuid);
+                    this.registryClient(meshGuardian, session, clientGuardianHistory);
                     continue;
                 }
 
@@ -290,7 +293,7 @@ public class MeshClientProcessorService {
                     .findGuardiansByClient(c.getIdOfClient(), null);
 
             for(Client guard : clientGuardians){
-                if(!guardianRelationInfo.getGuardianPersonGuids().contains(guard.getMeshGUID())){
+                if(guardianRelationInfo.getGuardianPersonGuids().stream().noneMatch(i -> i.getPersonGUID().equals(guard.getMeshGUID()))){
                     ClientGuardian cg = DAOReadonlyService.getInstance()
                             .findClientGuardianById(session, c.getIdOfClient(), guard.getIdOfClient());
 

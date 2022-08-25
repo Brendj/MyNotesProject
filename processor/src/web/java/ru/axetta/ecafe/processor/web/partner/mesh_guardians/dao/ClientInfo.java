@@ -17,7 +17,6 @@ public class ClientInfo implements IDAOEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
 
-    private String address;
     private String phone;
     private String mobile;
     private String email;
@@ -70,14 +69,6 @@ public class ClientInfo implements IDAOEntity {
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getPhone() {

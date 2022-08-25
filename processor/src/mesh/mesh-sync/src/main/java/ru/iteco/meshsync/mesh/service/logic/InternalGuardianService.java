@@ -65,11 +65,11 @@ public class InternalGuardianService {
     public Boolean clientExist(String personGUID) {
         try {
             Map<String, String> params = new HashMap<>();
-            params.put("guardianMeshGuid", personGUID);
+            params.put("personGuid", personGUID);
             HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
 
             ResponseEntity<ClientRestDTO> response = restTemplate.exchange(
-                    targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                    targetUrl + "/client?personGuid={personGuid}",
                     HttpMethod.GET,
                     request, ClientRestDTO.class, params);
 
@@ -125,7 +125,7 @@ public class InternalGuardianService {
         }
     }
 
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
+    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
         GuardianRelationDTO dto = GuardianRelationDTO.build(personGUID, agents);
 
         HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);

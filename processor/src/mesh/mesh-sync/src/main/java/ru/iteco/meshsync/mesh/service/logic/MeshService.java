@@ -302,6 +302,9 @@ public class MeshService {
     }
 
     private CompletableFuture<Boolean> processGuardianRelation(EntityChanges entityChanges) {
+        if(!internalGuardianService.clientExist(entityChanges.getPersonGUID())){
+            return CompletableFuture.completedFuture(true);
+        }
         try {
             PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), EntityType.PERSON_AGENT.getApiField());
             processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
@@ -312,7 +315,7 @@ public class MeshService {
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
-            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID());
+            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID(), e);
             return CompletableFuture.completedFuture(false);
         }
     }
@@ -442,14 +445,14 @@ public class MeshService {
         return allEdu.get(0);
     }
 
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) {
+    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
         for (PersonAgent a : agents) {
-            if (!internalGuardianService.clientExist(a.getPersonId().toString())) {
+            if (!internalGuardianService.clientExist(a.getAgentPersonId().toString())) {
                 try {
                     PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
                     internalGuardianService.createClientGuardian(personGUID, guardInfo);
                 } catch (Exception e) {
-                    log.error("Exception> when try create guardian as client ISPP, personID: " + a.getPersonId(), e);
+                    log.error("Exception when try create guardian as client ISPP, personID: " + a.getAgentPersonId(), e);
                 }
             }
         }

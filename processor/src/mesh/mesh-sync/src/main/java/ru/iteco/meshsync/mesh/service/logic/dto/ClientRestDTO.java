@@ -7,6 +7,7 @@ import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,10 +25,9 @@ public class ClientRestDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date birthdate;
 
-    private String address;
-    private String phone;
-    private String mobile;
-    private String email;
+    private String phone = "";
+    private String mobile = "";
+    private String email = "";
     private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
 
@@ -39,20 +39,19 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
-        if(CollectionUtils.isEmpty(info.getAddresses())){
-            throw new IllegalArgumentException("Addresses is empty, but this required parameter");
-        } else {
-            dto.address = info.getAddresses().get(0).getAddress().getAddress();
+
+        if(CollectionUtils.isNotEmpty(info.getContacts())) {
+            PersonContact mobile = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
+            dto.mobile = mobile == null ? "" : mobile.getData();
+
+            PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
+            dto.email = email == null ? "" : email.getData();
         }
 
-        PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
-        dto.phone = phone == null ? null : phone.getData();
-
-        PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
-        dto.email = email == null ? null : email.getData();
-
-        for(PersonDocument pd : info.getDocuments()){
-            dto.documents.add(DocumentDTO.build(pd));
+        if(CollectionUtils.isNotEmpty(info.getDocuments())) {
+            for (PersonDocument pd : info.getDocuments()) {
+                dto.documents.add(DocumentDTO.build(pd));
+            }
         }
 
         return dto;
@@ -111,14 +110,6 @@ public class ClientRestDTO implements Serializable {
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getPhone() {
