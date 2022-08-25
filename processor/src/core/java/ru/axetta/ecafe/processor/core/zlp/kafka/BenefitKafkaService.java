@@ -18,7 +18,7 @@ import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
-@Service
+@Service("BenefitKafkaService")
 public class BenefitKafkaService extends KafkaService {
     private static final Logger logger = LoggerFactory.getLogger(BenefitKafkaService.class);
     public static final String REQUEST_SYSTEM_PROPERTY = "ecafe.processing.zlp.service.request_system";
