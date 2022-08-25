@@ -374,6 +374,10 @@ public class DAOUtils {
         return findClientBySan(em.unwrap(Session.class), san);
     }
 
+    public static Client findClientsByMeshGuid(EntityManager em, String meshGuid) {
+        return findClientByMeshGuid(em.unwrap(Session.class), meshGuid);
+    }
+
     public static List<GoodBasicBasketPrice> findGoodBasicBasketPrice(Session persistenceSession,
             GoodsBasicBasket basicBasket, Long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(GoodBasicBasketPrice.class);

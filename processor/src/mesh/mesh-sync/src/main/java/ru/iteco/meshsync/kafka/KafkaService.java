@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -32,6 +33,9 @@ public class KafkaService {
     private final ObjectMapper objectMapper;
     private final MeshService meshService;
 
+    @Value(value = "${kafka.consumer-id}")
+    private String consumerId;
+
     public KafkaService(ObjectMapper objectMapper,
                         MeshService meshService){
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
@@ -50,6 +54,10 @@ public class KafkaService {
         log.info(String.format("Offset %d, Partition_ID %d, Received JSON: %s",
                 offset, partitionId, message));
         EntityChangeEventDTO dto = objectMapper.readValue(message, EntityChangeEventDTO.class);
+        if(dto.getUpdated_by().equals(consumerId)){
+            log.info("Self-update message, message skipped");
+            return;
+        }
         commitJson(dto);
     }
 

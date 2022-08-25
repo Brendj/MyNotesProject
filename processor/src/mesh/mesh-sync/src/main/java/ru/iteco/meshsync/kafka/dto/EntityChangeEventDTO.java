@@ -14,6 +14,7 @@ public class EntityChangeEventDTO {
     private String entity_id;
     private List<String> merged_person_ids;
     private String uid;
+    private String updated_by;
 
     public EntityChangeEventDTO() {
     }
@@ -71,5 +72,13 @@ public class EntityChangeEventDTO {
 
     public void setMerged_person_ids(List<String> merged_person_ids) {
         this.merged_person_ids = merged_person_ids;
+    }
+
+    public String getUpdated_by() {
+        return updated_by;
+    }
+
+    public void setUpdated_by(String updated_by) {
+        this.updated_by = updated_by;
     }
 }

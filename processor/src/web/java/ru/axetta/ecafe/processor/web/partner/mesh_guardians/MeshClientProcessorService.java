@@ -77,7 +77,7 @@ public class MeshClientProcessorService {
 
         Long nextVersion = DAOUtils.updateClientRegistryVersion(session);
 
-        Person p = new Person(info.getFirstname(), info.getPatronymic(), info.getLastname());
+        Person p = new Person(info.getFirstname(), info.getLastname(), info.getPatronymic());
         session.save(p);
 
         // Copy from ClientCreatePage
@@ -139,8 +139,8 @@ public class MeshClientProcessorService {
 
             Person p = c.getPerson();
             p.setFirstName(info.getFirstname());
-            p.setSurname(info.getPatronymic());
-            p.setSecondName(info.getLastname());
+            p.setSurname(info.getLastname());
+            p.setSecondName(info.getPatronymic());
             session.update(p);
 
             processDocuments(c.getDulDetail(), info.getDocuments(), session, c.getIdOfClient());
@@ -181,6 +181,8 @@ public class MeshClientProcessorService {
                 d.setIssuer(di.getIssuer());
                 d.setIssued(di.getIssuedDate());
                 d.setLastUpdate(new Date());
+                d.setExpiration(di.getExpiration());
+                d.setSubdivisionCode(di.getSubdivisionCode());
             }
         }
 
@@ -210,6 +212,8 @@ public class MeshClientProcessorService {
         d.setIssued(di.getIssuedDate());
         d.setIssuer(di.getIssuer());
         d.setDeleteState(false);
+        d.setExpiration(di.getExpiration());
+        d.setSubdivisionCode(di.getSubdivisionCode());
 
         session.save(d);
     }
@@ -289,7 +293,7 @@ public class MeshClientProcessorService {
                     .findGuardiansByClient(c.getIdOfClient(), null);
 
             for(Client guard : clientGuardians){
-                if(!guardianRelationInfo.getGuardianPersonGuids().contains(guard.getMeshGUID())){
+                if(guardianRelationInfo.getGuardianPersonGuids().stream().noneMatch(i -> i.getPersonGUID().equals(guard.getMeshGUID()))){
                     ClientGuardian cg = DAOReadonlyService.getInstance()
                             .findClientGuardianById(session, c.getIdOfClient(), guard.getIdOfClient());
 
