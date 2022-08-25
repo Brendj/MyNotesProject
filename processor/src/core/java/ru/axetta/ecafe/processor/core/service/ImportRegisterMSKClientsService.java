@@ -1545,7 +1545,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     return;
                 }
                 for (Client guardian : guardians) {
-                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient());
+                    List<Client> children = ClientManager.findChildsByClient(
+                            session, guardian.getIdOfClient(), true, true);
                     if (children.isEmpty()) {
                         logger.error(String.format("processClientGuardians(): Не удалось найти детей представителя c MЭШ.GUID: %s в ИСПП",
                                 child.getMeshGUID().toString()));
