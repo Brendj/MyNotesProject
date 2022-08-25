@@ -11,6 +11,10 @@ public class DocumentDTO implements Serializable {
     private String series;
     private String number;
     private Long idMKDocument;
+    private String subdivisionCode;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private Date expiration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date issuedDate;
@@ -26,6 +30,8 @@ public class DocumentDTO implements Serializable {
         d.idMKDocument = pd.getId();
         d.setIssuer(pd.getIssuer());
         d.setIssuedDate(DateUtils.parseSimpleDate(pd.getIssued().toString()));
+        d.setSubdivisionCode(pd.getSubdivisionCode());
+        d.setExpiration(DateUtils.parseSimpleDate(pd.getExpiration().toString()));
 
         return d;
     }
@@ -76,5 +82,21 @@ public class DocumentDTO implements Serializable {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    public String getSubdivisionCode() {
+        return subdivisionCode;
+    }
+
+    public void setSubdivisionCode(String subdivisionCode) {
+        this.subdivisionCode = subdivisionCode;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 }

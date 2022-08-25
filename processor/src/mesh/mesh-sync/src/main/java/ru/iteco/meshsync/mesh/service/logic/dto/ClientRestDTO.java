@@ -41,8 +41,8 @@ public class ClientRestDTO implements Serializable {
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
 
         if(CollectionUtils.isNotEmpty(info.getContacts())) {
-            PersonContact phone = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
-            dto.phone = phone == null ? "" : phone.getData();
+            PersonContact mobile = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
+            dto.mobile = mobile == null ? "" : mobile.getData();
 
             PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
             dto.email = email == null ? "" : email.getData();
