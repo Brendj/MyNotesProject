@@ -281,7 +281,7 @@ public class ClientMigrationHistoryService {
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, clientMigration.getClient().getIdOfClient(), true);
                 for (Client guardian : guardians) {
                     boolean hasChildrenInOtherOrg = false;
-                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient(), true);
+                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient(), true, false);
                     for (Client child : children) {
                         if (!child.equals(clientMigration.getClient()) && !DAOUtils.isFriendlyOrganizations(session, child.getOrg(), clientMigration.getOrg())) {
                             hasChildrenInOtherOrg = true;
