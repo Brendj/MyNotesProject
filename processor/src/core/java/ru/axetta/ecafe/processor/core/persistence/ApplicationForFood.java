@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -123,8 +124,8 @@ public class ApplicationForFood {
 
     private CategoryDiscountDSZN getCategoryDiscountDSZNByCode(List<CategoryDiscountDSZN> categoryDiscountDSZNList, Integer code) {
         for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
-            if (categoryDiscountDSZN.getCode() != null && code != null && categoryDiscountDSZN.getCode().equals(code)) return categoryDiscountDSZN;
-            if (categoryDiscountDSZN.getCode() == null && code == null) return categoryDiscountDSZN;
+            if (code != null && categoryDiscountDSZN.getCode().equals(code)) return categoryDiscountDSZN;
+            if (categoryDiscountDSZN.getCode().equals(Integer.parseInt(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE)) && code == null) return categoryDiscountDSZN;
         }
         return null;
     }

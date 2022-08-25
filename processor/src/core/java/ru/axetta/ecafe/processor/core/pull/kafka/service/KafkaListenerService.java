@@ -9,7 +9,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
@@ -24,11 +23,11 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySeri
 public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
-    private final KafkaServiceImpl kafkaService;
+    private final KafkaListenerServiceImpl kafkaService;
     private static final Logger logger = LoggerFactory.getLogger(KafkaListenerService.class);
 
     public KafkaListenerService(ObjectMapper objectMapper,
-                        KafkaServiceImpl kafkaService) {
+                        KafkaListenerServiceImpl kafkaService) {
         this.objectMapper = objectMapper;
         this.kafkaService = kafkaService;
     }
@@ -52,16 +51,32 @@ public class KafkaListenerService {
                 //Обработка информации о льготных категориях
                 ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
                 if (applicationForFood != null) {
-                    //Отправка запроса на проверку паспорта заявителя
-                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+                    Boolean validDoc = applicationForFood.getValidDoc();
+                    //Если в заявлении уже был флаг, то запрос на проверку не отправляем
+                    if (validDoc == null || !validDoc) {
+                        //Отправка запроса на проверку паспорта заявителя
+                        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+                    } else
+                    {
+                        //Исполнение заявления
+                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    }
                 }
             }
             if (data instanceof PassportBySerieNumberValidityCheckingResponse) {
                 //Обработка информации о подтверждении паспорта
                 ApplicationForFood applicationForFood = kafkaService.processingPassportValidation(data, message);
                 if (applicationForFood != null) {
-                    //Отправка запроса на проверку родства
-                    RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                    Boolean validGuard = applicationForFood.getValidGuardianShip();
+                    //Если в заявлении уже был флаг, то запрос на проверку не отправляем
+                    if (validGuard == null || !validGuard) {
+                        //Отправка запроса на проверку родства
+                        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                    } else
+                    {
+                        //Исполнение заявления
+                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    }
                 }
             }
             if (data instanceof RelatednessChecking2Response) {

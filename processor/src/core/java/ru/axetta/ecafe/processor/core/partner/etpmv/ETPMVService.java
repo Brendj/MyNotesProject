@@ -122,9 +122,11 @@ public class ETPMVService {
         logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
         try {
-            //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
-            RequestValidationData data = new RequestValidationData(coordinateMessage, null);
-            data.testForData();
+            if (serviceNumber.contains(NEW_ISPP_ID)) {
+                //валидация на то, что пакет парсится и хватает данных для отправки запросов по межведу
+                RequestValidationData data = new RequestValidationData(coordinateMessage, null);
+                data.testForData();
+            }
         } catch (Exception e) {
             logger.error("Error in valid application data: ", e);
             sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not enough data");

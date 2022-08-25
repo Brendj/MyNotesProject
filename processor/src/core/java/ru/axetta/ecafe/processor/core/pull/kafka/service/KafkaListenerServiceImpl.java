@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
@@ -22,13 +24,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class KafkaServiceImpl {
+public class KafkaListenerServiceImpl {
 
     private static final ThreadLocal<SimpleDateFormat> format = new ThreadLocal<SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); }
     };
 
-    private final Logger logger = LoggerFactory.getLogger(KafkaServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(KafkaListenerServiceImpl.class);
 
     public ApplicationForFood processingActiveBenefitCategories(AbstractPullData data, String message)
     {
@@ -42,10 +44,12 @@ public class KafkaServiceImpl {
 
             //Заполнение полей таблицы AppMezhvedRequest
             AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message, session);
+            ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             //Флаг того, что хотябы один ЛК был подтвержден
             boolean confirm = false;
+            ApplicationForFoodDiscount applicationForFoodDiscountActive = null;
             //Проставление статуса подтверждения для ЛК
-            for (ApplicationForFoodDiscount applicationForFoodDiscount: appMezhvedRequest.getApplicationForFood().getDtisznCodes())
+            for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
             {
                 for (BenefitCategoryInfo benefitCategoryInfo: activeBenefitCategoriesGettingResponse.getActive_benefit_categories_info())
                 {
@@ -54,11 +58,21 @@ public class KafkaServiceImpl {
                         applicationForFoodDiscount.setConfirmed(true);
                         applicationForFoodDiscount.setStartDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_from()));
                         applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_to()));
+                        //Сначала ставим всем низкий приоритет
+                        applicationForFoodDiscount.setAppointedMSP(false);
+                        //Далее алгоритм определения самой приоритетной льготы
+                        applicationForFoodDiscountActive = RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).getMaxPriorityDiscount(session, applicationForFoodDiscount, applicationForFoodDiscountActive);
                         session.save(applicationForFoodDiscount);
                         confirm = true;
                         break;
                     }
                 }
+            }
+            if (applicationForFoodDiscountActive != null)
+            {
+                //Проставляем флаг высшего приоритета у льготы
+                applicationForFoodDiscountActive.setAppointedMSP(true);
+                session.save(applicationForFoodDiscountActive);
             }
             //Сохранение сопуствующих документов
             for (BenefitDocument benefitDocument: activeBenefitCategoriesGettingResponse.getBenefit_activity_starting_reason_documents())
@@ -75,8 +89,11 @@ public class KafkaServiceImpl {
             }
             transaction.commit();
             transaction = null;
-            if (confirm)
-                return appMezhvedRequest.getApplicationForFood();
+            if (confirm) {
+                applicationForFood.setStatus(new ApplicationForFoodStatus(
+                        ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED));
+                return applicationForFood;
+            }
             return null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,6 +103,8 @@ public class KafkaServiceImpl {
             HibernateUtils.close(session, logger);
         }
     }
+
+
 
     public ApplicationForFood processingPassportValidation(AbstractPullData data, String message)
     {
@@ -97,7 +116,8 @@ public class KafkaServiceImpl {
             PassportBySerieNumberValidityCheckingResponse passport = (PassportBySerieNumberValidityCheckingResponse) data;
             AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message, session);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
-            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
+            if (applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080"))
+//            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
             {
                 //Если прошло более 5 дней с подачи запроса
                 applicationForFood.setStatus(new ApplicationForFoodStatus(
