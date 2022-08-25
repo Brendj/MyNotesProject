@@ -3044,7 +3044,13 @@ public class FrontController extends HttpServlet {
                                                      @WebParam(name = "relation") Integer relation,
                                                      @WebParam(name = "typeOfLegalRepresent") Integer typeOfLegalRepresent,
                                                      @WebParam(name = "informing") Boolean informing) throws FrontControllerException {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        MeshAgentResponse personResponse;
         try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
             if (checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
                     relation, typeOfLegalRepresent, informing, documents)) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
@@ -3058,18 +3064,30 @@ public class FrontController extends HttpServlet {
             if (snils != null && !snils.isEmpty() && DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
-            MeshAgentResponse personResponse = getMeshGuardiansService().createPersonWithEducation(idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
-                    mobile, email, childMeshGuid, dulDetails, agentTypeId, relation, typeOfLegalRepresent, !informing);
+
+            Client child = DAOReadonlyService.getInstance().findClientsByMeshGuid(childMeshGuid);
+            if (child == null) {
+                return new GuardianMeshGuidResponse(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+            }
+
+            personResponse = getMeshGuardiansService().createPersonWithEducation(persistenceSession, idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
+                    mobile, email, child, dulDetails, agentTypeId, relation, typeOfLegalRepresent, !informing);
 
             if (!personResponse.getCode().equals(GuardianResponse.OK)) {
                 logger.error(personResponse.getMessage());
                 return new GuardianMeshGuidResponse(personResponse.getCode(), personResponse.getMessage());
             }
-            return new GuardianMeshGuidResponse(personResponse.getAgentPersonId());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            persistenceSession.close();
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            return new GuardianMeshGuidResponse(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+            logger.error("Error in createMeshPerson", e);
+            return new GuardianMeshGuidResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
+        return new GuardianMeshGuidResponse(personResponse.getAgentPersonId());
     }
 
     @WebMethod(operationName = "getGuardians")

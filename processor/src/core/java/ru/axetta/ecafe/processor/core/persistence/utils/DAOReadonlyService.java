@@ -1567,6 +1567,10 @@ public class DAOReadonlyService {
         return DAOUtils.findClientsBySan(entityManager, san);
     }
 
+    public Client findClientsByMeshGuid(String meshGuid) {
+        return DAOUtils.findClientsByMeshGuid(entityManager, meshGuid);
+    }
+
     public List<TechnologicalMapProduct> getTechnologicalMapProducts(TechnologicalMap technologicalMap) {
         TypedQuery<TechnologicalMapProduct> query = entityManager
                 .createQuery("from TechnologicalMapProduct where technologicalMap=:technologicalMap",
