@@ -1907,14 +1907,17 @@ public class ClientManager {
 
     /* получить список опекаемых по опекуну */
     public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
-        return findChildsByClient(session, idOfGuardian, false);
+        return findChildsByClient(session, idOfGuardian, false, false);
     }
 
-    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDisabled) throws Exception {
+    public static List<Client> findChildsByClient(
+            Session session, Long idOfGuardian, boolean includeDisabled, boolean includeDeleted) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        if(!includeDeleted) {
+            idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        }
         if (!includeDisabled) {
             idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
         }
