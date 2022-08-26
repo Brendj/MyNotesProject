@@ -1386,15 +1386,16 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
             }
             else {
-                MigrantsUtils.disableMigrantRequestIfExists(
-                        session, beforeMigrateOrgId, guardian.getIdOfClient());
-
                 if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                     if (MigrantsUtils.findActiveMigrant(
                             session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
                         createMigrateRequestForGuardian(session, guardian, child.getOrg());
                     }
                 }
+
+                MigrantsUtils.disableMigrantRequestIfExists(
+                        session, beforeMigrateOrgId, guardian.getIdOfClient());
+
             }
         }
     }
