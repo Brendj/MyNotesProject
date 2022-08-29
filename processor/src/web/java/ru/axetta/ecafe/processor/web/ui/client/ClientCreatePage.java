@@ -790,7 +790,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
         if (this.dulDetail != null && !this.dulDetail.isEmpty()) {
-            dulDetailService.validateDulList(persistenceSession, this.dulDetail, false);
+            try {
+                dulDetailService.validateDulList(persistenceSession, this.dulDetail, false);
+            } catch (DocumentValidateException e) {
+                documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
+            } catch (DocumentExistsException e) {
+                documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
+            }
             if (isParentGroup())
                 checkDuls(persistenceSession, this.dulDetail, client.getIdOfClient());
             dulDetailService.saveDulOnlyISPP(persistenceSession, this.dulDetail, client.getIdOfClient());
@@ -836,6 +842,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
         clean();
         return client;
+    }
+
+    private void documentExceptionProcess(Session persistenceSession, Long documentTypeId, String message) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(DulGuide.class);
+        criteria.add(Restrictions.eq("documentTypeId", documentTypeId));
+        DulGuide dulGuide = (DulGuide) criteria.uniqueResult();
+        throw new Exception(String.format("Ошибка: %s. Документ: %s.", message, dulGuide.getName()));
     }
 
     private void addGuardianToClient(Session persistenceSession, ClientGuardianHistory clientGuardianHistory, Client client) throws Exception {

@@ -2804,6 +2804,7 @@ public class FrontController extends HttpServlet {
                         DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
+            dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .saveDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
@@ -2817,6 +2818,8 @@ public class FrontController extends HttpServlet {
             logger.error("Error in createDocumentForClient", e);
             if (e instanceof DocumentExistsException) {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
+            } else if (e instanceof DocumentValidateException) {
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
             } else {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_INTERNAL,
                         DocumentCreateResponse.ERROR_INTERNAL_MESSAGE);
@@ -2852,6 +2855,7 @@ public class FrontController extends HttpServlet {
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
+            dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .updateDulDetail(persistenceSession, dulDetail, client, true);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
@@ -2861,6 +2865,9 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
+             if (e instanceof DocumentValidateException) {
+                return new DocumentUpdateResponse(DocumentCreateResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
+            }
             logger.error("Error in updateDocumentForClient", e);
             return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_INTERNAL,
                     DocumentUpdateResponse.ERROR_INTERNAL_MESSAGE);

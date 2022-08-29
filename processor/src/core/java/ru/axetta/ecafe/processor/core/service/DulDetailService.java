@@ -1,6 +1,5 @@
 package ru.axetta.ecafe.processor.core.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -14,7 +13,11 @@ import ru.axetta.ecafe.processor.core.persistence.DulDetail;
 import ru.axetta.ecafe.processor.core.persistence.DulGuide;
 
 import javax.persistence.Query;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,37 +27,16 @@ public class DulDetailService {
     private static final Logger logger = LoggerFactory.getLogger(DulDetailService.class);
     //Не должно быть двух персон с одинаковыми действующими документами следующих типов:
     private final List<Long> dulTypes = Arrays.asList(3L, 124L, 17L, 9L, 1L, 189L, 15L, 900L, 902L, 11L, 13L);
+    private final String validateError = "Неверное поле \"Серия\" или \"Номер\" документа";
 
-    public void validateAndSaveDulDetails(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
-        Client client = session.get(Client.class, idOfClient);
-        MeshDocumentResponse meshDocumentResponse;
-
-        for (DulDetail dulDetail : dulDetails) {
-            if (dulDetail.getDeleteState() == null) {
-                dulDetail.setDeleteState(false);
-            }
-            if (dulDetail.getDeleteState() && dulDetail.getCreateDate() == null) {
-                continue;
-            }
-            if (dulDetail.getDeleteState()) {
-                meshDocumentResponse = deleteDulDetail(session, dulDetail, client, true);
-                checkError(meshDocumentResponse);
-            } else if (isChange(dulDetail, client)) {
-                if (dulDetail.getCreateDate() == null) {
-                    meshDocumentResponse = saveDulDetail(session, dulDetail, client, true);
-                } else {
-                    meshDocumentResponse = updateDulDetail(session, dulDetail, client, true);
-                }
-                checkError(meshDocumentResponse);
-            }
-        }
-    }
-
+    /**
+     * {@link #validateDul(Session, DulDetail, boolean)
+     * Использовать валидацию перед сохранением документа.}
+     */
     public MeshDocumentResponse updateDulDetail(Session session, DulDetail dulDetail, Client client, boolean saveToMK) throws Exception {
         if (!isChange(dulDetail, client)) {
             return new MeshDocumentResponse().okResponse();
         }
-        validateDul(session, dulDetail, true);
         dulDetail.setLastUpdate(new Date());
         MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (saveToMK && client.getMeshGUID() != null) {
@@ -68,23 +50,13 @@ public class DulDetailService {
         return documentResponse;
     }
 
-    private boolean isChange(DulDetail dulDetail, Client client) {
-        Set<DulDetail> originDulDetails = new HashSet<>();
-        if (client.getDulDetail() != null) {
-            originDulDetails = client.getDulDetail().stream()
-                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
-                    .collect(Collectors.toSet());
-        }
-        for (DulDetail originDul : originDulDetails)
-            if (dulDetail.equals(originDul))
-                return false;
-        return true;
-    }
-
+    /**
+     * {@link #validateDul(Session, DulDetail, boolean)
+     * Использовать валидацию перед сохранением документа.}
+     */
     public MeshDocumentResponse saveDulDetail(Session session, DulDetail dulDetail, Client client, boolean saveToMK) throws Exception {
         if (documentExists(session, client, dulDetail.getDocumentTypeId(), dulDetail.getId()))
-            throw new DocumentExistsException("У клиента уже есть документ этого типа");
-        validateDul(session, dulDetail, true);
+            throw new DocumentExistsException("У клиента уже есть документ этого типа", null, dulDetail.getDocumentTypeId());
         Date currentDate = new Date();
         dulDetail.setLastUpdate(currentDate);
         dulDetail.setCreateDate(currentDate);
@@ -112,6 +84,19 @@ public class DulDetailService {
         return documentResponse;
     }
 
+    private boolean isChange(DulDetail dulDetail, Client client) {
+        Set<DulDetail> originDulDetails = new HashSet<>();
+        if (client.getDulDetail() != null) {
+            originDulDetails = client.getDulDetail().stream()
+                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
+                    .collect(Collectors.toSet());
+        }
+        for (DulDetail originDul : originDulDetails)
+            if (dulDetail.equals(originDul))
+                return false;
+        return true;
+    }
+
     public void validateDulList(Session session, List<DulDetail> dulDetail, boolean checkAnotherClient) throws Exception {
         for (DulDetail detail : dulDetail) {
             validateDul(session, detail, checkAnotherClient);
@@ -119,16 +104,161 @@ public class DulDetailService {
     }
 
     public void validateDul(Session session, DulDetail dulDetail, boolean checkAnotherClient) throws Exception {
-        if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
-            throw new Exception("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»");
-        if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
-            throw new Exception("Не заполнено поле \"Номер\" документа");
-        if (checkAnotherClient) {
-            List<Long> ids = checkAnotherClient(session, dulDetail);
-            if (!ids.isEmpty())
-                throw new DocumentExistsException(String
-                        .format("Персона c данным документом уже существует, идентификатор клиента: %s", ids.get(0)), ids.get(0));
+        try {
+            validateDulNumberAndSeries(session, dulDetail);
+            if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
+                throw new DocumentValidateException("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»", dulDetail.getDocumentTypeId());
+            if (dulDetail.getNumber() == null || dulDetail.getNumber().isEmpty())
+                throw new DocumentValidateException("Не заполнено поле \"Номер\" документа", dulDetail.getDocumentTypeId());
+            if (checkAnotherClient) {
+                List<Long> ids = checkAnotherClient(session, dulDetail);
+                if (!ids.isEmpty())
+                    throw new DocumentExistsException(String
+                            .format("Персона c данным документом уже существует, идентификатор клиента: %s", ids.get(0)), ids.get(0), dulDetail.getDocumentTypeId());
+            }
+        } catch (Exception e) {
+            if (!(e instanceof DocumentValidateException) && !(e instanceof DocumentExistsException)) {
+                logger.error(e.getMessage());
+                throw new DocumentValidateException("Неизвестная ошибка сохранения документа", dulDetail.getDocumentTypeId());
+            } else
+                throw e;
         }
+    }
+
+    public void validateDulNumberAndSeries(Session session, DulDetail dulDetail) throws Exception {
+
+        if (dulDetail.getDocumentTypeId().equals(15L)) {
+            if (isBlank(dulDetail.getSeries()) || isBlank(dulDetail.getNumber())
+                    || dulDetail.getSeries().length() != 4 || dulDetail.getNumber().length() != 6
+                    || isDigit(dulDetail.getSeries()) || isDigit(dulDetail.getNumber()))
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        } else if (dulDetail.getDocumentTypeId().equals(1L)) {
+            if (isBlank(dulDetail.getSeries()) || isBlank(dulDetail.getNumber()) || isDigit(dulDetail.getNumber())
+                    || dulDetail.getNumber().length() != 6 || Integer.parseInt(dulDetail.getNumber()) < 500001
+                    || Integer.parseInt(dulDetail.getNumber()) > 750000) {
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            }
+            validateSSSR(dulDetail);
+        } else if (dulDetail.getDocumentTypeId().equals(16L)) {
+            if (isBlank(dulDetail.getNumber()) || dulDetail.getNumber().length() != 9 || isDigit(dulDetail.getNumber()))
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        } else if (dulDetail.getDocumentTypeId().equals(900L)) {
+            if (isBlank(dulDetail.getNumber()) || dulDetail.getNumber().length() < 5 || dulDetail.getNumber().length() > 14)
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            validateForeignPassport(dulDetail);
+        } else if (dulDetail.getDocumentTypeId().equals(19L)) {
+            if (isBlank(dulDetail.getNumber()) || dulDetail.getNumber().length() != 9)
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            validateSailorPassport(dulDetail);
+        } else if (dulDetail.getDocumentTypeId().equals(3L)) {
+            if (isBlank(dulDetail.getSeries()) || isBlank(dulDetail.getNumber()) || dulDetail.getNumber().length() != 6
+                    || dulDetail.getSeries().length() < 3)
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            validateBirthCertificate(session, dulDetail);
+        } else if (dulDetail.getDocumentTypeId().equals(6L)) {
+            if (isBlank(dulDetail.getNumber()) || dulDetail.getNumber().length() > 7  || dulDetail.getNumber().length() < 6)
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            validateMilitaryPassport(dulDetail);
+        }
+    }
+
+    private void validateBirthCertificate(Session session, DulDetail dulDetail) throws DocumentValidateException {
+        String cyrillic = ".*[а-яА-Я]+.*";
+
+        if (dulDetail.getIdOfClient() != null && dulDetail.getIdOfClient() != 0L) {
+            Client client = session.get(Client.class, dulDetail.getIdOfClient());
+            if (client != null && client.getBirthDate() != null) {
+                LocalDate birthDate = client.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate currentDate = LocalDate.now();
+                int age = Period.between(birthDate, currentDate).getYears() * 12 + Period.between(birthDate, currentDate).getMonths();
+                if (age > 170) {
+                    throw new DocumentValidateException("Снилс разрешен для пассажиров, возраст " +
+                            "которых не превышает 14 лет и 2 месяцев", dulDetail.getDocumentTypeId());
+                }
+            }
+        }
+        validateRoman(dulDetail, cyrillic);
+    }
+
+    private void validateMilitaryPassport(DulDetail dulDetail) throws DocumentValidateException {
+        String cyrillic = ".*[а-яА-Я]+.*";
+        String start = dulDetail.getSeries().substring(0, 2).trim();
+        String end = dulDetail.getSeries().substring(2);
+
+        if (!start.matches(cyrillic)) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+        if (!isDigit(end)) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+    }
+
+    private void validateSailorPassport(DulDetail dulDetail) throws DocumentValidateException {
+        String cyrillic = ".*[а-яА-Я]+.*";
+        String latin = ".*[a-zA-Z]+.*";
+        String start = dulDetail.getSeries().substring(0, 2).trim();
+        String end = dulDetail.getSeries().substring(2);
+
+        boolean latinOrCyrillicOrDigit = start.matches(latin);
+
+        if (start.matches(cyrillic)) {
+            if (latinOrCyrillicOrDigit) {
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            }
+            latinOrCyrillicOrDigit = true;
+        }
+        if (isDigit(start)) {
+            if (latinOrCyrillicOrDigit) {
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            }
+        }
+        if (!isDigit(end)) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+    }
+
+    private void validateForeignPassport(DulDetail dulDetail) throws DocumentValidateException {
+        String cyrillic = ".*[а-яА-Я]+.*";
+        boolean containsDigit = false;
+
+        for (char c : dulDetail.getNumber().toCharArray()) {
+            if (isDigit(c + "")) {
+                containsDigit = true;
+                break;
+            }
+        }
+        if (!containsDigit && Pattern.compile(cyrillic).matcher(dulDetail.getNumber()).matches()) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+
+    }
+
+    private boolean isDigit(String number) {
+        return !number.matches("\\d+");
+    }
+
+    private void validateSSSR(DulDetail dulDetail) throws Exception {
+        String cyrillic = ".*[а-яА-Я]+.*";
+        if (dulDetail.getSeries().length() < 3) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+        validateRoman(dulDetail, cyrillic);
+    }
+
+    private void validateRoman(DulDetail dulDetail, String cyrillic) throws DocumentValidateException {
+        String russian = dulDetail.getSeries().substring(dulDetail.getSeries().length() - 2);
+        String roman = dulDetail.getSeries().substring(0, dulDetail.getSeries().length() - 2).trim();
+
+        if (!Pattern.compile(cyrillic).matcher(russian).matches()) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+        if (romanToInt(roman) < 1 || romanToInt(roman) > 35) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
+    }
+
+    private boolean isBlank(String str) {
+        return str == null || str.trim().isEmpty();
     }
 
     @SuppressWarnings("unchecked")
@@ -197,13 +327,6 @@ public class DulDetailService {
         return RuntimeContext.getAppContext().getBean(MeshGuardiansService.class);
     }
 
-    private void checkError(MeshDocumentResponse documentResponse) throws Exception {
-        if (!documentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
-            logger.error(String.format("%s: %s", documentResponse.getCode(), documentResponse.getMessage()));
-            throw new Exception(documentResponse.getMessage());
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public void saveDulOnlyISPP(Session session, List<DulDetail> dulDetails, Long idOfClient) throws Exception {
         validateDulList(session, dulDetails, true);
@@ -226,5 +349,32 @@ public class DulDetailService {
             dulDetail.setIdOfClient(idOfClient);
             session.save(dulDetail);
         }
+    }
+
+    private int romanToInt(String s) {
+
+        int output = 0;
+        Map<String, Integer> map = new HashMap<>();
+        map.put("I", 1);
+        map.put("V", 5);
+        map.put("X", 10);
+        map.put("L", 50);
+        map.put("C", 100);
+        map.put("D", 500);
+        map.put("M", 1000);
+
+        if (s.length() == 0) return 0;
+        if (s.length() == 1) return map.get(String.valueOf(s.charAt(0)));
+
+        for (int i = 0; i < s.length() - 1; i++) {
+            if (map.get(String.valueOf(s.charAt(i))) >=
+                    map.get(String.valueOf(s.charAt(i + 1)))) {
+                output = output + map.get(String.valueOf(s.charAt(i)));
+            } else {
+                output = output - map.get(String.valueOf(s.charAt(i)));
+            }
+        }
+        output = output + map.get(String.valueOf(s.charAt(s.length() - 1)));
+        return output;
     }
 }
