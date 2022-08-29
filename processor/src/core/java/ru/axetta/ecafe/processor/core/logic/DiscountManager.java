@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
@@ -204,6 +205,16 @@ public class DiscountManager {
         }
     }
 
+    public static ClientDtisznDiscountInfo getAppointedClientDtisznDiscount(Client client) {
+        if (CollectionUtils.isEmpty(client.getCategoriesDSZN())) return null;
+        ClientDtisznDiscountInfo info = client.getCategoriesDSZN().stream()
+                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP()).findFirst().orElse(null);
+        if (info != null) return info;
+        List<ClientDtisznDiscountInfo> infos = new ArrayList(client.getCategoriesDSZN());
+        Collections.sort(infos);
+        return infos.get(infos.size()-1);
+    }
+
     public static void archiveApplicationForFood(Session session, ApplicationForFood applicationForFood, Long newVersion) {
         if (!applicationForFood.getArchived() && isEligibleToDelete(session, applicationForFood)) {
             applicationForFood.setArchived(true);
@@ -317,6 +328,37 @@ public class DiscountManager {
         if (newDiscounts.equals(client.getCategories())) return;
 
         renewDiscounts(session, client, newDiscounts, client.getCategories(), historyComment);
+    }
+
+    //0 элемент - льготы ИСПП, 1 - ДСЗН
+    public static String[] getClientDiscountsAsArray(Client client, List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        String[] result = {"", ""};
+        ClientDtisznDiscountInfo info = getAppointedClientDtisznDiscount(client);
+        if (info != null) {
+            result[0] = getISPPDiscounts(client, info, categoryDiscountDSZNList);
+            result[1] = info.getDtisznCode().toString();
+        } else {
+            result[0] = getClientDiscountsAsString(client);
+        }
+        return result;
+    }
+
+    private static String getISPPDiscounts(Client client, ClientDtisznDiscountInfo info,
+                                    List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        String result = "";
+        for (CategoryDiscount cd : client.getCategories()) {
+            if (categoryDiscountDSZNList.stream().anyMatch(cdDszn -> cdDszn.getCategoryDiscount().equals(cd)
+                    && info.getDtisznCode().equals(cdDszn.getCode().longValue()))) {
+                result += cd.getIdOfCategoryDiscount() + ",";
+            }
+            if (!categoryDiscountDSZNList.stream().anyMatch(cdDszn -> cdDszn.getCategoryDiscount().equals(cd))) {
+                result += cd.getIdOfCategoryDiscount() + ",";
+            }
+        }
+        if (result.length() > 0) {
+            result = result.substring(0, result.length()-1);
+        }
+        return result;
     }
 
     public static String getClientDiscountsAsString(Client client) {
