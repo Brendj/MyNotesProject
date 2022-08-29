@@ -6265,6 +6265,7 @@ public class Processor implements SyncProcessor {
         Org organization;
         List<Org> orgList;
         Set<Long> activeClientsId;
+        List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6289,9 +6290,9 @@ public class Processor implements SyncProcessor {
 
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
                 } else {
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1, categoryDiscountDSZNList));
                 }
             }
             activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
@@ -6302,7 +6303,7 @@ public class Processor implements SyncProcessor {
                 boolean isTempClient = entry.getKey().equals("TemporaryClients");
                 for (Client cl : entry.getValue()) {
                     if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, 2, isTempClient));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, 2, isTempClient, categoryDiscountDSZNList));
                     }
                     activeClientsId.add(cl.getIdOfClient());
                 }
@@ -6343,9 +6344,9 @@ public class Processor implements SyncProcessor {
                 for (Client client : errorClients) {
                     client.setClientGroup(clientGroup);
                     if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
                     } else {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1, categoryDiscountDSZNList));
                     }
                 }
             }
@@ -6361,6 +6362,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse.ClientRegistry processSyncClientRegistryForMigrants(Long idOfOrg) throws Exception {
         SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
+        List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6370,7 +6372,7 @@ public class Processor implements SyncProcessor {
             List<Client> clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
 
             for (Client client : clients) {
-                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
             }
 
             persistenceTransaction.commit();

@@ -4825,7 +4825,7 @@ public class DAOUtils {
         condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber = :number";
         condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery(
-                "select a from ApplicationForFood a join a.dtisznCodes codes " + condition + " order by a.createdDate, a.serviceNumber");
+                "select distinct a from ApplicationForFood a join a.dtisznCodes codes " + condition + " order by a.createdDate, a.serviceNumber");
         if (showPeriod) {
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
