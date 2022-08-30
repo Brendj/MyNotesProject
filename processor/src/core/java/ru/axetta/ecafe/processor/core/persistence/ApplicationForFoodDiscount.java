@@ -13,6 +13,7 @@ public class ApplicationForFoodDiscount {
     private Date startDate;
     private Date endDate;
     private Boolean appointedMSP;
+    private Date lastUpdate;
 
     public ApplicationForFoodDiscount() {
 
@@ -22,6 +23,11 @@ public class ApplicationForFoodDiscount {
         this.dtisznCode = dtisznCode;
         this.confirmed = false;
         this.appointedMSP = false;
+    }
+
+    public void removeConfirmed() {
+        this.confirmed = false;
+        this.lastUpdate = new Date();
     }
 
     @Override
@@ -95,5 +101,13 @@ public class ApplicationForFoodDiscount {
 
     public void setAppointedMSP(Boolean appointedMSP) {
         this.appointedMSP = appointedMSP;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

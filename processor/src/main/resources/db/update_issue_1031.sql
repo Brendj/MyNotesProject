@@ -8,6 +8,7 @@ create table cf_applications_for_food_discount(
     startdate int8 NULL,
     enddate int8 NULL,
     appointedMSP integer NOT NULL DEFAULT 0,
+    lastupdate bigint,
     CONSTRAINT cf_applications_for_food_discount_pk PRIMARY KEY (idofappdiscount),
     CONSTRAINT cf_applications_for_food_discount_app FOREIGN KEY (idofapplicationforfood)
         REFERENCES cf_applications_for_food (idofapplicationforfood) MATCH SIMPLE
