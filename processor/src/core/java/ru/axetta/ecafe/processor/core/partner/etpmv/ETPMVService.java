@@ -11,9 +11,11 @@ import generated.etp.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.ApplicationForFoodExistsException;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
@@ -25,11 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -55,6 +60,7 @@ import java.util.*;
 public class ETPMVService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVService.class);
     private final int COORDINATE_MESSAGE = 0;
+    private final int COORDINATE_STATUS_MESSAGE = 1;
     public static final String ISPP_ID = "-063101-";
     public static final String NEW_ISPP_ID = "-100101-";
     private final int PAUSE_IN_MILLIS = 1000;
@@ -78,8 +84,13 @@ public class ETPMVService {
     public void processIncoming(String message) {
         try {
             CoordinateMessage coordinateMessage = getCoordinateMessage(message);
-            if (coordinateMessage != null) {
-                processCoordinateMessage(coordinateMessage, message);
+            CoordinateStatusMessage coordinateStatusMessage = getCoordinateStatusMessage(message);
+            if (coordinateMessage != null || coordinateStatusMessage != null) {
+                if (coordinateMessage != null)
+                    processCoordinateMessage(coordinateMessage, message);
+                else
+                    //Обработка сообщения из ЕТП об отмене заявления
+                    processCoordinateStatusMessage(coordinateStatusMessage, message);
             } else {
                 sendToBK(message);
             }
@@ -93,16 +104,33 @@ public class ETPMVService {
         return message.contains(NEW_ISPP_ID);
     }
 
+    public CoordinateStatusMessage getCoordinateStatusMessage(String message) throws Exception {
+        try {
+            int type = getMessageType(message);
+
+            JAXBContext jaxbContext = getJAXBContext2(type);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
+            switch (type) {
+                case COORDINATE_STATUS_MESSAGE:
+                    return (CoordinateStatusMessage) unmarshaller.unmarshal(stream);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in getCoordinateStatusMessage: ", e);
+        }
+        return null;
+    }
+
     public CoordinateMessage getCoordinateMessage(String message) throws Exception {
         try {
             int type = getMessageType(message);
 
             JAXBContext jaxbContext = getJAXBContext(type);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
+            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
             switch (type) {
                 case COORDINATE_MESSAGE:
-                    InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
                     return (CoordinateMessage) unmarshaller.unmarshal(stream);
             }
 
@@ -249,6 +277,74 @@ public class ETPMVService {
 
         daoService.updateEtpPacketWithSuccess(serviceNumber);
     }
+
+    private void processCoordinateStatusMessage(CoordinateStatusMessage coordinateStatusMessage, String message) throws Exception {
+        long begin_time = System.currentTimeMillis();
+        ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
+
+        CoordinateStatusData coordinateStatusData = coordinateStatusMessage.getCoordinateStatusDataMessage();
+        String serviceNumber = coordinateStatusData.getServiceNumber();
+        StatusType statusType = coordinateStatusData.getStatus();
+        Integer code = statusType.getStatusCode();
+        //Обрабатываем только заявления на отмену
+        if (ApplicationForFoodState.CANCELED.getCode().equals(code.toString())) {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
+                if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID))
+                    throw new Exception("Wrong ISPP_ID in Service Number");
+                daoService.saveEtpPacket(serviceNumber, message);
+
+                //Находим заявления по номеру
+                ApplicationForFood applicationForFood = daoService.findApplicationForFoodByServiceNumber(serviceNumber);
+                Client client = applicationForFood.getClient();
+                ApplicationForFoodState applicationForFoodState = applicationForFood.getStatus().getApplicationForFoodState();
+                //заявление найдено и оно в статусе "заявление зарегистрировано" в одном из следующих статусов 1050, 1052, 1075, 7704.х (7704.1...10), 7705.х (7705.1...10) и не в архиве
+                if (!applicationForFood.getArchived() && (applicationForFoodState == ApplicationForFoodState.REGISTERED ||
+                        applicationForFoodState == ApplicationForFoodState.RESULT_PROCESSING ||
+                        applicationForFoodState == ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED ||
+                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode()) ||
+                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode())))
+                {
+                    for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
+                    {
+                        applicationForFoodDiscount.setConfirmed(false);
+                        persistenceSession.save(applicationForFoodDiscount);
+                        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(persistenceSession, client,
+                                applicationForFoodDiscount.getDtisznCode().longValue());
+                        discountInfo.setArchived(true);
+                        discountInfo.setArchiveDate(new Date());
+                        discountInfo.setLastUpdate(new Date());
+                        persistenceSession.save(discountInfo);
+                    }
+                    applicationForFood.setStatus(new ApplicationForFoodStatus(
+                            ApplicationForFoodState.WITHDRAWN));
+                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
+                    sendToBK(message);
+                    DiscountManager.rebuildAppointedMSPByClient(persistenceSession, client);
+                } else
+                {
+                    logger.error("Error in processCoordinateStatusMessage: not found application");
+                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not found application");
+                    sendToBK(message);
+                    return;
+                }
+                daoService.updateEtpPacketWithSuccess(serviceNumber);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Error in processCoordinateStatusMessage", e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+    }
+
 
     private boolean wrongBenefits(List<String> benefits) {
         return RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
@@ -581,9 +677,23 @@ public class ETPMVService {
         return null;
     }
 
+    private JAXBContext getJAXBContext2(int type) throws Exception {
+        switch (type) {
+            case COORDINATE_MESSAGE:
+                if (jaxbConsumerContext == null) {
+                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+                }
+                return jaxbConsumerContext;
+        }
+        return null;
+    }
+
     private int getMessageType(String message) throws Exception {
         if (message.contains(":CoordinateMessage")) {
             return COORDINATE_MESSAGE;
+        }
+        if (message.contains(":CoordinateStatusMessage")) {
+            return COORDINATE_STATUS_MESSAGE;
         }
         throw new Exception("Unknown message type");
     }
