@@ -28,10 +28,18 @@ public class DocumentDTO implements Serializable {
         d.series = pd.getSeries();
         d.number = pd.getNumber();
         d.idMKDocument = pd.getId();
-        d.setIssuer(pd.getIssuer());
-        d.setIssuedDate(DateUtils.parseSimpleDate(pd.getIssued().toString()));
-        d.setSubdivisionCode(pd.getSubdivisionCode());
-        d.setExpiration(DateUtils.parseSimpleDate(pd.getExpiration().toString()));
+        if(pd.getIssuer() != null) {
+            d.setIssuer(pd.getIssuer());
+        }
+        if(pd.getIssued() != null) {
+            d.setIssuedDate(DateUtils.parseSimpleDate(pd.getIssued().toString()));
+        }
+        if(pd.getSubdivisionCode() != null) {
+            d.setSubdivisionCode(pd.getSubdivisionCode());
+        }
+        if(pd.getExpiration() != null) {
+            d.setExpiration(DateUtils.parseSimpleDate(pd.getExpiration().toString()));
+        }
 
         return d;
     }
