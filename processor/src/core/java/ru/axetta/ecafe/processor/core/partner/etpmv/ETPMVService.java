@@ -312,14 +312,14 @@ public class ETPMVService {
                 {
                     for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
                     {
-                        applicationForFoodDiscount.setConfirmed(false);
-                        persistenceSession.save(applicationForFoodDiscount);
+                        applicationForFoodDiscount.removeConfirmed();
+                        persistenceSession.update(applicationForFoodDiscount);
                         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(persistenceSession, client,
                                 applicationForFoodDiscount.getDtisznCode().longValue());
                         discountInfo.setArchived(true);
                         discountInfo.setArchiveDate(new Date());
                         discountInfo.setLastUpdate(new Date());
-                        persistenceSession.save(discountInfo);
+                        persistenceSession.update(discountInfo);
                     }
                     applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
