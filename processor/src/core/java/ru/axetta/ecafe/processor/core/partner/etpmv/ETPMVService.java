@@ -300,13 +300,20 @@ public class ETPMVService {
                 daoService.saveEtpPacket(serviceNumber, message);
 
                 //Находим заявления по номеру
-                ApplicationForFood applicationForFood = daoService.findApplicationForFoodByServiceNumber(serviceNumber);
+                ApplicationForFood applicationForFood = daoService.getApplicationForFoodWithDtisznCodes(serviceNumber);
+                if (applicationForFood == null)
+                {
+                    logger.error("Error in processCoordinateStatusMessage: application not found");
+                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
+                    sendToBK(message);
+                    return;
+                }
                 Client client = applicationForFood.getClient();
                 ApplicationForFoodState applicationForFoodState = applicationForFood.getStatus().getApplicationForFoodState();
                 //заявление найдено и оно в статусе "заявление зарегистрировано" в одном из следующих статусов 1050, 1052, 1075, 7704.х (7704.1...10), 7705.х (7705.1...10) и не в архиве
                 if (!applicationForFood.getArchived() && (applicationForFoodState == ApplicationForFoodState.REGISTERED ||
                         applicationForFoodState == ApplicationForFoodState.RESULT_PROCESSING ||
-                        applicationForFoodState == ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED ||
+                        applicationForFoodState == ApplicationForFoodState.OK ||
                         applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode()) ||
                         applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode())))
                 {
@@ -316,10 +323,12 @@ public class ETPMVService {
                         persistenceSession.update(applicationForFoodDiscount);
                         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(persistenceSession, client,
                                 applicationForFoodDiscount.getDtisznCode().longValue());
-                        discountInfo.setArchived(true);
-                        discountInfo.setArchiveDate(new Date());
-                        discountInfo.setLastUpdate(new Date());
-                        persistenceSession.update(discountInfo);
+                        if (discountInfo != null) {
+                            discountInfo.setArchived(true);
+                            discountInfo.setArchiveDate(new Date());
+                            discountInfo.setLastUpdate(new Date());
+                            persistenceSession.update(discountInfo);
+                        }
                     }
                     applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
