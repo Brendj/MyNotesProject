@@ -76,6 +76,15 @@ public class ApplicationForFood {
 
     }
 
+    public boolean allDiscountsConfirmed() {
+        for (ApplicationForFoodDiscount discount : this.getDtisznCodes()) {
+            if (!discount.getConfirmed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean isInoe() {
         //Если льгота одна и она Иное, то true
         return (dtisznCodes != null && dtisznCodes.size() == 1

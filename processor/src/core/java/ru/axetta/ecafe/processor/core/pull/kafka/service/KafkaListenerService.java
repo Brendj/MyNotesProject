@@ -40,7 +40,7 @@ public class KafkaListenerService {
     public void MezvedListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
         AbstractPullData responseData = objectMapper.readValue(message, AbstractPullData.class);
-        parseResponseMessage(responseData, message);
+        RuntimeContext.getAppContext().getBean(KafkaListenerService.class).parseResponseMessage(responseData, message);
     }
 
 

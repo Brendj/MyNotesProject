@@ -17,5 +17,6 @@
         <property name="startDate" column="startdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="endDate" column="enddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="appointedMSP" column="appointedMSP" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>

@@ -18,7 +18,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.BenefitService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
@@ -485,11 +483,22 @@ public class DTSZNDiscountsReviseService {
         return newValues;
     }
 
+    private ApplicationForFoodDiscount getApplicationForFoodDiscountByInfo(ApplicationForFood application,
+                                                                           ClientDtisznDiscountInfo info) {
+        for (ApplicationForFoodDiscount discount : application.getDtisznCodes()) {
+            if (!discount.getConfirmed()) continue;
+            if ((discount.getDtisznCode() == null && info.getDtisznCode().equals(0L))
+            || discount.getDtisznCode().equals(info.getDtisznCode().intValue())) {
+                return discount;
+            }
+        }
+        return null;
+    }
+
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
         if (null == application
-                || !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK))
-                || application.isNewFormat()) {
+                || !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK))) {
             return;
         }
 
@@ -498,22 +507,30 @@ public class DTSZNDiscountsReviseService {
         try {
             Boolean isOk = false;
 
+            ApplicationForFoodDiscount applicationForFoodDiscount = null;
             for (ClientDtisznDiscountInfo info : infoList) {
-                if (((application.getApplicationDiscountOldFormat().getDtisznCode() == null && info.getDtisznCode().equals(0L))
-                        || application.getApplicationDiscountOldFormat().getDtisznCode().equals(info.getDtisznCode())) && info.getStatus()
+                applicationForFoodDiscount = getApplicationForFoodDiscountByInfo(application, info);
+                if (applicationForFoodDiscount == null) continue;
+                if (((applicationForFoodDiscount.getDtisznCode() == null && info.getDtisznCode().equals(0L))
+                        || applicationForFoodDiscount.getDtisznCode().equals(info.getDtisznCode().intValue())) && info.getStatus()
                         .equals(ClientDTISZNDiscountStatus.CONFIRMED) && fireTime.before(info.getDateEnd())
                         && !info.getArchived()) {
                     isOk = true;
                     break;
                 }
             }
+            if (applicationForFoodDiscount == null) return;
 
             if (application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK))) {
                 if (!isOk) {
-                    Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                    application.setArchived(true);
-                    application.setVersion(applicationVersion);
-                    session.update(application);
+                    applicationForFoodDiscount.removeConfirmed();
+                    session.update(applicationForFoodDiscount);
+                    if (!application.allDiscountsConfirmed()) {
+                        Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                        application.setArchived(true);
+                        application.setVersion(applicationVersion);
+                        session.update(application);
+                    }
                 }
             }
         } catch (Exception e) {

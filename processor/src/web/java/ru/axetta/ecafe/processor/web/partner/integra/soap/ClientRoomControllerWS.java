@@ -10866,7 +10866,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new ClientNotFoundException(String.format("Unable to find client with guid={%s}", clientGuid));
             }
 
-            DAOUtils.createApplicationForFood(persistenceSession, client, Arrays.asList(otherDiscount ? null : categoryDiscount.intValue()),
+            DAOUtils.createApplicationForFood(persistenceSession, client, otherDiscount ? null : Arrays.asList(categoryDiscount.intValue()),
                     mobilePhone, guardianName, guardianSecondName, guardianSurname, serviceNumber,
                     ApplicationForFoodCreatorType.PORTAL, null, null);
             DAOUtils.updateApplicationForFood(persistenceSession, client,
