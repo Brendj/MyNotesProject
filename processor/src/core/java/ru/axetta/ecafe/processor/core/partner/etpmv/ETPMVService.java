@@ -679,7 +679,7 @@ public class ETPMVService {
 
     private JAXBContext getJAXBContext2(int type) throws Exception {
         switch (type) {
-            case COORDINATE_MESSAGE:
+            case COORDINATE_STATUS_MESSAGE:
                 if (jaxbConsumerContext == null) {
                     jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
                 }
