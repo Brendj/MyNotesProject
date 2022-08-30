@@ -42,6 +42,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_DOCUMENT_EXISTS = 491;
     public static final int ERROR_DOCUMENT_NOT_FOUND = 510;
     public static final int ERROR_SNILS_EXISTS = 520;
+    public static final int ERROR_DOCUMENT_VALIDATION = 530;
 
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";

@@ -1249,9 +1249,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         //Получаем параллель клиента после изменений
         ClientParallel.addFoodBoxModifire(client);
 
-        for (DulDetail dul : this.dulDetail)
-            if (dul.getNumber().isEmpty() || dul.getNumber() == null && !dul.getDeleteState())
-                throw new Exception("Не заполнено поле \"Номер\" документа");
+        try {
+            getMeshDulDetailService().validateDulList(persistenceSession, dulDetail, true);
+        } catch (DocumentValidateException e) {
+            documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
+        } catch (DocumentExistsException e) {
+            documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
+        }
 
         if (isParentGroup() && this.clientWardItems.isEmpty() && this.removeListWardItems.isEmpty()) {
             throw new Exception("Не выбраны \"Опекаемые\"");
@@ -1347,14 +1351,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     throw new Exception(String.format("Ошибка удаления документов в МК: %s", meshDocumentResponse.getMessage()));
                 }
             } else {
-                MeshDocumentResponse meshDocumentResponse;
-                if (dulDetail.getNew()) {
-                    meshDocumentResponse = getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client, safeToMk);
-                } else {
-                    meshDocumentResponse = getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client, safeToMk);
-                }
-                if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                    throw new Exception(String.format("Ошибка сохранения документов в МК: %s", meshDocumentResponse.getMessage()));
+                try {
+                    MeshDocumentResponse meshDocumentResponse;
+                    if (dulDetail.getNew()) {
+                        meshDocumentResponse = getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client, safeToMk);
+                    } else {
+                        meshDocumentResponse = getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client, safeToMk);
+                    }
+                    if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                        throw new Exception(String.format("Ошибка сохранения документов в МК: %s", meshDocumentResponse.getMessage()));
+                    }
+                } catch (DocumentExistsException e) {
+                    documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
                 }
             }
             dulDetail.setNew(false);
@@ -1369,7 +1377,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
-         persistenceSession.update(client);
+        persistenceSession.update(client);
 
         //Перенос в группу выбывшие в случае удаления связок с опекунами
         if (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
@@ -1382,6 +1390,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private void documentExceptionProcess(Session persistenceSession, Long documentTypeId, String message) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(DulGuide.class);
+        criteria.add(Restrictions.eq("documentTypeId", documentTypeId));
+        DulGuide dulGuide = (DulGuide) criteria.uniqueResult();
+        throw new Exception(String.format("Ошибка: %s. Документ: %s.", message, dulGuide.getName()));
     }
 
     private boolean isDulRemoved(List<DulDetail> dulDetail) {
