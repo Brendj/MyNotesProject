@@ -301,7 +301,7 @@ public class MeshClientProcessorService {
                     Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                     clientGuardianHistory.setClientGuardian(cg);
                     clientGuardianHistory.setChangeDate(new Date());
-                    cg.setDisabled(true);
+                    cg.setDeletedState(true);
                     cg.setVersion(newGuardiansVersions);
                     session.update(cg);
 

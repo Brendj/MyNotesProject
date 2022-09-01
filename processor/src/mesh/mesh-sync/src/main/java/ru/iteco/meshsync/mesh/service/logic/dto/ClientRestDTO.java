@@ -22,7 +22,7 @@ public class ClientRestDTO implements Serializable {
     private String lastname;
     private Integer genderId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", timezone = "Europe/Moscow")
     private Date birthdate;
 
     private String phone = "";
