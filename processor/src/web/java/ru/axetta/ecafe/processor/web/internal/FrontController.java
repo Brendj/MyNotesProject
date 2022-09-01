@@ -1700,8 +1700,9 @@ public class FrontController extends HttpServlet {
         }
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, "
-                        + "cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s, longCardNo=%s",
-                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid, longCardNo));
+                        + "cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s, forceRegister=%s, longCardNo=%s",
+                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid, forceRegister,
+                longCardNo));
         CardService cardService = CardService.getInstance();
         if (!(type >= 0 && type < Card.TYPE_NAMES.length)) {
             return new CardResponseItem(CardResponseItem.ERROR_INVALID_TYPE,
@@ -1736,8 +1737,29 @@ public class FrontController extends HttpServlet {
                         throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                     }
                 } else {
-                    exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
-                    if (exCard != null) {
+                    //Идет регистрация 7-байтной карты
+                    //Вначале проверяем на дубли среди старых карт (у них не было longCardNo)
+                    Card cardNullLong = DAOUtils.findCardByCardNoAndWithoutLongCardNo(persistenceSession, cardNo);
+                    if (cardNullLong != null)
+                    {
+                        if (cardNullLong.getIsLongUid() == null || cardNullLong.getIsLongUid())
+                        {
+                            //в этом случае карта также считается 7-байтной
+                            // (т.е. она зарегистрирована ДО внедрения longCardNo, но флаг isLongUid выставлен)
+                            if (cardPrintedNo == cardNullLong.getCardPrintedNo())
+                            {
+                                //Если у найденной карты и регистрируемой одинаковый cardPrintedNo, то это дубль
+                                exCard = cardNullLong;
+
+                            }
+                        }
+                    }
+                    if (exCard == null) {
+                        //Проверяем для новых карт (у них есть longCardNo)
+                        exCard = DAOUtils.findCardByLongCardNoWithUniqueCheck(persistenceSession, longCardNo);
+                    }
+                    //Если дубль найден, то идет проверка на принудительную регистрацию
+                    if (exCard != null && (forceRegister == null || forceRegister != 1)) {
                         throw new NoUniqueCardNoException(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
                     }
                 }

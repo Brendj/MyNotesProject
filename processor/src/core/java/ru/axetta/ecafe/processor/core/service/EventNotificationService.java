@@ -7,6 +7,11 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.push.kafka.service.KafkaService;
+import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.push.model.BalanceData;
+import ru.axetta.ecafe.processor.core.push.model.BenefitData;
+import ru.axetta.ecafe.processor.core.push.model.EnterEventData;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
@@ -23,6 +28,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import javax.annotation.Resource;
 import java.io.StringReader;
@@ -81,10 +87,10 @@ public class EventNotificationService {
     private static final String IGNORE_EMPTY_MOBILE_OPTION = "ecafe.processor.sms.service.emp.ignoreEmptyMobile";
 
     public static final String GUARDIAN_VALUES_KEY = "guardianId";
-    public static final String TARGET_VALUES_KEY   = "targetId";
-    public static final String SOURCE_ORG_VALUES_KEY   = "sourceOrgId";
-    public static final String DIRECTION_VALUES_KEY   = "direction";
-    public static final String ENTER_WITH_CHECKER_VALUES_KEY   = "enterWithChecker";
+    public static final String TARGET_VALUES_KEY = "targetId";
+    public static final String SOURCE_ORG_VALUES_KEY = "sourceOrgId";
+    public static final String DIRECTION_VALUES_KEY = "direction";
+    public static final String ENTER_WITH_CHECKER_VALUES_KEY = "enterWithChecker";
     public static final String ORG_ADDRESS_KEY = "address";
     public static final String ORG_SHORT_NAME_KEY = "shortnameinfoservice";
     public static final String CLIENT_GENDER_KEY = "gender";
@@ -113,20 +119,20 @@ public class EventNotificationService {
             "Уведомление о времени прихода и ухода",
             NOTIFICATION_ENTER_EVENT + "." + TYPE_EMAIL_TEXT,
             "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n\n"
-            + "[eventName] [eventTime] ([surname] [firstName]). <br/>\n"
-            + "Текущий баланс лицевого счета [balance] рублей. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"
-            + "Служба поддержки клиентов\n" + "<br/><br/>\n"
-            + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
-            + "</body>\n" + "</html>",
+                    + "[eventName] [eventTime] ([surname] [firstName]). <br/>\n"
+                    + "Текущий баланс лицевого счета [balance] рублей. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"
+                    + "Служба поддержки клиентов\n" + "<br/><br/>\n"
+                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n" + "</html>",
             NOTIFICATION_BALANCE_TOPUP + "." + TYPE_SMS,
             "Зачислено [paySum]; баланс [balance] ([contractId] [surname] [firstName])",
             NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_TEXT,
             "<html>\n<body>\nУважаемый клиент, <br/><br/>\n" + "\n"
-            + "на Ваш лицевой счет ([contractId] [surname] [firstName]) были зачислены средства в размере [paySum] руб.<br/>\n"
-            + "Текущий баланс лицевого счета [balance] руб.\n" + "<br/><br/>\n" + "С уважением,<br/>\n"
-            + "Служба поддержки клиентов\n" + "<br/><br/>\n"
-            + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
-            + "</body>\n" + "</html>",
+                    + "на Ваш лицевой счет ([contractId] [surname] [firstName]) были зачислены средства в размере [paySum] руб.<br/>\n"
+                    + "Текущий баланс лицевого счета [balance] руб.\n" + "<br/><br/>\n" + "С уважением,<br/>\n"
+                    + "Служба поддержки клиентов\n" + "<br/><br/>\n"
+                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n" + "</html>",
             NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление о пополнении баланса",
             MESSAGE_RESTORE_PASSWORD + "." + TYPE_EMAIL_TEXT,
@@ -145,11 +151,11 @@ public class EventNotificationService {
             MESSAGE_PAYMENT + "." + TYPE_EMAIL_SUBJECT, "Уведомление о списании средств",
             MESSAGE_PAYMENT + "." + TYPE_EMAIL_TEXT,
             "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n" + "\n"
-            + "Дата списания: [date]. <br/>\n"
-            + "Л/c: [contractId]. <br/>\n"
-            + "Буфет: [others]. <br/>\n"
-            + "Комплекс: [complexes]. <br/>\n"+ "<br/>\n"
-            + "С уважением,<br/>\n" + "Служба поддержки клиентов\n" + "</body>\n" + "</html>",
+                    + "Дата списания: [date]. <br/>\n"
+                    + "Л/c: [contractId]. <br/>\n"
+                    + "Буфет: [others]. <br/>\n"
+                    + "Комплекс: [complexes]. <br/>\n" + "<br/>\n"
+                    + "С уважением,<br/>\n" + "Служба поддержки клиентов\n" + "</body>\n" + "</html>",
             NOTIFICATION_SMS_SUBSCRIPTION_FEE + "." + TYPE_SMS,
             "Л/с: [contractId] Сервис SMS: не забудьте пополнить баланс до [withdrawDate]",
             NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS + "." + TYPE_SMS,
@@ -289,7 +295,7 @@ public class EventNotificationService {
     public void sendEmailAsync(String email, String type, String[] values) {
         if (StringUtils.isEmpty(email)) {
             return;
-        }  else {
+        } else {
 
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
@@ -345,14 +351,17 @@ public class EventNotificationService {
     }
 
     public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
-
+        if (RuntimeContext.getInstance().getConfigProperties()
+                .getProperty(KafkaService.MESH_KAFKA_ENABLE_PROPERTY, "0").equals("1")) {
+            sendPushToMK(destClient, dataClient, type, values, eventTime, passDirection, guardian);
+        }
         if (dataClient == null && !isNotificationEnabled(destClient, type, values)) {
             return;
         }
         Boolean sms = null;
         if (smsService.ignoreNotifyFlags() || destClient.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
-                if(sendAsync != null) {
+                if (sendAsync != null) {
                     sms = sendSMS(destClient, dataClient, type, values, sendAsync, passDirection, guardian, eventTime);
                 } else {
                     sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian, eventTime);
@@ -381,6 +390,131 @@ public class EventNotificationService {
                 }
             }
         }
+    }
+
+    public void sendPushToMK(Client destClient, Client dataClient, String type,
+                             String[] values, Date eventTime, Integer passDirection, Client guardian) {
+        try {
+            if (dataClient != null) {
+                return;
+            }
+            AbstractPushData data = getBalanceData(destClient, type, values, eventTime);
+            if (data == null)
+                data = getEnterEventData(destClient, type, values, eventTime, passDirection, guardian);
+//            if (data == null)
+//                data = getBenefitData(destClient, type, values, eventTime);
+            if (data != null)
+                RuntimeContext.getAppContext().getBean(KafkaService.class).sendMessage(data);
+        } catch (Exception e) {
+            logger.error("Failed method sendPushToMK", e);
+        }
+    }
+
+    private AbstractPushData getBenefitData(Client destClient, String type, String[] values, Date eventTime) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        BenefitData benefitData = new BenefitData();
+
+        if (type.equals(NOTIFICATION_END_BENEFIT)) {
+            benefitData.setActionType(0);
+        } else if (type.equals(NOTIFICATION_PREFERENTIAL_FOOD)) {
+            benefitData.setActionType(1);
+        } else
+            return null;
+
+        String benefitCategoryName = findValueInParams(new String[]{BenefitService.DTISZN_DESCRIPTION}, values);
+        if (!benefitCategoryName.isEmpty()) {
+            benefitData.setBenefitCategoryName(benefitCategoryName);
+        }
+        String endAt = findValueInParams(new String[]{BenefitService.DATE_END_DISCOUNT}, values);
+        if (!benefitCategoryName.isEmpty()) {
+            benefitData.setEndAt(simpleDateFormat.format(endAt));
+        }
+        benefitData.setOccurredAt(simpleDateFormat.format(eventTime));
+        benefitData.setAccount(destClient.getContractId().toString());
+        benefitData.setPersonId(destClient.getMeshGUID());
+        return benefitData;
+    }
+
+    private EnterEventData getEnterEventData(Client destClient, String type, String[] values, Date eventTime, Integer passDirection, Client guardian) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        EnterEventData enterEventData = new EnterEventData();
+
+        if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
+            if (passDirection == null)
+                return null;
+            if ((passDirection == 0 || passDirection == 6))
+                enterEventData.setActionType(0);
+            else if ((passDirection == 1 || passDirection == 7))
+                enterEventData.setActionType(1);
+            else return null;
+            if (guardian != null)
+                enterEventData.setAgentId(guardian.getMeshGUID());
+        } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
+            enterEventData.setActionType(2);
+            enterEventData.setTicketStatus("0");
+            enterEventData.setOrganizationName(findValueInParams
+                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
+        } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
+            enterEventData.setActionType(2);
+            enterEventData.setTicketStatus("1");
+            enterEventData.setOrganizationName(findValueInParams
+                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
+        } else {
+            return null;
+        }
+        String childPassCheckerId = findValueInParams(new String[]{"childPassCheckerId"}, values);
+        if (!childPassCheckerId.isEmpty()) {
+            enterEventData.setAdmittedByStaffId(Integer.parseInt(childPassCheckerId));
+        }
+        if (destClient.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue())) {
+            enterEventData.setStaffId(destClient.getIdOfClient().intValue());
+        } else {
+            enterEventData.setPersonId(destClient.getMeshGUID());
+        }
+        enterEventData.setPersonId(destClient.getMeshGUID());
+        enterEventData.setOrganizationId(destClient.getOrg().getIdOfOrg().intValue());
+        enterEventData.setOccurredAt(simpleDateFormat.format(eventTime));
+        return enterEventData;
+    }
+
+    private BalanceData getBalanceData(Client destClient, String type, String[] values, Date eventTime) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        BalanceData balanceData = new BalanceData();
+        balanceData.setActionType(0);
+
+        String amount = findValueInParams(new String[]{PARAM_AMOUNT}, values);
+        if (amount != null && !amount.isEmpty()) {
+            balanceData.setBalanceChange(Integer.parseInt(amount.replaceAll(",", "")));
+        }
+        String balance = findValueInParams(new String[]{"balance"}, values);
+        if (balance != null && !balance.isEmpty()) {
+            balanceData.setBalance(CurrencyStringUtils.rublesToCopecksTwoDigitAfterComma(balance));
+        }
+
+        if (type.equals(NOTIFICATION_BALANCE_TOPUP)) {
+            balanceData.setReasonId(0);
+        } else if (type.equals(MESSAGE_PAYMENT)) {
+            type = getOrderNotificationType(values);
+            if (type.equals(MESSAGE_PAYMENT)) {
+                balanceData.setBenefitType(0);
+                balanceData.setReasonId(1);
+            } else if (type.equals(MESSAGE_PAYMENT_PAY)) {
+                balanceData.setBenefitType(0);
+                balanceData.setReasonId(2);
+            } else return null;
+        } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
+            balanceData.setActionType(1);
+        } else return null;
+
+        String paySum = findValueInParams(new String[]{"paySum"}, values);
+        if (paySum != null && !paySum.isEmpty()) {
+            balanceData.setBalanceChange(Integer.parseInt(paySum.replaceAll(",", "")));
+        }
+        balanceData.setAccount(destClient.getContractId().toString());
+        balanceData.setOrganizationId(destClient.getOrg().getIdOfOrg());
+        balanceData.setPersonId(destClient.getMeshGUID());
+        balanceData.setOccurredAt(simpleDateFormat.format(eventTime));
+        return balanceData;
     }
 
     public boolean isNotificationEnabled(Client client, String type, String[] values) {
@@ -436,11 +570,11 @@ public class EventNotificationService {
     }
 
     private String getOrderNotificationType(String[] values) {
-        if(EventNotificationService.findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
+        if (EventNotificationService.findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
             return MESSAGE_PAYMENT;
-        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+        } else if (EventNotificationService.findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
             return MESSAGE_PAYMENT_PAY;
-        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
+        } else if (EventNotificationService.findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
             return MESSAGE_PAYMENT_FREE;
         } else {
             return MESSAGE_PAYMENT;
@@ -517,9 +651,9 @@ public class EventNotificationService {
             } else if (type.equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS) || type
                     .equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS)) {
                 clientSMSType = ClientSms.TYPE_SMS_SUB_FEE_WITHDRAW;
-            } else if(type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING)){
+            } else if (type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING)) {
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING;
-            } else if (type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS)){
+            } else if (type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS)) {
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS;
             } else if (type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
                 clientSMSType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
@@ -554,7 +688,7 @@ public class EventNotificationService {
             }
 
             Object textObject = getTextObject(type, destClient, dataClient, direction, guardian, values);
-            if(textObject != null) {
+            if (textObject != null) {
                 if (sendAsync) {
                     smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                     result = true;
@@ -595,15 +729,15 @@ public class EventNotificationService {
             empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, dataClient, destClient);
         else
             empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, destClient);
-        for (int i = 0; i < values.length-1; i=i+2) {
-            empType.getParameters().put(values[i], values[i+1]);
+        for (int i = 0; i < values.length - 1; i = i + 2) {
+            empType.getParameters().put(values[i], values[i + 1]);
         }
         empType.setTime(new Date().getTime());
         return empType;
     }
 
     public boolean sendNotificationSummary(Client destClient, Client dataClient, String type, String[] values,
-            Date eventTime, int notificationType) {
+                                           Date eventTime, int notificationType) {
         boolean result = false;
         int clientSMSType = notificationType; //ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
         try {
@@ -622,25 +756,25 @@ public class EventNotificationService {
 
     private Object getSummaryNotificationObject(String type, Client destClient, Client dataClient, String[] values) {
         EMPEventType empType = null;
-        if(type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
+        if (type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
             if (dataClient != null)
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, dataClient, destClient);
             else
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient);
         }
-        if(type.equals(NOTIFICATION_SUMMARY_BY_WEEK)) {
+        if (type.equals(NOTIFICATION_SUMMARY_BY_WEEK)) {
             if (dataClient != null)
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, dataClient, destClient);
             else
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, destClient);
         }
 
-        for (int i = 0; i < values.length-1; i=i+2) {
-            empType.getParameters().put(values[i], values[i+1]);
+        for (int i = 0; i < values.length - 1; i = i + 2) {
+            empType.getParameters().put(values[i], values[i + 1]);
         }
 
-        String empDateStr = findValueInParams(new String [] {"empTime"}, values);
-        if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+        String empDateStr = findValueInParams(new String[]{"empTime"}, values);
+        if (empDateStr != null && !StringUtils.isBlank(empDateStr)) {
             try {
                 DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
                 Date eventDate = df.parse(empDateStr);
@@ -649,9 +783,7 @@ public class EventNotificationService {
                 empType.setTime(new Date().getTime());
                 logger.error("Failed to parse EMP date", e);
             }
-        }
-        else
-        {
+        } else {
             empType.setTime(new Date().getTime());
         }
         return empType;
@@ -695,8 +827,8 @@ public class EventNotificationService {
 
     private Object getInfoMailingNotificationObject(Client destClient, String[] values) {
         EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.INFO_MAILING_EVENT, destClient);
-        for (int i = 0; i < values.length-1; i=i+2) {
-            empType.getParameters().put(values[i], values[i+1]);
+        for (int i = 0; i < values.length - 1; i = i + 2) {
+            empType.getParameters().put(values[i], values[i + 1]);
         }
         empType.setTime(new Date().getTime());
         return empType;
@@ -704,26 +836,26 @@ public class EventNotificationService {
 
     private Object getClientNewPasswordNotificationObject(Client destClient, String[] values) {
         EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CLIENT_NEWPASSWORD_EVENT, destClient);
-        for (int i = 0; i < values.length-1; i=i+2) {
-            empType.getParameters().put(values[i], values[i+1]);
+        for (int i = 0; i < values.length - 1; i = i + 2) {
+            empType.getParameters().put(values[i], values[i + 1]);
         }
         empType.setTime(new Date().getTime());
         return empType;
     }
 
-    public static final String[] attachToValues(String key, String val, String [] values) {
-        if(val == null) {
+    public static final String[] attachToValues(String key, String val, String[] values) {
+        if (val == null) {
             return values;
         }
-        if(values == null || values.length < 2) {
-            values = new String[] { key, "" + val };
+        if (values == null || values.length < 2) {
+            values = new String[]{key, "" + val};
             return values;
         }
 
-        for(int i=0; i<values.length-1; i+=2) {
-            String name = values [i];
-            if(name.equals(key)) {
-                values[i+1] = "" + val;
+        for (int i = 0; i < values.length - 1; i += 2) {
+            String name = values[i];
+            if (name.equals(key)) {
+                values[i + 1] = "" + val;
                 return values;
             }
         }
@@ -737,28 +869,28 @@ public class EventNotificationService {
     }
 
     public static final String[] attachSourceOrgIdToValues(Long orgId, String[] values) {
-        if(orgId == null) {
+        if (orgId == null) {
             return values;
         }
         return attachToValues(SOURCE_ORG_VALUES_KEY, "" + orgId, values);
     }
 
     public static final String[] attachTargetIdToValues(Long targetId, String[] values) {
-        if(targetId == null) {
+        if (targetId == null) {
             return values;
         }
         return attachToValues(TARGET_VALUES_KEY, "" + targetId, values);
     }
 
     public static final String[] attachEventDirectionToValues(Integer direction, String[] values) {
-        if(direction == null) {
+        if (direction == null) {
             return values;
         }
         return attachToValues(DIRECTION_VALUES_KEY, "" + direction, values);
     }
 
     public static final String[] attachGuardianIdToValues(Long guardianId, String[] values) {
-        if(guardianId == null) {
+        if (guardianId == null) {
             return values;
         }
         return attachToValues(GUARDIAN_VALUES_KEY, "" + guardianId, values);
@@ -785,9 +917,14 @@ public class EventNotificationService {
 
         String genderString;
         switch (gender) {
-            case 0: genderString = CLIENT_GENDER_VALUE_FEMALE; break;
-            case 1: genderString = CLIENT_GENDER_VALUE_MALE; break;
-            default: return values;
+            case 0:
+                genderString = CLIENT_GENDER_VALUE_FEMALE;
+                break;
+            case 1:
+                genderString = CLIENT_GENDER_VALUE_MALE;
+                break;
+            default:
+                return values;
         }
 
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
@@ -810,32 +947,32 @@ public class EventNotificationService {
     }
 
     public static Long getTargetIdFromValues(String[] values) {
-        String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
-        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+        String id = findValueInParams(new String[]{TARGET_VALUES_KEY}, values);
+        if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }
         return Long.parseLong(id);
     }
 
     public static Long getSourceOrgIdFromValues(String[] values) {
-        String id = findValueInParams(new String [] {SOURCE_ORG_VALUES_KEY}, values);
-        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+        String id = findValueInParams(new String[]{SOURCE_ORG_VALUES_KEY}, values);
+        if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }
         return Long.parseLong(id);
     }
 
     public static Long getGuardianIdFromValues(String[] values) {
-        String id = findValueInParams(new String [] {GUARDIAN_VALUES_KEY}, values);
-        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+        String id = findValueInParams(new String[]{GUARDIAN_VALUES_KEY}, values);
+        if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }
         return Long.parseLong(id);
     }
 
     public static Integer getEventDirectionFromValues(String[] values) {
-        String id = findValueInParams(new String [] {DIRECTION_VALUES_KEY}, values);
-        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+        String id = findValueInParams(new String[]{DIRECTION_VALUES_KEY}, values);
+        if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }
         return Integer.parseInt(id);
@@ -844,7 +981,7 @@ public class EventNotificationService {
     private EMPEventType getEnterEventEMPType(Client destClient, Client dataClient, Integer direction, String[] values) {
         EMPEventType empType;
         int type;
-        String id = findValueInParams(new String [] {ENTER_WITH_CHECKER_VALUES_KEY}, values);
+        String id = findValueInParams(new String[]{ENTER_WITH_CHECKER_VALUES_KEY}, values);
         switch (id) {
             case "1":
                 if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
@@ -881,15 +1018,15 @@ public class EventNotificationService {
 
     private Object getTextObject(String type, Client destClient, Client dataClient, Integer direction, Client guardianClient, String[] values) {
         ISmsService smsService = runtimeContext.getSmsService();
-        if(smsService instanceof EMPSmsServiceImpl) {
+        if (smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
-            if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
+            if (type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY
-                    || direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
+                            || direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = getEnterEventEMPType(destClient, dataClient, direction, values);
                 putOrgParams(empType, values);
                 putGenderParams(empType, values);
-            } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
+            } else if (type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, dataClient, destClient);
@@ -898,7 +1035,7 @@ public class EventNotificationService {
                 }
                 putGuardianParams(guardianClient, empType);
                 putOrgParams(empType, values);
-            } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
+            } else if (type.equals(NOTIFICATION_BALANCE_TOPUP)) {
 
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, dataClient, destClient);
@@ -914,7 +1051,7 @@ public class EventNotificationService {
                 if (balance != null && balance.length() > 0) {
                     empType.getParameters().put("balance", balance);
                 }
-            } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
+            } else if (type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory
@@ -924,17 +1061,17 @@ public class EventNotificationService {
                 }
                 putGuardianParams(guardianClient, empType);
                 putOrgParams(empType, values);
-            } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
+            } else if (type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient);
-                String token = findValueInParams(new String [] {"linkingToken"}, values);
+                String token = findValueInParams(new String[]{"linkingToken"}, values);
                 empType.getParameters().put("token", token);
-            }  else if(type.equals(MESSAGE_PAYMENT)) {
+            } else if (type.equals(MESSAGE_PAYMENT)) {
                 int empEventType = -1;
-                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
+                if (findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
                     empEventType = EMPEventTypeFactory.PAYMENT_EVENT;
-                } else if(findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+                } else if (findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
                     empEventType = EMPEventTypeFactory.PAYMENT_PAY_EVENT;
-                } else if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
+                } else if (findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
                     empEventType = EMPEventTypeFactory.PAYMENT_REDUCED_EVENT;
                 } else {
                     throw new RuntimeException("Попытка отправить уведомление о неизвестном типе события");
@@ -946,15 +1083,14 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
-                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty())
-                {
+                if (!findValueInParams(new String[]{PARAM_FRATION}, values).isEmpty()) {
                     String ration = findValueInParams(new String[]{PARAM_FRATION}, values);
                     empType.getParameters().put(PARAM_FRATION, ration);
                 }
 
                 //  дата только для платного комплекса + льготного комплекса
-                if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
-                   findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+                if (findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
+                        findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
                     String orderEventDate = findValueInParams(new String[]{PARAM_ORDER_EVENT_TIME}, values);
                     empType.getParameters().put(PARAM_DATE, orderEventDate.substring(0, 10)); //дата без времени
                     String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
@@ -1027,31 +1163,27 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_CULTURE, destClient, values);
                 }
                 putGenderParams(empType, values);
-            }
-            else if (type.equals(NOTIFICATION_START_SICK) || type.equals(NOTIFICATION_CANCEL_START_SICK)) {
+            } else if (type.equals(NOTIFICATION_START_SICK) || type.equals(NOTIFICATION_CANCEL_START_SICK)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 2, values);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 2, values);
                 }
                 putGenderParams(empType, values);
-            }
-            else if (type.equals(NOTIFICATION_END_SICK) || type.equals(NOTIFICATION_CANCEL_END_SICK)) {
+            } else if (type.equals(NOTIFICATION_END_SICK) || type.equals(NOTIFICATION_CANCEL_END_SICK)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 3, values);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 3, values);
                 }
                 putGenderParams(empType, values);
-            }
-            else if (type.equals(NOTIFICATION_LIBRARY)) {
+            } else if (type.equals(NOTIFICATION_LIBRARY)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, dataClient, destClient, values);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_LIBRARY, destClient, values);
                 }
-            }
-            else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
+            } else if (type.equals(NOTIFICATION_CANCEL_PREORDER)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CANCEL_PREORDER, dataClient, destClient, values);
                 } else {
@@ -1083,10 +1215,10 @@ public class EventNotificationService {
 
     public static boolean findBooleanValueInParams(String valueNames[], String values[]) {
         String res = findValueInParams(valueNames, values);
-        if(res == null || StringUtils.isBlank(res)) {
+        if (res == null || StringUtils.isBlank(res)) {
             return false;
         }
-        if(NumberUtils.isNumber(res)) {
+        if (NumberUtils.isNumber(res)) {
             double v = NumberUtils.toDouble(res);
             return v > 0;
         }
@@ -1094,14 +1226,14 @@ public class EventNotificationService {
     }
 
     protected static String findValueInParams(String valueNames[], String values[]) {
-        if(valueNames == null || valueNames.length < 1) {
+        if (valueNames == null || valueNames.length < 1) {
             return "";
         }
-        for(int i=0; i<values.length-1; i+=2) {
-            String name = values [i];
-            String val = values[i+1];
-            for(String vn : valueNames) {
-                if(name.equals(vn)) {
+        for (int i = 0; i < values.length - 1; i += 2) {
+            String name = values[i];
+            String val = values[i + 1];
+            for (String vn : valueNames) {
+                if (name.equals(vn)) {
                     return val;
                 }
             }
@@ -1113,7 +1245,7 @@ public class EventNotificationService {
     private static final void putGuardianParams(Client guardian, EMPEventType empType) {
         String sn = "-";
         String n = "-";
-        if(guardian != null) {
+        if (guardian != null) {
             try {
                 sn = guardian.getPerson().getSurname();
                 n = guardian.getPerson().getFirstName();
@@ -1128,11 +1260,11 @@ public class EventNotificationService {
     }
 
     private static final void putOrgParams(EMPEventType empType, String[] values) {
-        String orgAddress = findValueInParams(new String[] {ORG_ADDRESS_KEY}, values);
+        String orgAddress = findValueInParams(new String[]{ORG_ADDRESS_KEY}, values);
         if (!StringUtils.isEmpty(orgAddress)) {
             empType.getParameters().put(ORG_ADDRESS_KEY, orgAddress);
         }
-        String orgShortName = findValueInParams(new String[] {ORG_SHORT_NAME_KEY}, values);
+        String orgShortName = findValueInParams(new String[]{ORG_SHORT_NAME_KEY}, values);
         if (!StringUtils.isEmpty(orgShortName)) {
             empType.getParameters().put(ORG_SHORT_NAME_KEY, orgShortName);
         }
