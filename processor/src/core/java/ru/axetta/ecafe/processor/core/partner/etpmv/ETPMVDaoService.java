@@ -308,6 +308,10 @@ public class ETPMVDaoService {
         Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.dtisznCodes codes "
                 + " where a.serviceNumber = :serviceNumber");
         query.setParameter("serviceNumber", serviceNumber);
-        return (ApplicationForFood)query.getSingleResult();
+        try {
+            return (ApplicationForFood) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

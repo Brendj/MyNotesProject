@@ -83,16 +83,15 @@ public class ETPMVService {
     @Async
     public void processIncoming(String message) {
         try {
-            CoordinateMessage coordinateMessage = getCoordinateMessage(message);
-            CoordinateStatusMessage coordinateStatusMessage = getCoordinateStatusMessage(message);
-            if (coordinateMessage != null || coordinateStatusMessage != null) {
-                if (coordinateMessage != null)
-                    processCoordinateMessage(coordinateMessage, message);
-                else
-                    //Обработка сообщения из ЕТП об отмене заявления
-                    processCoordinateStatusMessage(coordinateStatusMessage, message);
-            } else {
-                sendToBK(message);
+            int type = getMessageType(message);
+            if (type == COORDINATE_MESSAGE) {
+                CoordinateMessage coordinateMessage = (CoordinateMessage) getCoordinateMessage(message);
+                processCoordinateMessage(coordinateMessage, message);
+            }
+            if (type == COORDINATE_STATUS_MESSAGE) {
+                //Обработка сообщения из ЕТП об отмене заявления
+                CoordinateStatusMessage coordinateStatusMessage = (CoordinateStatusMessage)getCoordinateMessage(message);
+                processCoordinateStatusMessage(coordinateStatusMessage, message);
             }
         } catch (Exception e) {
             logger.error("Error in process incoming ETP message: ", e);
@@ -104,40 +103,11 @@ public class ETPMVService {
         return message.contains(NEW_ISPP_ID);
     }
 
-    public CoordinateStatusMessage getCoordinateStatusMessage(String message) throws Exception {
-        try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext2(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-            switch (type) {
-                case COORDINATE_STATUS_MESSAGE:
-                    return (CoordinateStatusMessage) unmarshaller.unmarshal(stream);
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in getCoordinateStatusMessage: ", e);
-        }
-        return null;
-    }
-
-    public CoordinateMessage getCoordinateMessage(String message) throws Exception {
-        try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-            switch (type) {
-                case COORDINATE_MESSAGE:
-                    return (CoordinateMessage) unmarshaller.unmarshal(stream);
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in getCoordinateMessage: ", e);
-        }
-        return null;
+    public Object getCoordinateMessage(String message) throws Exception {
+        JAXBContext jaxbContext = getJAXBContext();
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
+        return unmarshaller.unmarshal(stream);
     }
 
     private void processCoordinateMessage(CoordinateMessage coordinateMessage, String message) throws Exception {
@@ -675,26 +645,11 @@ public class ETPMVService {
         }
     }*/
 
-    private JAXBContext getJAXBContext(int type) throws Exception {
-        switch (type) {
-            case COORDINATE_MESSAGE:
-                if (jaxbConsumerContext == null) {
-                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                }
-                return jaxbConsumerContext;
+    private JAXBContext getJAXBContext() throws Exception {
+        if (jaxbConsumerContext == null) {
+            jaxbConsumerContext = JAXBContext.newInstance(CoordinateMessage.class, CoordinateStatusMessage.class);
         }
-        return null;
-    }
-
-    private JAXBContext getJAXBContext2(int type) throws Exception {
-        switch (type) {
-            case COORDINATE_STATUS_MESSAGE:
-                if (jaxbConsumerContext == null) {
-                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                }
-                return jaxbConsumerContext;
-        }
-        return null;
+        return jaxbConsumerContext;
     }
 
     private int getMessageType(String message) throws Exception {
