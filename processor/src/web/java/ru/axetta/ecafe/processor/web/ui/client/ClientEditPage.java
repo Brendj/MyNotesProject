@@ -1250,7 +1250,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         ClientParallel.addFoodBoxModifire(client);
 
         try {
-            getMeshDulDetailService().validateDulList(persistenceSession, dulDetail, true);
+            List<DulDetail> dulDetailWithoutRemove = dulDetail
+                    .stream().filter(d -> d.getDeleteState() == null || !d.getDeleteState()).collect(Collectors.toList());
+            getMeshDulDetailService().validateDulList(persistenceSession, dulDetailWithoutRemove, true);
         } catch (DocumentValidateException e) {
             documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
         } catch (DocumentExistsException e) {
