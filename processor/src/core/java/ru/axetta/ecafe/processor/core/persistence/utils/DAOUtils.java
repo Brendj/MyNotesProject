@@ -209,7 +209,7 @@ public class DAOUtils {
     public static Client findClientByMeshGuidAsGuardian(Session persistenceSession, String guid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.eq("meshGUID", guid));
-        criteria.add(Restrictions.eq("idOfClientGroup", ClientGroup.Predefined.CLIENT_PARENTS));
+        criteria.add(Restrictions.eq("idOfClientGroup", ClientGroup.Predefined.CLIENT_PARENTS.getValue()));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
