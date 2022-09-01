@@ -157,83 +157,43 @@ public class DulDetailService {
     }
 
     private void validateReleaseNote(DulDetail dulDetail) throws DocumentValidateException {
-        boolean containsDigit = false;
-
-        if (isBlank(dulDetail.getSeries()) || dulDetail.getNumber().length() > 12) {
-            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
-        }
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit) {
+        if (dulDetail.getNumber().length() > 12 || !containsDigit(dulDetail.getNumber())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
 
     private void validateRefugeeID(DulDetail dulDetail) throws DocumentValidateException {
-        boolean containsDigit = false;
         String pattern = "^[0-9-]+$";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(dulDetail.getNumber());
 
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit || dulDetail.getNumber().length() != 10 || !m.matches()) {
+        if (!containsDigit(dulDetail.getNumber()) || dulDetail.getNumber().length() != 10 || !m.matches()) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
 
     private void validateResidentCard(DulDetail dulDetail) throws DocumentValidateException {
-        boolean containsDigit = false;
         String pattern = "^[а-я0-9a-z-]+$";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(dulDetail.getNumber());
 
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit || dulDetail.getNumber().length() > 16 || !m.matches()) {
+        if (!containsDigit(dulDetail.getNumber()) || dulDetail.getNumber().length() > 16 || !m.matches()) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
 
     private void validateTemporaryID(DulDetail dulDetail) throws DocumentValidateException {
-        boolean containsDigit = false;
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit || dulDetail.getNumber().length() > 12) {
+        if (!containsDigit(dulDetail.getNumber()) || dulDetail.getNumber().length() > 12) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
 
     private void validateTemporaryResidence(DulDetail dulDetail) throws DocumentValidateException {
-        boolean containsDigit = false;
         String pattern = "^[а-я0-9a-z-]+$";
-
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(dulDetail.getNumber());
 
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit || dulDetail.getNumber().length() > 16 || !m.matches()) {
+        if (!containsDigit(dulDetail.getNumber()) || dulDetail.getNumber().length() > 16 || !m.matches()) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
@@ -241,22 +201,14 @@ public class DulDetailService {
     private void validateSoldierID(DulDetail dulDetail) throws DocumentValidateException {
         String cyrillic = ".*[а-яА-Я]+.*";
         String latin = ".*[a-zA-Z]+.*";
-        boolean containsDigit = false;
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
                 || dulDetail.getNumber().length() != 7 || !isDigit(dulDetail.getNumber())
-                || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin)) {
+                || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin)
+                || containsDigit(dulDetail.getSeries())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
 
-        for (char c : dulDetail.getSeries().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (containsDigit)
-            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
     private void validatePassport(DulDetail dulDetail) throws DocumentValidateException {
@@ -295,22 +247,12 @@ public class DulDetailService {
     private void validateMilitaryPassport(DulDetail dulDetail) throws DocumentValidateException {
         String cyrillic = ".*[а-яА-Я]+.*";
         String latin = ".*[a-zA-Z]+.*";
-        boolean containsDigit = false;
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
                 || dulDetail.getNumber().length() > 7 || dulDetail.getNumber().length() < 6 || !isDigit(dulDetail.getNumber())
-                || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin)) {
+                || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin) || containsDigit(dulDetail.getSeries())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
-        for (char c : dulDetail.getSeries().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-
-        if (containsDigit)
-            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
     private void validateSailorPassport(DulDetail dulDetail) throws DocumentValidateException {
@@ -319,7 +261,7 @@ public class DulDetailService {
         boolean latinOrCyrillicOrDigit = dulDetail.getSeries().matches(latin);
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
-                || dulDetail.getNumber().length() != 7) {
+                || dulDetail.getNumber().length() != 7 || !isDigit(dulDetail.getNumber())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
         if (dulDetail.getSeries().matches(cyrillic)) {
@@ -328,34 +270,36 @@ public class DulDetailService {
             }
             latinOrCyrillicOrDigit = true;
         }
-        if (isDigit(dulDetail.getSeries())) {
+        if (containsDigit(dulDetail.getSeries())) {
             if (latinOrCyrillicOrDigit) {
                 throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
             }
         }
     }
 
+    private boolean containsDigit(String str) {
+        for (char c : str.toCharArray()) {
+            if (isDigit(Character.toString(c))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void validateForeignPassport(DulDetail dulDetail) throws DocumentValidateException {
         String cyrillic = ".*[а-яА-Я]+.*";
-        boolean containsDigit = false;
 
         if (dulDetail.getNumber().length() < 5 || dulDetail.getNumber().length() > 14) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
-        for (char c : dulDetail.getNumber().toCharArray()) {
-            if (isDigit(c + "")) {
-                containsDigit = true;
-                break;
-            }
-        }
-        if (!containsDigit && Pattern.compile(cyrillic).matcher(dulDetail.getNumber()).matches()) {
+        if (!containsDigit(dulDetail.getNumber()) && Pattern.compile(cyrillic).matcher(dulDetail.getNumber()).matches()) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
 
     }
 
     private boolean isDigit(String number) {
-        return !number.matches("\\d+");
+        return number.matches("\\d+");
     }
 
     private void validateSSSR(DulDetail dulDetail) throws Exception {
@@ -370,13 +314,17 @@ public class DulDetailService {
     }
 
     private void validateRoman(DulDetail dulDetail, String cyrillic) throws DocumentValidateException {
-        String russian = dulDetail.getSeries().substring(dulDetail.getSeries().length() - 2);
-        String roman = dulDetail.getSeries().substring(0, dulDetail.getSeries().length() - 2).trim();
+        try {
+            String russian = dulDetail.getSeries().substring(dulDetail.getSeries().length() - 2);
+            String roman = dulDetail.getSeries().substring(0, dulDetail.getSeries().length() - 2).trim();
 
-        if (!Pattern.compile(cyrillic).matcher(russian).matches()) {
-            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
-        }
-        if (romanToInt(roman) < 1 || romanToInt(roman) > 35) {
+            if (!Pattern.compile(cyrillic).matcher(russian).matches()) {
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            }
+            if (romanToInt(roman) < 1 || romanToInt(roman) > 35) {
+                throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+            }
+        } catch (Exception e) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
     }
