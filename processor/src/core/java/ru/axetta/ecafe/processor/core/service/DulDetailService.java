@@ -213,12 +213,12 @@ public class DulDetailService {
 
     private void validatePassport(DulDetail dulDetail) throws DocumentValidateException {
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 4 || dulDetail.getNumber().length() != 6
-                || isDigit(dulDetail.getSeries()) || isDigit(dulDetail.getNumber()))
+                || !isDigit(dulDetail.getSeries()) || !isDigit(dulDetail.getNumber()))
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
     private void validateInternationalPassport(DulDetail dulDetail) throws DocumentValidateException {
-        if (dulDetail.getNumber().length() != 9 || isDigit(dulDetail.getNumber()))
+        if (dulDetail.getNumber().length() != 9 || !isDigit(dulDetail.getNumber()))
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
@@ -305,7 +305,7 @@ public class DulDetailService {
     private void validateSSSR(DulDetail dulDetail) throws Exception {
         String cyrillic = ".*[а-яА-Я]+.*";
 
-        if (isBlank(dulDetail.getSeries()) || isDigit(dulDetail.getNumber())
+        if (isBlank(dulDetail.getSeries()) || !isDigit(dulDetail.getNumber())
                 || dulDetail.getNumber().length() != 6 || Integer.parseInt(dulDetail.getNumber()) < 500001
                 || Integer.parseInt(dulDetail.getNumber()) > 750000 || dulDetail.getSeries().length() < 3) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
