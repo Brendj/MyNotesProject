@@ -17,6 +17,7 @@ public class GuardianRelationDTO implements Serializable {
 
         for(PersonAgent g : guardians){
             ClientRestDTO clientDTO = ClientRestDTO.build(g.getAgentPerson());
+            clientDTO.setAgentTypeId(g.getAgentTypeId());
             dto.guardianPersonGuids.add(clientDTO);
         }
 

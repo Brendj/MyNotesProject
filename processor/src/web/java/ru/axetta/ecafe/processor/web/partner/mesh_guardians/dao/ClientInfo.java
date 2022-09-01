@@ -22,6 +22,7 @@ public class ClientInfo implements IDAOEntity {
     private String email;
     private String childrenPersonGUID;
     private List<DocumentInfo> documents = new LinkedList<>();
+    private Integer agentTypeId;
 
     public String getPersonGUID() {
         return personGUID;
@@ -120,5 +121,13 @@ public class ClientInfo implements IDAOEntity {
 
     public void setDocuments(List<DocumentInfo> documents) {
         this.documents = documents;
+    }
+
+    public Integer getAgentTypeId() {
+        return agentTypeId;
+    }
+
+    public void setAgentTypeId(Integer agentTypeId) {
+        this.agentTypeId = agentTypeId;
     }
 }

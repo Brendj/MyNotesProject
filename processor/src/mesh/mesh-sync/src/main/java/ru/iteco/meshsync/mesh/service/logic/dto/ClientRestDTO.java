@@ -30,6 +30,7 @@ public class ClientRestDTO implements Serializable {
     private String email = "";
     private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
+    private Integer agentTypeId;
 
     public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
@@ -150,5 +151,13 @@ public class ClientRestDTO implements Serializable {
 
     public void setDocuments(List<DocumentDTO> documents) {
         this.documents = documents;
+    }
+
+    public Integer getAgentTypeId() {
+        return agentTypeId;
+    }
+
+    public void setAgentTypeId(Integer agentTypeId) {
+        this.agentTypeId = agentTypeId;
     }
 }
