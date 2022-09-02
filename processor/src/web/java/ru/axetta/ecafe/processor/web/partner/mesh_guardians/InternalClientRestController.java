@@ -151,8 +151,6 @@ public class InternalClientRestController extends Application {
             throw new IllegalArgumentException("PersonGUID is empty");
         } else if (StringUtils.isBlank(info.getFirstname())) {
             throw new IllegalArgumentException("Firstname is empty");
-        } else if (StringUtils.isBlank(info.getPatronymic())) {
-            throw new IllegalArgumentException("Patronymic is empty");
         } else if (StringUtils.isBlank(info.getLastname())) {
             throw new IllegalArgumentException("Lastname is empty");
         } else if (info.getGenderId() == null) {
@@ -164,16 +162,10 @@ public class InternalClientRestController extends Application {
             for (DocumentInfo di : info.getDocuments()) {
                 if (di.getIdMKDocument() == null) {
                     throw new IllegalArgumentException("IdMKDocument in documents is empty");
-                } else if (StringUtils.isBlank(di.getSeries())) {
-                    throw new IllegalArgumentException("Series in documents is empty");
                 } else if (StringUtils.isBlank(di.getNumber())) {
                     throw new IllegalArgumentException("Number in documents is empty");
                 } else if (di.getDocumentType() == null) {
                     throw new IllegalArgumentException("DocumentType is empty");
-                } else if (di.getIssuedDate() == null) {
-                    throw new IllegalArgumentException("IssuedDate in documents is empty");
-                } else if (StringUtils.isBlank(di.getIssuer())) {
-                    throw new IllegalArgumentException("Issuer in documents is empty");
                 }
             }
         }
