@@ -298,7 +298,7 @@ public class ETPMVDaoService {
 
     @Transactional
     public AppMezhvedRequest getMezhvedData(String requestid) {
-        Query query = entityManager.createQuery("select a from AppMezhvedRequest a join fetch a.applicationForFood app where a.requestid = :requestid");
+        Query query = entityManager.createQuery("select a from AppMezhvedRequest a join fetch a.applicationForFood app where a.requestId = :requestid");
         query.setParameter("requestid", requestid);
         return (AppMezhvedRequest)query.getSingleResult();
     }

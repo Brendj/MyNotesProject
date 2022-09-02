@@ -6,7 +6,7 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCa
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
 
-public class ResponseHeader extends AbstractPullData {
+public class ResponseHeader {
     protected String request_id;
     protected String requesting_system;
     protected String requested_method;

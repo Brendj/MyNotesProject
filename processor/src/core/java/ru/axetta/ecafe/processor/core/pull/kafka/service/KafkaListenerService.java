@@ -15,9 +15,9 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportResponse;
 
 @Service
 public class KafkaListenerService {
@@ -39,15 +39,21 @@ public class KafkaListenerService {
 //            @PartitionOffset(partition = "0", initialOffset = "0")}))//for tests
     public void MezvedListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
-        AbstractPullData responseData = objectMapper.readValue(message, AbstractPullData.class);
+        AbstractPullData responseData = (AbstractPullData)objectMapper.readValue(message, getMessageType(message));
         RuntimeContext.getAppContext().getBean(KafkaListenerService.class).parseResponseMessage(responseData, message);
     }
 
+    private Class getMessageType(String message) throws Exception {
+        if (message.contains("active_benefit_categories_getting_response")) return BenefitResponse.class;
+        if (message.contains("passport_by_serie_number_validity_checking_response")) return PassportResponse.class;
+        if (message.contains("relatedness_checking_2_response")) return GuardianResponse.class;
+        throw new Exception("Unknown message type");
+    }
 
     @Async
     public void parseResponseMessage(AbstractPullData data, String message) {
         try {
-            if (data instanceof ActiveBenefitCategoriesGettingResponse) {
+            if (data instanceof BenefitResponse) {
                 //Обработка информации о льготных категориях
                 ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
                 if (applicationForFood != null) {
@@ -63,7 +69,7 @@ public class KafkaListenerService {
                     }
                 }
             }
-            if (data instanceof PassportBySerieNumberValidityCheckingResponse) {
+            if (data instanceof PassportResponse) {
                 //Обработка информации о подтверждении паспорта
                 ApplicationForFood applicationForFood = kafkaService.processingPassportValidation(data, message);
                 if (applicationForFood != null) {
@@ -79,7 +85,7 @@ public class KafkaListenerService {
                     }
                 }
             }
-            if (data instanceof RelatednessChecking2Response) {
+            if (data instanceof GuardianResponse) {
                 //Обработка информации о подтверждении родства
                 ApplicationForFood applicationForFood = kafkaService.processingGuardianValidation(data, message);
                 if (applicationForFood != null) {
