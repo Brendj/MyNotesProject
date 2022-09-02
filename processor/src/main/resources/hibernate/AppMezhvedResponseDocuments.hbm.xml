@@ -13,7 +13,7 @@
         <property name="number" column="number" type="string"/>
         <property name="issue_date" column="issue_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="issuer" column="issuer" type="string"/>
-        <property name="type" column="type" type="integer">
+        <property name="type" column="type">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.AppMezhvedResponseDocDirection</param>
             </type>

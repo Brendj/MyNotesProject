@@ -47,7 +47,7 @@ public class KafkaListenerServiceImpl {
             String requestId = activeBenefitCategoriesGettingResponse.getRequest_id();
 
             //Заполнение полей таблицы AppMezhvedRequest
-            AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message, session);
+            AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             //Флаг того, что хотябы один ЛК был подтвержден
             boolean confirm = false;
@@ -119,7 +119,7 @@ public class KafkaListenerServiceImpl {
             transaction = session.beginTransaction();
             PassportResponse passportData = (PassportResponse) data;
             PassportBySerieNumberValidityCheckingResponse passport = passportData.getPassport_by_serie_number_validity_checking_response();
-            AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message, session);
+            AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080"))
 //            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
@@ -167,7 +167,7 @@ public class KafkaListenerServiceImpl {
             RelatednessChecking2Response relatednessChecking2Response = guardianData.getRelatedness_checking_2_response();
 
             AppMezhvedRequest appMezhvedRequest =
-                    updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message, session);
+                    updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
             {
@@ -204,18 +204,9 @@ public class KafkaListenerServiceImpl {
         }
     }
 
-    private AppMezhvedRequest updateMezved(String requestId, List<Errors> errors, String message, Session session)
+    private AppMezhvedRequest updateMezved(String requestId, List<Errors> errors, String message)
     {
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
-        AppMezhvedRequest appMezhvedRequest = daoService.getMezhvedData(requestId);
-        if (errors != null)
-            appMezhvedRequest.setResponseType(AppMezhvedResponseType.ERROR);
-        else
-            appMezhvedRequest.setResponseType(AppMezhvedResponseType.OK);
-        appMezhvedRequest.setResponsePayload(message);
-        appMezhvedRequest.setResponseDate(new Date());
-        appMezhvedRequest.setLastUpdate(new Date());
-        session.persist(appMezhvedRequest);
-        return appMezhvedRequest;
+        return daoService.updateMezhvedRequest(requestId, errors, message);
     }
 }

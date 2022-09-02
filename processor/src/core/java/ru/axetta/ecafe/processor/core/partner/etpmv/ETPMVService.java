@@ -274,8 +274,8 @@ public class ETPMVService {
                 if (applicationForFood == null)
                 {
                     logger.error("Error in processCoordinateStatusMessage: application not found");
-                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
-                    sendToBK(message);
+                    //sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
+                    sendToStatusBK(message);
                     return;
                 }
                 Client client = applicationForFood.getClient();
@@ -285,10 +285,8 @@ public class ETPMVService {
                         applicationForFoodState == ApplicationForFoodState.RESULT_PROCESSING ||
                         applicationForFoodState == ApplicationForFoodState.OK ||
                         applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode()) ||
-                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode())))
-                {
-                    for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
-                    {
+                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode()))) {
+                    for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes()) {
                         applicationForFoodDiscount.removeConfirmed();
                         persistenceSession.update(applicationForFoodDiscount);
                         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(persistenceSession, client,
@@ -303,13 +301,12 @@ public class ETPMVService {
                     applicationForFood.setStatus(new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
                     sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
-                    sendToBK(message);
+                    //sendToBK(message);
                     DiscountManager.rebuildAppointedMSPByClient(persistenceSession, client);
-                } else
-                {
+                } else {
                     logger.error("Error in processCoordinateStatusMessage: not found application");
-                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not found application");
-                    sendToBK(message);
+                    //sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not found application");
+                    sendToStatusBK(message);
                     return;
                 }
                 daoService.updateEtpPacketWithSuccess(serviceNumber);
@@ -392,6 +389,17 @@ public class ETPMVService {
             success = true;
         } catch (Exception e) {
             logger.error("Error in sendBKStatus: ", e);
+        }
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
+    }
+
+    private void sendToStatusBK(String message) {
+        boolean success = false;
+        try {
+            RuntimeContext.getAppContext().getBean(ETPMVClient.class).addToStatusBKQueue(message);
+            success = true;
+        } catch (Exception e) {
+            logger.error("Error in sendStatusBK: ", e);
         }
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
     }
