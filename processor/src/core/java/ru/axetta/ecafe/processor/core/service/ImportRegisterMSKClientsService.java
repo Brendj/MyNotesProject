@@ -1631,9 +1631,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 ClientGuardian clientGuardian = DAOUtils.findClientGuardian(
                         session, child.getIdOfClient(), guardian.getIdOfClient());
                 if (clientGuardian == null) {
+                    Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
+                            ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
                     clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
                             session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
                             ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
                 }
                 else {
@@ -1667,9 +1670,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         ClientCreatedFromType.REGISTRY,
                         clientsMobileHistory);
 
+                Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
+                        ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
                 ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
                         session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), false, child.getIdOfClient(),
+                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
                         ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
             }
         }
