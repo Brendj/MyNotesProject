@@ -254,22 +254,20 @@ public class MeshPersonsSyncService {
 
     public void deleteIrrelevantPersons(){
         String top = getTop();
-        int limit = Integer.parseInt(top);
 
         Transaction transaction = null;
         Session session = null;
-        int offset = 0;
         try{
             List<MeshSyncPerson> forDelete = new LinkedList<>();
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            List<MeshSyncPerson> personList = DAOUtils.getActiveMeshPersonssSample(session, offset, limit);
-            while(!org.apache.commons.collections4.CollectionUtils.isEmpty(personList)){
-                List<String> personsIds = personList.parallelStream().map(MeshSyncPerson::getPersonguid).collect(Collectors.toList());
+            List<Long> allOrganizationIds = DAOUtils.getAllDistinctOrganizationId(session);
 
+            for(Long orgIdFromNsi : allOrganizationIds){
+                List<MeshSyncPerson> personList = DAOUtils.getActiveMeshPersonsByOrg(session, orgIdFromNsi);
                 String parameters = String.format("filter=%stop=%s",URLEncoder
-                        .encode(getFilter(personsIds), "UTF-8"), top);
+                        .encode(getFilter(orgIdFromNsi), "UTF-8"), top);
                 byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
                 TypeFactory typeFactory = objectMapper.getTypeFactory();
                 CollectionType collectionType = typeFactory.constructCollectionType(
@@ -281,9 +279,6 @@ public class MeshPersonsSyncService {
                         forDelete.add(person);
                     }
                 }
-
-                offset += limit;
-                personList = DAOUtils.getActiveMeshPersonssSample(session, offset, limit);
             }
 
             for(MeshSyncPerson d : forDelete){
@@ -445,17 +440,15 @@ public class MeshPersonsSyncService {
         return objectMapper.writeValueAsString(filter);
     }
 
-    private String getFilter(List<String> personsIds) throws Exception {
-        List<OpContainer> list = new ArrayList<>(personsIds.size());
+    private String getFilter(Long orgIdFromNSI) throws Exception {
+        List<OpContainer> list;
         MeshJsonFilter filter = new MeshJsonFilter();
 
-        for(String personId : personsIds){
-            OpContainer op = new OpContainer();
-            op.setField("person_id");
-            op.setOp(FILTER_VALUE_EQUALS);
-            op.setValue(personId);
-            list.add(op);
-        }
+        OpContainer opContainerOrg = new OpContainer();
+        opContainerOrg.setField(FILTER_VALUE_ORG);
+        opContainerOrg.setOp(FILTER_VALUE_EQUALS);
+        opContainerOrg.setValue(orgIdFromNSI.toString());
+        list = Collections.singletonList(opContainerOrg);
 
         filter.setAnd(list);
         return objectMapper.writeValueAsString(filter);
