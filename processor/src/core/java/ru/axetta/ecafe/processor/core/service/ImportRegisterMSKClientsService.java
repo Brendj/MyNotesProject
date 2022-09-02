@@ -1266,9 +1266,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 ClientGuardian clientGuardian = DAOUtils.findClientGuardian(
                         session, child.getIdOfClient(), guardian.getIdOfClient());
                 if (clientGuardian == null) {
+                    Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
+                            ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
                     clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
                             session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
+                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
                             ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
                 }
                 else {
@@ -1302,9 +1305,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         ClientCreatedFromType.REGISTRY,
                         clientsMobileHistory);
 
+                Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
+                        ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
                 ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
                         session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), true, child.getIdOfClient(),
+                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
                         ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
             }
         }
@@ -1364,8 +1370,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
 
         if (guardianHasOtherChildrenInOldOrg) {
+            // Представитель отсутвует в ОО2
             if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                if (MigrantsUtils.findActiveMigrant(
+                // У представителя был проход в ОО1
+                if (guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId) ||
+                        MigrantsUtils.findActiveMigrant(
                         session, beforeMigrateOrgId, guardian.getIdOfClient()) != null){
                     createMigrateRequestForGuardian(session, guardian, child.getOrg());
                 }
@@ -1378,14 +1387,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     session.merge(guardian);
                 }
                 else if (guardian.isActiveAdultGroup()) {
-                    if (MigrantsUtils.findActiveMigrant(
-                            session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
-                        createMigrateRequestForGuardian(session, guardian, child.getOrg());
-                    }
+                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
                 }
 
             }
             else {
+                // Представитель отсутвует в ОО2
                 if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                     if (MigrantsUtils.findActiveMigrant(
                             session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {

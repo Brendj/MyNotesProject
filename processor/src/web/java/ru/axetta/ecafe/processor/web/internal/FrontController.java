@@ -3233,7 +3233,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "addGuardianToClient")
-    public GuardianResponse addGuardianToClient(
+    public ClientGuardianResponse addGuardianToClient(
             @WebParam(name = "meshGuid") String meshGuid,
             @WebParam(name = "childMeshGuid") String childMeshGuid,
             @WebParam(name = "agentTypeId") Integer agentTypeId,
@@ -3246,53 +3246,82 @@ public class FrontController extends HttpServlet {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        ClientGuardianResponse clientGuardianResponse;
+        ClientGuardian clientGuardian;
+        Client guardian;
+        Client child;
+
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
                     || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
-                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                return new ClientGuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
 
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", meshGuid));
-            Client guardian = (Client) criteria.uniqueResult();
+            guardian = (Client) criteria.uniqueResult();
 
             criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
-            Client child = (Client) criteria.uniqueResult();
+            child = (Client) criteria.uniqueResult();
 
-            MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setReason("Создана связка арм методом \"addGuardianToClient\"");
-            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
-
-            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
-            ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
-                    true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
-                    ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
-                    ClientGuardianRoleType.fromInteger(agentTypeId), !informing);
-
-            MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
-            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
-                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+            if (guardian == null || child == null) {
+                return new ClientGuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
+                        GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
+            clientGuardian = getClientGuardian(persistenceSession, guardian, child);
+
+            if (clientGuardian == null) {
+                MessageContext mc = wsContext.getMessageContext();
+                HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setReason("Создана связка арм методом \"addGuardianToClient\"");
+                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+
+                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+                ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
+                        true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
+                        ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
+                        ClientGuardianRoleType.fromInteger(agentTypeId), !informing);
+
+                MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
+                if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                    logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
+                    return new ClientGuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                }
+                clientGuardian = getClientGuardian(persistenceSession, guardian, child);
+            }
+            if (clientGuardian == null) {
+                return new ClientGuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            }
+            clientGuardianResponse = new ClientGuardianResponse(ClientGuardianResponse.OK, ClientGuardianResponse.OK_MESSAGE);
+            clientGuardianResponse.setClientsData(new ClientOfAnotherOrgItem(guardian, 0));
+            clientGuardianResponse.setClientsGuardians(new ClientGuardianItem(clientGuardian));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in addGuardianToClient", e);
-            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            return new ClientGuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
+        return clientGuardianResponse;
+    }
+
+    private static ClientGuardian getClientGuardian(Session persistenceSession, Client guardian, Client child) {
+        Criteria criteria;
+        criteria = persistenceSession.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+        criteria.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+        criteria.add(Restrictions.ne("deletedState", true));
+        return (ClientGuardian) criteria.uniqueResult();
     }
 
     @WebMethod(operationName = "deleteGuardianToClient")
