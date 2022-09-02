@@ -1729,8 +1729,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
 
         if (guardianHasOtherChildrenInOldOrg) {
+            // Представитель отсутвует в ОО2
             if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                if (MigrantsUtils.findActiveMigrant(
+                // У представителя был проход в ОО1
+                if (guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId) ||
+                        MigrantsUtils.findActiveMigrant(
                         session, beforeMigrateOrgId, guardian.getIdOfClient()) != null){
                     createMigrateRequestForGuardian(session, guardian, child.getOrg());
                 }
@@ -1743,14 +1746,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     session.merge(guardian);
                 }
                 else if (guardian.isActiveAdultGroup()) {
-                    if (MigrantsUtils.findActiveMigrant(
-                            session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
-                        createMigrateRequestForGuardian(session, guardian, child.getOrg());
-                    }
+                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
                 }
 
             }
             else {
+                // Представитель отсутвует в ОО2
                 if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                     if (MigrantsUtils.findActiveMigrant(
                             session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
