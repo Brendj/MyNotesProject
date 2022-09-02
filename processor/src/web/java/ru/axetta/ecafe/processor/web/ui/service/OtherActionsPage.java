@@ -80,7 +80,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     private List<OrgItem> orgItemsPreorder = new LinkedList<>();
     private List<OrgItem> orgItemsRemoveDup = new LinkedList<>();
     private List<OrgItem> orgItemsLoadMesh = new LinkedList<>();
-    private List<OrgItem> orgItemsDelIrrPersons = new LinkedList<>();
     protected String orgItemsPreorderFilter = "Не выбрано";
     protected String orgItemsRemoveDupFilter = "Не выбрано";
     protected String orgItemsLoadMeshFilter = "Не выбрано";
@@ -1063,20 +1062,11 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     }
 
     public void runDeleteIrrelevantPersons(){
-        if(CollectionUtils.isEmpty(orgItemsDelIrrPersons)){
-            printError("Не выбраны организации для обработки");
-            return;
-        }
-        List<Long> orgList = orgItemsDelIrrPersons.stream().map(OrgItem::getIdOfOrg).collect(Collectors.toList());
         MeshPersonsSyncService service = RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class);
 
-        List<Long> organizationsIdFromNSI = DAOReadonlyService.getInstance().getOrgIdFromNSIbyOrgsId(orgList);
-
-        for(Long orgId : organizationsIdFromNSI){
-            service.deleteIrrelevantPersons(orgId);
-        }
+        service.deleteIrrelevantPersons();
         
-        printMessage(String.format("Выполнено удаление неактуальных данных для %d организаций", orgList.size()));
+        printMessage("Выполнено удаление неактуальных данных");
     }
 
     @Override
@@ -1093,10 +1083,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             case ORG_LIST_LOAD_MESH: {
                 orgItemsLoadMesh = setOrgListSection(orgMap, orgItemsLoadMesh);
                 orgItemsLoadMeshFilter = setOrgListFilter(orgItemsLoadMesh);
-            } break;
-            case ORG_LIST_DEL_IRR_MESH: {
-                orgItemsDelIrrPersons = setOrgListSection(orgMap, orgItemsDelIrrPersons);
-                orgItemsDelIrrPersonsFilter = setOrgListFilter(orgItemsDelIrrPersons);
             } break;
         }
     }
@@ -1119,7 +1105,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
             case ORG_LIST_PREORDER: return orgItemsPreorder.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
             case ORG_LIST_REMOVE_DUPLICATES: return orgItemsRemoveDup.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
             case ORG_LIST_LOAD_MESH: return orgItemsLoadMesh.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
-            case ORG_LIST_DEL_IRR_MESH: return orgItemsDelIrrPersons.stream().map(o -> o.idOfOrg.toString()).collect(Collectors.joining(","));
         }
         return "";
     }
@@ -1138,12 +1123,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public Object showOrgListSelectLoadMeshPage(){
         selectOrgType = SelectedOrgListType.ORG_LIST_LOAD_MESH;
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
-
-    public Object showOrgListSelectRemoveIrrPersonsPage(){
-        selectOrgType = SelectedOrgListType.ORG_LIST_DEL_IRR_MESH;
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
     }

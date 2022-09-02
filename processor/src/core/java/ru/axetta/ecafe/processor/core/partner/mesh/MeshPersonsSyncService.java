@@ -252,29 +252,38 @@ public class MeshPersonsSyncService {
         }
     }
 
-    public void deleteIrrelevantPersons(Long orgId){
+    public void deleteIrrelevantPersons(){
+        String top = getTop();
+        int limit = Integer.parseInt(top);
+
         Transaction transaction = null;
         Session session = null;
+        int offset = 0;
         try{
+            List<MeshSyncPerson> forDelete = new LinkedList<>();
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            List<MeshSyncPerson> personList = DAOUtils.getMeshPersonsByOrg(session, orgId);
-            List<String> personsIds = personList.stream().map(MeshSyncPerson::getPersonguid).collect(Collectors.toList());
-            List<MeshSyncPerson> forDelete = new LinkedList<>();
+            List<MeshSyncPerson> personList = DAOUtils.getActiveMeshPersonssSample(session, offset, limit);
+            while(!org.apache.commons.collections4.CollectionUtils.isEmpty(personList)){
+                List<String> personsIds = personList.parallelStream().map(MeshSyncPerson::getPersonguid).collect(Collectors.toList());
 
-            String parameters = String.format("filter=%stop=%s",URLEncoder
-                    .encode(getFilter(personsIds), "UTF-8"), getTop());
-            byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
-            TypeFactory typeFactory = objectMapper.getTypeFactory();
-            CollectionType collectionType = typeFactory.constructCollectionType(
-                    List.class, ResponsePersons.class);
-            List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
+                String parameters = String.format("filter=%stop=%s",URLEncoder
+                        .encode(getFilter(personsIds), "UTF-8"), top);
+                byte[] response = meshRestClient.executeRequest(MESH_REST_PERSONS_URL, parameters);
+                TypeFactory typeFactory = objectMapper.getTypeFactory();
+                CollectionType collectionType = typeFactory.constructCollectionType(
+                        List.class, ResponsePersons.class);
+                List<ResponsePersons> meshResponses = objectMapper.readValue(response, collectionType);
 
-            for(MeshSyncPerson person : personList){
-                if(meshResponses.stream().noneMatch(mh -> mh.getPersonId().equals(person.getPersonguid()))){
-                    forDelete.add(person);
+                for(MeshSyncPerson person : personList){
+                    if(meshResponses.stream().noneMatch(mh -> mh.getPersonId().equals(person.getPersonguid()))){
+                        forDelete.add(person);
+                    }
                 }
+
+                offset += limit;
+                personList = DAOUtils.getActiveMeshPersonssSample(session, offset, limit);
             }
 
             for(MeshSyncPerson d : forDelete){
@@ -448,7 +457,7 @@ public class MeshPersonsSyncService {
             list.add(op);
         }
 
-        filter.setOr(list);
+        filter.setAnd(list);
         return objectMapper.writeValueAsString(filter);
     }
 

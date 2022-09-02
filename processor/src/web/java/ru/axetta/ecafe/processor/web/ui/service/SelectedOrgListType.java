@@ -4,8 +4,7 @@ public enum SelectedOrgListType {
 
     /*0*/ ORG_LIST_PREORDER("Список организаций генерации заявок по предзаказам"),
     /*1*/ ORG_LIST_REMOVE_DUPLICATES("Список организаций удаления дубликатов представителей"),
-    /*2*/ ORG_LIST_LOAD_MESH("Список организаций загрузки mesh гуидов представителей"),
-    /*3*/ ORG_LIST_DEL_IRR_MESH("Список организаций удаления неактуальных данных");
+    /*2*/ ORG_LIST_LOAD_MESH("Список организаций загрузки mesh гуидов представителей");
 
     private final String description;
 

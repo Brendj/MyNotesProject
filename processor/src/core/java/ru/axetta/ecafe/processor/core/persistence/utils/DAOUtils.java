@@ -5877,10 +5877,11 @@ public class DAOUtils {
         }
     }
 
-    public static List<MeshSyncPerson> getMeshPersonsByOrg(Session session, Long orgId) {
+    public static List<MeshSyncPerson> getActiveMeshPersonssSample(Session session, int offset, int limit) {
         Query q = session.createQuery("SELECT p FROM MeshSyncPerson p " +
-                "WHERE p.organizationid = :orgId AND (p.deletestate IS FALSE OR p.deletestate IS NULL) AND p.invaliddata IS FALSE");
-        q.setParameter("orgId", orgId);
+                "WHERE (p.deletestate IS FALSE OR p.deletestate IS NULL) AND p.invaliddata IS FALSE ORDER BY personguid")
+                .setMaxResults(limit)
+                .setFirstResult(offset);
 
         return q.list();
     }
