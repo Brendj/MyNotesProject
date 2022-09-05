@@ -446,17 +446,18 @@ public class MeshService {
     }
 
     public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
-        for (PersonAgent a : agents) {
-            if (!internalGuardianService.clientExist(a.getAgentPersonId().toString())) {
-                try {
-                    PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
-                    internalGuardianService.createClientGuardian(personGUID, guardInfo);
-                } catch (Exception e) {
-                    log.error("Exception when try create guardian as client ISPP, personID: " + a.getAgentPersonId(), e);
+        if (agents != null) {
+            for (PersonAgent a : agents) {
+                if (!internalGuardianService.clientExist(a.getAgentPersonId().toString())) {
+                    try {
+                        PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
+                        internalGuardianService.createClientGuardian(personGUID, guardInfo);
+                    } catch (Exception e) {
+                        log.error("Exception when try create guardian as client ISPP, personID: " + a.getAgentPersonId(), e);
+                    }
                 }
             }
         }
-
         internalGuardianService.processGuardianRelations(personGUID, agents);
     }
 }
