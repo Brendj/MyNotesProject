@@ -298,7 +298,7 @@ public class ETPMVService {
                             persistenceSession.update(discountInfo);
                         }
                     }
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
+                    DAOUtils.updateApplicationForFood(persistenceSession, applicationForFood.getClient(), new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
                     sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
                     //sendToBK(message);
