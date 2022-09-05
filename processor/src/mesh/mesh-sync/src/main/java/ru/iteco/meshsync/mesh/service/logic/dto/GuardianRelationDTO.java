@@ -15,12 +15,13 @@ public class GuardianRelationDTO implements Serializable {
 
         dto.childrenPersonGuid = childrenPersonGuid;
 
-        for(PersonAgent g : guardians){
-            ClientRestDTO clientDTO = ClientRestDTO.build(g.getAgentPerson());
-            clientDTO.setAgentTypeId(g.getAgentTypeId());
-            dto.guardianPersonGuids.add(clientDTO);
+        if (guardians != null) {
+            for (PersonAgent g : guardians) {
+                ClientRestDTO clientDTO = ClientRestDTO.build(g.getAgentPerson());
+                clientDTO.setAgentTypeId(g.getAgentTypeId());
+                dto.guardianPersonGuids.add(clientDTO);
+            }
         }
-
         return dto;
     }
 

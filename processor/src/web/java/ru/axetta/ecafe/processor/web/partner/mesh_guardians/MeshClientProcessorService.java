@@ -262,37 +262,37 @@ public class MeshClientProcessorService {
             if(c == null){
                 throw new NotFoundException("Not found client by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             }
+            if (!guardianRelationInfo.getGuardianPersonGuids().isEmpty()) {
+                for (ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
+                    Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
-            for(ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
-                Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
+                    if (guardian == null) {
+                        this.registryClient(meshGuardian, session, clientGuardianHistory);
+                        continue;
+                    }
 
-                if(guardian == null){
-                    this.registryClient(meshGuardian, session, clientGuardianHistory);
-                    continue;
-                }
-
-                ClientGuardian clientGuardian = DAOUtils
-                        .findClientGuardian(session, c.getIdOfClient(), guardian.getIdOfClient());
-                if (clientGuardian == null) {
-                    ClientManager.createClientGuardianInfoTransactionFree(
-                            session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                            ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), true, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
-                            ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
-                } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
-                    boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
-                    Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-                    clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
-                    clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
-                    clientGuardian.setCreatedFrom(ClientCreatedFromType.DEFAULT);
-                    session.update(clientGuardian);
+                    ClientGuardian clientGuardian = DAOUtils
+                            .findClientGuardian(session, c.getIdOfClient(), guardian.getIdOfClient());
+                    if (clientGuardian == null) {
+                        ClientManager.createClientGuardianInfoTransactionFree(
+                                session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
+                                ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), true, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
+                                ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
+                    } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
+                        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
+                        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                        clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
+                        clientGuardian.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+                        session.update(clientGuardian);
+                    }
                 }
             }
-
             List<Client> clientGuardians = DAOReadExternalsService.getInstance()
                     .findGuardiansByClient(c.getIdOfClient(), null);
 
             for(Client guard : clientGuardians){
-                if(guardianRelationInfo.getGuardianPersonGuids().stream().noneMatch(i -> i.getPersonGUID().equals(guard.getMeshGUID()))){
+                if(guardianRelationInfo.getGuardianPersonGuids().isEmpty() || guardianRelationInfo.getGuardianPersonGuids().stream().noneMatch(i -> i.getPersonGUID().equals(guard.getMeshGUID()))){
                     ClientGuardian cg = DAOReadonlyService.getInstance()
                             .findClientGuardianById(session, c.getIdOfClient(), guard.getIdOfClient());
 
