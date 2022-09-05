@@ -49,10 +49,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,children";
     public static final String ID_SEARCH_EXPAND = "agents,documents,contacts";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
-    public static final Integer GUARDIAN_DEFAULT_TYPE = 1;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
     public static final String DATE_PATTERN = "yyyy-MM-dd";
-    private static final Integer PASSPORT_TYPE_ID = 15;
     public static final String MK_ERROR = "Ошибка в МЭШ Контингент: %s";
     public static final Integer CONTACT_MOBILE_TYPE_ID = 1;
     public static final Integer CONTACT_EMAIL_TYPE_ID = 3;
@@ -243,20 +241,19 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             contact.setValue(validateContact(contact.getKey(), contact.getValue()));
             boolean isKeyAlreadyInMk = false;
             for (ContactsIdResponse contactsIdResponse : contactListResponse.getContactResponse()) {
-                if (contactsIdResponse.getContactType().equals(contact.getKey())) {
+                if (contactsIdResponse.getContactType().equals(contact.getKey()) && contactsIdResponse.getDefault()) {
+                    isKeyAlreadyInMk = true;
                     if (contact.getValue() == null || contact.getValue().isEmpty()) {
                         meshContactResponse = deletePersonContact(meshGuid, contactsIdResponse.getContactId());
                     } else {
                         meshContactResponse = modifyPersonContact(meshGuid, contact.getKey(), contact.getValue(),
                                 contactsIdResponse.getContactId());
                     }
-                    isKeyAlreadyInMk = true;
                     break;
                 }
             }
             if (!isKeyAlreadyInMk && contact.getValue() != null && !contact.getValue().isEmpty()) {
-                meshContactResponse = createPersonContact(meshGuid, contact.getKey(), contact.getValue(),
-                        MeshGuardiansService.CONTACT_MOBILE_TYPE_ID.equals(contact.getKey()));
+                meshContactResponse = createPersonContact(meshGuid, contact.getKey(), contact.getValue());
             }
             if (!meshContactResponse.getCode().equals(PersonListResponse.OK_CODE))
                 return new MeshContactResponse(meshContactResponse.getCode(), meshContactResponse.message);
@@ -273,10 +270,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return value;
     }
 
-    public MeshContactResponse createPersonContact(String meshGuid, Integer typeId, String data, boolean defaultFlag) {
+    public MeshContactResponse createPersonContact(String meshGuid, Integer typeId, String data) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Contact parameter = buildPersonContact(meshGuid, typeId, data, defaultFlag);
+            Contact parameter = buildPersonContact(meshGuid, typeId, data);
             String json = objectMapper.writeValueAsString(parameter);
             MeshResponseWithStatusCode result = meshRestClient.executePostMethod(buildCreateContactUrl(meshGuid), json);
             if (result.getCode() == HttpStatus.SC_OK) {
@@ -416,18 +413,17 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         contact.setPersonId(meshGuid);
         contact.setTypeId(typeId);
         contact.setData(data);
+        contact.setDefault(true);
         return contact;
     }
 
-    private Contact buildPersonContact(String personId, Integer typeId, String data, Boolean defaultFlag) {
+    private Contact buildPersonContact(String personId, Integer typeId, String data) {
         Contact contact = new Contact();
         contact.setId(0);
         contact.setPersonId(personId);
         contact.setTypeId(typeId);
         contact.setData(data);
-        if (defaultFlag != null) {
-            contact.setDefault(defaultFlag);
-        }
+        contact.setDefault(true);
         return contact;
     }
 
@@ -552,7 +548,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         contact.setPersonId(PERSON_ID_STUB);
         contact.setTypeId(typeId);
         contact.setData(value);
-        contact.setDefault(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID.equals(typeId));
+        contact.setDefault(true);
         return contact;
     }
 
