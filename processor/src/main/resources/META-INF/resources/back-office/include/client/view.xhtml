@@ -171,7 +171,8 @@
     <h:outputText escape="true" value="Документы" styleClass="output-text"/>
     <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientViewPage.dulDetail}"
                     var="dul"
-                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                            center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer-center">
         <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" >
             <f:facet name="header">

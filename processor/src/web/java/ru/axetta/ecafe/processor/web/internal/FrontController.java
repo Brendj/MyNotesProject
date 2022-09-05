@@ -2793,7 +2793,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (documentItem== null || documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
+            if (documentItem == null || documentItem.getIdOfClient() == null || documentItem.getDocumentTypeId() == null
                     || documentItem.getNumber() == null) {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         DocumentCreateResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
@@ -2803,10 +2803,15 @@ public class FrontController extends HttpServlet {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
+            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT,
+                        DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
+            }
+            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
-                    .saveDulDetail(persistenceSession, dulDetail, client, true);
+                    .saveDulDetail(persistenceSession, dulDetail, client, saveToMk);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentCreateResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2855,9 +2860,18 @@ public class FrontController extends HttpServlet {
             }
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
+            if (client == null) {
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentUpdateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT,
+                        DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
+            }
+            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
             dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
-                    .updateDulDetail(persistenceSession, dulDetail, client, true);
+                    .updateDulDetail(persistenceSession, dulDetail, client, saveToMk);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentUpdateResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }
@@ -2865,7 +2879,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
-             if (e instanceof DocumentValidateException) {
+            if (e instanceof DocumentValidateException) {
                 return new DocumentUpdateResponse(DocumentCreateResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
             }
             logger.error("Error in updateDocumentForClient", e);
@@ -2900,8 +2914,17 @@ public class FrontController extends HttpServlet {
             dulDetail.setDeleteState(true);
             dulDetail.setLastUpdate(new Date());
             Client client = persistenceSession.get(Client.class, dulDetail.getIdOfClient());
+            if (client == null) {
+                return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_CLIENT_NOT_FOUND,
+                        DocumentDeleteResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT,
+                        DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
+            }
+            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
-                    .deleteDulDetail(persistenceSession, dulDetail, client, true);
+                    .deleteDulDetail(persistenceSession, dulDetail, client, saveToMk);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
                 return new DocumentDeleteResponse(meshDocumentResponse.getCode(), meshDocumentResponse.getMessage());
             }

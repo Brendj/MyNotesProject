@@ -43,6 +43,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_DOCUMENT_NOT_FOUND = 510;
     public static final int ERROR_SNILS_EXISTS = 520;
     public static final int ERROR_DOCUMENT_VALIDATION = 530;
+    public static final int ERROR_CLIENT_IS_STUDENT = 540;
 
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
@@ -79,6 +80,8 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE = "Ошибка сохранения в методе МЭШ Контингент";
     public static final String ERROR_DOCUMENT_NOT_FOUND_MESSAGE = "Документы по запросу не найдены";
     public static final String ERROR_SNILS_EXISTS_MESSAGE = "Указанный снилс уже существует в системе";
+    public static final String ERROR_CLIENT_IS_STUDENT_MESSAGE = "Клиент является учеником";
+
 
     public int code;
     public String message;
