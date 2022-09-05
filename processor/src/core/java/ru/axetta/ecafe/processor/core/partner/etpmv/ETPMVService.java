@@ -349,6 +349,7 @@ public class ETPMVService {
 
     public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
+        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.WITHDRAWN)) return true; //1090 Отмененные
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_BENEFIT)
                 || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_GUARDIANSHIP)
