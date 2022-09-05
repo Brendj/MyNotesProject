@@ -17,8 +17,11 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitCategoryInfo;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitDocument;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -39,11 +42,12 @@ public class KafkaListenerServiceImpl {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            ActiveBenefitCategoriesGettingResponse activeBenefitCategoriesGettingResponse = (ActiveBenefitCategoriesGettingResponse) data;
+            BenefitResponse benefitResponse = (BenefitResponse) data;
+            ActiveBenefitCategoriesGettingResponse activeBenefitCategoriesGettingResponse = benefitResponse.getActive_benefit_categories_getting_response();
             String requestId = activeBenefitCategoriesGettingResponse.getRequest_id();
 
             //Заполнение полей таблицы AppMezhvedRequest
-            AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message, session);
+            AppMezhvedRequest appMezhvedRequest = updateMezved(requestId, activeBenefitCategoriesGettingResponse.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             //Флаг того, что хотябы один ЛК был подтвержден
             boolean confirm = false;
@@ -96,7 +100,7 @@ public class KafkaListenerServiceImpl {
             }
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in processingActiveBenefitCategories: ", e);
             return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -113,8 +117,9 @@ public class KafkaListenerServiceImpl {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            PassportBySerieNumberValidityCheckingResponse passport = (PassportBySerieNumberValidityCheckingResponse) data;
-            AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message, session);
+            PassportResponse passportData = (PassportResponse) data;
+            PassportBySerieNumberValidityCheckingResponse passport = passportData.getPassport_by_serie_number_validity_checking_response();
+            AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080"))
 //            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
@@ -143,7 +148,7 @@ public class KafkaListenerServiceImpl {
                 return applicationForFood;
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in processingPassportValidation: ", e);
             return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -158,10 +163,11 @@ public class KafkaListenerServiceImpl {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            RelatednessChecking2Response relatednessChecking2Response = (RelatednessChecking2Response) data;
+            GuardianResponse guardianData = (GuardianResponse) data;
+            RelatednessChecking2Response relatednessChecking2Response = guardianData.getRelatedness_checking_2_response();
 
             AppMezhvedRequest appMezhvedRequest =
-                    updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message, session);
+                    updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
             {
@@ -190,7 +196,7 @@ public class KafkaListenerServiceImpl {
                 return applicationForFood;
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in processingGuardianValidation: ", e);
             return null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -198,18 +204,9 @@ public class KafkaListenerServiceImpl {
         }
     }
 
-    private AppMezhvedRequest updateMezved(String requestId, List<Errors> errors, String message, Session session)
+    private AppMezhvedRequest updateMezved(String requestId, List<Errors> errors, String message)
     {
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
-        AppMezhvedRequest appMezhvedRequest = daoService.getMezhvedData(requestId);
-        if (errors != null)
-            appMezhvedRequest.setResponseType(AppMezhvedResponseType.ERROR);
-        else
-            appMezhvedRequest.setResponseType(AppMezhvedResponseType.OK);
-        appMezhvedRequest.setResponsePayload(message);
-        appMezhvedRequest.setResponseDate(new Date());
-        appMezhvedRequest.setLastUpdate(new Date());
-        session.persist(appMezhvedRequest);
-        return appMezhvedRequest;
+        return daoService.updateMezhvedRequest(requestId, errors, message);
     }
 }

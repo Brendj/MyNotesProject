@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -286,10 +287,10 @@ public class ETPMVDaoService {
             applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
             entityManager.merge(applicationForFood);
         }
-        if (request instanceof BenefitValidationRequest) {
+        /*if (request instanceof BenefitValidationRequest) {
             applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
             entityManager.merge(applicationForFood);
-        }
+        }*/
         if (request instanceof DocValidationRequest) {
             applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
             entityManager.merge(applicationForFood);
@@ -297,10 +298,22 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public AppMezhvedRequest getMezhvedData(String requestid) {
-        Query query = entityManager.createQuery("select a from AppMezhvedRequest a join fetch a.applicationForFood app where a.requestid = :requestid");
-        query.setParameter("requestid", requestid);
-        return (AppMezhvedRequest)query.getSingleResult();
+    public AppMezhvedRequest updateMezhvedRequest(String requestId, List<Errors> errors, String message) {
+        Query query = entityManager.createQuery("select a from AppMezhvedRequest a " +
+                "where a.requestId = :requestId");
+        query.setParameter("requestId", requestId);
+        AppMezhvedRequest appMezhvedRequest = (AppMezhvedRequest)query.getSingleResult();
+        if (errors != null)
+            appMezhvedRequest.setResponseType(AppMezhvedResponseType.ERROR);
+        else
+            appMezhvedRequest.setResponseType(AppMezhvedResponseType.OK);
+        appMezhvedRequest.setResponsePayload(message);
+        appMezhvedRequest.setResponseDate(new Date());
+        appMezhvedRequest.setLastUpdate(new Date());
+
+        appMezhvedRequest = entityManager.merge(appMezhvedRequest);
+        appMezhvedRequest.getApplicationForFood().getDtisznCodes().size();
+        return appMezhvedRequest;
     }
 
     @Transactional
@@ -308,6 +321,10 @@ public class ETPMVDaoService {
         Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.dtisznCodes codes "
                 + " where a.serviceNumber = :serviceNumber");
         query.setParameter("serviceNumber", serviceNumber);
-        return (ApplicationForFood)query.getSingleResult();
+        try {
+            return (ApplicationForFood) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

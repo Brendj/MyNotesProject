@@ -72,7 +72,7 @@ public class BenefitKafkaService extends KafkaService {
     public RequestValidationData getBenefitData(ApplicationForFood applicationForFood) throws Exception {
         String message = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                 .getOriginalMessageFromApplicationForFood(applicationForFood);
-        CoordinateMessage coordinateMessage = RuntimeContext.getAppContext().getBean(ETPMVService.class).getCoordinateMessage(message);
+        CoordinateMessage coordinateMessage = (CoordinateMessage)RuntimeContext.getAppContext().getBean(ETPMVService.class).getCoordinateMessage(message);
         return new RequestValidationData(coordinateMessage, applicationForFood.getIdOfApplicationForFood());
     }
 

@@ -83,16 +83,15 @@ public class ETPMVService {
     @Async
     public void processIncoming(String message) {
         try {
-            CoordinateMessage coordinateMessage = getCoordinateMessage(message);
-            CoordinateStatusMessage coordinateStatusMessage = getCoordinateStatusMessage(message);
-            if (coordinateMessage != null || coordinateStatusMessage != null) {
-                if (coordinateMessage != null)
-                    processCoordinateMessage(coordinateMessage, message);
-                else
-                    //Обработка сообщения из ЕТП об отмене заявления
-                    processCoordinateStatusMessage(coordinateStatusMessage, message);
-            } else {
-                sendToBK(message);
+            int type = getMessageType(message);
+            if (type == COORDINATE_MESSAGE) {
+                CoordinateMessage coordinateMessage = (CoordinateMessage) getCoordinateMessage(message);
+                processCoordinateMessage(coordinateMessage, message);
+            }
+            if (type == COORDINATE_STATUS_MESSAGE) {
+                //Обработка сообщения из ЕТП об отмене заявления
+                CoordinateStatusMessage coordinateStatusMessage = (CoordinateStatusMessage)getCoordinateMessage(message);
+                processCoordinateStatusMessage(coordinateStatusMessage, message);
             }
         } catch (Exception e) {
             logger.error("Error in process incoming ETP message: ", e);
@@ -104,40 +103,11 @@ public class ETPMVService {
         return message.contains(NEW_ISPP_ID);
     }
 
-    public CoordinateStatusMessage getCoordinateStatusMessage(String message) throws Exception {
-        try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext2(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-            switch (type) {
-                case COORDINATE_STATUS_MESSAGE:
-                    return (CoordinateStatusMessage) unmarshaller.unmarshal(stream);
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in getCoordinateStatusMessage: ", e);
-        }
-        return null;
-    }
-
-    public CoordinateMessage getCoordinateMessage(String message) throws Exception {
-        try {
-            int type = getMessageType(message);
-
-            JAXBContext jaxbContext = getJAXBContext(type);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
-            switch (type) {
-                case COORDINATE_MESSAGE:
-                    return (CoordinateMessage) unmarshaller.unmarshal(stream);
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in getCoordinateMessage: ", e);
-        }
-        return null;
+    public Object getCoordinateMessage(String message) throws Exception {
+        JAXBContext jaxbContext = getJAXBContext();
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        InputStream stream = new ByteArrayInputStream(message.getBytes(Charset.forName("UTF-8")));
+        return unmarshaller.unmarshal(stream);
     }
 
     private void processCoordinateMessage(CoordinateMessage coordinateMessage, String message) throws Exception {
@@ -304,8 +274,8 @@ public class ETPMVService {
                 if (applicationForFood == null)
                 {
                     logger.error("Error in processCoordinateStatusMessage: application not found");
-                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
-                    sendToBK(message);
+                    //sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "wrong contacts data");
+                    sendToStatusBK(message);
                     return;
                 }
                 Client client = applicationForFood.getClient();
@@ -315,10 +285,8 @@ public class ETPMVService {
                         applicationForFoodState == ApplicationForFoodState.RESULT_PROCESSING ||
                         applicationForFoodState == ApplicationForFoodState.OK ||
                         applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode()) ||
-                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode())))
-                {
-                    for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
-                    {
+                        applicationForFoodState.getCode().startsWith(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode()))) {
+                    for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes()) {
                         applicationForFoodDiscount.removeConfirmed();
                         persistenceSession.update(applicationForFoodDiscount);
                         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(persistenceSession, client,
@@ -330,16 +298,15 @@ public class ETPMVService {
                             persistenceSession.update(discountInfo);
                         }
                     }
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
+                    DAOUtils.updateApplicationForFood(persistenceSession, applicationForFood.getClient(), new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
                     sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
-                    sendToBK(message);
+                    //sendToBK(message);
                     DiscountManager.rebuildAppointedMSPByClient(persistenceSession, client);
-                } else
-                {
+                } else {
                     logger.error("Error in processCoordinateStatusMessage: not found application");
-                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not found application");
-                    sendToBK(message);
+                    //sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, "not found application");
+                    sendToStatusBK(message);
                     return;
                 }
                 daoService.updateEtpPacketWithSuccess(serviceNumber);
@@ -422,6 +389,17 @@ public class ETPMVService {
             success = true;
         } catch (Exception e) {
             logger.error("Error in sendBKStatus: ", e);
+        }
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
+    }
+
+    private void sendToStatusBK(String message) {
+        boolean success = false;
+        try {
+            RuntimeContext.getAppContext().getBean(ETPMVClient.class).addToStatusBKQueue(message);
+            success = true;
+        } catch (Exception e) {
+            logger.error("Error in sendStatusBK: ", e);
         }
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
     }
@@ -675,26 +653,11 @@ public class ETPMVService {
         }
     }*/
 
-    private JAXBContext getJAXBContext(int type) throws Exception {
-        switch (type) {
-            case COORDINATE_MESSAGE:
-                if (jaxbConsumerContext == null) {
-                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                }
-                return jaxbConsumerContext;
+    private JAXBContext getJAXBContext() throws Exception {
+        if (jaxbConsumerContext == null) {
+            jaxbConsumerContext = JAXBContext.newInstance(CoordinateMessage.class, CoordinateStatusMessage.class);
         }
-        return null;
-    }
-
-    private JAXBContext getJAXBContext2(int type) throws Exception {
-        switch (type) {
-            case COORDINATE_STATUS_MESSAGE:
-                if (jaxbConsumerContext == null) {
-                    jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
-                }
-                return jaxbConsumerContext;
-        }
-        return null;
+        return jaxbConsumerContext;
     }
 
     private int getMessageType(String message) throws Exception {
