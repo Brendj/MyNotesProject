@@ -8,7 +8,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
@@ -21,7 +20,6 @@ import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -110,7 +108,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                        Boolean informing) {
         try {
             Client guardian = createGuardianInternal(persistenceSession, idOfOrg, firstName, patronymic, lastName,
-                    genderId, birthDate, snils, mobile, child, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing);
+                    genderId, birthDate, snils, mobile, child, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing, email);
             ObjectMapper objectMapper = new ObjectMapper();
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
                     email, dulDetails, agentTypeId);
@@ -166,12 +164,12 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     private Client createGuardianInternal(Session session, Long idOfOrg, String firstName,
-                                        String patronymic, String lastName,
-                                        Integer genderId, Date birthDate, String snils,
-                                        String mobile, Client child,
-                                        List<DulDetail> dulDetails, Integer relation,
-                                        Integer typeOfLegalRepresent, Integer agentTypeId,
-                                        Boolean informing) throws Exception {
+                                          String patronymic, String lastName,
+                                          Integer genderId, Date birthDate, String snils,
+                                          String mobile, Client child,
+                                          List<DulDetail> dulDetails, Integer relation,
+                                          Integer typeOfLegalRepresent, Integer agentTypeId,
+                                          Boolean informing, String email) throws Exception {
 
         Org org = session.load(Org.class, idOfOrg);
         ClientsMobileHistory clientsMobileHistory =
@@ -183,6 +181,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                         org, ClientCreatedFromType.ARM, "", null, null, null,
                         null, null, clientsMobileHistory);
         guardian.setSan(snils);
+        guardian.setEmail(email);
         guardian.setBirthDate(birthDate);
         session.update(guardian);
         RuntimeContext.getAppContext().getBean(DulDetailService.class)
