@@ -10,23 +10,38 @@ import java.util.Map;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonPropertyOrder({
-    "and"
+    "and",
+    "or"
 })
 public class MeshJsonFilter {
 
     @JsonProperty("and")
-    private List<And> and = null;
+    private List<OpContainer> and = null;
+
+    @JsonProperty("or")
+    private List<OpContainer> or = null;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("and")
-    public List<And> getAnd() {
+    public List<OpContainer> getAnd() {
         return and;
     }
 
     @JsonProperty("and")
-    public void setAnd(List<And> and) {
+    public void setAnd(List<OpContainer> and) {
         this.and = and;
+    }
+
+    @JsonProperty("or")
+    public List<OpContainer> getOr() {
+        return or;
+    }
+
+    @JsonProperty("or")
+    public void setOr(List<OpContainer> or) {
+        this.or = or;
     }
 
     @JsonAnyGetter

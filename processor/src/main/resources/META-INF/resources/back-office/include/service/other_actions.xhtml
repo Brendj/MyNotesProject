@@ -394,6 +394,26 @@
                 </rich:panel>
             </h:panelGrid>
 
+            <rich:panel id="deleteIrrelevantPersonsPanel">
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Удаление неактуальных записей в cf_mh_persons"
+                                  styleClass="output-text"/><br/>
+                    <a4j:commandButton value="Запустить удаление излишних данных"
+                                       action="#{otherActionsPage.runDeleteIrrelevantPersons()}"
+                                       id="deleteIrrelevantPersonsButtons"
+                                       styleClass="command-button" render="mainMenu, workspaceTogglePanel"/><br/>
+                </h:panelGrid>
+            </rich:panel>
+
+            <rich:panel rendered="#{otherActionsPage.isSpb()}">
+                <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"
+                                   id="updateSpbCardUids"
+                                   title="Запуск скрипта по преобразовыванию уидов карт"
+                                   styleClass="command-button" onclick="disableButtons(true);"
+                                   oncomplete="disableButtons(false)"/><br/>
+                <h:outputText value="Список ид. организаций:"/>
+                <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
+            </rich:panel>
         <rich:panel rendered="#{otherActionsPage.isSpb()}">
             <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"
                                id="updateSpbCardUids"
@@ -404,6 +424,13 @@
             <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
         </rich:panel>
 
+
+
+            <a4j:status>
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>

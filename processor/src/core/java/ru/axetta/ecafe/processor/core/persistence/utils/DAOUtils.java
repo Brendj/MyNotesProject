@@ -5916,4 +5916,19 @@ public class DAOUtils {
 
         return (DulGuide) q.getSingleResult();
     }
+
+    public static List<MeshSyncPerson> getActiveMeshPersonsByOrg(Session session, Long orgIdFromNSI) {
+        Query q = session.createQuery("SELECT p FROM MeshSyncPerson p " +
+                "WHERE (p.deletestate IS FALSE OR p.deletestate IS NULL) AND p.invaliddata IS FALSE AND p.organizationid = :orgId")
+                .setParameter("orgId", orgIdFromNSI);
+
+        return q.list();
+    }
+
+    public static List<Long> getAllDistinctOrganizationId(Session session) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.setProjection(
+                Projections.projectionList().add(Projections.distinct(Projections.property("orgIdFromNsi"))));
+        return criteria.list();
+    }
 }

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshAgentResponse;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshGuardiansService;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
@@ -92,6 +93,7 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     private String guardian;
     private String kid;
     private String idOfOrg;
+    protected String orgItemsDelIrrPersonsFilter = "Не выбрано";
 
     private static class OrgItem {
         protected final Long idOfOrg;
@@ -1143,6 +1145,14 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
         }
     }
 
+    public void runDeleteIrrelevantPersons(){
+        MeshPersonsSyncService service = RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class);
+
+        service.deleteIrrelevantPersons();
+
+        printMessage("Выполнено удаление неактуальных данных");
+    }
+
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         switch (selectOrgType) {
@@ -1326,5 +1336,13 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public void setIdOfOrg(String idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getOrgItemsDelIrrPersonsFilter() {
+        return orgItemsDelIrrPersonsFilter;
+    }
+
+    public void setOrgItemsDelIrrPersonsFilter(String orgItemsDelIrrPersonsFilter) {
+        this.orgItemsDelIrrPersonsFilter = orgItemsDelIrrPersonsFilter;
     }
 }
