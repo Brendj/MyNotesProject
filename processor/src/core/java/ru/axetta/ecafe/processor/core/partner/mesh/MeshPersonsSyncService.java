@@ -267,6 +267,8 @@ public class MeshPersonsSyncService {
 
             List<Long> allOrganizationIds = DAOUtils.getAllDistinctOrganizationId(session);
 
+            logger.info("Process \"falsely alive\" persons for " + allOrganizationIds.size() + " Orgs");
+
             for(Long orgIdFromNsi : allOrganizationIds){
                 List<MeshSyncPerson> personList = DAOUtils.getActiveMeshPersonsByOrg(session, orgIdFromNsi);
                 String parameters = String.format("filter=%stop=%s",URLEncoder
@@ -284,6 +286,8 @@ public class MeshPersonsSyncService {
                 }
             }
 
+            logger.info(forDelete.size() + " will be processed for deletion");
+
             for(MeshSyncPerson d : forDelete){
                 d.setLastupdate(now);
                 d.setLastupdateRest(now);
@@ -294,6 +298,8 @@ public class MeshPersonsSyncService {
             transaction.commit();
             transaction = null;
             session.close();
+
+            logger.info("Completed processing of \"falsely alive\" persons");
         } catch (Exception e){
             logger.error("Error in deleteIrrelevantPersons: ", e);
         } finally {
