@@ -414,23 +414,7 @@
                 <h:outputText value="Список ид. организаций:"/>
                 <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
             </rich:panel>
-        <rich:panel rendered="#{otherActionsPage.isSpb()}">
-            <a4j:commandButton value="Преобразовать номера карт" action="#{otherActionsPage.runUpdateSpbCardUids}"
-                               id="updateSpbCardUids"
-                               title="Запуск скрипта по преобразовыванию уидов карт"
-                               styleClass="command-button" onclick="disableButtons(true);"
-                               oncomplete="disableButtons(false)"/><br/>
-            <h:outputText value="Список ид. организаций:"/>
-            <h:inputText value="#{otherActionsPage.orgsForSpbCardsUidUpdate}" size="50"/>
-        </rich:panel>
 
-
-
-            <a4j:status>
-                <f:facet name="start">
-                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-                </f:facet>
-            </a4j:status>
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
