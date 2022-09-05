@@ -4674,9 +4674,8 @@ public class DAOUtils {
         try {
             addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
         }
-        catch (Exception e)
-        {
-            logger.error(e.getMessage());
+        catch (Exception e) {
+            logger.error("Error in updateApplicationForFoodWithVersion: " + e.getMessage());
         }
         return applicationForFood;
     }
