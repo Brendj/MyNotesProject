@@ -257,6 +257,8 @@ public class MeshPersonsSyncService {
 
         Transaction transaction = null;
         Session session = null;
+
+        Date now = new Date();
         try{
             List<MeshSyncPerson> forDelete = new LinkedList<>();
             session = RuntimeContext.getInstance().createPersistenceSession();
@@ -282,7 +284,10 @@ public class MeshPersonsSyncService {
             }
 
             for(MeshSyncPerson d : forDelete){
-                session.delete(d);
+                d.setLastupdate(now);
+                d.setLastupdateRest(now);
+                d.setDeletestate(true);
+                session.update(d);
             }
 
             transaction.commit();
