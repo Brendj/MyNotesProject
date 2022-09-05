@@ -231,11 +231,9 @@ public class MeshClientProcessorService {
             }
 
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-            ClientGroup cg = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session,
-                    c.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
 
             c.setClientRegistryVersion(nextClientVersion);
-            c.setClientGroup(cg);
+            c.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
 
             session.update(c);
 
@@ -278,7 +276,7 @@ public class MeshClientProcessorService {
                 if (clientGuardian == null) {
                     ClientManager.createClientGuardianInfoTransactionFree(
                             session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                            ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), false, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
+                            ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), true, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
                             ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
                 } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                     boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
