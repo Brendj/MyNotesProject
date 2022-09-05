@@ -790,6 +790,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         DulDetailService dulDetailService = RuntimeContext.getAppContext().getBean(DulDetailService.class);
         if (this.dulDetail != null && !this.dulDetail.isEmpty()) {
+            if (isStudentGroup()) {
+                throw new Exception("Нельзя добавить документы для студентов");
+            }
             try {
                 dulDetailService.validateDulList(persistenceSession, this.dulDetail, false);
             } catch (DocumentValidateException e) {
@@ -1049,6 +1052,12 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             i++;
         }
         return result;
+    }
+
+    public Boolean isStudentGroup() {
+        if (this.idOfClientGroup != null)
+            return this.idOfClientGroup < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
+        return false;
     }
 
 }

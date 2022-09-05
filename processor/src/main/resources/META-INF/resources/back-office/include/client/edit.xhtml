@@ -211,7 +211,8 @@
             <h:outputText escape="true" value="Документы" styleClass="output-text"/>
             <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientEditPage.dulDetail}"
                             var="dul"
-                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                            center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                             footerClass="data-table-footer-center">
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
@@ -224,28 +225,34 @@
                     <f:facet name="header">
                         <h:outputText escape="true" value="Серия"/>
                     </f:facet>
-                    <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text"/>
+                    <h:inputText value="#{dul.series}" maxlength="64" styleClass="input-text" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.series}" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Номер"/>
                     </f:facet>
-                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text"/>
+                    <h:inputText value="#{dul.number}" maxlength="64" styleClass="input-text" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.number}" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
+
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Код подразделения (для паспорта)"/>
                     </f:facet>
-                    <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text"/>
+                    <h:inputText value="#{dul.subdivisionCode}" maxlength="64" styleClass="input-text" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.subdivisionCode}" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Кем выдан"/>
                     </f:facet>
-                    <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text"/>
+                    <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.issuer}" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
+
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
@@ -254,7 +261,8 @@
                     </f:facet>
                     <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
                                    converter="dateConverter"
-                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.issued}" converter="dateConverter" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}" styleClass="date-table">
@@ -263,7 +271,9 @@
                     </f:facet>
                     <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
                                    converter="dateConverter"
-                                   inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                                   inputClass="input-text" inputSize="6" showWeeksBar="false" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"/>
+                    <h:outputText escape="true" value="#{dul.expiration}" converter="dateConverter" rendered="#{mainPage.clientEditPage.isStudentGroup()}"/>
+
                 </rich:column>
 
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
@@ -280,7 +290,7 @@
                     <h:outputText escape="true" value="#{dul.lastUpdate}" converter="dateTimeConverter"/>
                 </rich:column>
 
-                <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                <rich:column headerClass="column-header" rendered="#{!dul.deleteState &amp;&amp; !mainPage.clientEditPage.isStudentGroup()}">
                     <f:facet name="header">
                         <h:outputText value="Удалить" escape="true"/>
                     </f:facet>
@@ -293,7 +303,7 @@
                 </rich:column>
 
                 <f:facet name="footer">
-                    <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
+                    <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}" rendered="#{!mainPage.clientEditPage.isStudentGroup()}"
                                        render="modalDulSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
                                        styleClass="command-link">

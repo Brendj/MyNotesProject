@@ -81,7 +81,7 @@
                              styleClass="input-text"
                              style="margin-right: 2px;"/>
                 <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}"
-                                   render="modalClientGroupSelectorPanel"
+                                   render="modalClientGroupSelectorPanel,addDocumentButton"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;"
                                    disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
@@ -290,7 +290,8 @@
             <h:outputText escape="true" value="Документы" styleClass="output-text"/>
             <rich:dataTable id="dulDetailEditTable" value="#{mainPage.clientCreatePage.dulDetail}"
                             var="dul"
-                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                            columnClasses="left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                            center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                             footerClass="data-table-footer-center">
                 <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
                     <f:facet name="header">
@@ -357,7 +358,8 @@
                 </rich:column>
 
                 <f:facet name="footer">
-                    <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
+                    <a4j:commandButton id="addDocumentButton" value="Добавить" action="#{mainPage.showDulSelectPage}"
+                                       rendered="#{!mainPage.clientCreatePage.isStudentGroup()}"
                                        render="modalDulSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
                                        styleClass="command-link">

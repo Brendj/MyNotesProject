@@ -1343,6 +1343,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         //Работа с документами
         boolean safeToMk = ClientManager.isClientGuardian(persistenceSession, client);
+        if (isStudentGroup()) {
+            if (this.dulDetail.stream().anyMatch(d -> d.getDeleteState() == null || !d.getDeleteState()))
+                throw new Exception("Нельзя добавить документы для студентов");
+        }
         for (DulDetail dulDetail : this.dulDetail) {
             if (dulDetail.getDeleteState() != null && dulDetail.getDeleteState()) {
                 if (dulDetail.getNew())
@@ -1353,6 +1357,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     throw new Exception(String.format("Ошибка удаления документов в МК: %s", meshDocumentResponse.getMessage()));
                 }
             } else {
+
                 try {
                     MeshDocumentResponse meshDocumentResponse;
                     if (dulDetail.getNew()) {
@@ -1883,6 +1888,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public Boolean isParentGroup() {
         if (this.idOfClientGroup != null)
             return this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+        return false;
+    }
+
+    public Boolean isStudentGroup() {
+        if (this.idOfClientGroup != null)
+            return this.idOfClientGroup < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
         return false;
     }
 
