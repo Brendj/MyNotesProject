@@ -1154,10 +1154,6 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
         } catch (Exception e){
             printError("Не удалось выполнить удаление неактуальных данных: " + e.getMessage());
         }
-        MeshPersonsSyncService service = RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class);
-
-        service.deleteIrrelevantPersons();
-
         printMessage("Выполнено удаление неактуальных данных");
     }
 
