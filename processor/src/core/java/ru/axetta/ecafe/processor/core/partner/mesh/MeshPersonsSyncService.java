@@ -253,7 +253,7 @@ public class MeshPersonsSyncService {
         }
     }
 
-    public void deleteIrrelevantPersons(){
+    public void deleteIrrelevantPersons() throws Exception {
         String top = getTop();
 
         Transaction transaction = null;
@@ -302,6 +302,7 @@ public class MeshPersonsSyncService {
             logger.info("Completed processing of \"falsely alive\" persons");
         } catch (Exception e){
             logger.error("Error in deleteIrrelevantPersons: ", e);
+            throw e;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
