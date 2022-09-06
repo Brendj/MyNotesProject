@@ -51,11 +51,13 @@ public class MeshGuardianPerson {
         this.birthDate = getDateFromString(responsePersons.getBirthdate());
         this.snils = responsePersons.getSnils();
         this.meshGender = responsePersons.getGenderId();
-        if (responsePersons.getContacts() != null) {
-            this.mobile = Client.checkAndConvertMobile(getContact(responsePersons.getContacts(), MeshGuardiansService.CONTACT_MOBILE_TYPE_ID));
-            this.email = getContact(responsePersons.getContacts(), MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
-        }
         this.validationStateId = responsePersons.getValidationStateId();
+
+        List<Contact> personContacts = responsePersons.getContacts();
+        if (personContacts != null && !personContacts.isEmpty()) {
+            this.mobile = Client.checkAndConvertMobile(getContact(personContacts, MeshGuardiansService.CONTACT_MOBILE_TYPE_ID));
+            this.email = getContact(personContacts, MeshGuardiansService.CONTACT_EMAIL_TYPE_ID);
+        }
 
         List<PersonDocument> personDocuments = responsePersons.getDocuments();
         if (personDocuments != null && !personDocuments.isEmpty()) {
@@ -65,6 +67,7 @@ public class MeshGuardianPerson {
             }
             this.setDocument(meshDocumentResponses);
         }
+
         List<PersonAgent> personAgents = responsePersons.getAgents();
         if (personAgents != null && !personAgents.isEmpty()) {
             List<MeshAgentResponse> meshAgentResponses = new ArrayList<>();
@@ -106,15 +109,29 @@ public class MeshGuardianPerson {
         return RuntimeContext.getAppContext().getBean(MeshGuardianConverter.class);
     }
 
-    private String getContact(List<Contact> contacts, Integer typeId) {
+    private String getContact(List<Contact> contacts, Integer typeId) throws Exception{
         List<Contact> list = contacts.stream()
-                .filter(contact -> contact.getTypeId() == typeId)
+                .filter(contact -> (contact.getTypeId() == typeId) && (contact.getDefault() == true))
                 .collect(Collectors.toList());
-        if (list.size() > 0) {
-            Collections.sort(list);
-            return list.get(0).getData();
+        if (list.size() == 0) {
+            list = contacts.stream()
+                    .filter(contact -> (contact.getTypeId() == typeId) )
+                    .collect(Collectors.toList());
         }
-        return null;
+        String data = null;
+        if(list.size() > 0) {
+            Date createdAtMax = getDateFromString(list.get(0).getCreatedAt());
+            data = list.get(0).getData();
+            for (Contact item : list) {
+                Date itemCreatedAt = getDateFromString(item.getCreatedAt());
+                if (itemCreatedAt.compareTo(createdAtMax) == 1) {
+                    createdAtMax = itemCreatedAt;
+                    data = item.getData();
+                }
+
+            }
+        }
+        return data;
     }
 
     private Date getDateFromString(String date) throws Exception {

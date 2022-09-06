@@ -1555,7 +1555,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     switch (operation) {
                         case DELETE_OPERATION:
-                            processDeleteOperationForGuardian(session, child, guardian, children);
+                            processDeleteOperationForGuardian(session, child, guardian, children, clientGuardianHistory);
                             break;
                         case MOVE_OPERATION:
                             processMoveOperationForGuardian(session, child, guardian, children, beforeMigrateOrgId);
@@ -1596,34 +1596,18 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
 
                 // Данные персоны из МК записываем поверх данных клиента в ИСПП
-                guardian.setMeshGUID(guardianPerson.getMeshGuid());
+
+                guardian.getPerson().setFirstName(guardianPerson.getFirstName());
+                guardian.getPerson().setSurname(guardianPerson.getSurname());
+                guardian.getPerson().setSecondName(StringUtils.defaultIfEmpty(guardianPerson.getSecondName(), ""));
                 guardian.setBirthDate(guardianPerson.getBirthDate());
-                if(!guardian.getPerson().getFirstName().equals(guardianPerson.getFirstName()) ||
-                        !guardian.getPerson().getSurname().equals(guardianPerson.getSurname()) ||
-                        !guardian.getPerson().getSecondName().equals(guardianPerson.getSecondName())) {
-                    guardian.getPerson().setFirstName(guardianPerson.getFirstName());
-                    guardian.getPerson().setSurname(guardianPerson.getSurname());
-                    if(StringUtils.isNotEmpty(guardianPerson.getSecondName())) {
-                        guardian.getPerson().setSecondName(guardianPerson.getSecondName());
-                    }
-                    else {
-                        guardian.getPerson().setSecondName("");
-                    }
-                }
                 guardian.setSan(guardianPerson.getSnils());
                 guardian.setGender(guardianPerson.getIsppGender());
                 List<DulDetail> dulDetails = new ArrayList<>();
                 if (!guardianPerson.getDocument().isEmpty()) {
-                    for (MeshDocumentResponse document : guardianPerson.getDocument()) {
-                        DulDetail dulDetail = document.getDulDetail();
-                        if(!RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                                .documentExists(session, guardian, dulDetail)) {
-                            dulDetails.add(dulDetail);
-                        }
-                    }
-                    RuntimeContext.getAppContext().getBean(DulDetailService.class)
-                            .saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
+                    getMeshGuardiansService().processDocumentsInternal(session, guardian, guardianPerson.getDocument());
                 }
+                guardian.initClientMobileHistory(clientsMobileHistory);
                 guardian.setMobile(guardianPerson.getMobile());
                 guardian.setEmail(guardianPerson.getEmail());
 
@@ -1634,29 +1618,34 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
                             ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
 
-                    clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
+                    ClientManager.createClientGuardianInfoTransactionFree(
                             session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
                             ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
                             ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
                 }
                 else {
                     if (clientGuardian.getDeletedState().equals(Boolean.TRUE)) {
-                        clientGuardian.setDeletedState(Boolean.FALSE);
+                        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
+                        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                        clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                        clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
+                        clientGuardian.setCreatedFrom(ClientCreatedFromType.REGISTRY);
                         session.merge(clientGuardian);
                     }
                 }
 
-                /*
-                if (guardian.isActiveAdultGroup()) {
-                    if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                        createMigrateRequestForGuardian(session,guardian, child.getOrg());
-                    }
-                } else
-                */
                 if (guardian.isLeaving()){
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                    ClientManager.createClientGroupMigrationHistoryLite(
+                            session, guardian, child.getOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getValue(),
+                            ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
+                                    .concat(String.format(" (ид. ОО=%s)", child.getOrg().getIdOfOrg())));
+                    ClientManager.addClientMigrationEntry(session, guardian.getOrg(), null, child.getOrg(),
+                            guardian, ClientGroupMigrationHistory.MODIFY_IN_REGISTRY, guardian.getClientGroup().getGroupName());
                     guardian.setOrg(child.getOrg());
                 }
+                Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                guardian.setClientRegistryVersion(nextClientVersion);
                 session.merge(guardian);
             } else {
                 // Создаем нового клиента-представителя и связь с обучающимся
@@ -1682,7 +1671,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
 
-    private void processDeleteOperationForGuardian(Session session, Client child, Client guardian, List<Client> children) throws Exception {
+    private void processDeleteOperationForGuardian(Session session, Client child, Client guardian, List<Client> children,
+                                                   ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (children.size() > 1) {
             Org newOrg = null;
 
@@ -1699,7 +1689,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
             if (guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                 if (guardian.isParent()){
+                    ClientManager.addClientMigrationEntry(session, guardian.getOrg(), null, newOrg,
+                            guardian, ClientGroupMigrationHistory.MODIFY_IN_REGISTRY, guardian.getClientGroup().getGroupName());
                     guardian.setOrg(newOrg);
+
+                    Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                    guardian.setClientRegistryVersion(nextClientVersion);
                     session.merge(guardian);
                 }
             }
@@ -1712,6 +1707,13 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             if (guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                 if(guardian.isParent()) {
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                    ClientManager.createClientGroupMigrationHistoryLite(
+                            session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
+                                    .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
+
+                    Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                    guardian.setClientRegistryVersion(nextClientVersion);
                     session.merge(guardian);
                 }
             }
@@ -1741,18 +1743,23 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId) ||
                         MigrantsUtils.findActiveMigrant(
                         session, beforeMigrateOrgId, guardian.getIdOfClient()) != null){
-                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                    createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
                 }
             }
         }
         else {
             if(guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId)) {
                 if (guardian.isParent()) {
+                    ClientManager.addClientMigrationEntry(session, guardian.getOrg(), null, child.getOrg(),
+                            guardian, ClientGroupMigrationHistory.MODIFY_IN_REGISTRY, guardian.getClientGroup().getGroupName());
                     guardian.setOrg(child.getOrg());
+
+                    Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                    guardian.setClientRegistryVersion(nextClientVersion);
                     session.merge(guardian);
                 }
                 else if (guardian.isActiveAdultGroup()) {
-                    createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                    createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
                 }
 
             }
@@ -1761,7 +1768,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
                     if (MigrantsUtils.findActiveMigrant(
                             session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
-                        createMigrateRequestForGuardian(session, guardian, child.getOrg());
+                        createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
                     }
                 }
 
@@ -1773,7 +1780,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
 
-    private void createMigrateRequestForGuardian(Session session, Client client, Org orgVisit) {
+    private void createMigrantRequestForGuardianIfNoPass(Session session, Client client, Org orgVisit) {
         if (!DAOUtils.isFriendlyOrganizations(session, client.getOrg(), orgVisit)) {
             if(MigrantsUtils.findActiveMigrant(
                     session, orgVisit.getIdOfOrg(), client.getIdOfClient()) == null) {
