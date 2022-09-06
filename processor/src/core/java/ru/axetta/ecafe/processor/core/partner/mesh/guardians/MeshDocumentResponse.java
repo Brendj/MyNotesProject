@@ -68,18 +68,6 @@ public class MeshDocumentResponse extends MeshGuardianResponse {
         return this;
     }
 
-    public DulDetail getDulDetail() {
-        DulDetail dulDetail = new DulDetail();
-        dulDetail.setDocumentTypeId(new Long(this.documentTypeId));
-        dulDetail.setSeries(this.getSeries());
-        dulDetail.setNumber(this.getNumber());
-        dulDetail.setSubdivisionCode(this.getSubdivisionCode());
-        dulDetail.setIssuer(this.getIssuer());
-        dulDetail.setIssued(this.getIssued());
-        dulDetail.setExpiration(this.getExpiration());
-        dulDetail.setIdMkDocument(this.getId());
-        return dulDetail;
-    }
 
 
     /*public DocumentResponse mkErrorResponse() {

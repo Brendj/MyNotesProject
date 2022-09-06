@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshResponseWithStatusCode;
 import ru.axetta.ecafe.processor.core.partner.mesh.json.*;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
@@ -202,6 +203,67 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return guardian;
     }
 
+    public void createDulDetailInternal(Session session, MeshDocumentResponse documentResponse, Long idOfClient)
+    throws Exception{
+        DulGuide dulGuide = DAOUtils.getDulGuideByType(session, new Integer(documentResponse.getDocumentTypeId()));
+        if (dulGuide == null) {
+            return;
+        }
+        DulDetail newDulDetail = new DulDetail(idOfClient, new Long(documentResponse.getDocumentTypeId()), dulGuide);
+        newDulDetail.setIdMkDocument(documentResponse.getId());
+        newDulDetail.setCreateDate(new Date());
+        newDulDetail.setLastUpdate(new Date());
+        newDulDetail.setNumber(documentResponse.getNumber());
+        newDulDetail.setSeries(documentResponse.getSeries());
+        newDulDetail.setIssued(documentResponse.getIssued());
+        newDulDetail.setIssuer(documentResponse.getIssuer());
+        newDulDetail.setDeleteState(false);
+        newDulDetail.setExpiration(documentResponse.getExpiration());
+        newDulDetail.setSubdivisionCode(documentResponse.getSubdivisionCode());
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                validateDul(session, newDulDetail, true);
+        session.save(newDulDetail);
+    }
+
+    public void processDocumentsInternal(
+            Session session, Client client, List<MeshDocumentResponse> documents) throws Exception {
+        // Создаем документы, которых нет в испп, обновляем документы, которые есть в ИСПП и МК
+        for (MeshDocumentResponse document : documents) {
+            DulDetail dulDetail = client.getDulDetail()
+                    .stream()
+                    .filter(dulDetailItem -> dulDetailItem.getIdMkDocument().equals(document.getId()))
+                    .findFirst()
+                    .orElse(null);
+            if(dulDetail == null){
+                createDulDetailInternal(session, document, client.getIdOfClient());
+            } else {
+                dulDetail.setSeries(document.getSeries());
+                dulDetail.setNumber(document.getNumber());
+                dulDetail.setIssuer(document.getIssuer());
+                dulDetail.setIssued(document.getIssued());
+                dulDetail.setLastUpdate(new Date());
+                dulDetail.setExpiration(document.getExpiration());
+                dulDetail.setSubdivisionCode(document.getSubdivisionCode());
+                RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                        validateDul(session, dulDetail, false);
+                session.merge(dulDetail);
+                session.flush();
+            }
+        }
+
+        // Удаляем те документы, которых уже нет в МК, но есть с ИСПП
+        for(DulDetail dulDetailItem : client.getDulDetail()){
+            boolean exists = documents.stream()
+                    .anyMatch(di -> di.getId().equals(dulDetailItem.getIdMkDocument()));
+            if(!exists){
+                dulDetailItem.setLastUpdate(new Date());
+                dulDetailItem.setDeleteState(true);
+
+                session.merge(dulDetailItem);
+            }
+        }
+    }
+
     public Client createGuardianInternalByMeshGuardianPerson(
             Session session, MeshGuardianPerson guardianPerson, Org org, String remark,
             ClientCreatedFromType clientCreatedFromType, ClientsMobileHistory clientsMobileHistory) throws Exception {
@@ -216,11 +278,10 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         guardian.setBirthDate(guardianPerson.getBirthDate());
         session.update(guardian);
 
-        if (guardianPerson.getDocument() != null && !guardianPerson.getDocument().isEmpty()) {
-            List<DulDetail> dulDetails = guardianPerson.getDocument()
-                    .stream().map(MeshDocumentResponse::getDulDetail).collect(Collectors.toList());
-
-            RuntimeContext.getAppContext().getBean(DulDetailService.class).saveDulOnlyISPP(session, dulDetails, guardian.getIdOfClient());
+        if (!guardianPerson.getDocument().isEmpty()) {
+            for (MeshDocumentResponse document : guardianPerson.getDocument()) {
+                createDulDetailInternal(session, document, guardian.getIdOfClient());
+            }
         }
 
         return guardian;

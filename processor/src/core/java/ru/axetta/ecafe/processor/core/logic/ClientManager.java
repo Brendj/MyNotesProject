@@ -1077,11 +1077,7 @@ public class ClientManager {
                                                        String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
                                                        String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
                                                        String ssoid, String guid, ClientsMobileHistory clientsMobileHistory) throws Exception {
-
-        if(StringUtils.isEmpty(secondName)) {
-            secondName = "";
-        }
-        Person personGuardian = new Person(firstName, surname, secondName);
+        Person personGuardian = new Person(firstName, surname, StringUtils.defaultIfEmpty(secondName, ""));
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
         Person contractGuardianPerson = new Person("", "", "");
@@ -2485,9 +2481,9 @@ public class ClientManager {
     }
 
     public static void createClientGroupMigrationHistoryLite(Session session, Client client, Org org, Long idOfClientGroup,
-                                                             String clientGroupName, String comment, ClientGuardianHistory clientGuardianHistory) {
+                                                             String clientGroupName, String comment) {
         createClientGroupMigrationHistoryFull(session, client, org, idOfClientGroup,
-                clientGroupName, comment, false, clientGuardianHistory);
+                clientGroupName, comment, false, null);
     }
 
     public static void createClientGroupMigrationHistoryFull(Session session, Client client, Org org, Long idOfClientGroup,

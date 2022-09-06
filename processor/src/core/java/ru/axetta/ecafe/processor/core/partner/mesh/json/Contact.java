@@ -25,7 +25,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
         "validated_at",
         "validation_errors"
 })
-public class Contact implements Comparable {
+public class Contact {
 
     @JsonProperty("id")
     private Integer id;
@@ -59,19 +59,6 @@ public class Contact implements Comparable {
     private Object validationErrors;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof Contact)) {
-            return 1;
-        }
-
-        Contact item = (Contact) o;
-        if (empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 0;
-        if (!empty(this.getCreatedAt()) && empty(item.getCreatedAt())) return 1;
-        if (empty(this.getCreatedAt()) && !empty(item.getCreatedAt())) return -1;
-        return this.getCreatedAt().compareTo(item.getCreatedAt());
-    }
 
     @JsonIgnore
     public boolean empty(String valueActualFrom) {
