@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import generated.etp.CoordinateMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ public class BenefitKafkaService extends KafkaService {
     public static final String RESPONSE_METHOD_DOC = "passport_by_serie_number_validity_checking_response";
     public static final String RESPONSE_METHOD_GUARDIANSHIP = "relatedness_checking_2_response";
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public BenefitKafkaService(KafkaTemplate<String, Object> kafkaTemplate) {
         super(kafkaTemplate);
     }
@@ -61,9 +64,9 @@ public class BenefitKafkaService extends KafkaService {
             RequestValidationData data = getBenefitData(applicationForFood);
             AbstractPushData request = clazz.getDeclaredConstructor(RequestValidationData.class).newInstance(data);
             Message<AbstractPushData> message = MessageBuilder.withPayload(request).build();
-            ListenableFuture<SendResult<String, Object>> future = kafkaTemplate
-                    .send(getTopicFromConfig(request), message);
-            future.addCallback(new ZlpLoggingListenableFutureCallback(message, data.getIdOfApplicationForFood(), applicationForFood.getServiceNumber()));
+            String msg = objectMapper.writeValueAsString(request);
+            ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send(getTopicFromConfig(request), msg);
+            future.addCallback(new ZlpLoggingListenableFutureCallback(message, msg, data.getIdOfApplicationForFood(), applicationForFood.getServiceNumber()));
         } catch (Exception e) {
             logger.error(String.format("Error in sendGuardianshipValidationRequest for serviceNumber = %s", applicationForFood.getServiceNumber()), e);
         }

@@ -4776,6 +4776,7 @@ public class DAOUtils {
                 new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)));
         criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)));
         criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.WITHDRAWN)));
         criteria.add(Restrictions.or(Restrictions.isNull("archived"), Restrictions.eq("archived", false)));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();

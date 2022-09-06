@@ -22,11 +22,13 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRe
 public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
     private final Logger log = LoggerFactory.getLogger(ZlpLoggingListenableFutureCallback.class);
     private final Message<AbstractPushData> message;
+    private final String jsonMessage;
     private final Long idOfApplicationForFood;
     private final String serviceNumber;
 
-    public ZlpLoggingListenableFutureCallback(Message<AbstractPushData> message, Long idOfApplicationForFood, String serviceNumber) {
+    public ZlpLoggingListenableFutureCallback(Message<AbstractPushData> message, String jsonMessage, Long idOfApplicationForFood, String serviceNumber) {
         this.message = message;
+        this.jsonMessage = jsonMessage;
         this.idOfApplicationForFood = idOfApplicationForFood;
         this.serviceNumber = serviceNumber;
     }
@@ -37,9 +39,8 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
             onFailure(new NullPointerException("SendResult is null"));
             return;
         }
-        String jsonString = requestToJsonString(message.getPayload());
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonString, idOfApplicationForFood);
-        log.info("Send kafka message: " + jsonString + ", Partition: " + result.getRecordMetadata().partition());
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveMezhvedRequest(message.getPayload(), jsonMessage, idOfApplicationForFood);
+        log.info("Send kafka message: " + jsonMessage + ", Partition: " + result.getRecordMetadata().partition());
         try {
             ApplicationForFoodStatus status = getApplicationForFoodStatus();
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
