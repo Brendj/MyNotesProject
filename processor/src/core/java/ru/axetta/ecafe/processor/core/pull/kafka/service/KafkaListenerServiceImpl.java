@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
@@ -61,7 +62,11 @@ public class KafkaListenerServiceImpl {
                     {
                         applicationForFoodDiscount.setConfirmed(true);
                         applicationForFoodDiscount.setStartDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_from()));
-                        applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_to()));
+                        try {
+                            applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_to()));
+                        } catch (Exception ignore) {
+                            applicationForFoodDiscount.setEndDate(CalendarUtils.parseDate("31.12.2099"));
+                        }
                         //Сначала ставим всем низкий приоритет
                         applicationForFoodDiscount.setAppointedMSP(false);
                         //Далее алгоритм определения самой приоритетной льготы
@@ -91,14 +96,27 @@ public class KafkaListenerServiceImpl {
                         requestId, AppMezhvedResponseDocDirection.ENDING);
                 session.persist(appMezhvedResponseDocument);
             }
+
+            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            ApplicationForFoodStatus status;
+            if (confirm) {
+                status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED);
+            } else {
+                status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
+            }
+            applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
+            RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                    applicationForFood.getServiceNumber(),
+                    applicationForFood.getStatus().getApplicationForFoodState());
+
             transaction.commit();
             transaction = null;
             if (confirm) {
-                applicationForFood.setStatus(new ApplicationForFoodStatus(
-                        ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED));
                 return applicationForFood;
+            } else {
+                return null;
             }
-            return null;
         } catch (Exception e) {
             logger.error("Error in processingActiveBenefitCategories: ", e);
             return null;

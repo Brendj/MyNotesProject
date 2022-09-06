@@ -39,6 +39,7 @@ public class KafkaListenerService {
 //            @PartitionOffset(partition = "0", initialOffset = "0")}))//for tests
     public void MezvedListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
+        logger.info(String.format("Response from kafka. Offset = %s, partitionId = %s, message = %s", offset, partitionId, message));
         AbstractPullData responseData = (AbstractPullData)objectMapper.readValue(message, getMessageType(message));
         RuntimeContext.getAppContext().getBean(KafkaListenerService.class).parseResponseMessage(responseData, message);
     }
@@ -62,10 +63,14 @@ public class KafkaListenerService {
                     if (validDoc == null || !validDoc) {
                         //Отправка запроса на проверку паспорта заявителя
                         RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
-                    } else
-                    {
-                        //Исполнение заявления
-                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    } else {
+                        Boolean validGuardianship = applicationForFood.getValidGuardianShip();
+                        if (validGuardianship == null || !validGuardianship) {
+                            RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                        } else {
+                            //Исполнение заявления
+                            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                        }
                     }
                 }
             }

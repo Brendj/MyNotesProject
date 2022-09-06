@@ -4732,7 +4732,7 @@ public class DAOUtils {
                 applicationForFood, status);
         if (applicationForFoodHistory != null) {
             String errorString = String
-                    .format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
+                    .format("Exist applicationForFoodHistory state = %s for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
                             applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                             applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
             throw new ApplicationForFoorStatusExistsException(errorString);
@@ -4748,7 +4748,7 @@ public class DAOUtils {
                     applicationForFood, status);
             if (applicationForFoodHistory != null) {
                 logger.warn(String.format(
-                        "Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s, ",
+                        "Exist applicationForFoodHistory state = %s for ApplicationForFood: clientContractID= %d , serviceNumber= %s, ",
                         applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                         applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber()));
                 return;

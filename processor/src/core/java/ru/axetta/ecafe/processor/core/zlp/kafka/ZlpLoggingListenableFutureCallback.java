@@ -19,7 +19,7 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
-public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, Object>> {
+public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, String>> {
     private final Logger log = LoggerFactory.getLogger(ZlpLoggingListenableFutureCallback.class);
     private final Message<AbstractPushData> message;
     private final String jsonMessage;
@@ -34,7 +34,7 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
     }
 
     @Override
-    public void onSuccess(SendResult<String, Object> result) {
+    public void onSuccess(SendResult<String, String> result) {
         if (result == null) {
             onFailure(new NullPointerException("SendResult is null"));
             return;
