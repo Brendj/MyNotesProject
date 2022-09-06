@@ -421,7 +421,7 @@ public class ClientUpdateFileLoadPage extends BasicWorkspacePage implements OrgS
             ClientManager.createClientGroupMigrationHistoryLite(session, client, client.getOrg(),
                     clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP +
-                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser(), clientGuardianHistory);
+                            FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
             client.setClientGroup(clientGroup);
             client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
 

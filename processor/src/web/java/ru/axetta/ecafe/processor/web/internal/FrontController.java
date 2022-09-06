@@ -2839,7 +2839,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
-            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
+            boolean saveToMk = ClientManager.isClientGuardian(persistenceSession, client);
             DulDetail dulDetail = fillingDulDetail(persistenceSession, documentItem);
             dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
@@ -2900,7 +2900,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
-            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
+            boolean saveToMk = ClientManager.isClientGuardian(persistenceSession, client);
             dulDetailService.validateDul(persistenceSession, dulDetail, true);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .updateDulDetail(persistenceSession, dulDetail, client, saveToMk);
@@ -2954,7 +2954,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
-            boolean saveToMk =  ClientManager.isClientGuardian(persistenceSession, client);
+            boolean saveToMk = ClientManager.isClientGuardian(persistenceSession, client);
             MeshDocumentResponse meshDocumentResponse = dulDetailService
                     .deleteDulDetail(persistenceSession, dulDetail, client, saveToMk);
             if (!meshDocumentResponse.getCode().equals(MeshDocumentResponse.OK_CODE)) {
@@ -3129,7 +3129,7 @@ public class FrontController extends HttpServlet {
 
             Client child = DAOReadonlyService.getInstance().findClientsByMeshGuid(childMeshGuid);
             if (child == null) {
-                return new GuardianMeshGuidResponse(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+                return new GuardianMeshGuidResponse(ResponseItem.ERROR_CLIENT_NOT_FOUND, ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
 
             personResponse = getMeshGuardiansService().createPersonWithEducation(persistenceSession, idOfOrg, firstName, patronymic, lastName, genderId, birthDate, snils,
@@ -3256,7 +3256,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "addGuardianToClient")
-    public ClientGuardianResponse addGuardianToClient(
+    public GuardianResponse addGuardianToClient(
             @WebParam(name = "meshGuid") String meshGuid,
             @WebParam(name = "childMeshGuid") String childMeshGuid,
             @WebParam(name = "agentTypeId") Integer agentTypeId,
@@ -3265,38 +3265,31 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "idOfOrg") Long idOfOrg,
             @WebParam(name = "informing") Boolean informing) {
 
-        //todo для чего idOfOrg?
-
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        ClientGuardianResponse clientGuardianResponse;
-        ClientGuardian clientGuardian;
-        Client guardian;
-        Client child;
-
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
                     || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
-                return new ClientGuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
+                return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
 
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", meshGuid));
-            guardian = (Client) criteria.uniqueResult();
+            Client guardian = (Client) criteria.uniqueResult();
 
             criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
-            child = (Client) criteria.uniqueResult();
+            Client child = (Client) criteria.uniqueResult();
 
             if (guardian == null || child == null) {
-                return new ClientGuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
+                return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
                         GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            clientGuardian = getClientGuardian(persistenceSession, guardian, child);
+            ClientGuardian clientGuardian = getClientGuardian(persistenceSession, guardian, child);
 
             if (clientGuardian == null) {
                 MessageContext mc = wsContext.getMessageContext();
@@ -3314,37 +3307,28 @@ public class FrontController extends HttpServlet {
                 MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
                 if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                     logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
-                    return new ClientGuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                    return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
                 }
-                clientGuardian = getClientGuardian(persistenceSession, guardian, child);
             }
-            if (clientGuardian == null) {
-                return new ClientGuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            if (!idOfOrg.equals(guardian.getOrg().getIdOfOrg()) && MigrantsUtils.findActiveMigrant(
+                    persistenceSession, idOfOrg, guardian.getIdOfClient()) == null) {
+                Org org = persistenceSession.get(Org.class, idOfOrg);
+                Date date = new Date();
+                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, date, org,
+                        MigrantInitiatorEnum.INITIATOR_ORG, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT, 12);
             }
-            clientGuardianResponse = new ClientGuardianResponse(ClientGuardianResponse.OK, ClientGuardianResponse.OK_MESSAGE);
-            clientGuardianResponse.setClientsData(new ClientOfAnotherOrgItem(guardian, 0));
-            clientGuardianResponse.setClientsGuardians(new ClientGuardianItem(clientGuardian));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in addGuardianToClient", e);
-            return new ClientGuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            return new GuardianResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return clientGuardianResponse;
-    }
-
-    private static ClientGuardian getClientGuardian(Session persistenceSession, Client guardian, Client child) {
-        Criteria criteria;
-        criteria = persistenceSession.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
-        criteria.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
-        criteria.add(Restrictions.ne("deletedState", true));
-        return (ClientGuardian) criteria.uniqueResult();
+        return new GuardianResponse(GuardianResponse.OK, GuardianResponse.OK_MESSAGE);
     }
 
     @WebMethod(operationName = "deleteGuardianToClient")
@@ -3371,21 +3355,26 @@ public class FrontController extends HttpServlet {
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
             Client child = (Client) criteria.uniqueResult();
 
-            MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
-            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+            if (guardian == null || child == null) {
+                return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
+                        GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            ClientGuardian clientGuardian = getClientGuardian(persistenceSession, guardian, child);
 
-            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+            if (clientGuardian != null) {
+                MessageContext mc = wsContext.getMessageContext();
+                HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+                clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
+                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
-            ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
-                    newGuardiansVersions, clientGuardianHistory);
-
-            MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
-
-            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+                ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
+                        newGuardiansVersions, clientGuardianHistory);
+                MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
+                if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                    return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
+                }
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -3471,6 +3460,15 @@ public class FrontController extends HttpServlet {
         dulDetail.setExpiration(documentItem.getExpiration());
         dulDetail.setLastUpdate(currentDate);
         return dulDetail;
+    }
+
+    private static ClientGuardian getClientGuardian(Session persistenceSession, Client guardian, Client child) {
+        Criteria criteria;
+        criteria = persistenceSession.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+        criteria.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+        criteria.add(Restrictions.ne("deletedState", true));
+        return (ClientGuardian) criteria.uniqueResult();
     }
 
 }
