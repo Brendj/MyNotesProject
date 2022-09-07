@@ -231,33 +231,37 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public void processDocumentsInternal(
             Session session, Client client, List<MeshDocumentResponse> documents) throws Exception {
         // Создаем документы, которых нет в испп, обновляем документы, которые есть в ИСПП и МК
-        for (MeshDocumentResponse document : documents) {
-            DulDetail dulDetail = client.getDulDetail()
-                    .stream()
-                    .filter(dulDetailItem -> dulDetailItem.getIdMkDocument().equals(document.getId()))
-                    .findFirst()
-                    .orElse(null);
-            if(dulDetail == null){
-                createDulDetailInternal(session, document, client.getIdOfClient());
-            } else {
-                dulDetail.setSeries(document.getSeries());
-                dulDetail.setNumber(document.getNumber());
-                dulDetail.setIssuer(document.getIssuer());
-                dulDetail.setIssued(document.getIssued());
-                dulDetail.setLastUpdate(new Date());
-                dulDetail.setExpiration(document.getExpiration());
-                dulDetail.setSubdivisionCode(document.getSubdivisionCode());
-                RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                        validateDul(session, dulDetail, false);
-                session.merge(dulDetail);
-                session.flush();
+        if(documents != null || !documents.isEmpty()) {
+            for (MeshDocumentResponse document : documents) {
+                DulDetail dulDetail = client.getDulDetail()
+                        .stream()
+                        .filter(dulDetailItem -> dulDetailItem.getIdMkDocument().equals(document.getId()))
+                        .findFirst()
+                        .orElse(null);
+                if (dulDetail == null) {
+                    createDulDetailInternal(session, document, client.getIdOfClient());
+                } else {
+                    dulDetail.setSeries(document.getSeries());
+                    dulDetail.setNumber(document.getNumber());
+                    dulDetail.setIssuer(document.getIssuer());
+                    dulDetail.setIssued(document.getIssued());
+                    dulDetail.setLastUpdate(new Date());
+                    dulDetail.setExpiration(document.getExpiration());
+                    dulDetail.setSubdivisionCode(document.getSubdivisionCode());
+                    RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                            validateDul(session, dulDetail, false);
+                    session.merge(dulDetail);
+                    session.flush();
+                }
             }
         }
-
         // Удаляем те документы, которых уже нет в МК, но есть с ИСПП
         for(DulDetail dulDetailItem : client.getDulDetail()){
-            boolean exists = documents.stream()
-                    .anyMatch(di -> di.getId().equals(dulDetailItem.getIdMkDocument()));
+            boolean exists = false;
+            if (documents != null || !documents.isEmpty()) {
+                exists = documents.stream()
+                        .anyMatch(di -> di.getId().equals(dulDetailItem.getIdMkDocument()));
+            }
             if(!exists){
                 dulDetailItem.setLastUpdate(new Date());
                 dulDetailItem.setDeleteState(true);
