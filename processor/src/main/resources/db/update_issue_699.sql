@@ -53,25 +53,17 @@ COMMENT ON COLUMN CF_Dul_Detail.LastUpdate IS 'Дата изменения за�
 COMMENT ON COLUMN CF_Dul_Detail.DeleteState IS 'Признак удаления ';
 
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (15, 'Паспорт РФ');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (5, 'Справка об освобождении');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (19, 'Паспорт моряка');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (3, 'Свидетельство о рождении');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (2, 'Заграничный паспорт гражданина СССР');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (18, 'Удостоверение личности военнослужащего Российской Федерации');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (17, 'Свидетельство о рождении, выданное уполномоченным органом иностранного государства');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (16, 'Заграничный паспорт гражданина Российской Федерации');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (14, 'Свидетельство о предоставлении временного убежища на территории Российской Федерации');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (13, 'Разрешение на временное проживание лица без гражданства в Российской Федерации');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (12, 'Временное удостоверение личности гражданина Российской Федерации');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (11, 'Удостоверение беженца');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (10, 'Вид на жительство');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (8, 'Дипломатический паспорт гражданина Российской Федерации');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (7, 'Временное удостоверение, выданное взамен военного билета');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (1, 'Паспорт гражданина СССР');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (6, 'Военный билет');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (900, 'Паспорт иностранного гражданина');
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (901, 'Документ, удостоверяющий личность на период рассмотрения заявления о признании гражданином РФ или о приеме в гражданство РФ');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (902, 'Свидетельство о рассмотрении ходатайства о признании беженцем на территории РФ по существу');
+INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (124, 'Полис обязательного медицинского страхования');
+INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (189, 'Социальная карта москвича');
+INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (9, 'Иностранный паспорт');
 
 
 INSERT INTO cf_dul_detail (idofclient, document_type_id, series, number, createdate, lastupdate)
