@@ -806,10 +806,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
 
         if (isParentGroup()) {
-            if (!this.clientWardItems.isEmpty()) {
-                if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
-                    throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
-                }
+            if ((this.san == null || this.san.isEmpty()) && (dulDetail == null || dulDetail.isEmpty())) {
+                throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
@@ -1058,6 +1056,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if (this.idOfClientGroup != null)
             return this.idOfClientGroup < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
         return false;
+    }
+
+    public Object clearWards() {
+        this.clientWardItems.clear();
+        return null;
     }
 
 }
