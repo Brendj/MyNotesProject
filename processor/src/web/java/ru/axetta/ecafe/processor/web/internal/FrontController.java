@@ -3167,7 +3167,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "birthDate") Date birthDate,
             @WebParam(name = "snils") String snils,
             @WebParam(name = "genderId") Integer genderId,
-            @WebParam(name = "mobile") String mobile) {
+            @WebParam(name = "mobile") String mobile,
+            @WebParam(name = "email") String email) {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3190,6 +3191,7 @@ public class FrontController extends HttpServlet {
             client.setGender(genderId);
             client.setBirthDate(birthDate);
             client.setMobile(mobile);
+            client.setEmail(email);
             persistenceSession.update(client);
 
             if (client.getMeshGUID() != null) {
@@ -3203,6 +3205,9 @@ public class FrontController extends HttpServlet {
                 Map<Integer, String> contacts = new HashMap<>();
                 if (mobile != null && !mobile.isEmpty()) {
                     contacts.put(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, mobile);
+                }
+                if (email != null && !email.isEmpty()) {
+                    contacts.put(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, email);
                 }
                 MeshContactResponse meshContactResponse = getMeshGuardiansService()
                         .savePersonContact(client.getMeshGUID(), contacts);
