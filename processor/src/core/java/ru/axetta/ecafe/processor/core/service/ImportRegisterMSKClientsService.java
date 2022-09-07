@@ -1239,9 +1239,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 guardian.setSan(guardianPerson.getSnils());
                 guardian.setGender(guardianPerson.getIsppGender());
                 List<DulDetail> dulDetails = new ArrayList<>();
-                if (!guardianPerson.getDocument().isEmpty()) {
-                    getMeshGuardiansService().processDocumentsInternal(session, guardian, guardianPerson.getDocument());
-                }
+                getMeshGuardiansService().processDocumentsInternal(session, guardian, guardianPerson.getDocument());
                 guardian.initClientMobileHistory(clientsMobileHistory);
                 guardian.setMobile(guardianPerson.getMobile());
                 guardian.setEmail(guardianPerson.getEmail());

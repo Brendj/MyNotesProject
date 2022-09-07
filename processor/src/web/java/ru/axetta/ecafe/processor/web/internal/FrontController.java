@@ -3270,6 +3270,7 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            Org org = persistenceSession.get(Org.class, idOfOrg);
 
             if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
                     || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
@@ -3310,9 +3311,8 @@ public class FrontController extends HttpServlet {
                     return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
                 }
             }
-            if (!idOfOrg.equals(guardian.getOrg().getIdOfOrg()) && MigrantsUtils.findActiveMigrant(
-                    persistenceSession, idOfOrg, guardian.getIdOfClient()) == null) {
-                Org org = persistenceSession.get(Org.class, idOfOrg);
+            if (!idOfOrg.equals(guardian.getOrg().getIdOfOrg()) && !DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), org)
+                    && MigrantsUtils.findActiveMigrant(persistenceSession, idOfOrg, guardian.getIdOfClient()) == null) {
                 Date date = new Date();
                 ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, date, org,
                         MigrantInitiatorEnum.INITIATOR_ORG, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT, 12);
