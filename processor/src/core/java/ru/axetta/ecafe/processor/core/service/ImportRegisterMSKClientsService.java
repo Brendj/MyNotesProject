@@ -1253,16 +1253,28 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     ClientManager.createClientGuardianInfoTransactionFree(
                             session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
-                            ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
+                            ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled,
+                            child.getIdOfClient(), ClientCreatedFromType.REGISTRY,
+                            ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
                 }
                 else {
-                    if (clientGuardian.getDeletedState().equals(Boolean.TRUE)) {
-                        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
-                        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                    if (clientGuardian.getDeletedState()) {
+                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
                         clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
-                        clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
-                        clientGuardian.setCreatedFrom(ClientCreatedFromType.REGISTRY);
+                        clientGuardian.restore(ClientManager.generateNewClientGuardianVersion(session),
+                                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL));
+
+                        // Опекунство активировно(default=false), если:
+                        // A. Типы представителей в МК от 1 до 4 типа;
+                        // B. Роли представителя в ИСПП от 1 до 2 типа;
+                        Boolean disabled = meshAgentResponse.getAgentTypeId().equals(
+                                ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
+                        if (clientGuardian.getRepresentType() != null) {
+                            disabled = disabled && (!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW) &&
+                                    !clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.GUARDIAN));
+                        }
+                        clientGuardian.setDisabled(disabled);
                         session.merge(clientGuardian);
                     }
                 }
@@ -1297,8 +1309,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                 ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(
                         session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled, child.getIdOfClient(),
-                        ClientCreatedFromType.REGISTRY, null, clientGuardianHistory);
+                        ClientGuardianRoleType.fromInteger(meshAgentResponse.getAgentTypeId()), disabled,
+                        child.getIdOfClient(), ClientCreatedFromType.REGISTRY,
+                        ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
             }
         }
     }
