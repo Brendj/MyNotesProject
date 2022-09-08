@@ -2,6 +2,7 @@ package ru.iteco.meshsync.mesh.service.logic.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.collections4.CollectionUtils;
+import org.threeten.bp.OffsetDateTime;
 import ru.iteco.client.model.PersonContact;
 import ru.iteco.client.model.PersonDocument;
 import ru.iteco.client.model.PersonInfo;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClientRestDTO implements Serializable {
     private static final Integer PHONE_ID = 1;
@@ -25,12 +27,12 @@ public class ClientRestDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", timezone = "Europe/Moscow")
     private Date birthdate;
 
-    private String phone = "";
     private String mobile = "";
     private String email = "";
     private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
     private Integer agentTypeId;
+    private String snils;
 
     public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
@@ -40,13 +42,11 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
-
-        if(CollectionUtils.isNotEmpty(info.getContacts())) {
-            PersonContact mobile = info.getContacts().stream().filter(c -> c.getTypeId().equals(PHONE_ID)).findFirst().orElse(null);
-            dto.mobile = mobile == null ? "" : mobile.getData();
-
-            PersonContact email = info.getContacts().stream().filter(c -> c.getTypeId().equals(EMAIL_ID)).findFirst().orElse(null);
-            dto.email = email == null ? "" : email.getData();
+        dto.snils = info.getSnils();
+        List<PersonContact> personContacts = info.getContacts();
+        if (CollectionUtils.isNotEmpty(personContacts)) {
+            dto.mobile = checkAndConvertMobile(getContact(personContacts, PHONE_ID));
+            dto.email = getContact(personContacts, EMAIL_ID);
         }
 
         if(CollectionUtils.isNotEmpty(info.getDocuments())) {
@@ -63,6 +63,47 @@ public class ClientRestDTO implements Serializable {
         dto.childrenPersonGUID = childrenPersonId;
 
         return dto;
+    }
+
+    private static String checkAndConvertMobile(String mobilePhone) {
+        if (mobilePhone == null || mobilePhone.length() == 0) {
+            return mobilePhone;
+        }
+        mobilePhone = mobilePhone.replaceAll("[+ \\-()]", "");
+        if (mobilePhone.startsWith("8")) {
+            mobilePhone = "7" + mobilePhone.substring(1);
+        }
+        if (mobilePhone.length() == 10) {
+            mobilePhone = "7" + mobilePhone;
+        } else if (mobilePhone.length() != 11) {
+            return null;
+        }
+        return mobilePhone;
+    }
+
+    private static String getContact(List<PersonContact> contacts, Integer typeId) throws Exception{
+        List<PersonContact> list = contacts.stream()
+                .filter(contact -> (contact.getTypeId() == typeId) && (contact.isDefault() == true))
+                .collect(Collectors.toList());
+        if (list.size() == 0) {
+            list = contacts.stream()
+                    .filter(contact -> (contact.getTypeId() == typeId) )
+                    .collect(Collectors.toList());
+        }
+        String data = null;
+        if(list.size() > 0) {
+            OffsetDateTime createdAtMax = list.get(0).getCreatedAt();
+            data = list.get(0).getData();
+            for (PersonContact item : list) {
+                OffsetDateTime itemCreatedAt = item.getCreatedAt();
+                if (itemCreatedAt.compareTo(createdAtMax) > 0) {
+                    createdAtMax = itemCreatedAt;
+                    data = item.getData();
+                }
+
+            }
+        }
+        return data;
     }
 
     public String getPersonGUID() {
@@ -113,14 +154,6 @@ public class ClientRestDTO implements Serializable {
         this.birthdate = birthdate;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public String getMobile() {
         return mobile;
     }
@@ -159,5 +192,12 @@ public class ClientRestDTO implements Serializable {
 
     public void setAgentTypeId(Integer agentTypeId) {
         this.agentTypeId = agentTypeId;
+    }
+
+    public String getSnils() {
+        return snils;
+    }
+    public void setSnils(String snils) {
+        this.snils = snils;
     }
 }

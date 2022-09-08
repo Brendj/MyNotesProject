@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.partner.mesh_guardians;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.ClientInfo;
 import ru.axetta.ecafe.processor.web.partner.mesh_guardians.dao.DocumentInfo;
@@ -55,10 +57,7 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-            clientGuardianHistory.setReason("Создание клиента через внутренний REST-сервис");
-
-            registryClient(info, session, clientGuardianHistory);
+            registryClient(info, session);
 
             transaction.commit();
             transaction = null;
@@ -70,57 +69,26 @@ public class MeshClientProcessorService {
         }
     }
 
-    private void registryClient(ClientInfo info, Session session, ClientGuardianHistory clientGuardianHistory) throws Exception {
+    private void registryClient(ClientInfo info, Session session) throws Exception {
         Org org = service.getOrgByClientMeshGuid(info.getChildrenPersonGUID());
-        Long contractId = RuntimeContext.getInstance()
-                .getClientContractIdGenerator().generateTransactionFree(org.getIdOfOrg());
-
-        Long nextVersion = DAOUtils.updateClientRegistryVersion(session);
-
-        Person p = new Person(info.getFirstname(), info.getLastname(), info.getPatronymic());
-        session.save(p);
-
-        // Copy from ClientCreatePage
-        Client client = new Client(org, p, p, 0, notifyViaEmail, true, notifyViaPUSH, contractId,
-                new Date(), 0, contractId.toString(), 1, nextVersion, limit, expenditureLimit);
-
-        client.setAddress("");
-        client.setPhone(info.getPhone());
-        session.save(client);
-
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Регистрация клиента через внутренний REST-сервис");
         clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
-        client.initClientMobileHistory(clientsMobileHistory);
 
-        client.setMeshGUID(info.getPersonGUID());
-        client.setMobile(info.getMobile());
-        client.setEmail(info.getEmail());
-        client.setBirthDate(info.getBirthdate());
-        client.setGender(info.getGenderId());
-        client.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        client.setCreatedFrom(ClientCreatedFromType.DEFAULT);
+        Client guardian = ClientManager
+                .createGuardianTransactionFree(session, info.getFirstname(), info.getLastname(),
+                        info.getPatronymic(), info.getMobile(), null,
+                        info.getIsppGender(), org, ClientCreatedFromType.DEFAULT, "", null,
+                        null, null, null, null, clientsMobileHistory);
+        guardian.setMeshGUID(info.getPersonGUID());
+        guardian.setSan(info.getSnils());
+        guardian.setBirthDate(info.getBirthdate());
+        session.update(guardian);
 
-        ClientGroup cg = service.getClientGroupParentByOrg(org);
-        if(cg == null) {
-            cg = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS);
-        }
-        client.setClientGroup(cg);
-        client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-
-        session.update(client);
-
-        for(DocumentInfo di : info.getDocuments()){
-            createDul(di, session, client.getIdOfClient());
-        }
-
-        ClientMigration clientMigration = new ClientMigration(client, org, new Date());
-        session.save(clientMigration);
-
-        if(client.getClientGroup() != null) {
-            ClientManager.createClientGroupMigrationHistory(session, client, org,
-                    client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
-                    ClientGroupMigrationHistory.MODIFY_IN_ISPP, clientGuardianHistory);
+        if (!info.getDocuments().isEmpty()) {
+            for (DocumentInfo document : info.getDocuments()) {
+                createDul(document, session, guardian.getIdOfClient());
+            }
         }
     }
 
@@ -131,27 +99,27 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client c = DAOUtils.findClientByMeshGuid(session, info.getPersonGUID());
-            if(c == null){
+            Client guardian = DAOUtils.findClientByMeshGuid(session, info.getPersonGUID());
+            if(guardian == null){
                 throw new NotFoundException("Not found client by MESH-GUID: " + info.getPersonGUID());
             }
+            guardian.getPerson().setFirstName(info.getFirstname());
+            guardian.getPerson().setSurname(info.getLastname());
+            guardian.getPerson().setSecondName(StringUtils.defaultIfEmpty(info.getPatronymic(), ""));
+            guardian.setBirthDate(info.getBirthdate());
+            guardian.setSan(info.getSnils());
+            guardian.setGender(info.getIsppGender());
+            ClientsMobileHistory clientsMobileHistory =
+                    new ClientsMobileHistory("Обновление клиента через внутренний REST-сервис");
+            clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
+            guardian.initClientMobileHistory(clientsMobileHistory);
+            guardian.setMobile(info.getMobile());
+            guardian.setEmail(info.getEmail());
+            processDocuments(guardian.getDulDetail(), info.getDocuments(), session, guardian.getIdOfClient());
+
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-
-            Person p = c.getPerson();
-            p.setFirstName(info.getFirstname());
-            p.setSurname(info.getLastname());
-            p.setSecondName(info.getPatronymic());
-            session.update(p);
-
-            processDocuments(c.getDulDetail(), info.getDocuments(), session, c.getIdOfClient());
-
-            c.setClientRegistryVersion(nextClientVersion);
-            c.setBirthDate(info.getBirthdate());
-            c.setGender(info.getGenderId());
-            c.setPhone(info.getPhone());
-            c.setMobile(info.getMobile());
-            c.setEmail(info.getEmail());
-            session.update(c);
+            guardian.setClientRegistryVersion(nextClientVersion);
+            session.merge(guardian);
 
             transaction.commit();
             transaction = null;
@@ -166,7 +134,7 @@ public class MeshClientProcessorService {
         }
     }
 
-    private void processDocuments(Set<DulDetail> dulDetails, List<DocumentInfo> documents, Session session, Long idOfClient) {
+    private void processDocuments(Set<DulDetail> dulDetails, List<DocumentInfo> documents, Session session, Long idOfClient) throws Exception{
         for(DocumentInfo di : documents){
             DulDetail d = dulDetails
                     .stream()
@@ -183,39 +151,44 @@ public class MeshClientProcessorService {
                 d.setLastUpdate(new Date());
                 d.setExpiration(di.getExpiration());
                 d.setSubdivisionCode(di.getSubdivisionCode());
+                RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                        validateDul(session, d, false);
+                session.merge(d);
+                session.flush();
             }
         }
 
-        for(DulDetail d : dulDetails){
+        for(DulDetail dulDetailItem : dulDetails){
             boolean exists = documents.stream()
-                    .anyMatch(di -> di.getIdMKDocument().equals(d.getIdMkDocument()));
+                    .anyMatch(di -> di.getIdMKDocument().equals(dulDetailItem.getIdMkDocument()));
             if(!exists){
-                d.setLastUpdate(new Date());
-                d.setDeleteState(true);
+                dulDetailItem.setLastUpdate(new Date());
+                dulDetailItem.setDeleteState(true);
 
-                session.update(d);
+                session.merge(dulDetailItem);
             }
         }
     }
 
-    private void createDul(DocumentInfo di, Session session, Long idOfClient) {
+    private void createDul(DocumentInfo di, Session session, Long idOfClient) throws Exception{
         DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
         if(dulGuide == null){
-            throw new NotFoundException("Not found DulGuide by type: " + di.getDocumentType());
+            return;
         }
-        DulDetail d = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
-        d.setIdMkDocument(di.getIdMKDocument());
-        d.setCreateDate(new Date());
-        d.setLastUpdate(new Date());
-        d.setNumber(di.getNumber());
-        d.setSeries(di.getSeries());
-        d.setIssued(di.getIssuedDate());
-        d.setIssuer(di.getIssuer());
-        d.setDeleteState(false);
-        d.setExpiration(di.getExpiration());
-        d.setSubdivisionCode(di.getSubdivisionCode());
-
-        session.save(d);
+        DulDetail newDulDetail = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
+        newDulDetail.setIdMkDocument(di.getIdMKDocument());
+        newDulDetail.setCreateDate(new Date());
+        newDulDetail.setLastUpdate(new Date());
+        newDulDetail.setNumber(di.getNumber());
+        newDulDetail.setSeries(di.getSeries());
+        newDulDetail.setIssued(di.getIssuedDate());
+        newDulDetail.setIssuer(di.getIssuer());
+        newDulDetail.setDeleteState(false);
+        newDulDetail.setExpiration(di.getExpiration());
+        newDulDetail.setSubdivisionCode(di.getSubdivisionCode());
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).
+                validateDul(session, newDulDetail, true);
+        session.save(newDulDetail);
     }
 
     public void deleteClient(String personGuid) throws Exception {
@@ -225,17 +198,21 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client c = DAOUtils.findClientByMeshGuidAsGuardian(session, personGuid);
-            if (c == null) {
+            Client guardian = DAOUtils.findClientByMeshGuidAsGuardian(session, personGuid);
+            if (guardian == null) {
                 throw new NotFoundException("Not found client by MESH-GUID: " + personGuid);
             }
 
+            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            ClientManager.createClientGroupMigrationHistoryLite(
+                    session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
+                            .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
+
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
 
-            c.setClientRegistryVersion(nextClientVersion);
-            c.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-
-            session.update(c);
+            guardian.setClientRegistryVersion(nextClientVersion);
+            session.merge(guardian);
 
             transaction.commit();
             transaction = null;
@@ -257,9 +234,10 @@ public class MeshClientProcessorService {
 
             ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
             clientGuardianHistory.setReason("Изменение/Создание через внутренний REST-сервис");
+            clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
 
-            Client c = DAOUtils.findClientByMeshGuid(session, guardianRelationInfo.getChildrenPersonGuid());
-            if(c == null){
+            Client child = DAOUtils.findClientByMeshGuid(session, guardianRelationInfo.getChildrenPersonGuid());
+            if(child == null){
                 throw new NotFoundException("Not found client by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             }
             if (!guardianRelationInfo.getGuardianPersonGuids().isEmpty()) {
@@ -267,44 +245,63 @@ public class MeshClientProcessorService {
                     Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
                     if (guardian == null) {
-                        this.registryClient(meshGuardian, session, clientGuardianHistory);
+                        this.registryClient(meshGuardian, session);
                         continue;
                     }
 
                     ClientGuardian clientGuardian = DAOUtils
-                            .findClientGuardian(session, c.getIdOfClient(), guardian.getIdOfClient());
+                            .findClientGuardian(session, child.getIdOfClient(), guardian.getIdOfClient());
+
                     if (clientGuardian == null) {
+                        Boolean disabled = meshGuardian.getAgentTypeId().equals(
+                                ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
                         ClientManager.createClientGuardianInfoTransactionFree(
                                 session, guardian, ClientGuardianRelationType.UNDEFINED.getDescription(),
-                                ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), true, c.getIdOfClient(), ClientCreatedFromType.DEFAULT,
+                                ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), disabled,
+                                child.getIdOfClient(), ClientCreatedFromType.DEFAULT,
                                 ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
-                    } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
-                        boolean enableSpecialNotification = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL);
-                        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-                        clientGuardianHistory.setCreatedFrom(ClientCreatedFromType.DEFAULT);
-                        clientGuardian.restore(newGuardiansVersions, enableSpecialNotification);
-                        clientGuardian.setCreatedFrom(ClientCreatedFromType.DEFAULT);
-                        session.update(clientGuardian);
+                    } else if (clientGuardian.getDeletedState()) {
+                        clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                        clientGuardian.restore(ClientManager.generateNewClientGuardianVersion(session),
+                                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL));
+
+                        // Опекунство активировно(default=false), если:
+                        // A. Типы представителей в МК от 1 до 4 типа;
+                        // B. Роли представителя в ИСПП от 1 до 2 типа;
+                        Boolean disabled = meshGuardian.getAgentTypeId().equals(
+                                ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+
+                        if (clientGuardian.getRepresentType() != null) {
+                            disabled = disabled && (!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW) &&
+                                    !clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.GUARDIAN));
+                        }
+                        clientGuardian.setDisabled(disabled);
+                        session.merge(clientGuardian);
+                    } else if (clientGuardian.getRoleType().getCode() != meshGuardian.getAgentTypeId()) {
+                        clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                        clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()));
+                        session.merge(clientGuardian);
                     }
                 }
             }
-            List<Client> clientGuardians = DAOReadExternalsService.getInstance()
-                    .findGuardiansByClient(c.getIdOfClient(), null);
+            List<Client> guardians = DAOReadExternalsService.getInstance()
+                    .findGuardiansByClient(child.getIdOfClient(), null);
 
-            for(Client guard : clientGuardians){
-                if(guardianRelationInfo.getGuardianPersonGuids().isEmpty() || guardianRelationInfo.getGuardianPersonGuids().stream().noneMatch(i -> i.getPersonGUID().equals(guard.getMeshGUID()))){
-                    ClientGuardian cg = DAOReadonlyService.getInstance()
-                            .findClientGuardianById(session, c.getIdOfClient(), guard.getIdOfClient());
+            // Удаляем те связи, которых нет в МК, но есть в ИСПП
+            for(Client guardian : guardians){
+                if(guardianRelationInfo.getGuardianPersonGuids().isEmpty() ||
+                        guardianRelationInfo.getGuardianPersonGuids().stream().
+                                noneMatch(i -> i.getPersonGUID().equals(guardian.getMeshGUID()))){
 
-                    Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-                    clientGuardianHistory.setClientGuardian(cg);
-                    clientGuardianHistory.setChangeDate(new Date());
-                    cg.setDeletedState(true);
-                    cg.setVersion(newGuardiansVersions);
-                    session.update(cg);
+                    ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
+                            .findClientGuardianById(session, child.getIdOfClient(), guardian.getIdOfClient());
+                    clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
 
-                    DAOUtils.disableCardRequest(session, guard.getIdOfClient());
-                    MigrantsUtils.disableMigrantRequestIfExists(session, c.getOrg().getIdOfOrg(), guard.getIdOfClient());
+                    clientGuardian.delete(ClientManager.generateNewClientGuardianVersion(session));
+                    session.merge(clientGuardian);
+
+                    DAOUtils.disableCardRequest(session, guardian.getIdOfClient());
+                    MigrantsUtils.disableMigrantRequestIfExists(session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                 }
             }
 
