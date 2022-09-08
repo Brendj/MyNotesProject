@@ -597,23 +597,6 @@ public class ETPMVService {
         return new String(Hex.encodeHex(resultByte));
     }
 
-    public void sendRequestForGuardianshipValidation(ApplicationForFood applicationForFood) {
-        if (applicationForFood.getValidGuardianShip()) {
-            //todo исполнение заявления?
-            return;
-        }
-        //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
-    }
-
-    public void sendRequestForDocValidation(ApplicationForFood applicationForFood) {
-        if (applicationForFood.getValidDoc()) {
-            sendRequestForGuardianshipValidation(applicationForFood);
-            return;
-        }
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
-    }
-
     private void initAISContingentService() throws Exception {
         if (port == null) {
             service = new IsppWebServiceService();

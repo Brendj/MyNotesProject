@@ -46,8 +46,8 @@ public class KafkaListenerService {
 
     private Class getMessageType(String message) throws Exception {
         if (message.contains("active_benefit_categories_getting_response")) return BenefitResponse.class;
-        if (message.contains("passport_by_serie_number_validity_checking_response")) return PassportResponse.class;
-        if (message.contains("relatedness_checking_2_response")) return GuardianResponse.class;
+        if (message.contains("passport_validity_checking_response")) return PassportResponse.class;
+        if (message.contains("relatedness_checking_response")) return GuardianResponse.class;
         throw new Exception("Unknown message type");
     }
 

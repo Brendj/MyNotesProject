@@ -3,9 +3,9 @@ package ru.axetta.ecafe.processor.core.zlp.kafka.request;
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 
 public class ParentPassportInfo {
-    private String passport_series;
-    private String passport_number;
-    private String passport_issue_date;
+    protected String passport_series;
+    protected String passport_number;
+    protected String passport_issue_date;
 
     public ParentPassportInfo() {
 

@@ -20,8 +20,8 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitCategory
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitDocument;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportValidityCheckingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportResponse;
 
 import java.text.SimpleDateFormat;
@@ -71,7 +71,7 @@ public class KafkaListenerServiceImpl {
                         applicationForFoodDiscount.setAppointedMSP(false);
                         //Далее алгоритм определения самой приоритетной льготы
                         applicationForFoodDiscountActive = RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).getMaxPriorityDiscount(session, applicationForFoodDiscount, applicationForFoodDiscountActive);
-                        session.save(applicationForFoodDiscount);
+                        session.update(applicationForFoodDiscount);
                         confirm = true;
                         break;
                     }
@@ -81,7 +81,7 @@ public class KafkaListenerServiceImpl {
             {
                 //Проставляем флаг высшего приоритета у льготы
                 applicationForFoodDiscountActive.setAppointedMSP(true);
-                session.save(applicationForFoodDiscountActive);
+                session.update(applicationForFoodDiscountActive);
             }
             //Сохранение сопуствующих документов
             for (BenefitDocument benefitDocument: activeBenefitCategoriesGettingResponse.getBenefit_activity_starting_reason_documents())
@@ -136,30 +136,27 @@ public class KafkaListenerServiceImpl {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             PassportResponse passportData = (PassportResponse) data;
-            PassportBySerieNumberValidityCheckingResponse passport = passportData.getPassport_by_serie_number_validity_checking_response();
+            PassportValidityCheckingResponse passport = passportData.getPassport_validity_checking_response();
             AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
-            if (applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080"))
-//            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
-            {
-                //Если прошло более 5 дней с подачи запроса
-                applicationForFood.setStatus(new ApplicationForFoodStatus(
-                        ApplicationForFoodState.DENIED_GUARDIANSHIP));
-                applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
-            }
-            else {
-                if (passport.getPassportValidityInfo() != null &&
-                        Objects.equals(passport.getPassportValidityInfo().getPassport_status_info().getPassport_status(), "Действителен")) {
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
-                            ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT));
+            if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+                ApplicationForFoodStatus status;
+                if (passport.getPassport_validity_info() != null &&
+                        Objects.equals(passport.getPassport_validity_info().getPassport_status_info().getPassport_status(), "Да")) {
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
-                            ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
+                Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                        applicationForFood.getServiceNumber(),
+                        applicationForFood.getStatus().getApplicationForFoodState());
+                session.update(applicationForFood);
             }
-            session.save(applicationForFood);
             transaction.commit();
             transaction = null;
             if (applicationForFood.getDocConfirmed().equals(ApplicationForFoodMezhvedState.CONFIRMED))
@@ -182,32 +179,30 @@ public class KafkaListenerServiceImpl {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             GuardianResponse guardianData = (GuardianResponse) data;
-            RelatednessChecking2Response relatednessChecking2Response = guardianData.getRelatedness_checking_2_response();
+            RelatednessCheckingResponse relatednessCheckingResponse = guardianData.getRelatedness_checking_response();
 
             AppMezhvedRequest appMezhvedRequest =
-                    updateMezved(relatednessChecking2Response.getRequest_id(), relatednessChecking2Response.getErrors(), message);
+                    updateMezved(relatednessCheckingResponse.getRequest_id(), relatednessCheckingResponse.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
-            if (CalendarUtils.daysBetween(appMezhvedRequest.getCreatedDate(), new Date()).size() >=5)
-            {
-                //Если прошло более 5 дней с подачи запроса
-                applicationForFood.setStatus(new ApplicationForFoodStatus(
-                        ApplicationForFoodState.DENIED_GUARDIANSHIP));
-                applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
+            if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+                ApplicationForFoodStatus status;
+                if (relatednessCheckingResponse.getRelatedness_info() != null &&
+                        relatednessCheckingResponse.getRelatedness_info().getRelatedness_confirmation().toLowerCase().equals("да")) {
 
-            }
-            else {
-                if (relatednessChecking2Response.getRelatednessInfo() != null &&
-                        relatednessChecking2Response.getRelatednessInfo().getRelatedness_confirmation().toLowerCase().equals("да")) {
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
-                            ApplicationForFoodState.INFORMATION_RESPONSE_GUARDIAN));
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_GUARDIAN);
                     applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
-                    applicationForFood.setStatus(new ApplicationForFoodStatus(
-                            ApplicationForFoodState.DENIED_GUARDIANSHIP));
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP);
                     applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
+                Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                        applicationForFood.getServiceNumber(),
+                        applicationForFood.getStatus().getApplicationForFoodState());
+                session.update(applicationForFood);
             }
-            session.save(applicationForFood);
             transaction.commit();
             transaction = null;
             if (applicationForFood.getGuardianshipConfirmed().equals(ApplicationForFoodMezhvedState.CONFIRMED))

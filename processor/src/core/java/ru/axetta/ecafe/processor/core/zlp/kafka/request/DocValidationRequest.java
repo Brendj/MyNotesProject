@@ -4,23 +4,24 @@ import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 
 public class DocValidationRequest extends AbstractPushData {
-    private PassportBySerieNumberValidityCheckingRequest passportBySerieNumberValidityCheckingRequest;
+    private PassportValidityCheckingRequest passportValidityCheckingRequest;
 
     public DocValidationRequest() {
 
     }
 
     public DocValidationRequest(RequestValidationData data) {
-        PassportBySerieNumberValidityCheckingRequest request = new PassportBySerieNumberValidityCheckingRequest(data);
-        request.setPassport_info(new LearnerDocumentInfo(data));
-        this.passportBySerieNumberValidityCheckingRequest = request;
+        PassportValidityCheckingRequest request = new PassportValidityCheckingRequest(data);
+        request.setPassport_info(new PassportInfo(data));
+        request.setPerson_info(new LearnerInfo(data));
+        this.passportValidityCheckingRequest = request;
     }
 
-    public PassportBySerieNumberValidityCheckingRequest getPassportBySerieNumberValidityCheckingRequest() {
-        return passportBySerieNumberValidityCheckingRequest;
+    public PassportValidityCheckingRequest getPassportValidityCheckingRequest() {
+        return passportValidityCheckingRequest;
     }
 
-    public void setPassportBySerieNumberValidityCheckingRequest(PassportBySerieNumberValidityCheckingRequest passportBySerieNumberValidityCheckingRequest) {
-        this.passportBySerieNumberValidityCheckingRequest = passportBySerieNumberValidityCheckingRequest;
+    public void setPassportValidityCheckingRequest(PassportValidityCheckingRequest passportValidityCheckingRequest) {
+        this.passportValidityCheckingRequest = passportValidityCheckingRequest;
     }
 }

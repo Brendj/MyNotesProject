@@ -316,7 +316,7 @@ public class DTSZNDiscountsReviseService {
 
             //Назначение новых ЛК
             Date fireTime = new Date();
-            Client client = applicationForFood.getClient();
+            Client client = session.load(Client.class, applicationForFood.getClient().getIdOfClient());
             Set<CategoryDiscount> oldDiscounts = client.getCategories();
             Set<CategoryDiscount> newDiscounts;
 
@@ -348,7 +348,8 @@ public class DTSZNDiscountsReviseService {
             }
             if (infomax != null) {
                 infomax.setAppointedMSP(true);
-                session.save(infomax);
+                infomax.setLastUpdate(new Date());
+                session.update(infomax);
             }
             newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
             Integer oldDiscountMode = client.getDiscountMode();

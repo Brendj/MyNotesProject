@@ -1,10 +1,9 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka.response;
 
-import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessChecking2Response;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportBySerieNumberValidityCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessCheckingResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportValidityCheckingResponse;
 
 public class ResponseHeader {
     protected String request_id;
@@ -14,13 +13,6 @@ public class ResponseHeader {
 
     public ResponseHeader() {
 
-    }
-
-    private String getReqsponseMethod() {
-        if (this instanceof ActiveBenefitCategoriesGettingResponse) return BenefitKafkaService.RESPONSE_METHOD_BENEFIT;
-        if (this instanceof RelatednessChecking2Response) return BenefitKafkaService.RESPONSE_METHOD_GUARDIANSHIP;
-        if (this instanceof PassportBySerieNumberValidityCheckingResponse) return BenefitKafkaService.RESPONSE_METHOD_DOC;
-        return "";
     }
 
     public String getRequest_id() {

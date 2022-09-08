@@ -24,6 +24,7 @@ public class RequestValidationData {
     private String parentPassportSeries;
     private String parentPassportNumber;
     private String parentPassportIssueDate;
+    private String issuerCode;
 
     private Long idOfApplicationForFood;
 
@@ -58,6 +59,7 @@ public class RequestValidationData {
         this.parentPassportNumber = serviceDocument2.getDocNumber();
         this.parentPassportSeries = serviceDocument2.getDocSerie();
         this.parentPassportIssueDate = df.format(getDate(serviceDocument2.getDocDate().getValue()));
+        this.issuerCode = serviceDocument2.getDivisionCode();
 
         this.idOfApplicationForFood = idOfApplicationForFood;
     }
@@ -204,5 +206,13 @@ public class RequestValidationData {
 
     public void setIdOfApplicationForFood(Long idOfApplicationForFood) {
         this.idOfApplicationForFood = idOfApplicationForFood;
+    }
+
+    public String getIssuerCode() {
+        return issuerCode;
+    }
+
+    public void setIssuerCode(String issuerCode) {
+        this.issuerCode = issuerCode;
     }
 }

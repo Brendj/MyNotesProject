@@ -25,10 +25,10 @@ public class AppMezhvedRequest {
 
     public AppMezhvedRequest(AbstractPushData request, String jsonString, ApplicationForFood applicationForFood) {
         if (request instanceof GuardianshipValidationRequest) {
-            this.requestId = ((GuardianshipValidationRequest) request).getRelatedness_checking_2_request().getRequest_id();
+            this.requestId = ((GuardianshipValidationRequest) request).getRelatedness_checking_request().getRequest_id();
         }
         if (request instanceof DocValidationRequest) {
-            this.requestId = ((DocValidationRequest) request).getPassportBySerieNumberValidityCheckingRequest().getRequest_id();
+            this.requestId = ((DocValidationRequest) request).getPassportValidityCheckingRequest().getRequest_id();
         }
         if (request instanceof BenefitValidationRequest) {
             this.requestId = ((BenefitValidationRequest) request).getActive_benefit_categories_getting_request().getRequest_id();

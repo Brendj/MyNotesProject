@@ -29,16 +29,16 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRe
 public class BenefitKafkaService {
     private static final Logger logger = LoggerFactory.getLogger(BenefitKafkaService.class);
     public static final String REQUEST_SYSTEM_PROPERTY = "ecafe.processing.zlp.service.request_system";
-    public static final String REQUEST_SYSTEM_DEFAULT = "ispp";
-    public static final String REQUEST_METHOD_GUARDIANSHIP = "relatedness_checking_2";
+    public static final String REQUEST_SYSTEM_DEFAULT = "pp";
+    public static final String REQUEST_METHOD_GUARDIANSHIP = "relatedness_checking";
     public static final String REQUEST_METHOD_BENEFIT = "active_benefit_categories_getting_request";
-    public static final String REQUEST_METHOD_DOC = "passport_by_serie_number_validity_checking_request";
-    public static final String STATE_SERVICE_VARIETY_CODE_DEFAULT = "77060601";
+    public static final String REQUEST_METHOD_DOC = "passport_validity_checking";
+    public static final String STATE_SERVICE_VARIETY_CODE_DEFAULT = "100101";
     public static final String STATE_SERVICE_VARIETY_CODE_PROPERTY = "ecafe.processing.zlp.service.code";
 
     public static final String RESPONSE_METHOD_BENEFIT = "active_benefit_categories_getting_response";
-    public static final String RESPONSE_METHOD_DOC = "passport_by_serie_number_validity_checking_response";
-    public static final String RESPONSE_METHOD_GUARDIANSHIP = "relatedness_checking_2_response";
+    public static final String RESPONSE_METHOD_DOC = "passport_validity_checking_response";
+    public static final String RESPONSE_METHOD_GUARDIANSHIP = "relatedness_checking_response";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final KafkaTemplate<String, String> benefitKafkaTemplate;
@@ -85,10 +85,6 @@ public class BenefitKafkaService {
                 .getOriginalMessageFromApplicationForFood(applicationForFood);
         CoordinateMessage coordinateMessage = (CoordinateMessage)RuntimeContext.getAppContext().getBean(ETPMVService.class).getCoordinateMessage(message);
         return new RequestValidationData(coordinateMessage, applicationForFood.getIdOfApplicationForFood());
-    }
-
-    public GuardianshipValidationRequest getGuardianshipValidationRequest(RequestValidationData benefitData) {
-        return new GuardianshipValidationRequest(benefitData);
     }
 
 }
