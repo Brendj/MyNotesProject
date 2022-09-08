@@ -17,12 +17,12 @@ public class ClientInfo implements IDAOEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", timezone = "Europe/Moscow")
     private Date birthdate;
 
-    private String phone;
     private String mobile;
     private String email;
     private String childrenPersonGUID;
     private List<DocumentInfo> documents = new LinkedList<>();
     private Integer agentTypeId;
+    private String snils;
 
     public String getPersonGUID() {
         return personGUID;
@@ -70,14 +70,6 @@ public class ClientInfo implements IDAOEntity {
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getMobile() {
@@ -129,5 +121,18 @@ public class ClientInfo implements IDAOEntity {
 
     public void setAgentTypeId(Integer agentTypeId) {
         this.agentTypeId = agentTypeId;
+    }
+
+    public String getSnils() {
+        return snils;
+    }
+
+    public void setSnils(String snils) {
+        this.snils = snils;
+    }
+
+    public Integer getIsppGender() {
+        if (this.genderId == 2) return 0;
+        else return 1;
     }
 }

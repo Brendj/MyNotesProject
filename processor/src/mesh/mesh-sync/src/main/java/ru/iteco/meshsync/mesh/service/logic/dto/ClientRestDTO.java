@@ -27,12 +27,12 @@ public class ClientRestDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", timezone = "Europe/Moscow")
     private Date birthdate;
 
-    private String phone = "";
     private String mobile = "";
     private String email = "";
     private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
     private Integer agentTypeId;
+    private String snils;
 
     public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
@@ -42,7 +42,7 @@ public class ClientRestDTO implements Serializable {
         dto.lastname = info.getLastname();
         dto.genderId = info.getGenderId();
         dto.birthdate = DateUtils.parseSimpleDate(info.getBirthdate().toString());
-
+        dto.snils = info.getSnils();
         List<PersonContact> personContacts = info.getContacts();
         if (CollectionUtils.isNotEmpty(personContacts)) {
             dto.mobile = checkAndConvertMobile(getContact(personContacts, PHONE_ID));
@@ -154,14 +154,6 @@ public class ClientRestDTO implements Serializable {
         this.birthdate = birthdate;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public String getMobile() {
         return mobile;
     }
@@ -200,5 +192,12 @@ public class ClientRestDTO implements Serializable {
 
     public void setAgentTypeId(Integer agentTypeId) {
         this.agentTypeId = agentTypeId;
+    }
+
+    public String getSnils() {
+        return snils;
+    }
+    public void setSnils(String snils) {
+        this.snils = snils;
     }
 }
