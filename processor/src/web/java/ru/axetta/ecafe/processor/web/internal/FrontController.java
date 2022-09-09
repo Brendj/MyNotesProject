@@ -3214,7 +3214,8 @@ public class FrontController extends HttpServlet {
 
             Client client = persistenceSession.get(Client.class, idOfClient);
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-
+            String oldMobile = client.getMobile();
+            String oldEmail = client.getEmail();
             client.setClientRegistryVersion(clientRegistryVersion);
             client.getPerson().setSurname(lastName);
             client.getPerson().setFirstName(firstName);
@@ -3234,19 +3235,16 @@ public class FrontController extends HttpServlet {
                 }
 
                 //Обновление контактов в мк
-                Map<Integer, String> contacts = new HashMap<>();
-                if (mobile != null && !mobile.isEmpty()) {
-                    contacts.put(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, mobile);
-                }
-                if (email != null && !email.isEmpty()) {
-                    contacts.put(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, email);
-                }
+                List<ModifyContactsItem> modifyContactsItems = new ArrayList<>();
+                modifyContactsItems.add(new ModifyContactsItem(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, oldMobile, mobile));
+                modifyContactsItems.add(new ModifyContactsItem(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, oldEmail, email));
                 MeshContactResponse meshContactResponse = getMeshGuardiansService()
-                        .savePersonContact(client.getMeshGUID(), contacts);
+                        .savePersonContact(client.getMeshGUID(), modifyContactsItems);
                 if (!meshContactResponse.getCode().equals(MeshGuardianResponse.OK_CODE)) {
                     return new GuardianResponse(meshContactResponse.getCode(), meshContactResponse.getMessage());
                 }
             }
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
             persistenceSession.close();

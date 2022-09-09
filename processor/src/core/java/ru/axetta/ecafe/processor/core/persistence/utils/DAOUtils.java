@@ -5913,8 +5913,12 @@ public class DAOUtils {
         Query q = session.createQuery("SELECT dg from DulGuide dg where dg.documentTypeId = :documentType");
         q.setParameter("documentType", documentType.longValue());
         q.setMaxResults(1);
-
-        return (DulGuide) q.getSingleResult();
+        try {
+            return (DulGuide) q.getSingleResult();
+        }
+        catch (NoResultException ex) {
+            return null;
+        }
     }
 
     public static List<MeshSyncPerson> getActiveMeshPersonsByOrg(Session session, Long orgIdFromNSI) {

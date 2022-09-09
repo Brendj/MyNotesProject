@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.web.internal.ModifyContactsItem;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -205,7 +206,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     public void createDulDetailInternal(Session session, MeshDocumentResponse documentResponse, Long idOfClient)
-    throws Exception{
+            throws Exception {
         DulGuide dulGuide = DAOUtils.getDulGuideByType(session, new Integer(documentResponse.getDocumentTypeId()));
         if (dulGuide == null) {
             return;
@@ -229,7 +230,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public void processDocumentsInternal(
             Session session, Client client, List<MeshDocumentResponse> documents) throws Exception {
         // Создаем документы, которых нет в испп, обновляем документы, которые есть в ИСПП и МК
-        if(documents != null || !documents.isEmpty()) {
+        if (documents != null || !documents.isEmpty()) {
             for (MeshDocumentResponse document : documents) {
                 DulDetail dulDetail = client.getDulDetail()
                         .stream()
@@ -254,13 +255,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             }
         }
         // Удаляем те документы, которых уже нет в МК, но есть с ИСПП
-        for(DulDetail dulDetailItem : client.getDulDetail()){
+        for (DulDetail dulDetailItem : client.getDulDetail()) {
             boolean exists = false;
             if (documents != null || !documents.isEmpty()) {
                 exists = documents.stream()
                         .anyMatch(di -> di.getId().equals(dulDetailItem.getIdMkDocument()));
             }
-            if(!exists){
+            if (!exists) {
                 dulDetailItem.setLastUpdate(new Date());
                 dulDetailItem.setDeleteState(true);
 
@@ -294,32 +295,42 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     }
 
     /**
-     * Принимаем контакты -> приходит пустой контакт или null?
-     * Нет. Ищем контакт (по типу) у персоны -> если контакт есть - меняем, иначе - создаем (изменение, создание)
-     * Да. Ищем контакт у персоны (по типу) -> если контакт есть - удаляем, иначе - ничего не делаем (удаление)
+     * Принимаем контакты -> тип контакта, старое значение, новое значение.
+     * Если старое значение не пустое, то обновляем контакт, если пустое, то создаем новый (изменение, создание).
+     * Если новое значение пустое, то удаляем контакт (удаление).
      */
-    public MeshContactResponse savePersonContact(String meshGuid, Map<Integer, String> contacts) {
+    public MeshContactResponse savePersonContact(String meshGuid, List<ModifyContactsItem> contacts) {
+        //Убираем контакты где old и new равны. Конвертируем контакты для мк
+        contacts = contacts
+                .stream()
+                .filter(c -> !c.getNewValue().equals(c.getOldValue()))
+                .map(c -> new ModifyContactsItem(c.getTypeId(),
+                        convertContact(c.getTypeId(), c.getOldValue()), convertContact(c.getTypeId(), c.getNewValue())))
+                .collect(Collectors.toList());
+        if (contacts.isEmpty()) {
+            return new MeshContactResponse().okResponse();
+        }
+        //Получаем акуальные контакты из мк
         IdListResponse contactListResponse = searchIdByMeshGuid(meshGuid);
         MeshContactResponse meshContactResponse = new MeshContactResponse().okResponse();
         if (!contactListResponse.getCode().equals(PersonListResponse.OK_CODE))
             return new MeshContactResponse(contactListResponse.getCode(), contactListResponse.message);
-        for (Map.Entry<Integer, String> contact : contacts.entrySet()) {
-            contact.setValue(validateContact(contact.getKey(), contact.getValue()));
-            boolean isKeyAlreadyInMk = false;
+        //Сохраняем контакты
+        for (ModifyContactsItem contact : contacts) {
             for (ContactsIdResponse contactsIdResponse : contactListResponse.getContactResponse()) {
-                if (contactsIdResponse.getContactType().equals(contact.getKey()) && contactsIdResponse.getDefault()) {
-                    isKeyAlreadyInMk = true;
-                    if (contact.getValue() == null || contact.getValue().isEmpty()) {
+                if (contactsIdResponse.getContactType().equals(contact.getTypeId())
+                        && contactsIdResponse.getContactValue().equals(contact.getOldValue())) {
+                    if (StringUtils.isBlank(contact.getNewValue())) {
                         meshContactResponse = deletePersonContact(meshGuid, contactsIdResponse.getContactId());
                     } else {
-                        meshContactResponse = modifyPersonContact(meshGuid, contact.getKey(), contact.getValue(),
+                        meshContactResponse = modifyPersonContact(meshGuid, contact.getTypeId(), contact.getNewValue(),
                                 contactsIdResponse.getContactId());
                     }
                     break;
                 }
             }
-            if (!isKeyAlreadyInMk && contact.getValue() != null && !contact.getValue().isEmpty()) {
-                meshContactResponse = createPersonContact(meshGuid, contact.getKey(), contact.getValue());
+            if (!StringUtils.isBlank(contact.getNewValue()) && StringUtils.isBlank(contact.getOldValue())) {
+                meshContactResponse = createPersonContact(meshGuid, contact.getTypeId(), contact.getNewValue());
             }
             if (!meshContactResponse.getCode().equals(PersonListResponse.OK_CODE))
                 return new MeshContactResponse(meshContactResponse.getCode(), meshContactResponse.message);
@@ -327,7 +338,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         return new MeshContactResponse().okResponse();
     }
 
-    private String validateContact(Integer key, String value) {
+    private String convertContact(Integer key, String value) {
         if (Objects.equals(key, MeshGuardiansService.CONTACT_MOBILE_TYPE_ID)) {
             if (value != null && !value.isEmpty()) {
                 return convertMobileToMK(value);

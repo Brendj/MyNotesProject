@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.internal.GuardianResponse;
+import ru.axetta.ecafe.processor.web.internal.ModifyContactsItem;
 import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -1006,6 +1007,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+        String oldMobile = client.getMobile();
+        String oldEmail = client.getEmail();
 
         Person person = client.getPerson();
         this.person.copyTo(person);
@@ -1328,7 +1331,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 //Изменение представителя в МК
                 updateClientToMK();
                 //Изменение контактов представителя в МК
-                updateContactToMK();
+                updateContactToMK(oldMobile, oldEmail);
             }
         }
 
@@ -1425,12 +1428,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-    private void updateContactToMK() throws Exception {
-        Map<Integer, String> contacts = new HashMap<>();
-        contacts.put(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, this.mobile);
-        contacts.put(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, this.email);
+    private void updateContactToMK(String oldMobile, String oldEmail) throws Exception {
+        List<ModifyContactsItem> modifyContactsItems = new ArrayList<>();
+        modifyContactsItems.add(new ModifyContactsItem(MeshGuardiansService.CONTACT_MOBILE_TYPE_ID, oldMobile, this.mobile));
+        modifyContactsItems.add(new ModifyContactsItem(MeshGuardiansService.CONTACT_EMAIL_TYPE_ID, oldEmail, this.email));
         MeshContactResponse meshContactResponse = getMeshGuardiansService()
-                .savePersonContact(this.meshGUID, contacts);
+                .savePersonContact(this.meshGUID, modifyContactsItems);
         if (meshContactResponse != null && !meshContactResponse.getCode().equals(GuardianResponse.OK)) {
             logger.error(String.format("code: %s message: %s", meshContactResponse.getCode(), meshContactResponse.getMessage()));
             throw new Exception(String.format("Ошибка изменения контактов представителя в МК: %s", meshContactResponse.getMessage()));

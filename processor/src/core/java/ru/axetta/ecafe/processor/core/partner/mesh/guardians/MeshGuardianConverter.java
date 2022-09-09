@@ -75,7 +75,7 @@ public class MeshGuardianConverter {
         if (responsePersons.getContacts() == null || responsePersons.getContacts().isEmpty())
             return new ArrayList<>();
         return responsePersons.getContacts()
-                .stream().map(a -> new ContactsIdResponse(a.getId(), a.getTypeId(), a.getDefault()))
+                .stream().map(a -> new ContactsIdResponse(a.getId(), a.getTypeId(), a.getDefault(), a.getData()))
                 .collect(Collectors.toList());
     }
 
