@@ -164,7 +164,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             User user = MainPage.getSessionInstance().getCurrentUser();
 
             ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("Добавдение представителя через редактирование клиента");
+                    new ClientsMobileHistory("Добавление представителя через редактирование клиента");
             clientsMobileHistory.setUser(user);
             clientsMobileHistory.setShowing("Изменено в веб.приложении. Пользователь:" + user.getUserName());
             client = getMeshGuardiansService().createGuardianInternalByMeshGuardianPerson(session, meshGuardianPerson, clientOrg,

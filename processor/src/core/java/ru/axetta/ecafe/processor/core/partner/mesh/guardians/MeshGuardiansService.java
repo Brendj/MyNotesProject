@@ -50,6 +50,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
     public static final String DATE_PATTERN = "yyyy-MM-dd";
+    public static final String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     public static final String MK_ERROR = "Ошибка в МЭШ Контингент: %s";
     public static final Integer CONTACT_MOBILE_TYPE_ID = 1;
     public static final Integer CONTACT_EMAIL_TYPE_ID = 3;
@@ -277,12 +278,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                         guardianPerson.getSurname(), guardianPerson.getMobile(), remark, guardianPerson.getIsppGender(),
                         org, clientCreatedFromType, "", null, null, null,
                         null, null, clientsMobileHistory);
+        guardian.setEmail(guardianPerson.getEmail());
         guardian.setMeshGUID(guardianPerson.getMeshGuid());
         guardian.setSan(guardianPerson.getSnils());
         guardian.setBirthDate(guardianPerson.getBirthDate());
         session.update(guardian);
 
-        if (!guardianPerson.getDocument().isEmpty()) {
+        if (guardianPerson.getDocument() != null && !guardianPerson.getDocument().isEmpty()) {
             for (MeshDocumentResponse document : guardianPerson.getDocument()) {
                 createDulDetailInternal(session, document, guardian.getIdOfClient());
             }

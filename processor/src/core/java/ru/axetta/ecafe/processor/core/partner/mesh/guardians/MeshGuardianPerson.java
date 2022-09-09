@@ -6,10 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MeshGuardianPerson {
@@ -109,29 +106,17 @@ public class MeshGuardianPerson {
         return RuntimeContext.getAppContext().getBean(MeshGuardianConverter.class);
     }
 
-    private String getContact(List<Contact> contacts, Integer typeId) throws Exception{
+    private String getContact(List<Contact> contacts, Integer typeId) {
         List<Contact> list = contacts.stream()
-                .filter(contact -> (contact.getTypeId() == typeId) && (contact.getDefault() == true))
+                .filter(contact -> (contact.getTypeId().equals(typeId)) && (contact.getDefault()))
                 .collect(Collectors.toList());
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             list = contacts.stream()
-                    .filter(contact -> (contact.getTypeId() == typeId) )
+                    .filter(contact -> (contact.getTypeId().equals(typeId)))
+                    .sorted((Contact c1, Contact c2) -> getDateTimeFromString(c2.getCreatedAt()).compareTo(getDateTimeFromString(c1.getCreatedAt())))
                     .collect(Collectors.toList());
         }
-        String data = null;
-        if(list.size() > 0) {
-            Date createdAtMax = getDateFromString(list.get(0).getCreatedAt());
-            data = list.get(0).getData();
-            for (Contact item : list) {
-                Date itemCreatedAt = getDateFromString(item.getCreatedAt());
-                if (itemCreatedAt.compareTo(createdAtMax) == 1) {
-                    createdAtMax = itemCreatedAt;
-                    data = item.getData();
-                }
-
-            }
-        }
-        return data;
+        return list.isEmpty() ? null : list.get(0).getData();
     }
 
     private Date getDateFromString(String date) throws Exception {
@@ -139,6 +124,14 @@ public class MeshGuardianPerson {
         return dateFormat.parse(date);
     }
 
+    private Date getDateTimeFromString(String date) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(MeshGuardiansService.DATE_TIME_PATTERN);
+            return dateFormat.parse(date);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public String getMobile() {
         return mobile;
