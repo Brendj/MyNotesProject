@@ -64,7 +64,6 @@ public class InternalClientRestController extends Application {
             log.error("InternalClientRestController.checkClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("InternalClientRestController.checkClient: Unable to find guardian by MESH-GUID:" + personGuid);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         }
     }
