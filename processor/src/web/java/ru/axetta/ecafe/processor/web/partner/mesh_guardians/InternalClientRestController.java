@@ -40,13 +40,13 @@ public class InternalClientRestController extends Application {
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't find all parameters", e);
+            log.error("InternalClientRestController.createClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find organizations", e);
+            log.error("InternalClientRestController.createClient: Unable to find organization for child with MESH-GUID:" + info.getChildrenPersonGUID());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("Internal Error: ", e);
+            log.error("InternalClientRestController.createClient: Internal Error: ", e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
@@ -61,10 +61,10 @@ public class InternalClientRestController extends Application {
 
             return generateResponse(HttpURLConnection.HTTP_OK, clientInfo);
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't find all parameters", e);
+            log.error("InternalClientRestController.checkClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NoResultException e) {
-            log.error("Unable to find guardian", e);
+            log.error("InternalClientRestController.checkClient: Unable to find guardian by MESH-GUID:" + personGuid);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         }
     }
@@ -79,13 +79,13 @@ public class InternalClientRestController extends Application {
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't find all parameters", e);
+            log.error("InternalClientRestController.updateClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
-        } catch (NoResultException e) {
-            log.error("Unable to find guardian", e);
+        } catch (NotFoundException e) {
+            log.error("InternalClientRestController.updateClient: Unable to find guardian by MESH-GUID:" + info.getPersonGUID());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("Internal Error: ", e);
+            log.error("InternalClientRestController.updateClient: Internal Error: ", e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
@@ -99,33 +99,33 @@ public class InternalClientRestController extends Application {
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't find all parameters", e);
+            log.error("InternalClientRestController.deleteClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
-        } catch (NoResultException e) {
-            log.error("Unable to find guardian", e);
+        } catch (NotFoundException e) {
+            log.error("InternalClientRestController.deleteClient: Unable to find guardian by MESH-GUID:" + personGuid);
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("Internal Error: ", e);
+            log.error("InternalClientRestController.deleteClient: Internal Error: ", e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
 
     @POST
     @Path("guardians")
-    public Response processGuardiaRelations(@RequestBody GuardianRelationInfo guardianRelationInfo){
+    public Response processGuardianRelations(@RequestBody GuardianRelationInfo guardianRelationInfo){
         try {
             checkParameterGuardianRelationInfo(guardianRelationInfo);
             service.processRelation(guardianRelationInfo);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't find all parameters", e);
+            log.error("InternalClientRestController.processGuardianRelations: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
-        } catch (NoResultException e) {
-            log.error("Unable to find guardian", e);
+        } catch (NotFoundException e) {
+            log.error("InternalClientRestController.processGuardianRelations: Unable to find child by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("Internal Error: ", e);
+            log.error("InternalClientRestController.processGuardianRelations: Internal Error: ", e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
