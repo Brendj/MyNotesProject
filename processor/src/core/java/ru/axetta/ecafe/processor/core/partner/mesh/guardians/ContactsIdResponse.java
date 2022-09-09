@@ -5,11 +5,13 @@ public class ContactsIdResponse {
     private Integer contactId;
     private Integer contactType;
     private Boolean isDefault;
+    private String contactValue;
 
-    public ContactsIdResponse(Integer contactId, Integer contactType, Boolean isDefault) {
+    public ContactsIdResponse(Integer contactId, Integer contactType, Boolean isDefault, String contactValue) {
         this.contactId = contactId;
         this.contactType = contactType;
         this.isDefault = isDefault;
+        this.contactValue = contactValue;
     }
 
     public Integer getContactId() {
@@ -34,5 +36,13 @@ public class ContactsIdResponse {
 
     public void setDefault(Boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public String getContactValue() {
+        return contactValue;
+    }
+
+    public void setContactValue(String contactValue) {
+        this.contactValue = contactValue;
     }
 }
