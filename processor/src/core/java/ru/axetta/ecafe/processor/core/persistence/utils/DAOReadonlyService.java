@@ -21,9 +21,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.Food
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.foodBox.FoodBoxPreorder.FoodBoxPreorderNewItemItem;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +40,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.axetta.ecafe.processor.core.utils.RequestUtils;
 
 import javax.persistence.*;
 import javax.servlet.http.HttpServletRequest;
@@ -789,30 +786,28 @@ public class DAOReadonlyService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<EMIAS> getExemptionVisitingForMaxVersionAndIdOrg(Long maxVersion, List<Long> idOfOrgs) {
         try {
             Session session = entityManager.unwrap(Session.class);
-
             org.hibernate.query.Query q = session.createSQLQuery("select max(e.version) from cf_emias e");
-            Long maxVersionEmias = (Long) q.uniqueResult();
+            BigInteger maxVersionEmias = (BigInteger) q.uniqueResult();
 
-            if (maxVersionEmias - maxVersion > 5000) {
+            if (maxVersionEmias.longValue() - maxVersion > 5000) {
                 q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.idemias, ce.processed, ce.accepteddatetime   from cf_emias ce "
-                        + " left join cf_clients cc on cc.meshguid = ce.guid "
-                        + " where cc.idofclient is not null and cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIAS.class);
+                        + " inner join cf_clients cc on cc.meshguid = ce.guid "
+                        + " where cc.idoforg in (:orgs) and ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIAS.class);
                 q.setParameterList("orgs", idOfOrgs);
                 q.setParameter("vers", maxVersion);
                 return q.list();
             } else {
-                q = session.createSQLQuery("select ce.*, cc.idoforg from cf_emias ce "
-                        + " left join cf_clients cc on cc.meshguid = ce.guid "
-                        + " where cc.idofclient is not null and ce.version > :vers and ce.kafka=true and ce.processed = true");
+                q = session.createSQLQuery("select ce.id, ce.guid, ce.idEventEMIAS, ce.typeEventEMIAS, ce.dateLiberate, ce.startDateLiberate, ce.endDateLiberate,  ce.createDate, ce.updateDate, ce.accepted, ce.deletedemiasid, ce.version,  ce.kafka, ce.archive, ce.hazard_level_id, ce.idemias, ce.processed, ce.accepteddatetime, cc.idoforg from cf_emias ce "
+                        + " inner join cf_clients cc on cc.meshguid = ce.guid "
+                        + " where ce.version > :vers and ce.kafka=true and ce.processed = true").addEntity(EMIASByOrg.class);
                 q.setParameter("vers", maxVersion);
-                List<Object[]> emias = q.list();
-                return emias
-                        .stream()
-                        .filter(e -> e[1] != null && idOfOrgs.contains((Long) e[1]))
-                        .map(e -> (EMIAS) e[0])
+                List<EMIASByOrg> list = q.getResultList();
+                return list.stream()
+                        .filter(item -> idOfOrgs.contains(item.getIdOfOrg()))
                         .collect(Collectors.toList());
             }
         } catch (Exception e) {
