@@ -81,29 +81,17 @@ public class ClientRestDTO implements Serializable {
         return mobilePhone;
     }
 
-    private static String getContact(List<PersonContact> contacts, Integer typeId) throws Exception{
+    private static String getContact(List<PersonContact> contacts, Integer typeId) {
         List<PersonContact> list = contacts.stream()
-                .filter(contact -> (contact.getTypeId() == typeId) && (contact.isDefault() == true))
+                .filter(contact -> (contact.getTypeId().equals(typeId)) && (contact.isDefault()))
                 .collect(Collectors.toList());
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             list = contacts.stream()
-                    .filter(contact -> (contact.getTypeId() == typeId) )
+                    .filter(contact -> (contact.getTypeId().equals(typeId)))
+                    .sorted((PersonContact c1, PersonContact c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()))
                     .collect(Collectors.toList());
         }
-        String data = null;
-        if(list.size() > 0) {
-            OffsetDateTime createdAtMax = list.get(0).getCreatedAt();
-            data = list.get(0).getData();
-            for (PersonContact item : list) {
-                OffsetDateTime itemCreatedAt = item.getCreatedAt();
-                if (itemCreatedAt.compareTo(createdAtMax) > 0) {
-                    createdAtMax = itemCreatedAt;
-                    data = item.getData();
-                }
-
-            }
-        }
-        return data;
+        return list.isEmpty() ? null : list.get(0).getData();
     }
 
     public String getPersonGUID() {
