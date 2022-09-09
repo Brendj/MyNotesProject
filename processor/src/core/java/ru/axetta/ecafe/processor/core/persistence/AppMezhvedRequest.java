@@ -28,7 +28,7 @@ public class AppMezhvedRequest {
             this.requestId = ((GuardianshipValidationRequest) request).getRelatedness_checking_request().getRequest_id();
         }
         if (request instanceof DocValidationRequest) {
-            this.requestId = ((DocValidationRequest) request).getPassportValidityCheckingRequest().getRequest_id();
+            this.requestId = ((DocValidationRequest) request).getPassport_validity_checking_request().getRequest_id();
         }
         if (request instanceof BenefitValidationRequest) {
             this.requestId = ((BenefitValidationRequest) request).getActive_benefit_categories_getting_request().getRequest_id();

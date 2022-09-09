@@ -16,6 +16,8 @@ public class GuardianshipValidationRequest extends AbstractPushData {
         request.setLearner_document_info(new LearnerDocumentInfo(data));
         request.setParent_info(new ParentInfo(data));
         request.setParent_passport_info(new ParentPassportInfo(data));
+        request.setLearner_snils_info(data.getChildSnilsInfo());
+        request.setParent_snils_info(data.getParentSnilsInfo());
 
         this.relatedness_checking_request = request;
     }

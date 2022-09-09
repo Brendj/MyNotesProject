@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientDiscountHistoryService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
@@ -350,7 +351,33 @@ public class DTSZNDiscountsReviseService {
                 infomax.setAppointedMSP(true);
                 infomax.setLastUpdate(new Date());
                 session.update(infomax);
+                ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client,
+                        infomax.getDtisznCode().longValue());
+                Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                if (null == discountInfo) {
+                    CategoryDiscountDSZN categoryDiscountDSZN = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                            .getCategoryDiscountDSZNByCode(infomax.getDtisznCode());
+                    String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
+                    discountInfo = new ClientDtisznDiscountInfo(client, infomax.getDtisznCode().longValue(), title,
+                            ClientDTISZNDiscountStatus.CONFIRMED, infomax.getStartDate(), infomax.getEndDate(),
+                            infomax.getLastUpdate(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                    discountInfo.setArchived(false);
+                    discountInfo.setAppointedMSP(true);
+                    session.save(discountInfo);
+                } else {
+                    discountInfo.setDateStart(infomax.getStartDate());
+                    discountInfo.setDateEnd(infomax.getEndDate());
+                    discountInfo.setArchived(false);
+                    discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                    discountInfo.setLastUpdate(new Date());
+                    discountInfo.setVersion(clientDTISZNDiscountVersion);
+                    discountInfo.setAppointedMSP(true);
+                    RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
+                            DiscountChangeHistory.MODIFY_IN_SERVICE);
+                    session.update(discountInfo);
+                }
             }
+
             newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
             Integer oldDiscountMode = client.getDiscountMode();
             Integer newDiscountMode =

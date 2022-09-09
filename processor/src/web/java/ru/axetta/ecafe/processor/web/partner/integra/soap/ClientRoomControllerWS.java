@@ -10894,7 +10894,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "serviceNumber") String serviceNumber) {
         String code = stateCode.toString();
         if (declineReasonCode != null &&declineReasonCode > 0) {
-            code += declineReasonCode.toString();
+            code += "." + declineReasonCode.toString();
         }
         ApplicationForFoodState state = ApplicationForFoodState.fromCode(code);
         if (state == null) {

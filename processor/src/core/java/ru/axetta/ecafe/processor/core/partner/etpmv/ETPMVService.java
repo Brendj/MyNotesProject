@@ -406,12 +406,13 @@ public class ETPMVService {
     }
 
     private String createStatusMessage(String serviceNumber, ApplicationForFoodState status) throws Exception {
+        boolean isNewFomat = serviceNumber.contains(ETPMVService.NEW_ISPP_ID);
         ObjectFactory objectFactory = new ObjectFactory();
         CoordinateStatusMessage coordinateStatusMessage = objectFactory.createCoordinateStatusMessage();
         CoordinateStatusData coordinateStatusData = objectFactory.createCoordinateStatusData();
         StatusType statusType = objectFactory.createStatusType();
         statusType.setStatusCode(status.getPureCode());
-        statusType.setStatusTitle(status.getDescription());
+        statusType.setStatusTitle(isNewFomat ? status.getDescriptionNew() : status.getDescription());
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
         calendar.setTimezone(getTimeZoneOffsetInMinutes());
@@ -422,10 +423,20 @@ public class ETPMVService {
         if (status.getReason() != null) {
             DictionaryItem dictionaryItem = objectFactory.createDictionaryItem();
             dictionaryItem.setCode(status.getReason());
-            dictionaryItem.setName(status.getDescription());
+            dictionaryItem.setName(isNewFomat ? status.getDescriptionNew() : status.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
-        coordinateStatusData.setNote(status.getNote());
+        if (status.equals(ApplicationForFoodState.OK) && isNewFomat) {
+            ApplicationForFood applicationForFood = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getApplicationForFoodWithPerson(serviceNumber);
+            String note = status.getNoteNew().replaceAll("%FIO%", applicationForFood.getClient().getPerson().getFullName());
+            ClientDtisznDiscountInfo info = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getClientDtisznDiscountInfoAppointed(applicationForFood.getClient());
+            note.replaceAll("%DATE%", info == null ? "" : CalendarUtils.dateToString(info.getDateEnd()));
+            coordinateStatusData.setNote(note);
+        } else {
+            coordinateStatusData.setNote(isNewFomat ? status.getNoteNew() : status.getNote());
+        }
 
         JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();

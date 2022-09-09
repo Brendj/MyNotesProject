@@ -12,19 +12,24 @@ import java.util.Date;
 public class RequestValidationData {
     private String childLastName;
     private String childFirstName;
+    private String childMiddleName;
     private String childBirthDate;
     private String childDocumentTypeCode;
     private String childDocumentSeries;
     private String childDocumentNumber;
     private String childDocumentIssueDate;
+    private String childSnilsInfo;
 
     private String parentLastName;
     private String parentFirstName;
+    private String parentMiddleName;
     private String parentBirthDate;
     private String parentPassportSeries;
     private String parentPassportNumber;
     private String parentPassportIssueDate;
-    private String issuerCode;
+    private String parentPassportIssuerCode;
+    private String parentPassportIssuerName;
+    private String parentSnilsInfo;
 
     private Long idOfApplicationForFood;
 
@@ -41,6 +46,8 @@ public class RequestValidationData {
         BaseDeclarant baseDeclarantParent = getBaseDeclarant(contacts, ContactType.DECLARANT);
         this.childLastName = ((RequestContact) baseDeclarantChild).getLastName();
         this.childFirstName = ((RequestContact) baseDeclarantChild).getFirstName();
+        this.childMiddleName = ((RequestContact) baseDeclarantChild).getMiddleName();
+        this.childSnilsInfo =  ((RequestContact) baseDeclarantChild).getSnils();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         this.childBirthDate = df.format(getDate(((RequestContact) baseDeclarantChild).getBirthDate()));
         ServiceDocument serviceDocument = baseDeclarantChild.getDocuments().getServiceDocument().stream()
@@ -53,13 +60,16 @@ public class RequestValidationData {
 
         this.parentLastName = ((RequestContact) baseDeclarantParent).getLastName();
         this.parentFirstName = ((RequestContact) baseDeclarantParent).getFirstName();
+        this.parentMiddleName = ((RequestContact) baseDeclarantParent).getMiddleName();
+        this.parentSnilsInfo = ((RequestContact) baseDeclarantParent).getSnils();
         this.parentBirthDate = df.format(getDate(((RequestContact) baseDeclarantParent).getBirthDate()));
         ServiceDocument serviceDocument2 = baseDeclarantParent.getDocuments().getServiceDocument().stream()
                 .filter(sd -> sd.getDocKind().getCode().equals(DOC_KIND_PASSPORT)).findFirst().orElse(null);
         this.parentPassportNumber = serviceDocument2.getDocNumber();
         this.parentPassportSeries = serviceDocument2.getDocSerie();
         this.parentPassportIssueDate = df.format(getDate(serviceDocument2.getDocDate().getValue()));
-        this.issuerCode = serviceDocument2.getDivisionCode();
+        this.parentPassportIssuerCode = serviceDocument2.getDivisionCode();
+        this.parentPassportIssuerName = serviceDocument2.getWhoSign();
 
         this.idOfApplicationForFood = idOfApplicationForFood;
     }
@@ -208,11 +218,51 @@ public class RequestValidationData {
         this.idOfApplicationForFood = idOfApplicationForFood;
     }
 
-    public String getIssuerCode() {
-        return issuerCode;
+    public String getParentMiddleName() {
+        return parentMiddleName;
     }
 
-    public void setIssuerCode(String issuerCode) {
-        this.issuerCode = issuerCode;
+    public void setParentMiddleName(String parentMiddleName) {
+        this.parentMiddleName = parentMiddleName;
+    }
+
+    public String getChildMiddleName() {
+        return childMiddleName;
+    }
+
+    public void setChildMiddleName(String childMiddleName) {
+        this.childMiddleName = childMiddleName;
+    }
+
+    public String getChildSnilsInfo() {
+        return childSnilsInfo;
+    }
+
+    public void setChildSnilsInfo(String childSnilsInfo) {
+        this.childSnilsInfo = childSnilsInfo;
+    }
+
+    public String getParentSnilsInfo() {
+        return parentSnilsInfo;
+    }
+
+    public void setParentSnilsInfo(String parentSnilsInfo) {
+        this.parentSnilsInfo = parentSnilsInfo;
+    }
+
+    public String getParentPassportIssuerCode() {
+        return parentPassportIssuerCode;
+    }
+
+    public void setParentPassportIssuerCode(String parentPassportIssuerCode) {
+        this.parentPassportIssuerCode = parentPassportIssuerCode;
+    }
+
+    public String getParentPassportIssuerName() {
+        return parentPassportIssuerName;
+    }
+
+    public void setParentPassportIssuerName(String parentPassportIssuerName) {
+        this.parentPassportIssuerName = parentPassportIssuerName;
     }
 }

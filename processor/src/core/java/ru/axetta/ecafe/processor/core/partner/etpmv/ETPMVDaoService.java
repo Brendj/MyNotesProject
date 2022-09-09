@@ -327,4 +327,36 @@ public class ETPMVDaoService {
             return null;
         }
     }
+
+    @Transactional
+    public ApplicationForFood getApplicationForFoodWithPerson(String serviceNumber) {
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join fetch c.person " +
+                "where a.serviceNumber = :serviceNumber");
+        query.setParameter("serviceNumber", serviceNumber);
+        return (ApplicationForFood)query.getSingleResult();
+    }
+
+    @Transactional
+    public ClientDtisznDiscountInfo getClientDtisznDiscountInfoAppointed(Client client) {
+        Query query = entityManager.createQuery("select info from ClientDtisznDiscountInfo info where info.client = :client " +
+                "and info.archived = false and info.appointedMSP = true");
+        query.setParameter("client", client);
+        query.setMaxResults(1);
+        try {
+            return (ClientDtisznDiscountInfo) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public CategoryDiscountDSZN getCategoryDiscountDSZNByCode(Integer code) {
+        Query query = entityManager.createQuery("select d from CategoryDiscountDSZN d where d.code=:code");
+        query.setParameter("code", code);
+        try {
+            return (CategoryDiscountDSZN) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
