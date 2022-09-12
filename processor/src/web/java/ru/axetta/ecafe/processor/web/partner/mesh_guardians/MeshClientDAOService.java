@@ -46,7 +46,6 @@ public class MeshClientDAOService {
             Client c = (Client) q.getSingleResult();
             return ClientInfo.build(c);
         } catch (Exception e){
-            log.error("Can't find Guardian by MeshGuid: " + meshGuid);
             throw e;
         }
     }
