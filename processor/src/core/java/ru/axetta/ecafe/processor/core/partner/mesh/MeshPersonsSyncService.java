@@ -270,6 +270,9 @@ public class MeshPersonsSyncService {
             logger.info("Process \"falsely alive\" persons for " + allOrganizationIds.size() + " Orgs");
 
             for(Long orgIdFromNsi : allOrganizationIds){
+                if (orgIdFromNsi == null) {
+                    continue;
+                }
                 List<MeshSyncPerson> personList = DAOUtils.getActiveMeshPersonsByOrg(session, orgIdFromNsi);
                 String parameters = String.format("filter=%stop=%s",URLEncoder
                         .encode(getFilter(orgIdFromNsi), "UTF-8"), top);
