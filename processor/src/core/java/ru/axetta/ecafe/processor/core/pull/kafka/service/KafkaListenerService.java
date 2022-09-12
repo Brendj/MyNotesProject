@@ -15,7 +15,7 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportResponse;
 
@@ -45,7 +45,7 @@ public class KafkaListenerService {
     }
 
     private Class getMessageType(String message) throws Exception {
-        if (message.contains("active_benefit_categories_getting_response")) return BenefitResponse.class;
+        if (message.contains("benefit_categories")) return ActiveBenefitCategoriesGettingResponse.class;
         if (message.contains("passport_validity_checking_response")) return PassportResponse.class;
         if (message.contains("relatedness_checking_response")) return GuardianResponse.class;
         throw new Exception("Unknown message type");
@@ -54,7 +54,7 @@ public class KafkaListenerService {
     @Async
     public void parseResponseMessage(AbstractPullData data, String message) {
         try {
-            if (data instanceof BenefitResponse) {
+            if (data instanceof ActiveBenefitCategoriesGettingResponse) {
                 //Обработка информации о льготных категориях
                 ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
                 if (applicationForFood != null) {

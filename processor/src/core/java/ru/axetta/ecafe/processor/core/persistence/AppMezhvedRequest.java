@@ -1,9 +1,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.PersonBenefitCheckRequest;
 
 import java.util.Date;
 
@@ -30,8 +30,8 @@ public class AppMezhvedRequest {
         if (request instanceof DocValidationRequest) {
             this.requestId = ((DocValidationRequest) request).getPassport_validity_checking_request().getRequest_id();
         }
-        if (request instanceof BenefitValidationRequest) {
-            this.requestId = ((BenefitValidationRequest) request).getActive_benefit_categories_getting_request().getRequest_id();
+        if (request instanceof PersonBenefitCheckRequest) {
+            this.requestId = ((PersonBenefitCheckRequest) request).getRequest_id();
         }
         this.requestPayload = jsonString;
         this.createdDate = new Date();
@@ -42,7 +42,7 @@ public class AppMezhvedRequest {
     private AppMezhvedRequestType getAppMezhvedRequestTypeByMessage(AbstractPushData request) {
         if (request instanceof GuardianshipValidationRequest) return AppMezhvedRequestType.GUARDIANSHIP;
         if (request instanceof DocValidationRequest) return AppMezhvedRequestType.DOCS;
-        if (request instanceof BenefitValidationRequest) return AppMezhvedRequestType.BENEFITS;
+        if (request instanceof PersonBenefitCheckRequest) return AppMezhvedRequestType.BENEFITS;
         return null;
     }
 

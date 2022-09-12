@@ -17,12 +17,9 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.push.kafka.service.KafkaService;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
-import ru.axetta.ecafe.processor.core.push.model.BalanceData;
-import ru.axetta.ecafe.processor.core.push.model.BenefitData;
-import ru.axetta.ecafe.processor.core.push.model.EnterEventData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.PersonBenefitCheckRequest;
 
 @Configuration
 @Service
@@ -49,15 +46,15 @@ public class BenefitKafkaService {
 
     public void sendBenefitValidationRequest(String serviceNumber) {
         ApplicationForFood applicationForFood = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
-                .findApplicationForFoodByServiceNumber(serviceNumber);
-        sendRequest(applicationForFood, BenefitValidationRequest.class);
+                .getApplicationForFoodWithDtisznCodes(serviceNumber);
+        sendBenefitValidationRequest(applicationForFood);
     }
 
     private String getTopicFromConfig(AbstractPushData data) throws Exception {
         String topicLink = null;
         if (data instanceof GuardianshipValidationRequest)
             topicLink = AbstractPushData.GUARDIANSHIP_VALIDATION_REQUEST_TOPIC;
-        else if (data instanceof BenefitValidationRequest)
+        else if (data instanceof PersonBenefitCheckRequest)
             topicLink = AbstractPushData.BENEFIT_VALIDATION_REQUEST_TOPIC;
         else if (data instanceof DocValidationRequest)
             topicLink = AbstractPushData.DOC_VALIDATION_REQUEST_TOPIC;
@@ -65,6 +62,19 @@ public class BenefitKafkaService {
         if (address.equals(""))
             throw new Exception(String.format("Kafka topic not specified, topicLink: %s", topicLink));
         return address;
+    }
+
+    public void sendBenefitValidationRequest(ApplicationForFood applicationForFood) {
+        try {
+            AbstractPushData request = new PersonBenefitCheckRequest(applicationForFood);
+            Message<AbstractPushData> message = MessageBuilder.withPayload(request).build();
+            String msg = objectMapper.writeValueAsString(request);
+            ListenableFuture<SendResult<String, String>> future = benefitKafkaTemplate.send(getTopicFromConfig(request), msg);
+            future.addCallback(new ZlpLoggingListenableFutureCallback(message, msg, applicationForFood.getIdOfApplicationForFood(),
+                    applicationForFood.getServiceNumber()));
+        } catch (Exception e) {
+            logger.error(String.format("Error in sendBenefitValidationRequest for serviceNumber = %s", applicationForFood.getServiceNumber()), e);
+        }
     }
 
     public void sendRequest(ApplicationForFood applicationForFood, Class<? extends AbstractPushData> clazz) {
@@ -76,7 +86,7 @@ public class BenefitKafkaService {
             ListenableFuture<SendResult<String, String>> future = benefitKafkaTemplate.send(getTopicFromConfig(request), msg);
             future.addCallback(new ZlpLoggingListenableFutureCallback(message, msg, data.getIdOfApplicationForFood(), applicationForFood.getServiceNumber()));
         } catch (Exception e) {
-            logger.error(String.format("Error in sendGuardianshipValidationRequest for serviceNumber = %s", applicationForFood.getServiceNumber()), e);
+            logger.error(String.format("Error in sendRequest for serviceNumber = %s", applicationForFood.getServiceNumber()), e);
         }
     }
 

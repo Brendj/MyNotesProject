@@ -15,9 +15,9 @@ import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodStatus;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.PersonBenefitCheckRequest;
 
 public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallback<SendResult<String, String>> {
     private final Logger log = LoggerFactory.getLogger(ZlpLoggingListenableFutureCallback.class);
@@ -61,7 +61,7 @@ public class ZlpLoggingListenableFutureCallback implements ListenableFutureCallb
         if (message.getPayload() instanceof GuardianshipValidationRequest) {
             return new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_VALIDITY_REQUEST_SENDED);
         }
-        if (message.getPayload() instanceof BenefitValidationRequest) {
+        if (message.getPayload() instanceof PersonBenefitCheckRequest) {
             return new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED);
         }
         if (message.getPayload() instanceof DocValidationRequest) {

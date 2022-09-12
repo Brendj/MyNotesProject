@@ -16,9 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitCategoryInfo;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitDocument;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitCategory;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.RelatednessCheckingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportValidityCheckingResponse;
@@ -43,8 +41,7 @@ public class KafkaListenerServiceImpl {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            BenefitResponse benefitResponse = (BenefitResponse) data;
-            ActiveBenefitCategoriesGettingResponse activeBenefitCategoriesGettingResponse = benefitResponse.getActive_benefit_categories_getting_response();
+            ActiveBenefitCategoriesGettingResponse activeBenefitCategoriesGettingResponse = (ActiveBenefitCategoriesGettingResponse) data;
             String requestId = activeBenefitCategoriesGettingResponse.getRequest_id();
 
             //Заполнение полей таблицы AppMezhvedRequest
@@ -56,14 +53,14 @@ public class KafkaListenerServiceImpl {
             //Проставление статуса подтверждения для ЛК
             for (ApplicationForFoodDiscount applicationForFoodDiscount: applicationForFood.getDtisznCodes())
             {
-                for (BenefitCategoryInfo benefitCategoryInfo: activeBenefitCategoriesGettingResponse.getActive_benefit_categories_info())
+                for (BenefitCategory benefitCategoryInfo: activeBenefitCategoriesGettingResponse.getBenefit_categories())
                 {
-                    if (Objects.equals(applicationForFoodDiscount.getDtisznCode(), Integer.valueOf(benefitCategoryInfo.getBenefit_category_id())))
+                    if (Objects.equals(applicationForFoodDiscount.getDtisznCode(), Integer.valueOf(benefitCategoryInfo.getId())))
                     {
                         applicationForFoodDiscount.setConfirmed(true);
-                        applicationForFoodDiscount.setStartDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_from()));
+                        applicationForFoodDiscount.setStartDate(format.get().parse(benefitCategoryInfo.getStart_at()));
                         try {
-                            applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getBenefit_activity_date_to()));
+                            applicationForFoodDiscount.setEndDate(format.get().parse(benefitCategoryInfo.getEnd_at()));
                         } catch (Exception ignore) {
                             applicationForFoodDiscount.setEndDate(CalendarUtils.parseDate("31.12.2099"));
                         }
@@ -82,19 +79,6 @@ public class KafkaListenerServiceImpl {
                 //Проставляем флаг высшего приоритета у льготы
                 applicationForFoodDiscountActive.setAppointedMSP(true);
                 session.update(applicationForFoodDiscountActive);
-            }
-            //Сохранение сопуствующих документов
-            for (BenefitDocument benefitDocument: activeBenefitCategoriesGettingResponse.getBenefit_activity_starting_reason_documents())
-            {
-                AppMezhvedResponseDocument appMezhvedResponseDocument = new AppMezhvedResponseDocument(benefitDocument,
-                        requestId, AppMezhvedResponseDocDirection.STARTING);
-                session.persist(appMezhvedResponseDocument);
-            }
-            for (BenefitDocument benefitDocument: activeBenefitCategoriesGettingResponse.getBenefit_activity_ending_reason_documents())
-            {
-                AppMezhvedResponseDocument appMezhvedResponseDocument = new AppMezhvedResponseDocument(benefitDocument,
-                        requestId, AppMezhvedResponseDocDirection.ENDING);
-                session.persist(appMezhvedResponseDocument);
             }
 
             Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);

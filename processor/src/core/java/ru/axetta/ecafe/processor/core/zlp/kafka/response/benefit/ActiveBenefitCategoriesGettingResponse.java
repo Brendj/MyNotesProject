@@ -1,33 +1,19 @@
 package ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit;
 
+import ru.axetta.ecafe.processor.core.pull.model.AbstractPullData;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.*;
 
 import java.util.List;
 
-public class ActiveBenefitCategoriesGettingResponse extends ResponseHeader {
-    private List<BenefitCategoryInfo> active_benefit_categories_info;
-    private List<BenefitDocument> benefit_activity_starting_reason_documents;
-    private List<BenefitDocument> benefit_activity_ending_reason_documents;
+public class ActiveBenefitCategoriesGettingResponse extends AbstractPullData {
+    private String request_id;
+    private String person_id;
+    private List<BenefitCategory> benefit_categories;
     private List<Errors> errors;
     public ActiveBenefitCategoriesGettingResponse() {
 
     }
 
-    public List<BenefitDocument> getBenefit_activity_starting_reason_documents() {
-        return benefit_activity_starting_reason_documents;
-    }
-
-    public void setBenefit_activity_starting_reason_documents(List<BenefitDocument> benefit_activity_starting_reason_documents) {
-        this.benefit_activity_starting_reason_documents = benefit_activity_starting_reason_documents;
-    }
-
-    public List<BenefitDocument> getBenefit_activity_ending_reason_documents() {
-        return benefit_activity_ending_reason_documents;
-    }
-
-    public void setBenefit_activity_ending_reason_documents(List<BenefitDocument> benefit_activity_ending_reason_documents) {
-        this.benefit_activity_ending_reason_documents = benefit_activity_ending_reason_documents;
-    }
 
     public List<Errors> getErrors() {
         return errors;
@@ -37,11 +23,27 @@ public class ActiveBenefitCategoriesGettingResponse extends ResponseHeader {
         this.errors = errors;
     }
 
-    public List<BenefitCategoryInfo> getActive_benefit_categories_info() {
-        return active_benefit_categories_info;
+    public List<BenefitCategory> getBenefit_categories() {
+        return benefit_categories;
     }
 
-    public void setActive_benefit_categories_info(List<BenefitCategoryInfo> active_benefit_categories_info) {
-        this.active_benefit_categories_info = active_benefit_categories_info;
+    public void setBenefit_categories(List<BenefitCategory> benefit_categories) {
+        this.benefit_categories = benefit_categories;
+    }
+
+    public String getPerson_id() {
+        return person_id;
+    }
+
+    public void setPerson_id(String person_id) {
+        this.person_id = person_id;
+    }
+
+    public String getRequest_id() {
+        return request_id;
+    }
+
+    public void setRequest_id(String request_id) {
+        this.request_id = request_id;
     }
 }

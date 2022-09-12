@@ -18,9 +18,6 @@ import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.push.model.BalanceData;
 import ru.axetta.ecafe.processor.core.push.model.BenefitData;
 import ru.axetta.ecafe.processor.core.push.model.EnterEventData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import java.util.UUID;
 

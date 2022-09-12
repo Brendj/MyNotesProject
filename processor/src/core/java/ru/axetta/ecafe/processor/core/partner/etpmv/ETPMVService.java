@@ -426,13 +426,15 @@ public class ETPMVService {
             dictionaryItem.setName(isNewFomat ? status.getDescriptionNew() : status.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
-        if (status.equals(ApplicationForFoodState.OK) && isNewFomat) {
+        if ((status.equals(ApplicationForFoodState.OK) || status.equals(ApplicationForFoodState.END_BENEFIT_NOTIFICATION)) && isNewFomat) {
             ApplicationForFood applicationForFood = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                     .getApplicationForFoodWithPerson(serviceNumber);
             String note = status.getNoteNew().replaceAll("%FIO%", applicationForFood.getClient().getPerson().getFullName());
             ClientDtisznDiscountInfo info = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                     .getClientDtisznDiscountInfoAppointed(applicationForFood.getClient());
-            note = note.replaceAll("%DATE%", info == null ? "" : CalendarUtils.dateToString(info.getDateEnd()));
+            if (status.equals(ApplicationForFoodState.OK)) {
+                note = note.replaceAll("%DATE%", info == null ? "31.12.2099" : CalendarUtils.dateToString(info.getDateEnd()));
+            }
             coordinateStatusData.setNote(note);
         } else {
             coordinateStatusData.setNote(isNewFomat ? status.getNoteNew() : status.getNote());
