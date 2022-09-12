@@ -1278,6 +1278,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception(String.format("Нельзя выбрать группу \"%s\" для представителя", this.clientGroupName));
         }
 
+        //Создание связи с опекунами в ИСПП
+        addGuardiansISPP(persistenceSession, client);
+        //Удаление связи с опекунами в ИСПП
+        removeGuardiansISPP(persistenceSession, client);
+
         //Явялется ли клиент представителем
         if (!this.clientWardItems.isEmpty() && isGuardianGroup(client) ||
                 (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && isGuardianGroup(client))) {
@@ -1294,12 +1299,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
             }
 
-            //Создание связи с опекунами в ИСПП
-            addGuardiansISPP(persistenceSession, client);
             //Создание связи с опекаемыми в ИСПП
             addWardsISPP(persistenceSession, client);
-            //Удаление связи с опекунами в ИСПП
-            removeGuardiansISPP(persistenceSession, client);
             //Удаление связи с опекаемыми в ИСПП
             removeWardsISPP(persistenceSession, client);
 
