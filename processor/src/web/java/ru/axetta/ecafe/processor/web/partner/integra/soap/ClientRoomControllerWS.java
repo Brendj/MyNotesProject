@@ -10917,12 +10917,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new Exception(
                         "Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
             }
-            RuntimeContext.getAppContext().getBean(ETPMVService.class)
-                    .sendStatus(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState());
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                    .sendStatusAsync(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState());
         } catch (Exception e) {
             logger.error(String.format("Can't update ApplicationForFood serviceNumber = %s", serviceNumber), e);
             result.resultCode = RC_INTERNAL_ERROR;

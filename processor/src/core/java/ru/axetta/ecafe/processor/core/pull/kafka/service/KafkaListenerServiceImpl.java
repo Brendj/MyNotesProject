@@ -106,12 +106,12 @@ public class KafkaListenerServiceImpl {
                 status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
             }
             applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
-            RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
-                    applicationForFood.getServiceNumber(),
-                    applicationForFood.getStatus().getApplicationForFoodState());
 
             transaction.commit();
             transaction = null;
+            RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                    applicationForFood.getServiceNumber(),
+                    applicationForFood.getStatus().getApplicationForFoodState());
             if (confirm) {
                 return applicationForFood;
             } else {
@@ -152,13 +152,15 @@ public class KafkaListenerServiceImpl {
                 Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
                 Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
                 applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
-                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
-                        applicationForFood.getServiceNumber(),
-                        applicationForFood.getStatus().getApplicationForFoodState());
                 session.update(applicationForFood);
             }
             transaction.commit();
             transaction = null;
+            if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                        applicationForFood.getServiceNumber(),
+                        applicationForFood.getStatus().getApplicationForFoodState());
+            }
             if (applicationForFood.getDocConfirmed().equals(ApplicationForFoodMezhvedState.CONFIRMED))
                 return applicationForFood;
             return null;

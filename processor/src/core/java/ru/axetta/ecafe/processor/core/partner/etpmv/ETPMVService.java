@@ -432,7 +432,7 @@ public class ETPMVService {
             String note = status.getNoteNew().replaceAll("%FIO%", applicationForFood.getClient().getPerson().getFullName());
             ClientDtisznDiscountInfo info = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
                     .getClientDtisznDiscountInfoAppointed(applicationForFood.getClient());
-            note.replaceAll("%DATE%", info == null ? "" : CalendarUtils.dateToString(info.getDateEnd()));
+            note = note.replaceAll("%DATE%", info == null ? "" : CalendarUtils.dateToString(info.getDateEnd()));
             coordinateStatusData.setNote(note);
         } else {
             coordinateStatusData.setNote(isNewFomat ? status.getNoteNew() : status.getNote());

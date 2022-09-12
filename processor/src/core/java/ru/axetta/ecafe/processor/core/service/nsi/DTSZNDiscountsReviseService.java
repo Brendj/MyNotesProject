@@ -405,10 +405,10 @@ public class DTSZNDiscountsReviseService {
             applicationForFood.setDiscountDateStart(min);
             applicationForFood.setDiscountDateEnd(max);
             session.update(applicationForFood);
-            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
-            service.sendStatusesAsync(statusList);
             transaction.commit();
             transaction = null;
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+            service.sendStatusesAsync(statusList);
         } catch (Exception e) {
             logger.error("Error in update ApplicationsForFoodKafkaService", e);
         } finally {
