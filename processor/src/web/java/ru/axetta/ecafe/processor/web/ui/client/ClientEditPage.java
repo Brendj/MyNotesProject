@@ -1278,15 +1278,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception(String.format("Нельзя выбрать группу \"%s\" для представителя", this.clientGroupName));
         }
 
-        //Создание связи с опекунами в ИСПП
-        addGuardiansISPP(persistenceSession, client);
-        //Создание связи с опекаемыми в ИСПП
-        addWardsISPP(persistenceSession, client);
-        //Удаление связи с опекунами в ИСПП
-        removeGuardiansISPP(persistenceSession, client);
-        //Удаление связи с опекаемыми в ИСПП
-        removeWardsISPP(persistenceSession, client);
-
         //Явялется ли клиент представителем
         if (!this.clientWardItems.isEmpty() && isGuardianGroup(client) ||
                 (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && isGuardianGroup(client))) {
@@ -1298,16 +1289,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (clientWardItem.getIdOfClient().equals(this.idOfClient))
                     throw new Exception("Персона не может быть представителем самой себя");
             }
-
             for (ClientGuardianItem clientWardItem : clientWardItems) {
-                if (StringUtils.isEmpty(clientWardItem.getMeshGuid()))
+                if (StringUtils.isBlank(clientWardItem.getMeshGuid()))
                     throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
             }
 
+            //Создание связи с опекунами в ИСПП
+            addGuardiansISPP(persistenceSession, client);
+            //Создание связи с опекаемыми в ИСПП
+            addWardsISPP(persistenceSession, client);
+            //Удаление связи с опекунами в ИСПП
+            removeGuardiansISPP(persistenceSession, client);
+            //Удаление связи с опекаемыми в ИСПП
+            removeWardsISPP(persistenceSession, client);
+
             if (client.getMeshGUID() == null) {
-                if (clientWardItems.size() > 1) {
-                    throw new Exception("Нельзя добавить больше одного опекаемого за один раз");
-                }
                 //Поиск представителя в МК
                 PersonListResponse personListResponse = getMeshGuardiansService().searchPerson(this.person.firstName,
                         this.person.secondName, this.person.surname, this.gender, this.birthDate, this.san, this.mobile,
