@@ -299,6 +299,9 @@ public class ClientMigrationHistoryService {
 
                         ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), null, clientMigration.getOrg(),
                                 guardian, ClientGroupMigrationHistory.MODIFY_AUTO_MODE, guardian.getClientGroup().getGroupName());
+
+                        MigrantsUtils.disableMigrantRequestIfExists(
+                                session, clientMigration.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                     }
                     if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {
                         //есть дети в других ОО, создаем заявку на посещение
