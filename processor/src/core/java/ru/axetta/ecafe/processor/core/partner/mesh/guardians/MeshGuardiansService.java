@@ -222,8 +222,6 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         newDulDetail.setDeleteState(false);
         newDulDetail.setExpiration(documentResponse.getExpiration());
         newDulDetail.setSubdivisionCode(documentResponse.getSubdivisionCode());
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                validateDul(session, newDulDetail, true);
         session.save(newDulDetail);
     }
 
@@ -247,8 +245,6 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                     dulDetail.setLastUpdate(new Date());
                     dulDetail.setExpiration(document.getExpiration());
                     dulDetail.setSubdivisionCode(document.getSubdivisionCode());
-                    RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                            validateDul(session, dulDetail, false);
                     session.merge(dulDetail);
                     session.flush();
                 }
