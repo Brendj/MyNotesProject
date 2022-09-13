@@ -1288,9 +1288,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     ClientManager.addClientMigrationEntry(session, guardian.getOrg(), null, child.getOrg(),
                             guardian, ClientGroupMigrationHistory.MODIFY_IN_REGISTRY, guardian.getClientGroup().getGroupName());
                     guardian.setOrg(child.getOrg());
+                    MigrantsUtils.disableMigrantRequestIfExists(
+                            session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                 }
                 Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                 guardian.setClientRegistryVersion(nextClientVersion);
+                guardian.setUpdateTime(new Date());
                 session.merge(guardian);
             } else {
                 // Создаем нового клиента-представителя и связь с обучающимся
@@ -1341,10 +1344,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
 
                     MigrantsUtils.disableMigrantRequestIfExists(
-                            session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
+                            session, newOrg.getIdOfOrg(), guardian.getIdOfClient());
                 }
             }
             else {
@@ -1363,6 +1367,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
                 }
             }
@@ -1405,7 +1410,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
+                    MigrantsUtils.disableMigrantRequestIfExists(
+                            session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                 }
                 else if (guardian.isActiveAdultGroup()) {
                     createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
