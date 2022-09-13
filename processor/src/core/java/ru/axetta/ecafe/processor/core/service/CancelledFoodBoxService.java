@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
- */
-
 package ru.axetta.ecafe.processor.core.service;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,17 +13,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Main;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.util.*;
-
-/**
- * Created with IntelliJ IDEA.
- * User: a.voinov
- * Date: 05.04.22
- */
 
 @Component
 @Scope("singleton")
@@ -38,7 +26,7 @@ public class CancelledFoodBoxService {
     public static Map<Long, Date> currentFoodBoxPreorders = new HashMap<>();
     public static final Integer TIME_ALIVE = getHealthTime();
 
-    public static class cancelledFoodBox implements Job {
+    public static class CancelledFoodBox implements Job {
 
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
@@ -109,7 +97,7 @@ public class CancelledFoodBoxService {
         String syncScheduleSync = RuntimeContext.getInstance().getConfigProperties().
                 getProperty("ecafe.processor.cancelled.foodbox.time", "0 * * ? * *");
         try {
-            JobDetail jobDetailSync = new JobDetail(AUTO_ARCHIVED, Scheduler.DEFAULT_GROUP, cancelledFoodBox.class);
+            JobDetail jobDetailSync = new JobDetail(AUTO_ARCHIVED, Scheduler.DEFAULT_GROUP, CancelledFoodBox.class);
             SchedulerFactory sfb = new StdSchedulerFactory();
             Scheduler scheduler = sfb.getScheduler();
 
