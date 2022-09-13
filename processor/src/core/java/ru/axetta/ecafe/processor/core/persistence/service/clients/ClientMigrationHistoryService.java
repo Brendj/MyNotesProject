@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientMigrationHistoryRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -301,8 +302,13 @@ public class ClientMigrationHistoryService {
                     }
                     if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {
                         //есть дети в других ОО, создаем заявку на посещение
-                        ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(),
-                                MigrantInitiatorEnum.INITIATOR_PROCESSING, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+                        if(!DAOUtils.isFriendlyOrganizations(session, guardian.getOrg(), clientMigration.getOrg()) &&
+                                MigrantsUtils.findActiveMigrant(session, clientMigration.getOrg().getIdOfOrg(), guardian.getIdOfClient()) == null &&
+                                !guardian.getOrg().getIdOfOrg().equals(clientMigration.getOrg().getIdOfOrg())) {
+
+                            ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(),
+                                    MigrantInitiatorEnum.INITIATOR_PROCESSING, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+                        }
                     }
                 }
             }

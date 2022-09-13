@@ -1342,6 +1342,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
                     session.merge(guardian);
+
+                    MigrantsUtils.disableMigrantRequestIfExists(
+                            session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                 }
             }
             else {
