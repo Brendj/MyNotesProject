@@ -1658,6 +1658,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                 guardian.setClientRegistryVersion(nextClientVersion);
+                guardian.setUpdateTime(new Date());
                 session.merge(guardian);
             } else {
                 // Создаем нового клиента-представителя и связь с обучающимся
@@ -1708,6 +1709,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
 
                     MigrantsUtils.disableMigrantRequestIfExists(
@@ -1730,6 +1732,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
                 }
             }
@@ -1772,6 +1775,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
                     guardian.setClientRegistryVersion(nextClientVersion);
+                    guardian.setUpdateTime(new Date());
                     session.merge(guardian);
                     MigrantsUtils.disableMigrantRequestIfExists(
                             session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
