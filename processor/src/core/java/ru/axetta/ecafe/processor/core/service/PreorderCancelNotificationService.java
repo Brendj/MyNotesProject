@@ -44,42 +44,24 @@ public class PreorderCancelNotificationService {
 
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
             try {
                 logger.info("Start PreorderCancelNotificationService");
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
                 RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class)
-                        .start(persistenceSession);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
+                        .start();
                 logger.info("End PreorderCancelNotificationService");
             } catch (Exception e) {
-                logger.error("Error in PreorderCancelNotificationService.execute: ", e);
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+                logger.error("Error in PreorderCancelNotificationService.manualStart: ", e);
             }
         }
 
         public static void manualStart() throws JobExecutionException {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
             try {
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
+                logger.info("Start PreorderCancelNotificationService");
                 RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class)
-                        .start(persistenceSession);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
+                        .start();
+                logger.info("End PreorderCancelNotificationService");
             } catch (Exception e) {
                 logger.error("Error in PreorderCancelNotificationService.manualStart: ", e);
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
             }
         }
     }
@@ -121,7 +103,7 @@ public class PreorderCancelNotificationService {
     }
 
 
-    public void start(Session session) throws Exception {
+    public void start() throws Exception {
         try {
             logger.info("Start service for 23 type notifications");
             Map<Client, Object> newMessage = new HashMap<>();
@@ -216,21 +198,53 @@ public class PreorderCancelNotificationService {
                     HibernateUtils.close(persistenceSession4, logger);
                 }
                 logger.info("End send newMessage");
-                //Очищаем таблицу сообщений
-                logger.info("Start clear table notification");
-                DAOUtils.clearCancelNotificationTable(session);
-                logger.info("End clear table notification");
+
+                Session persistenceSession5 = null;
+                Transaction persistenceTransaction5 = null;
+                try {
+                    logger.info("Start new Session for clear table");
+                    persistenceSession5 = RuntimeContext.getInstance().createPersistenceSession();
+                    persistenceTransaction5 = persistenceSession5.beginTransaction();
+                    //Очищаем таблицу сообщений
+                    logger.info("Start clear table notification");
+                    DAOUtils.clearCancelNotificationTable(persistenceSession5);
+                    logger.info("End clear table notification");
+                    persistenceTransaction5.commit();
+                    persistenceTransaction5 = null;
+                    logger.info("End new Session for for clear table");
+                } catch (Exception e) {
+                    logger.error("Error in new Session for really send new Message: ", e);
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction5, logger);
+                    HibernateUtils.close(persistenceSession5, logger);
+                }
+
                 logger.info("End sending a message because the time is right");
             } else {
-                logger.info("Saving the message to the database because the time is not right");
-                //Сохраняем новые данные в БД
-                convertResultToDB(session, newMessage);
-                logger.info("End saving the message to the database because the time is not right");
+
+                RuntimeContext runtimeContext = RuntimeContext.getInstance();
+                Session persistenceSession = null;
+                Transaction persistenceTransaction = null;
+                try {
+                    persistenceSession = runtimeContext.createPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    logger.info("Saving the message to the database because the time is not right");
+                    //Сохраняем новые данные в БД
+                    convertResultToDB(persistenceSession, newMessage);
+                    logger.info("End saving the message to the database because the time is not right");
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } catch (Exception e) {
+                    logger.error("Error in PreorderCancelNotificationService.manualStart: ", e);
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
             }
             logger.info("End service for 23 type notifications");
         } catch (Exception e)
         {
-            logger.error("Error in service for 23 type notifications");
+            logger.error("Error in service for 23 type notifications", e);
         }
     }
 
@@ -420,7 +434,7 @@ public class PreorderCancelNotificationService {
         for (PreorderComplex preorderComplex: preorderComplexs)
         {
             preorderComplex.setCancelnotification(true);
-            session.save(preorderComplex);
+            session.update(preorderComplex);
         }
     }
 
@@ -429,7 +443,7 @@ public class PreorderCancelNotificationService {
         for (RegularPreorder regularPreorder: regularPreorders)
         {
             regularPreorder.setCancelnotification(true);
-            session.save(regularPreorder);
+            session.update(regularPreorder);
         }
     }
 
