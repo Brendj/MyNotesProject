@@ -46,7 +46,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     private static final String CONTACT_CREATE_URL = "/persons/%s/contacts";
     private static final String CONTACT_CHANGE_URL = "/persons/%s/contacts/%s";
     public static final String PERSONS_LIKE_EXPAND = "children,documents,contacts";
-    public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,children";
+    public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,agents.contacts,children";
     public static final String ID_SEARCH_EXPAND = "agents,documents,contacts";
     public static final Integer PERSONS_LIKE_LIMIT = 5;
     private static final String PERSON_ID_STUB = "00000000-0000-0000-0000-000000000000";
