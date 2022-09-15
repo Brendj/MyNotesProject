@@ -139,6 +139,13 @@ public class ApplicationForFood {
         return null;
     }
 
+    public ApplicationForFoodDiscount getAppointedDiscount() {
+        for (ApplicationForFoodDiscount discount : dtisznCodes) {
+            if (discount.getAppointedMSP()) return discount;
+        }
+        return null;
+    }
+
     public ApplicationForFoodDiscount getApplicationDiscountOldFormat() {
         return (ApplicationForFoodDiscount)dtisznCodes.toArray()[0];
     }

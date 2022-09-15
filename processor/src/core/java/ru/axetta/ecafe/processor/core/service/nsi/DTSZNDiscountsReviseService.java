@@ -307,94 +307,10 @@ public class DTSZNDiscountsReviseService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            session.setFlushMode(FlushMode.COMMIT);
             transaction = session.beginTransaction();
             LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
             //1052
             ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING);
-            statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
-                    status.getApplicationForFoodState()));
-
-            //Назначение новых ЛК
-            Date fireTime = new Date();
-            Client client = session.load(Client.class, applicationForFood.getClient().getIdOfClient());
-            Set<CategoryDiscount> oldDiscounts = client.getCategories();
-            Set<CategoryDiscount> newDiscounts;
-
-            List<Long> categoryDiscountsList = new ArrayList<Long>();
-
-            List<Long> discountCodes = new ArrayList<Long>(categoryDiscountsList);
-            Date min = new Date(0);
-            Date max = new Date(0);
-            ApplicationForFoodDiscount infomax = null;
-            for (ApplicationForFoodDiscount info : applicationForFood.getDtisznCodes()) {
-                if (!info.getConfirmed() || !CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getStartDate(), info.getEndDate())) {
-                    continue;
-                }
-                //Далее алгоритм определения самой приоритетной льготы
-                infomax = getMaxPriorityDiscount(session, info, infomax);
-                CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
-                        .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode().longValue());
-
-                if (null != categoryDiscountDSZN && null != categoryDiscountDSZN.getCategoryDiscount()) {
-                    if (!discountCodes.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
-                        discountCodes.add(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount());
-                        if (info.getStartDate().before(min))
-                            min = info.getStartDate();
-                        if (info.getEndDate().after(max))
-                            max = info.getEndDate();
-                    }
-                }
-            }
-            if (infomax != null) {
-                infomax.setAppointedMSP(true);
-                infomax.setLastUpdate(new Date());
-                session.update(infomax);
-                ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client,
-                        infomax.getDtisznCode().longValue());
-                Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-                if (null == discountInfo) {
-                    CategoryDiscountDSZN categoryDiscountDSZN = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
-                            .getCategoryDiscountDSZNByCode(infomax.getDtisznCode());
-                    String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
-                    discountInfo = new ClientDtisznDiscountInfo(client, infomax.getDtisznCode().longValue(), title,
-                            ClientDTISZNDiscountStatus.CONFIRMED, infomax.getStartDate(), infomax.getEndDate(),
-                            infomax.getLastUpdate(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
-                    discountInfo.setArchived(false);
-                    discountInfo.setAppointedMSP(true);
-                    session.save(discountInfo);
-                } else {
-                    discountInfo.setDateStart(infomax.getStartDate());
-                    discountInfo.setDateEnd(infomax.getEndDate());
-                    discountInfo.setArchived(false);
-                    discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
-                    discountInfo.setLastUpdate(new Date());
-                    discountInfo.setVersion(clientDTISZNDiscountVersion);
-                    discountInfo.setAppointedMSP(true);
-                    RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
-                            DiscountChangeHistory.MODIFY_IN_SERVICE);
-                    session.update(discountInfo);
-                }
-            }
-
-            newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
-            Integer oldDiscountMode = client.getDiscountMode();
-            Integer newDiscountMode =
-                    newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-
-            if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-                try {
-                    DiscountManager.renewDiscounts(session, client, newDiscounts, oldDiscounts,
-                            DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                } catch (Exception e) {
-                    logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()),
-                            e);
-                }
-            }
-
-            //1075
-            status = new ApplicationForFoodStatus(ApplicationForFoodState.OK);
             Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
             applicationForFood = DAOUtils
@@ -402,8 +318,33 @@ public class DTSZNDiscountsReviseService {
                             applicationVersion, historyVersion, true);
             statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                     status.getApplicationForFoodState()));
-            applicationForFood.setDiscountDateStart(min);
-            applicationForFood.setDiscountDateEnd(max);
+
+            //Назначение новых ЛК
+            Client client = session.load(Client.class, applicationForFood.getClient().getIdOfClient());
+
+            ApplicationForFoodDiscount infomax = applicationForFood.getAppointedDiscount();
+            for (ApplicationForFoodDiscount discount : applicationForFood.getDtisznCodes()) {
+                if (!discount.getConfirmed()) continue;
+                if (discount.equals(infomax)) continue;
+                DiscountManager.addDtisznDiscount(session, client, discount.getDtisznCode(), discount.getStartDate(),
+                        discount.getEndDate(), false);
+            }
+            if (infomax != null) {
+                DiscountManager.addDtisznDiscount(session, client, infomax.getDtisznCode(), infomax.getStartDate(),
+                        infomax.getEndDate(), true);
+                applicationForFood.setDiscountDateStart(infomax.getStartDate());
+                applicationForFood.setDiscountDateEnd(infomax.getEndDate());
+            } else {
+                logger.info("Not found appointed discount for " + applicationForFood.getServiceNumber());
+            }
+
+            //1075
+            ApplicationForFoodStatus status2 = new ApplicationForFoodStatus(ApplicationForFoodState.OK);
+            applicationForFood = DAOUtils
+                    .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status2,
+                            applicationVersion, historyVersion, true);
+            statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                    status2.getApplicationForFoodState()));
             session.update(applicationForFood);
             transaction.commit();
             transaction = null;
