@@ -31,6 +31,10 @@ import java.util.Set;
 public class MeshClientProcessorService {
     private static final Logger log = LoggerFactory.getLogger(MeshClientProcessorService.class);
 
+    public static final int FULL_UPDATE_OPERATION = 1;
+    public static final int DOCUMENTS_UPDATE_OPERATION = 2;
+    public static final int CONTACTS_UPDATE_OPERATION = 3;
+
     private Boolean notifyViaEmail;
     private Boolean notifyViaPUSH;
     private Long expenditureLimit;
@@ -46,31 +50,31 @@ public class MeshClientProcessorService {
         limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
     }
 
-    public ClientInfo getClientByMeshGUID(String personGuid) {
-        return service.getClientGuardianByMeshGUID(personGuid);
-    }
 
-    public void createClient(ClientInfo info) throws Exception {
-        Session session = null;
-        Transaction transaction = null;
+    public Client getGuardianByMeshGUID(String personGuid) throws Exception {
+        Session session = RuntimeContext.getInstance().createReportPersistenceSession();
+        Client guardian = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            registryClient(info, session);
-
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e){
+            Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
+            if(client != null) {
+                List<Client> children = ClientManager.findChildsByClient(
+                        session, client.getIdOfClient(), false, false);
+                if(!children.isEmpty()) {
+                    guardian = client;
+                }
+            }
+            session.close();
+        }
+        catch (Exception e) {
             throw e;
-        } finally {
-            HibernateUtils.rollback(transaction, log);
+        }
+        finally {
             HibernateUtils.close(session, log);
         }
+        return guardian;
     }
 
-    private void registryClient(ClientInfo info, Session session) throws Exception {
-        Org org = service.getOrgByClientMeshGuid(info.getChildrenPersonGUID());
+    private Client createGuardian(ClientInfo info, Org org, Session session) throws Exception {
         ClientsMobileHistory clientsMobileHistory =
                 new ClientsMobileHistory("Регистрация клиента через внутренний REST-сервис");
         clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
@@ -90,6 +94,8 @@ public class MeshClientProcessorService {
                 createDul(document, session, guardian.getIdOfClient());
             }
         }
+        session.flush();
+        return guardian;
     }
 
     public void updateClient(ClientInfo info) throws Exception {
@@ -99,26 +105,36 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client guardian = DAOUtils.findClientByMeshGuid(session, info.getPersonGUID());
+            Client guardian = getGuardianByMeshGUID(info.getPersonGUID());
             if(guardian == null){
-                throw new NotFoundException("Not found client by MESH-GUID: " + info.getPersonGUID());
+                throw new NotFoundException("Not found guardian by MESH-GUID: " + info.getPersonGUID());
             }
-            guardian.getPerson().setFirstName(info.getFirstname());
-            guardian.getPerson().setSurname(info.getLastname());
-            guardian.getPerson().setSecondName(StringUtils.defaultIfEmpty(info.getPatronymic(), ""));
-            guardian.setBirthDate(info.getBirthdate());
-            guardian.setSan(info.getSnils());
-            guardian.setGender(info.getIsppGender());
-            ClientsMobileHistory clientsMobileHistory =
-                    new ClientsMobileHistory("Обновление клиента через внутренний REST-сервис");
-            clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
-            guardian.initClientMobileHistory(clientsMobileHistory);
-            guardian.setMobile(info.getMobile());
-            guardian.setEmail(info.getEmail());
-            processDocuments(guardian.getDulDetail(), info.getDocuments(), session, guardian.getIdOfClient());
+
+            if(info.getUpdateOperation().equals(FULL_UPDATE_OPERATION)) {
+                guardian.getPerson().setFirstName(info.getFirstname());
+                guardian.getPerson().setSurname(info.getLastname());
+                guardian.getPerson().setSecondName(StringUtils.defaultIfEmpty(info.getPatronymic(), ""));
+                guardian.setBirthDate(info.getBirthdate());
+                guardian.setSan(info.getSnils());
+                guardian.setGender(info.getIsppGender());
+            }
+            if(info.getUpdateOperation().equals(FULL_UPDATE_OPERATION) ||
+                    info.getUpdateOperation().equals(CONTACTS_UPDATE_OPERATION)) {
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("Обновление клиента через внутренний REST-сервис");
+                clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
+                guardian.initClientMobileHistory(clientsMobileHistory);
+                guardian.setMobile(info.getMobile());
+                guardian.setEmail(info.getEmail());
+            }
+            if(info.getUpdateOperation().equals(FULL_UPDATE_OPERATION) ||
+                    info.getUpdateOperation().equals(DOCUMENTS_UPDATE_OPERATION)) {
+                processDocuments(guardian.getDulDetail(), info.getDocuments(), session, guardian.getIdOfClient());
+            }
 
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
             guardian.setClientRegistryVersion(nextClientVersion);
+            guardian.setUpdateTime(new Date());
             session.merge(guardian);
 
             transaction.commit();
@@ -134,62 +150,6 @@ public class MeshClientProcessorService {
         }
     }
 
-    private void processDocuments(Set<DulDetail> dulDetails, List<DocumentInfo> documents, Session session, Long idOfClient) throws Exception{
-        for(DocumentInfo di : documents){
-            DulDetail d = dulDetails
-                    .stream()
-                    .filter(dulDetail -> dulDetail.getIdMkDocument().equals(di.getIdMKDocument()))
-                    .findFirst()
-                    .orElse(null);
-            if(d == null){
-                createDul(di, session, idOfClient);
-            } else {
-                d.setSeries(di.getSeries());
-                d.setNumber(di.getNumber());
-                d.setIssuer(di.getIssuer());
-                d.setIssued(di.getIssuedDate());
-                d.setLastUpdate(new Date());
-                d.setExpiration(di.getExpiration());
-                d.setSubdivisionCode(di.getSubdivisionCode());
-                RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                        validateDul(session, d, false);
-                session.merge(d);
-                session.flush();
-            }
-        }
-
-        for(DulDetail dulDetailItem : dulDetails){
-            boolean exists = documents.stream()
-                    .anyMatch(di -> di.getIdMKDocument().equals(dulDetailItem.getIdMkDocument()));
-            if(!exists){
-                dulDetailItem.setLastUpdate(new Date());
-                dulDetailItem.setDeleteState(true);
-
-                session.merge(dulDetailItem);
-            }
-        }
-    }
-
-    private void createDul(DocumentInfo di, Session session, Long idOfClient) throws Exception{
-        DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
-        if(dulGuide == null){
-            return;
-        }
-        DulDetail newDulDetail = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
-        newDulDetail.setIdMkDocument(di.getIdMKDocument());
-        newDulDetail.setCreateDate(new Date());
-        newDulDetail.setLastUpdate(new Date());
-        newDulDetail.setNumber(di.getNumber());
-        newDulDetail.setSeries(di.getSeries());
-        newDulDetail.setIssued(di.getIssuedDate());
-        newDulDetail.setIssuer(di.getIssuer());
-        newDulDetail.setDeleteState(false);
-        newDulDetail.setExpiration(di.getExpiration());
-        newDulDetail.setSubdivisionCode(di.getSubdivisionCode());
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).
-                validateDul(session, newDulDetail, true);
-        session.save(newDulDetail);
-    }
 
     public void deleteClient(String personGuid) throws Exception {
         Session session = null;
@@ -198,9 +158,9 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client guardian = DAOUtils.findClientByMeshGuidAsGuardian(session, personGuid);
-            if (guardian == null) {
-                throw new NotFoundException("Not found client by MESH-GUID: " + personGuid);
+            Client guardian = getGuardianByMeshGUID(personGuid);
+            if (guardian == null || (guardian != null && guardian.isDeletedOrLeaving())) {
+                throw new NotFoundException("Not found guardian by MESH-GUID: " + personGuid);
             }
 
             guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
@@ -210,8 +170,8 @@ public class MeshClientProcessorService {
                             .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
 
             Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-
             guardian.setClientRegistryVersion(nextClientVersion);
+            guardian.setUpdateTime(new Date());
             session.merge(guardian);
 
             transaction.commit();
@@ -225,7 +185,7 @@ public class MeshClientProcessorService {
         }
     }
 
-    public void processRelation(GuardianRelationInfo guardianRelationInfo) throws Exception {
+    public void processRelations(GuardianRelationInfo guardianRelationInfo) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try{
@@ -238,15 +198,14 @@ public class MeshClientProcessorService {
 
             Client child = DAOUtils.findClientByMeshGuid(session, guardianRelationInfo.getChildrenPersonGuid());
             if(child == null){
-                throw new NotFoundException("Not found client by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
+                throw new NotFoundException("Not found child by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
             }
             if (!guardianRelationInfo.getGuardianPersonGuids().isEmpty()) {
                 for (ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
                     Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
                     if (guardian == null) {
-                        this.registryClient(meshGuardian, session);
-                        continue;
+                        guardian = createGuardian(meshGuardian, child.getOrg(), session);
                     }
 
                     ClientGuardian clientGuardian = DAOUtils
@@ -314,5 +273,60 @@ public class MeshClientProcessorService {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);
         }
+    }
+
+    private void processDocuments(Set<DulDetail> dulDetails, List<DocumentInfo> documents, Session session, Long idOfClient) throws Exception{
+        for(DocumentInfo di : documents){
+            DulDetail d = dulDetails
+                    .stream()
+                    .filter(dulDetail -> dulDetail.getIdMkDocument().equals(di.getIdMKDocument()))
+                    .findFirst()
+                    .orElse(null);
+            if(d == null){
+                createDul(di, session, idOfClient);
+            } else {
+                d.setSeries(di.getSeries());
+                d.setNumber(di.getNumber());
+                d.setIssuer(di.getIssuer());
+                d.setIssued(di.getIssuedDate());
+                d.setLastUpdate(new Date());
+                d.setExpiration(di.getExpiration());
+                d.setSubdivisionCode(di.getSubdivisionCode());
+
+                session.merge(d);
+                session.flush();
+            }
+        }
+
+        for(DulDetail dulDetailItem : dulDetails){
+            boolean exists = documents.stream()
+                    .anyMatch(di -> di.getIdMKDocument().equals(dulDetailItem.getIdMkDocument()));
+            if(!exists){
+                dulDetailItem.setLastUpdate(new Date());
+                dulDetailItem.setDeleteState(true);
+
+                session.merge(dulDetailItem);
+            }
+        }
+    }
+
+    private void createDul(DocumentInfo di, Session session, Long idOfClient) throws Exception{
+        DulGuide dulGuide = DAOUtils.getDulGuideByType(session, di.getDocumentType());
+        if(dulGuide == null){
+            return;
+        }
+        DulDetail newDulDetail = new DulDetail(idOfClient, di.getDocumentType().longValue(), dulGuide);
+        newDulDetail.setIdMkDocument(di.getIdMKDocument());
+        newDulDetail.setCreateDate(new Date());
+        newDulDetail.setLastUpdate(new Date());
+        newDulDetail.setNumber(di.getNumber());
+        newDulDetail.setSeries(di.getSeries());
+        newDulDetail.setIssued(di.getIssuedDate());
+        newDulDetail.setIssuer(di.getIssuer());
+        newDulDetail.setDeleteState(false);
+        newDulDetail.setExpiration(di.getExpiration());
+        newDulDetail.setSubdivisionCode(di.getSubdivisionCode());
+
+        session.save(newDulDetail);
     }
 }

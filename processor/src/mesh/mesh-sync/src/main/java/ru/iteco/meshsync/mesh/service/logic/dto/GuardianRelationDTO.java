@@ -10,15 +10,15 @@ public class GuardianRelationDTO implements Serializable {
     private String childrenPersonGuid;
     private List<ClientRestDTO> guardianPersonGuids = new LinkedList<>();
 
-    public static GuardianRelationDTO build(String childrenPersonGuid, List<PersonAgent> guardians) throws Exception {
+    public static GuardianRelationDTO build(String childPersonGuid, List<PersonAgent> agents) throws Exception {
         GuardianRelationDTO dto = new GuardianRelationDTO();
 
-        dto.childrenPersonGuid = childrenPersonGuid;
+        dto.childrenPersonGuid = childPersonGuid;
 
-        if (guardians != null) {
-            for (PersonAgent g : guardians) {
-                ClientRestDTO clientDTO = ClientRestDTO.build(g.getAgentPerson());
-                clientDTO.setAgentTypeId(g.getAgentTypeId());
+        if (agents != null) {
+            for (PersonAgent agent : agents) {
+                ClientRestDTO clientDTO = ClientRestDTO.build(agent.getAgentPerson());
+                clientDTO.setAgentTypeId(agent.getAgentTypeId());
                 dto.guardianPersonGuids.add(clientDTO);
             }
         }

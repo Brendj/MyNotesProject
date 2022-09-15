@@ -1,12 +1,14 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.client.RestClientException;
 import org.threeten.bp.LocalDate;
 import ru.iteco.client.ApiException;
 import ru.iteco.client.model.*;
 import ru.iteco.meshsync.enums.ActionType;
 import ru.iteco.meshsync.enums.EntityType;
 import ru.iteco.meshsync.enums.ServiceType;
+import ru.iteco.meshsync.enums.UpdateOperation;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
@@ -40,6 +42,7 @@ public class MeshService {
             EntityType.CATEGORY.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
+    public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,agents.contacts";
 
     private static final String GUARDIAN_EXPAND = StringUtils.join(
             Arrays.asList(
@@ -165,27 +168,31 @@ public class MeshService {
             return CompletableFuture.completedFuture(true);
         }
 
-        Boolean clientIsExists = internalGuardianService.clientExist(entityChanges.getPersonGUID());
-        if (!clientIsExists) {
-            log.warn("Client with PersonGUID: " + entityChanges.getPersonGUID() + " not exists!");
-            return CompletableFuture.completedFuture(true);
-        }
-
         try {
-            if(entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
+            if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
                 internalGuardianService.deleteClient(entityChanges.getPersonGUID());
-            } else {
-                PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
-                internalGuardianService.updateClient(info);
+            } else if (entityChanges.getAction().equals(ActionType.update)) {
+                Integer operation = null;
+                if (entityChanges.getEntity().equals(EntityType.PERSON)) {
+                    operation = UpdateOperation.FULL_UPDATE_OPERATION.getCode();
+                } else if (entityChanges.getEntity().equals(EntityType.PERSON_DOCUMENT)) {
+                    operation = UpdateOperation.DOCUMENTS_UPDATE_OPERATION.getCode();
+                } else if (entityChanges.getEntity().equals(EntityType.PERSON_CONTACT)) {
+                    operation = UpdateOperation.CONTACTS_UPDATE_OPERATION.getCode();
+                }
+                if (operation != null) {
+                    PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
+                    internalGuardianService.updateClient(info, operation);
+                }
             }
 
             return CompletableFuture.completedFuture(true);
         } catch (ApiException e) {
             log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
-            if (e.getResponseBody().contains("удален")) { // Нет точного признака удаления
-                internalGuardianService.deleteClient(entityChanges.getPersonGUID());
-            }
+            return CompletableFuture.completedFuture(false);
+        } catch (RestClientException ex) {
+            log.error(ex.getMessage());
             return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
             log.error("Can't process changes for Guardian with PersonGUID: " + entityChanges.getPersonGUID(), e);
@@ -201,7 +208,7 @@ public class MeshService {
         }
 
         if (entityChanges.getEntity().equals(EntityType.PERSON_AGENT)) {
-            return processGuardianRelation(entityChanges);
+            return processGuardianRelations(entityChanges);
         }
 
         boolean inSupportedOrg = true;
@@ -215,8 +222,8 @@ public class MeshService {
                 throw new UnknownActionTypeException();
             } else if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
                 if (person == null) {
-                    log.warn("Get action DELETE from Kafka for person GUID: " + entityChanges.getPersonGUID()
-                            + ", but in our DB not data about this person");
+                    log.warn("Unable to delete person as child with PersonGUID: " + entityChanges.getPersonGUID()
+                            + "because he is not in DB");
                 } else {
                     person.setDeleteState(true);
                     serviceJournalService.writeMessage("Из Apache Kafka получен пакет с меткой \"Удален\"",
@@ -275,13 +282,6 @@ public class MeshService {
             log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             serviceJournalService.writeErrorWithUserMsg(e, e.getResponseBody(), entityChanges.getPersonGUID());
-            if (e.getResponseBody().contains("удален")) { // Нет точного признака удаления
-                if (person != null) {
-                    person.setDeleteState(true);
-                }
-            } else {
-                invalidData = true;
-            }
         } catch (NoRequiredDataException e) {
             log.warn("Catch NoRequiredDataException, person marks as with invalid data Except: " + e.getMessage());
             serviceJournalService.writeError(e, entityChanges.getPersonGUID());
@@ -298,24 +298,23 @@ public class MeshService {
                 person = null;
             }
         }
-        return CompletableFuture.completedFuture(invalidData);
+        return CompletableFuture.completedFuture(!invalidData);
     }
 
-    private CompletableFuture<Boolean> processGuardianRelation(EntityChanges entityChanges) {
-        if(!internalGuardianService.clientExist(entityChanges.getPersonGUID())){
-            return CompletableFuture.completedFuture(true);
-        }
+    private CompletableFuture<Boolean> processGuardianRelations(EntityChanges entityChanges) {
         try {
-            PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), EntityType.PERSON_AGENT.getApiField());
-            processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
-
+            PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), PERSONS_SEARCH_EXPAND);
+            internalGuardianService.processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
             return CompletableFuture.completedFuture(true);
         } catch (ApiException e) {
             log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             return CompletableFuture.completedFuture(false);
+        } catch (RestClientException ex) {
+            log.error(ex.getMessage());
+            return CompletableFuture.completedFuture(false);
         } catch (Exception e) {
-            log.error("Can't process guardian relations for children PersonGUID " + entityChanges.getPersonGUID(), e);
+            log.error("Can't process guardian relations for child with PersonGUID " + entityChanges.getPersonGUID(), e);
             return CompletableFuture.completedFuture(false);
         }
     }
@@ -443,21 +442,5 @@ public class MeshService {
         }
 
         return allEdu.get(0);
-    }
-
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
-        if (agents != null) {
-            for (PersonAgent a : agents) {
-                if (!internalGuardianService.clientExist(a.getAgentPersonId().toString())) {
-                    try {
-                        PersonInfo guardInfo = restService.getPersonInfoByGUIDAndExpand(a.getAgentPersonId().toString(), GUARDIAN_EXPAND);
-                        internalGuardianService.createClientGuardian(personGUID, guardInfo);
-                    } catch (Exception e) {
-                        log.error("Exception when try create guardian as client ISPP, personID: " + a.getAgentPersonId(), e);
-                    }
-                }
-            }
-        }
-        internalGuardianService.processGuardianRelations(personGUID, agents);
     }
 }
