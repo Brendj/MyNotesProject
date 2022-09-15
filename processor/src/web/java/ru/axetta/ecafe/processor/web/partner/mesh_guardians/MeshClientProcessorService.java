@@ -80,8 +80,8 @@ public class MeshClientProcessorService {
         clientsMobileHistory.setShowing("Изменено сервисом Кафки.");
 
         Client guardian = ClientManager
-                .createGuardianTransactionFree(session, info.getFirstname(), info.getLastname(),
-                        info.getPatronymic(), info.getMobile(), null,
+                .createGuardianTransactionFree(session, info.getFirstname(), info.getPatronymic(),
+                        info.getLastname(), info.getMobile(), null,
                         info.getIsppGender(), org, ClientCreatedFromType.DEFAULT, "", null,
                         null, null, null, null, clientsMobileHistory);
         guardian.setMeshGUID(info.getPersonGUID());
