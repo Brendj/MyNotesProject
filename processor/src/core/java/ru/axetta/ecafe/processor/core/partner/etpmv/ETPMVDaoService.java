@@ -358,4 +358,46 @@ public class ETPMVDaoService {
             return null;
         }
     }
+
+
+    @Transactional
+    public void saveMezvedKafkaError(String msg, String topic, Integer type, String error, Long idOfApplicationForFood) {
+        try{
+            ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+            AppMezhvedErrorSendKafka appMezhvedErrorSendKafka = new AppMezhvedErrorSendKafka(msg, topic, type, error, applicationForFood);
+            entityManager.persist(appMezhvedErrorSendKafka);
+        } catch (Exception e)
+        {
+            logger.error("Error in saveMezvedKafkaError: " + e);
+        }
+    }
+
+    @Transactional
+    public List<AppMezhvedErrorSendKafka> getMezvedKafkaError() {
+        try{
+            Query query = entityManager.createQuery("select a from AppMezhvedErrorSendKafka a join fetch a.applicationForFood c");
+            return query.getResultList();
+        } catch (Exception e)
+        {
+            logger.error("Error in getMezvedKafkaError: " + e);
+        }
+        return null;
+    }
+
+    @Transactional
+    public void updateMezhvedKafkaError(AppMezhvedErrorSendKafka appMezhvedErrorSendKafka, Boolean success) {
+        try {
+            if (!success) {
+                //Если не удалось отправить повторно, то просто обновляем время
+                appMezhvedErrorSendKafka.setUpdatedate(new Date());
+                entityManager.merge(appMezhvedErrorSendKafka);
+            } else {
+                //Если отправка успешна, то убираем запись из таблицы
+                entityManager.remove(appMezhvedErrorSendKafka);
+            }
+        } catch (Exception e)
+        {
+            logger.error("Error in updateMezhvedKafkaError: " + e);
+        }
+    }
 }
