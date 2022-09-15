@@ -126,11 +126,11 @@ public class KafkaListenerServiceImpl {
             if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
                 ApplicationForFoodStatus status;
                 if (passport.getPassport_validity_info() != null &&
-                        Objects.equals(passport.getPassport_validity_info().getPassport_status_info().getPassport_status(), "Да")) {
+                        Objects.equals(passport.getPassport_validity_info().getPassport_status_info().getPassport_status().toLowerCase(), "да")) {
                     status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
-                    status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP);
+                    status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
                 Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);

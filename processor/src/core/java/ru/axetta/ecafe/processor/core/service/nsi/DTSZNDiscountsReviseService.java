@@ -227,7 +227,7 @@ public class DTSZNDiscountsReviseService {
                         session.update(applicationForFood);
                     } else {
                         //1080.3
-                        status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD);
+                        status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT);
                         applicationForFood = DAOUtils
                                 .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
                                         applicationVersion, historyVersion, true);

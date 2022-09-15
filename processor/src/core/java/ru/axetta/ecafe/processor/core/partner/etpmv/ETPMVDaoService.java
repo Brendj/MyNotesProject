@@ -258,7 +258,7 @@ public class ETPMVDaoService {
                 } else {
                     if (ApplicationForFoodState.DENIED_BENEFIT != applicationForFood.getStatus().getApplicationForFoodState()
                     && ApplicationForFoodState.DENIED_GUARDIANSHIP != applicationForFood.getStatus().getApplicationForFoodState()
-                    && ApplicationForFoodState.DENIED_OLD != applicationForFood.getStatus().getApplicationForFoodState()) {
+                    && ApplicationForFoodState.DENIED_PASSPORT != applicationForFood.getStatus().getApplicationForFoodState()) {
                         DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
                     }
                 }

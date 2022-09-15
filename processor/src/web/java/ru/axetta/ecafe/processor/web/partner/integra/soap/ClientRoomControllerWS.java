@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import org.springframework.stereotype.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -10788,7 +10787,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         || applicationForFood.getStatus()
                         .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)) || applicationForFood.getStatus()
                         .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)) || applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD))) {
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss");

@@ -30,8 +30,6 @@ import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -353,7 +351,7 @@ public class ETPMVService {
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_BENEFIT)
                 || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_GUARDIANSHIP)
-                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_OLD)) return true; //1080.1, 1080.2, 1080.3
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_PASSPORT)) return true; //1080.1, 1080.2, 1080.3
         return false;
     }
 
