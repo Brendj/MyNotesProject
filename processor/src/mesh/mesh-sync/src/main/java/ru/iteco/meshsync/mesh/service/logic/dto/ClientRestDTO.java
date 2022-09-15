@@ -29,11 +29,10 @@ public class ClientRestDTO implements Serializable {
 
     private String mobile = "";
     private String email = "";
-    private String childrenPersonGUID;
     private List<DocumentDTO> documents = new LinkedList<>();
     private Integer agentTypeId;
     private String snils;
-
+    private Integer updateOperation;
     public static ClientRestDTO build(PersonInfo info) throws Exception {
         ClientRestDTO dto = new ClientRestDTO();
         dto.personGUID = info.getPersonId().toString();
@@ -58,9 +57,9 @@ public class ClientRestDTO implements Serializable {
         return dto;
     }
 
-    public static ClientRestDTO build(PersonInfo info, String childrenPersonId) throws Exception {
+    public static ClientRestDTO build(PersonInfo info, Integer updateOperation) throws Exception {
         ClientRestDTO dto = build(info);
-        dto.childrenPersonGUID = childrenPersonId;
+        dto.updateOperation = updateOperation;
 
         return dto;
     }
@@ -158,12 +157,12 @@ public class ClientRestDTO implements Serializable {
         this.email = email;
     }
 
-    public String getChildrenPersonGUID() {
-        return childrenPersonGUID;
+    public Integer getUpdateOperation() {
+        return updateOperation;
     }
 
-    public void setChildrenPersonGUID(String childrenPersonGUID) {
-        this.childrenPersonGUID = childrenPersonGUID;
+    public void setUpdateOperation(Integer updateOperation) {
+        this.updateOperation = updateOperation;
     }
 
     public List<DocumentDTO> getDocuments() {
