@@ -1,5 +1,5 @@
 -- Пакет обновлений issue 1166
-CREATE TABLE public.cf_mezhved_kafka_error (
+CREATE TABLE cf_mezhved_kafka_error (
     idofmezhvedkafkaerror bigserial NOT NULL,
     msg varchar NOT NULL,
     topic varchar NOT NULL,
