@@ -90,7 +90,7 @@ public class InternalClientRestController extends Application {
             log.error("InternalClientRestController.processGuardianRelations: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e) {
-            log.error("InternalClientRestController.deleteClient: Error while processing client with MESH-GUID: "
+            log.error("InternalClientRestController.processGuardianRelations: Error while processing client with MESH-GUID: "
                     + guardianRelationInfo.getChildrenPersonGuid(), e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }

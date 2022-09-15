@@ -14,6 +14,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.iteco.client.model.PersonAgent;
@@ -62,38 +63,59 @@ public class InternalGuardianService {
         return new RestTemplate(requestFactory);
     }
 
-    public void deleteClient(String personGUID) throws Exception {
-        Map<String, String> params = new HashMap<>();
-        params.put("guardianMeshGuid", personGUID);
+    public void deleteClient(String personGUID) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("guardianMeshGuid", personGUID);
 
-        HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
-        ResponseEntity<Void> response = restTemplate.exchange(
-                targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
-                HttpMethod.DELETE,
-                request, Void.class, params);
-        processStatusCode(response.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
+            HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                    HttpMethod.DELETE,
+                    request, Void.class, params);
+        }
+        catch (HttpClientErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
+        }
+        catch (HttpServerErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
+        }
     }
 
     public void updateClient(PersonInfo info, Integer operation) throws Exception {
-        ClientRestDTO dto = ClientRestDTO.build(info, operation);
+        try {
+            ClientRestDTO dto = ClientRestDTO.build(info, operation);
 
-        HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
-        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.PUT,
-                request, Void.class);
-        processStatusCode(response.getStatusCode(),"InternalGuardianService.updateClient:", dto.getPersonGUID());
+            HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
+            ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.PUT,
+                    request, Void.class);
+        }
+        catch (HttpClientErrorException ex) {
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateClient:", info.getPersonId().toString());
+        }
+        catch (HttpServerErrorException ex) {
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateClient:", info.getPersonId().toString());
+        }
     }
 
     public void processGuardianRelations(String childPersonGUID, List<PersonAgent> agents) throws Exception {
-        GuardianRelationDTO dto = GuardianRelationDTO.build(childPersonGUID, agents);
+        try {
+            GuardianRelationDTO dto = GuardianRelationDTO.build(childPersonGUID, agents);
 
-        HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);
-        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/guardians", HttpMethod.POST,
-                request, Void.class);
-        processStatusCode(response.getStatusCode(),"InternalGuardianService.processGuardianRelations:", childPersonGUID);
+            HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);
+            ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/guardians", HttpMethod.POST,
+                    request, Void.class);
 
+        }
+        catch (HttpClientErrorException ex) {
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.processGuardianRelations:", childPersonGUID);
+        }
+        catch (HttpServerErrorException ex) {
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.processGuardianRelations:", childPersonGUID);
+        }
     }
 
-    public void processStatusCode(HttpStatus statusCode, String sourceMethod, String personGuid) throws Exception {
+    public void processStatusCode(HttpStatus statusCode, String sourceMethod, String personGuid) {
         if (statusCode.equals(HttpStatus.NOT_FOUND)) {
             throw new RestClientException(sourceMethod + " Unable to find client by MESH-GUID: " + personGuid);
         }
@@ -103,7 +125,7 @@ public class InternalGuardianService {
         } else if (!statusCode.equals(HttpStatus.OK)) {
             throw new RestClientException(sourceMethod +
                     " Error while processing client with MESH-GUID: "
-                    + personGuid + " StatusCode: " + statusCode.getReasonPhrase());
+                    + personGuid + " StatusCode: " + statusCode + " " + statusCode.getReasonPhrase());
         }
     }
 }
