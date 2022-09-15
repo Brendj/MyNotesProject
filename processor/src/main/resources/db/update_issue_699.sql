@@ -52,7 +52,7 @@ COMMENT ON COLUMN CF_Dul_Detail.CreateDate IS 'Дата создания зап�
 COMMENT ON COLUMN CF_Dul_Detail.LastUpdate IS 'Дата изменения записи';
 COMMENT ON COLUMN CF_Dul_Detail.DeleteState IS 'Признак удаления ';
 
-INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (15, 'Паспорт РФ');
+INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (15, 'Паспорт гражданина Российской Федерации');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (3, 'Свидетельство о рождении');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (17, 'Свидетельство о рождении, выданное уполномоченным органом иностранного государства');
 INSERT INTO CF_Dul_Guide (Document_type_id, Name) VALUES (14, 'Свидетельство о предоставлении временного убежища на территории Российской Федерации');

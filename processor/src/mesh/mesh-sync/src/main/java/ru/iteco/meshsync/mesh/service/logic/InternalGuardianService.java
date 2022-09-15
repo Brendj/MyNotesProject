@@ -62,31 +62,7 @@ public class InternalGuardianService {
         return new RestTemplate(requestFactory);
     }
 
-    public Boolean clientExist(String personGUID) {
-        try {
-            Map<String, String> params = new HashMap<>();
-            params.put("personGuid", personGUID);
-            HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
-
-            ResponseEntity<ClientRestDTO> response = restTemplate.exchange(
-                    targetUrl + "/client?personGuid={personGuid}",
-                    HttpMethod.GET,
-                    request, ClientRestDTO.class, params);
-
-
-            ClientRestDTO dto = response.getBody();
-
-            return dto != null && StringUtils.isNotEmpty(dto.getPersonGUID());
-        } catch (HttpClientErrorException e){
-            if(e.getStatusCode().equals(HttpStatus.NOT_FOUND)){
-                return false;
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    public void deleteClient(String personGUID) {
+    public void deleteClient(String personGUID) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("guardianMeshGuid", personGUID);
 
@@ -95,45 +71,39 @@ public class InternalGuardianService {
                 targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
                 HttpMethod.DELETE,
                 request, Void.class, params);
-
-        if(!response.getStatusCode().equals(HttpStatus.OK)){
-            throw new RestClientException("ИС ПП вернул ошибку!");
-        }
+        processStatusCode(response.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
     }
 
-    public void updateClient(PersonInfo info) throws Exception {
-        ClientRestDTO dto = ClientRestDTO.build(info);
+    public void updateClient(PersonInfo info, Integer operation) throws Exception {
+        ClientRestDTO dto = ClientRestDTO.build(info, operation);
 
         HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
         ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.PUT,
                 request, Void.class);
-
-        if(!response.getStatusCode().equals(HttpStatus.OK)){
-            throw new RestClientException("ИС ПП вернул ошибку!");
-        }
+        processStatusCode(response.getStatusCode(),"InternalGuardianService.updateClient:", dto.getPersonGUID());
     }
 
-    public void createClientGuardian(String childrenPersonId, PersonInfo info) throws Exception {
-        ClientRestDTO dto = ClientRestDTO.build(info, childrenPersonId);
-
-        HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
-        ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.POST,
-                request, Void.class);
-
-        if(!response.getStatusCode().equals(HttpStatus.OK)){
-            throw new RestClientException("ИС ПП вернул ошибку!");
-        }
-    }
-
-    public void processGuardianRelations(String personGUID, List<PersonAgent> agents) throws Exception {
-        GuardianRelationDTO dto = GuardianRelationDTO.build(personGUID, agents);
+    public void processGuardianRelations(String childPersonGUID, List<PersonAgent> agents) throws Exception {
+        GuardianRelationDTO dto = GuardianRelationDTO.build(childPersonGUID, agents);
 
         HttpEntity<GuardianRelationDTO> request = new HttpEntity<>(dto, httpHeaders);
         ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/guardians", HttpMethod.POST,
                 request, Void.class);
+        processStatusCode(response.getStatusCode(),"InternalGuardianService.processGuardianRelations:", childPersonGUID);
 
-        if(!response.getStatusCode().equals(HttpStatus.OK)){
-            throw new RestClientException("ИС ПП вернул ошибку!");
+    }
+
+    public void processStatusCode(HttpStatus statusCode, String sourceMethod, String personGuid) throws Exception {
+        if (statusCode.equals(HttpStatus.NOT_FOUND)) {
+            throw new RestClientException(sourceMethod + " Unable to find client by MESH-GUID: " + personGuid);
+        }
+        else if (statusCode.equals(HttpStatus.BAD_REQUEST)) {
+            throw new RestClientException(sourceMethod +
+                    " Incorrect data was transmitted to process client with MESH-GUID: " + personGuid);
+        } else if (!statusCode.equals(HttpStatus.OK)) {
+            throw new RestClientException(sourceMethod +
+                    " Error while processing client with MESH-GUID: "
+                    + personGuid + " StatusCode: " + statusCode.getReasonPhrase());
         }
     }
 }

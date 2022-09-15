@@ -30,43 +30,6 @@ public class InternalClientRestController extends Application {
         service = RuntimeContext.getAppContext().getBean(MeshClientProcessorService.class);
     }
 
-    @POST
-    @Path(value = "client")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createClient(@RequestBody ClientInfo info){
-        try {
-            checkParameterClientInfo(info);
-            service.createClient(info);
-
-            return Response.status(HttpURLConnection.HTTP_OK).build();
-        } catch (IllegalArgumentException e) {
-            log.error("InternalClientRestController.createClient: " + e.getMessage());
-            return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
-        } catch (NoResultException e) {
-            log.error("InternalClientRestController.createClient: Unable to find organization for child with MESH-GUID:" + info.getChildrenPersonGUID());
-            return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
-        } catch (Exception e){
-            log.error("InternalClientRestController.createClient: Internal Error: ", e);
-            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
-        }
-    }
-
-    @GET
-    @Path(value = "client")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response checkClient(@QueryParam(value = "personGuid") String personGuid){
-        try {
-            checkParameter("personGuid", personGuid);
-            ClientInfo clientInfo = service.getClientByMeshGUID(personGuid);
-
-            return generateResponse(HttpURLConnection.HTTP_OK, clientInfo);
-        } catch (IllegalArgumentException e) {
-            log.error("InternalClientRestController.checkClient: " + e.getMessage());
-            return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
-        } catch (NoResultException e) {
-            return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
-        }
-    }
 
     @PUT
     @Path(value = "client")
@@ -74,6 +37,7 @@ public class InternalClientRestController extends Application {
     public Response updateClient(@RequestBody ClientInfo info){
         try {
             checkParameterClientInfo(info);
+            checkParameterUpdateOperation(info.getUpdateOperation());
             service.updateClient(info);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
@@ -81,10 +45,11 @@ public class InternalClientRestController extends Application {
             log.error("InternalClientRestController.updateClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NotFoundException e) {
-            log.error("InternalClientRestController.updateClient: Unable to find guardian by MESH-GUID:" + info.getPersonGUID());
+            //log.error("InternalClientRestController.updateClient: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("InternalClientRestController.updateClient: Internal Error: ", e);
+            log.error("InternalClientRestController.updateClient: Error while processing client with MESH-GUID: "
+                    + info.getPersonGUID(), e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
@@ -101,10 +66,11 @@ public class InternalClientRestController extends Application {
             log.error("InternalClientRestController.deleteClient: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NotFoundException e) {
-            log.error("InternalClientRestController.deleteClient: Unable to find guardian by MESH-GUID:" + personGuid);
+            //log.error("InternalClientRestController.deleteClient: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("InternalClientRestController.deleteClient: Internal Error: ", e);
+            log.error("InternalClientRestController.deleteClient: Error while processing client with MESH-GUID: "
+                    + personGuid, e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
@@ -114,17 +80,18 @@ public class InternalClientRestController extends Application {
     public Response processGuardianRelations(@RequestBody GuardianRelationInfo guardianRelationInfo){
         try {
             checkParameterGuardianRelationInfo(guardianRelationInfo);
-            service.processRelation(guardianRelationInfo);
+            service.processRelations(guardianRelationInfo);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
             log.error("InternalClientRestController.processGuardianRelations: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NotFoundException e) {
-            log.error("InternalClientRestController.processGuardianRelations: Unable to find child by MESH-GUID:" + guardianRelationInfo.getChildrenPersonGuid());
+            log.error("InternalClientRestController.processGuardianRelations: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
-        } catch (Exception e){
-            log.error("InternalClientRestController.processGuardianRelations: Internal Error: ", e);
+        } catch (Exception e) {
+            log.error("InternalClientRestController.deleteClient: Error while processing client with MESH-GUID: "
+                    + guardianRelationInfo.getChildrenPersonGuid(), e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
@@ -170,11 +137,17 @@ public class InternalClientRestController extends Application {
         }
     }
 
+    private void checkParameterUpdateOperation(Integer updateOperation) {
+        if (updateOperation == null) {
+            throw new IllegalArgumentException("updateOperation is empty");
+        } else if(updateOperation.intValue() < 1 || updateOperation.intValue() > 3) {
+            throw new IllegalArgumentException("updateOperation is wrong");
+        }
+    }
+
     private void checkParameterGuardianRelationInfo(GuardianRelationInfo info){
         if (StringUtils.isBlank(info.getChildrenPersonGuid())) {
             throw new IllegalArgumentException("ChildrenPersonGuid is empty");
-        } else if(CollectionUtils.isEmpty(info.getGuardianPersonGuids())){
-            throw new IllegalArgumentException("GuardianPersonGuids is empty");
         }
     }
 }

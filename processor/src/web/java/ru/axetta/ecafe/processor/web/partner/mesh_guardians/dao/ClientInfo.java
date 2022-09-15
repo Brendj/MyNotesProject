@@ -19,11 +19,10 @@ public class ClientInfo implements IDAOEntity {
 
     private String mobile;
     private String email;
-    private String childrenPersonGUID;
     private List<DocumentInfo> documents = new LinkedList<>();
     private Integer agentTypeId;
     private String snils;
-
+    private Integer updateOperation;
     public String getPersonGUID() {
         return personGUID;
     }
@@ -88,12 +87,12 @@ public class ClientInfo implements IDAOEntity {
         this.email = email;
     }
 
-    public String getChildrenPersonGUID() {
-        return childrenPersonGUID;
+    public Integer getUpdateOperation() {
+        return updateOperation;
     }
 
-    public void setChildrenPersonGUID(String childrenPersonGUID) {
-        this.childrenPersonGUID = childrenPersonGUID;
+    public void setUpdateOperation(Integer updateOperation) {
+        this.updateOperation = updateOperation;
     }
 
     public static ClientInfo build(Client c) {
