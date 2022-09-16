@@ -171,7 +171,7 @@ public class MeshService {
         try {
             if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
                 internalGuardianService.deleteClient(entityChanges.getPersonGUID());
-            } else if (entityChanges.getAction().equals(ActionType.update)) {
+            } else {
                 Integer operation = null;
                 if (entityChanges.getEntity().equals(EntityType.PERSON)) {
                     operation = UpdateOperation.FULL_UPDATE_OPERATION.getCode();

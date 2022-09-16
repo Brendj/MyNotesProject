@@ -74,6 +74,7 @@ public class MeshClientProcessorService {
                         info.getLastname(), info.getMobile(), null,
                         info.getIsppGender(), org, ClientCreatedFromType.DEFAULT, "", null,
                         null, null, null, null, clientsMobileHistory);
+        guardian.setEmail(info.getEmail());
         guardian.setMeshGUID(info.getPersonGUID());
         guardian.setSan(info.getSnils());
         guardian.setBirthDate(info.getBirthdate());
