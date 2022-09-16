@@ -56,7 +56,7 @@ public class MeshClientProcessorService {
         Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
         if(client != null) {
             List<Client> children = ClientManager.findChildsByClient(
-                    session, client.getIdOfClient(), false, false);
+                    session, client.getIdOfClient(), true, false);
             if(!children.isEmpty()) {
                 guardian = client;
             }
