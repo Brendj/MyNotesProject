@@ -5158,6 +5158,15 @@ public class DAOUtils {
         return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
 
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListAppointedBetweenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.eq("appointedMSP", true));
+        criteria.add(Restrictions.ne("archived", true));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
     public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,
             Long code) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);

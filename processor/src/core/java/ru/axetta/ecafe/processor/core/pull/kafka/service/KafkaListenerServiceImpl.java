@@ -123,6 +123,7 @@ public class KafkaListenerServiceImpl {
             PassportValidityCheckingResponse passport = passportData.getPassport_validity_checking_response();
             AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
+            boolean modifiedStatus = false;
             if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
                 ApplicationForFoodStatus status;
                 if (passport.getPassport_validity_info() != null &&
@@ -137,10 +138,11 @@ public class KafkaListenerServiceImpl {
                 Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
                 applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
                 session.update(applicationForFood);
+                modifiedStatus = true;
             }
             transaction.commit();
             transaction = null;
-            if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+            if (modifiedStatus) {
                 RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
                         applicationForFood.getServiceNumber(),
                         applicationForFood.getStatus().getApplicationForFoodState());

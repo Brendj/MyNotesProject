@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -48,7 +49,7 @@ public class BenefitService {
     public final static String SERVICE_NUMBER="ServiceNumber";
     public final static String ID_DISCOUNT_INFO="idDiscountInfo";
     public static final String NODE_PROPERTY = "ecafe.processor.notification.client.endBenefit.node";
-
+    public static final int DAYS_NOTIFY_ETP = 14;
 
     public static class NotificationEndBenefit implements Job {
         @Override
@@ -93,6 +94,45 @@ public class BenefitService {
             }
         }
         return false;
+    }
+
+    public void runEndBenefitNotificationETP() {
+        logger.info("Start runEndBenefitNotificationETP task");
+        Date startDate = CalendarUtils.startOfDay(new Date());
+        Date endDate = DateUtils.addDays(startDate, DAYS_NOTIFY_ETP);
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<ClientDtisznDiscountInfo> list = DAOUtils.getCategoryDiscountListAppointedBetweenDates(session, startDate, endDate);
+            ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.END_BENEFIT_NOTIFICATION);
+            Long applicationVersion;
+            Long historyVersion;
+            for (ClientDtisznDiscountInfo info : list) {
+                ApplicationForFood applicationForFood = DAOUtils.findActiveApplicationForFoodByClient(session, info.getClient());
+                if (applicationForFood == null || !applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
+                    continue;
+                }
+                applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                applicationForFood = DAOUtils
+                        .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                                applicationVersion, historyVersion, true);
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatus(System.currentTimeMillis(),
+                        applicationForFood.getServiceNumber(), status.getApplicationForFoodState());
+            }
+
+            transaction.commit();
+            transaction = null;
+        } catch(Exception e) {
+            logger.error("Error in runEndBenefitNotificationETP", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        logger.info("End runEndBenefitNotificationETP task");
     }
 
     public void runEndBenefit(boolean forTest) {
