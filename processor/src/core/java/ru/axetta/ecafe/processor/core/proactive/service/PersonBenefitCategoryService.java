@@ -9,13 +9,16 @@ import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -58,4 +61,31 @@ public class PersonBenefitCategoryService {
         }
     }
 
+    @Async
+    public void checkEndDateForBenefitCategory() {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Date currentDate = new Date();
+            Date startDate = CalendarUtils.startOfDay(currentDate);
+            Date endDate = CalendarUtils.endOfDay(currentDate);
+
+            List<ClientDtisznDiscountInfo> info = DAOUtils
+                    .getExpiredDTISZNDiscountInfoByDayAndCode(session, startDate, endDate, Long.parseLong(DSZN_MOS_CODE));
+
+            for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : info) {
+                //Добавть архивацию льгот
+                //Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            log.error("Error in checkEndDateForBenefitCategory: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
 }

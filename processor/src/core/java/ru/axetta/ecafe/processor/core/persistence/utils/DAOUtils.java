@@ -4083,6 +4083,15 @@ public class DAOUtils {
         return (ClientDtisznDiscountInfo) criteria.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<ClientDtisznDiscountInfo> getExpiredDTISZNDiscountInfoByDayAndCode(Session session, Date startDate,
+                                                                                    Date endDate, Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.between("dateEnd", startDate, endDate));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
     public static List<ClientDtisznDiscountInfo> getDTISZNDiscountsInfoByClient(Session session, Client client) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client", client));

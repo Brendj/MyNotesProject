@@ -31,7 +31,7 @@ public class KafkaListenerService {
 
     public KafkaListenerService(ObjectMapper objectMapper,
                                 KafkaListenerServiceImpl kafkaService,
-                                PersonBenefitCategoryService personBenefitCategoryService) throws Exception {
+                                PersonBenefitCategoryService personBenefitCategoryService) {
         this.objectMapper = objectMapper;
         this.kafkaService = kafkaService;
         this.personBenefitCategoryService = personBenefitCategoryService;
