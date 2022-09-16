@@ -1,0 +1,61 @@
+package ru.axetta.ecafe.processor.core.proactive.service;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
+import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
+@Service
+public class PersonBenefitCategoryService {
+
+    private final Logger log = LoggerFactory.getLogger(PersonBenefitCategoryService.class);
+    private static final ThreadLocal<SimpleDateFormat> format = ThreadLocal.withInitial(()
+            -> new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+    private static final String DSZN_MOS_CODE = "48";
+
+    @Async
+    public void parseResponseMessage(PersonBenefitCategoryChanges responseData) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client cl = DAOUtils.findClientByMeshGuid(session, responseData.getPerson_id());
+            if (cl == null)
+                return;
+            for (BenefitCategoryChange benefit : responseData.getBenefit_category_changes()) {
+                if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
+                    continue;
+                if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).after(new Date())) {
+                    //то: ЛК с истёкшим сроком действия, переход к удалению ЛК, п.6.2 БФТ Проактив МоС;
+                } else {
+                    Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
+                    Date startDate = format.get().parse(benefit.getBegin_date());
+                    Date endDate = format.get().parse(benefit.getEnd_date());
+                    DiscountManager.addDtisznDiscount(session, cl, categoryCode, startDate, endDate, true);
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            log.error("Error in parseResponseMessage: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
+
+}
