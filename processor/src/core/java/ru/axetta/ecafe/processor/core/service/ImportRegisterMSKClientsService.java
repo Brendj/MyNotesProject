@@ -1175,7 +1175,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             else {
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, child.getIdOfClient());
                 if (guardians.isEmpty()) {
-                    logger.error(String.format("processClientGuardians(): Не удалось найти представителей ребенка c MЭШ.GUID: %s в ИСПП",
+                    logger.warn(String.format("processClientGuardians(): Не удалось найти представителей ребенка c MЭШ.GUID: %s в ИСПП",
                             child.getMeshGUID().toString()));
                     return;
                 }
@@ -1217,6 +1217,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             return;
         }
 
+        if (childPersonResponse.getResponse().getAgents() == null) {
+            return;
+        }
         for (MeshAgentResponse meshAgentResponse : childPersonResponse.getResponse().getAgents()) {
             MeshGuardianPerson guardianPerson = meshAgentResponse.getAgentPerson();
 
