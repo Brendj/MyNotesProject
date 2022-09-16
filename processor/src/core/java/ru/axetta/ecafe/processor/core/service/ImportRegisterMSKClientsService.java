@@ -1049,7 +1049,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
-                    addClientMigrationLeaving(session, dbClient, change, clientGuardianHistory);
+                    addClientMigrationLeaving(session, dbClient, change);
 
                     dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     if(dbClient.getMeshGUID() == null && StringUtils.isNotEmpty(change.getMeshGUID())){
@@ -1147,7 +1147,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                             if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
                                     (change.getGroupName() != null && change.getGroupNameFrom() != null &&
                                     !change.getGroupName().equals(change.getGroupNameFrom()))) {
-                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change, clientGuardianHistory);
+                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
                                 //если орг. не меняется, добавляем историю миграции внутри ОО
                             }
                         }
@@ -1181,7 +1181,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 for (Client guardian : guardians) {
                     List<Client> children = ClientManager.findChildsByClient(
-                            session, guardian.getIdOfClient(), true, true);
+                            session, guardian.getIdOfClient(), true, false);
                     if (children.isEmpty()) {
                         logger.error(String.format("processClientGuardians(): Не удалось найти детей представителя c MЭШ.GUID: %s в ИСПП",
                                 child.getMeshGUID().toString()));
@@ -1539,19 +1539,16 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     //@Transactional
-    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change,
-            ClientGuardianHistory clientGuardianHistory){
-        ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
-                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())),
-                clientGuardianHistory);
+    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
+        ClientManager.createClientGroupMigrationHistoryLite(session, client, org, client.getIdOfClientGroup(),
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
-    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change,
-            ClientGuardianHistory clientGuardianHistory) throws Exception {
+    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change) throws Exception {
         Org org = (Org)session.get(Org.class, change.getIdOfOrg());
-        ClientManager.createClientGroupMigrationHistory(session, client, org, ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+        ClientManager.createClientGroupMigrationHistoryLite(session, client, org, ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
-                        .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())), clientGuardianHistory);
+                        .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
     public void setChangeError(long idOfRegistryChange, Exception e) throws Exception {
