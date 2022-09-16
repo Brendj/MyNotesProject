@@ -219,27 +219,31 @@ public class MeshClientProcessorService {
                                 ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), disabled,
                                 child.getIdOfClient(), ClientCreatedFromType.DEFAULT,
                                 ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
-                    } else if (clientGuardian.getDeletedState()) {
-                        clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
-                        clientGuardian.restore(ClientManager.generateNewClientGuardianVersion(session),
-                                RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL));
+                    } else {
+                        if (clientGuardian.getDeletedState()) {
+                            clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                            clientGuardian.restore(ClientManager.generateNewClientGuardianVersion(session),
+                                    RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL));
 
-                        // Опекунство активировно(default=false), если:
-                        // A. Типы представителей в МК от 1 до 4 типа;
-                        // B. Роли представителя в ИСПП от 1 до 2 типа;
-                        Boolean disabled = meshGuardian.getAgentTypeId().equals(
-                                ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
+                            // Опекунство активировно(default=false), если:
+                            // A. Типы представителей в МК от 1 до 4 типа;
+                            // B. Роли представителя в ИСПП от 1 до 2 типа;
+                            Boolean disabled = meshGuardian.getAgentTypeId().equals(
+                                    ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
 
-                        if (clientGuardian.getRepresentType() != null) {
-                            disabled = disabled && (!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW) &&
-                                    !clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.GUARDIAN));
+                            if (clientGuardian.getRepresentType() != null) {
+                                disabled = disabled && (!clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.IN_LAW) &&
+                                        !clientGuardian.getRepresentType().equals(ClientGuardianRepresentType.GUARDIAN));
+                            }
+                            clientGuardian.setDisabled(disabled);
+                            session.merge(clientGuardian);
                         }
-                        clientGuardian.setDisabled(disabled);
-                        session.merge(clientGuardian);
-                    } else if (clientGuardian.getRoleType().getCode() != meshGuardian.getAgentTypeId()) {
-                        clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
-                        clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()));
-                        session.merge(clientGuardian);
+
+                        if (clientGuardian.getRoleType().getCode() != meshGuardian.getAgentTypeId()) {
+                            clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                            clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()));
+                            session.merge(clientGuardian);
+                        }
                     }
                 }
             }
