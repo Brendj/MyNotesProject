@@ -51,25 +51,15 @@ public class MeshClientProcessorService {
     }
 
 
-    public Client getGuardianByMeshGUID(String personGuid) throws Exception {
-        Session session = RuntimeContext.getInstance().createReportPersistenceSession();
+    public Client getGuardianByMeshGUID(Session session, String personGuid) throws Exception {
         Client guardian = null;
-        try {
-            Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
-            if(client != null) {
-                List<Client> children = ClientManager.findChildsByClient(
-                        session, client.getIdOfClient(), false, false);
-                if(!children.isEmpty()) {
-                    guardian = client;
-                }
+        Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
+        if(client != null) {
+            List<Client> children = ClientManager.findChildsByClient(
+                    session, client.getIdOfClient(), false, false);
+            if(!children.isEmpty()) {
+                guardian = client;
             }
-            session.close();
-        }
-        catch (Exception e) {
-            throw e;
-        }
-        finally {
-            HibernateUtils.close(session, log);
         }
         return guardian;
     }
@@ -105,7 +95,7 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client guardian = getGuardianByMeshGUID(info.getPersonGUID());
+            Client guardian = getGuardianByMeshGUID(session, info.getPersonGUID());
             if(guardian == null){
                 throw new NotFoundException("Not found guardian by MESH-GUID: " + info.getPersonGUID());
             }
@@ -158,7 +148,7 @@ public class MeshClientProcessorService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client guardian = getGuardianByMeshGUID(personGuid);
+            Client guardian = getGuardianByMeshGUID(session, personGuid);
             if (guardian == null || (guardian != null && guardian.isDeletedOrLeaving())) {
                 throw new NotFoundException("Not found guardian by MESH-GUID: " + personGuid);
             }
