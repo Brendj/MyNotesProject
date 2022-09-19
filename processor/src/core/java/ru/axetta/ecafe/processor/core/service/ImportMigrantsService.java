@@ -147,9 +147,8 @@ public class ImportMigrantsService {
                     if(request.getDateLearnEnd().getTime() <= now.getTime()) {
                         resolution = VisitReqResolutionHist.RES_CANCELED;
                     }
-                    if(request.getDateEnd() != null) {
-                        if(resolution.equals(VisitReqResolutionHist.RES_CONFIRMED) &&
-                                request.getDateEnd().getTime() <= now.getTime()) {
+                    if(request.getDateEnd() != null && resolution.equals(VisitReqResolutionHist.RES_CONFIRMED)) {
+                        if(request.getDateEnd().getTime() <= now.getTime()) {
                             resolution = VisitReqResolutionHist.RES_CANCELED;
                         }
                     }
@@ -193,7 +192,6 @@ public class ImportMigrantsService {
                             session.save(
                                     createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
                                             VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(now, 5)));
-
                         }
                     } else {
                         boolean isMigrantChanged = false;
