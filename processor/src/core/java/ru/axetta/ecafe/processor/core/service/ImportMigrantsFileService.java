@@ -177,17 +177,8 @@ public class ImportMigrantsFileService {
         sb.append("'").append(getQuotedStr(array[7])).append("'").append(", "); // visitorginn
         sb.append(getQuotedStr(array[8])).append(", ");             // visitorgunom
 
-        //dateend
-        // если не null и дата меньше\равна текущей - клиент отчислен, не обрабатываем
-        // если null или дата больше текущей - все ок
         if (array[9].equals("null")) {
-            Date dateLearnEnd = simpleDateFormat.parse(array[11]);
-            Date currentDate = new Date();
-            if (dateLearnEnd.getTime() <= currentDate.getTime()) {
-                throw new ClientIsExpelled(String.format("client with guid={%s} is expelled", getQuotedStr(array[5])));
-            } else {
-                sb.append(getQuotedStr("null")).append(", ");
-            }
+            sb.append("NULL, ");
         } else {
             Date dateEnd = simpleDateFormat.parse(array[9]);
             sb.append(dateEnd.getTime()).append(", ");

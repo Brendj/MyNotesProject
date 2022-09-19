@@ -1228,19 +1228,15 @@ public class ClientManager {
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
 
-    public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName,
-                                         String clientGuid, ClientsMobileHistory clientsMobileHistory) throws Exception {
+    public static long createClientFromESZ(Session session, Long eszId, String surname, String firstName, String secondName,
+            String clientGuid, ClientsMobileHistory clientsMobileHistory) throws Exception {
         Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
-        Query query = session.createQuery("select c.idOfClient from Client c where c.externalId = :externalId");
-        query.setParameter("externalId", eszId);
-        Long idOfClient = (Long) query.uniqueResult();
-        if (idOfClient != null) return idOfClient;
 
         ClientFieldConfig fc = new ClientFieldConfig();
         fc.setValue(FieldId.SURNAME, surname);
         fc.setValue(FieldId.NAME, firstName);
         fc.setValue(FieldId.SECONDNAME, secondName);
-        fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
+        fc.setValue(FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
         fc.setValue(FieldId.EXTERNAL_ID, eszId);
         fc.setValue(FieldId.MESH_GUID, clientGuid);
         return ClientManager.registerClient(idOfESZOrg, fc, false, true, clientsMobileHistory);

@@ -67,7 +67,7 @@ public class ImportMigrantsService {
             long begin = System.currentTimeMillis();
             List<ESZMigrantsRequest> eszMigrantsRequestList = MigrantsUtils.getAllESZMigrantsRequests(session);
 
-            Date date = new Date();
+            Date now = new Date();
 
             Integer counter = 0;
             Integer size = eszMigrantsRequestList.size();
@@ -78,145 +78,127 @@ public class ImportMigrantsService {
                     transaction = session.beginTransaction();
                 }
                 try {
+                    // Запись без Мэш-гуида не обрабывается, так как может создаться дубликат клиента
+                    // https://yt.iteco.dev/issue/ISPP-752
+                    if (StringUtils.isEmpty(request.getClientGuid())) {
+                        logger.warn("Empty MESHGUID was received from ESZ for: " +
+                                request.getFirstname() + " " + request.getSurname()+ " " + request.getSecondname());
+                        cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
+                        continue;
+                    }
+
+                    // Обрабатываем только те записи, у которых дата аннулирования равна нулю или дата
+                    // аннулирования максимальная среди остальных повторяющихся записей о клиенте
+                    // https://gitlab.iteco.mobi/ispp/processor/-/issues/421
                     List<ESZMigrantsRequest> eszRequestList = MigrantsUtils
                             .getRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
                                     request.getIdOfServiceClass());
                     Date lastDateEnd = getLastDateEnd(eszRequestList);
-
-                    Migrant migrant = MigrantsUtils.getMigrantRequestByGuidAndGroupId(session, request.getClientGuid(),
-                            request.getIdOfServiceClass());
-
-                    if (null == migrant) {
-                        List<Migrant> migrants = MigrantsUtils
-                                .getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
-                                        request.getIdOfServiceClass());
-                        if (migrants.size() == 0) {
-                            migrant = null;
-                        } else {
-                            migrant = migrants.get(0);
-                        }
-                    }
-
-                    List<Org> orgVisitList = DAOUtils
-                            .getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
-
-                    if (orgVisitList.size() > 1) {
-                        logger.warn(String.format(
-                                "More then one organization was found with unom=%d and inn=%s for client with guid={%s}",
-                                request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
-                        cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
-                        continue;
-                    }
-
-                    if (orgVisitList.isEmpty()) {
-                        logger.warn(String.format(
-                                "No organization was found with unom=%d and inn=%s for client with guid={%s}",
-                                request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
-                        cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
-                        continue;
-                    }
-
-                    Client client = null;
-
-                    if (StringUtils.isNotEmpty(request.getClientGuid())) {
-                        client = DAOUtils.findClientByMeshGuid(session, request.getClientGuid());
-                    }
-
-                    if (null == client) {
-                        Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(),
-                                (request.getSurname() == null) ? "" : request.getSurname(),
-                                (request.getFirstname() == null) ? "" : request.getFirstname(),
-                                (request.getSecondname() == null) ? "" : request.getSecondname(),
-                                (request.getClientGuid() == null) ? "" : request.getClientGuid(), clientsMobileHistory);
-                        client = (Client) session.load(Client.class, idOfClient);
-                        if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup()
-                                .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
-                            ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                            fieldConfig.setValue(ClientManager.FieldId.GROUP,
-                                    ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
-                            ClientManager.modifyClientTransactionFree(fieldConfig, null, "",
-                                    client, session, clientsMobileHistory);
-                            ClientGroup clientGroup = DAOUtils
-                                    .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
-                                            client.getOrg().getIdOfOrg(),
-                                            ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
-                            if (null != clientGroup) {
-                                ESZMigrantsUpdateService.addGroupHistory(session, client,
-                                        clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGuardianHistory);
-                            } else {
-                                logger.error(String.format(
-                                        "Unable to save client group migration history for client with id = %d",
-                                        client.getIdOfClient()));
-                            }
-                        }
-                    } else {
-                        if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {
-                            ClientManager.removeExternalIdFromClients(session, request.getIdOfESZ(), clientsMobileHistory);
-                            client.setExternalId(request.getIdOfESZ());
-                        }
-                    }
-
-                    Integer resolution;
-
-                    if (null == request.getDateEnd()) { // Всегда ставим 1 – подтверждена, если поле DateEnd = null.
-                        resolution = VisitReqResolutionHist.RES_CONFIRMED;
-                    } else {  // Всегда ставим 3 — аннулирована и сдана в архив, если поле DateEnd = не null.
-                        if (request.getDateEnd().getTime() <= date.getTime()) {
-                            resolution = VisitReqResolutionHist.RES_CANCELED;
-                        } else {
-                            resolution = VisitReqResolutionHist.RES_CONFIRMED;
-                        }
-                    }
-
-                    if (request.getDateLearnEnd().getTime() <= date.getTime()) {
-                        resolution = VisitReqResolutionHist.RES_CANCELED;
-                    }
-
                     Date endDate = null;
                     if (request.getDateEnd() == null) {
                         endDate = request.getDateLearnEnd();
                     } else if (checkLastDate(request.getDateEnd(), lastDateEnd)) {
                         endDate = request.getDateEnd();
                     }
+                    if (endDate == null) {
+                        cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
+                        continue;
+                    }
+                    List<Org> orgVisitList = DAOUtils
+                            .getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
 
-                    // флаг, показывающий наличие изменений в заявке
-                    boolean isMigrantChanged = false;
+                    if (orgVisitList.size() > 1 || orgVisitList.isEmpty()) {
+                        logger.warn(String.format(
+                                "{%d} organizations were found with unom=%d and inn=%s for client with guid={%s}",
+                                orgVisitList.size(), request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                        cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
+                        continue;
+                    }
 
-                    // нет связки - добавляем в мигрантов и историю
+                    Migrant migrant = null;
+                    Client client = DAOUtils.findClientByMeshGuid(session, request.getClientGuid());
+                    if (null == client) {
+                        // В БД ИСПП могут быть клиенты, у которых отсутсвует Мэш-гуид
+                        // Их попробуем найти на ИД ЕСЗ
+                        client = DAOUtils.findClientByExternalId(session, request.getIdOfESZ());
+                        if(client != null) {
+                            // Добавляем клиенту Мэш-гуид
+                            client.setMeshGUID(request.getClientGuid());
+                            client.setUpdateTime(now);
+                            Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                            client.setClientRegistryVersion(nextClientVersion);
+                            session.merge(client);
+                        }
+                    }
+                    if(null == client) {
+                        Long idOfClient = ClientManager.createClientFromESZ(session, request.getIdOfESZ(),
+                                StringUtils.defaultIfEmpty(request.getSurname(), ""),
+                                StringUtils.defaultIfEmpty(request.getFirstname(), ""),
+                                StringUtils.defaultIfEmpty(request.getSecondname(), ""),
+                                request.getClientGuid(), clientsMobileHistory);
+                        client = (Client) session.load(Client.class, idOfClient);
+                    }
+                    else {
+                        migrant = MigrantsUtils.findMigrantByClientAndGroupId(
+                                session, request.getIdOfServiceClass(), client.getIdOfClient());
+                    }
+
+                    Integer resolution = VisitReqResolutionHist.RES_CONFIRMED;
+                    if(request.getDateLearnEnd().getTime() <= now.getTime()) {
+                        resolution = VisitReqResolutionHist.RES_CANCELED;
+                    }
+                    if(request.getDateEnd() != null) {
+                        if(resolution.equals(VisitReqResolutionHist.RES_CONFIRMED) &&
+                                request.getDateEnd().getTime() <= now.getTime()) {
+                            resolution = VisitReqResolutionHist.RES_CANCELED;
+                        }
+                    }
+
+                    if(client.isLeaving() && resolution.equals(VisitReqResolutionHist.RES_CONFIRMED)) {
+                        // При создании заявки на миграцию переводить клиента в обучающуюся группу,
+                        // если он находится в группе "Выбывшие"
+                        // https://gitlab.iteco.mobi/ispp/processor/-/issues/172
+                        if (client.isLeaving()) {
+                            client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
+                            Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                            client.setClientRegistryVersion(nextClientVersion);
+                            session.merge(client);
+                            ESZMigrantsUpdateService.addGroupHistory(session, client,
+                                    ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue(), clientGuardianHistory);
+                        }
+                    }
                     if (null == migrant) {
-                        Long idOfProcessorMigrantRequest = MigrantsUtils
-                                .nextIdOfProcessorMigrantRequest(session, client.getOrg().getIdOfOrg());
-                        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(
-                                idOfProcessorMigrantRequest, client.getOrg().getIdOfOrg());
-                        String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(),
-                                orgVisitList.get(0).getIdOfOrg(), idOfProcessorMigrantRequest, date);
+                        if (resolution.equals(VisitReqResolutionHist.RES_CONFIRMED)) {
+                            Long idOfProcessorMigrantRequest = MigrantsUtils
+                                    .nextIdOfProcessorMigrantRequest(session, client.getOrg().getIdOfOrg());
+                            CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(
+                                    idOfProcessorMigrantRequest, client.getOrg().getIdOfOrg());
+                            String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(),
+                                    orgVisitList.get(0).getIdOfOrg(), idOfProcessorMigrantRequest, now);
 
-                        // создаем нового мигранта
-                        if (endDate != null) {
                             Migrant migrantNew = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
                                     requestNumber, client, orgVisitList.get(0), request.getDateLearnStart(), endDate,
                                     Migrant.NOT_SYNCHRONIZED);
                             migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ESZ);
                             migrantNew.setSection(request.getGroupName());
                             migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-                            session.save(migrantNew);
-                        }
 
-                        session.save(
-                                createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
-                                        VisitReqResolutionHist.RES_CREATED, date));
-                        session.flush();
-                        session.save(
-                                createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
-                                        resolution, CalendarUtils.addSeconds(date, 1)));
-                    } else {    // сравниваем, если надо - обновляем
+                            session.save(migrantNew);
+
+                            session.save(
+                                    createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
+                                            VisitReqResolutionHist.RES_CREATED, now));
+                            session.flush();
+
+                            session.save(
+                                    createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
+                                            VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(now, 5)));
+
+                        }
+                    } else {
+                        boolean isMigrantChanged = false;
                         if (!migrant.getOrgRegVendor().equals(client.getOrg().getDefaultSupplier())) {
                             migrant.setOrgRegVendor(client.getOrg().getDefaultSupplier());
-                            isMigrantChanged = true;
-                        }
-
-                        if (!migrant.getClientMigrate().equals(client)) {
-                            migrant.setClientMigrate(client);
                             isMigrantChanged = true;
                         }
 
@@ -230,7 +212,7 @@ public class ImportMigrantsService {
                             isMigrantChanged = true;
                         }
 
-                        if (endDate!= null && !migrant.getVisitEndDate().equals(endDate)) {
+                        if (!migrant.getVisitEndDate().equals(endDate)) {
                             migrant.setVisitEndDate(endDate);
                             isMigrantChanged = true;
                         }
@@ -240,20 +222,16 @@ public class ImportMigrantsService {
                             isMigrantChanged = true;
                         }
 
-                        if (!migrant.getResolutionCodeGroup().equals(request.getIdOfServiceClass())) {
-                            migrant.setResolutionCodeGroup(request.getIdOfServiceClass());
-                        }
+                        if (isMigrantChanged || resolution.equals(VisitReqResolutionHist.RES_CANCELED)) {
+                            if (resolution.equals(VisitReqResolutionHist.RES_CANCELED)) {
+                                migrant.setSyncState(Migrant.CLOSED);
+                            } else {
+                                migrant.setSyncState(Migrant.NOT_SYNCHRONIZED);
+                            }
+                            session.merge(migrant);
 
-                        if (isMigrantChanged) {
-                            migrant.setSyncState(Migrant.NOT_SYNCHRONIZED);
-                            session.saveOrUpdate(migrant);
-                        }
-
-                        // VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
-                        // if (!resolution.equals(hist.getResolution())
-                        if (checkLastDate(request.getDateEnd(), lastDateEnd)) {
                             session.save(createResolutionHistoryInternal(session, client,
-                                    migrant.getCompositeIdOfMigrant().getIdOfRequest(), resolution, date));
+                                    migrant.getCompositeIdOfMigrant().getIdOfRequest(), resolution, now));
                         }
                     }
                 } catch (Exception e) {
@@ -305,7 +283,7 @@ public class ImportMigrantsService {
                 idOfRequest, client.getOrg().getIdOfOrg());
 
         // создаем новую запись в истории
-        return new VisitReqResolutionHist(comIdOfHist, client.getOrg(), resolution, date, null, null, null,
+        return new VisitReqResolutionHist(comIdOfHist, client.getOrg(), resolution, date, MigrantsUtils.getResolutionString(resolution), null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
     }
 
@@ -317,7 +295,7 @@ public class ImportMigrantsService {
                 idOfRequest, idOfESZSchool);
 
         // создаем новую запись в истории
-        return new VisitReqResolutionHist(comIdOfHist, client.getOrg(), resolution, date, null, null, null,
+        return new VisitReqResolutionHist(comIdOfHist, client.getOrg(), resolution, date, MigrantsUtils.getResolutionString(resolution), null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
     }
 
