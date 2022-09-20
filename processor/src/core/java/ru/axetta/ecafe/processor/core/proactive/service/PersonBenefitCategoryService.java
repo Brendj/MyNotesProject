@@ -43,12 +43,13 @@ public class PersonBenefitCategoryService {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
                 if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).after(new Date())) {
-                    //то: ЛК с истёкшим сроком действия, переход к удалению ЛК, п.6.2 БФТ Проактив МоС;
+                    //todo Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
                 } else {
                     Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());
                     Date endDate = format.get().parse(benefit.getEnd_date());
                     DiscountManager.addDtisznDiscount(session, cl, categoryCode, startDate, endDate, true);
+
                 }
             }
             transaction.commit();
@@ -76,8 +77,8 @@ public class PersonBenefitCategoryService {
                     .getExpiredDTISZNDiscountInfoByDayAndCode(session, startDate, endDate, Long.parseLong(DSZN_MOS_CODE));
 
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : info) {
-                //Добавть архивацию льгот
-                //Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
+                //todo Добавть архивацию льгот
+                //todo Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
             }
             transaction.commit();
             transaction = null;
