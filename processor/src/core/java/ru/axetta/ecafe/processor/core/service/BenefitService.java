@@ -55,6 +55,7 @@ public class BenefitService {
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
             RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefit(false);
+            RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefitNotificationETP();
         }
     }
 
