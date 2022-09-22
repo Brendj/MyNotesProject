@@ -127,6 +127,10 @@ public class DulDetailService {
     }
 
     public void validateDulNumberAndSeries(Session session, DulDetail dulDetail) throws Exception {
+        if ((!isBlank(dulDetail.getSeries()) && dulDetail.getSeries().startsWith("-"))
+                || dulDetail.getNumber().startsWith("-")) {
+            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+        }
         if (dulDetail.getDocumentTypeId().equals(15L)) {
             validatePassport(dulDetail);
         } else if (dulDetail.getDocumentTypeId().equals(1L)) {
@@ -203,7 +207,7 @@ public class DulDetailService {
         String latin = ".*[a-zA-Z]+.*";
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
-                || dulDetail.getNumber().length() != 7 || !isDigit(dulDetail.getNumber())
+                || dulDetail.getNumber().length() != 7 || !isPositiveDigit(dulDetail.getNumber())
                 || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin)
                 || containsDigit(dulDetail.getSeries())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
@@ -213,12 +217,12 @@ public class DulDetailService {
 
     private void validatePassport(DulDetail dulDetail) throws DocumentValidateException {
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 4 || dulDetail.getNumber().length() != 6
-                || !isDigit(dulDetail.getSeries()) || !isDigit(dulDetail.getNumber()))
+                || !isPositiveDigit(dulDetail.getSeries()) || !isPositiveDigit(dulDetail.getNumber()))
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
     private void validateInternationalPassport(DulDetail dulDetail) throws DocumentValidateException {
-        if (dulDetail.getNumber().length() != 9 || !isDigit(dulDetail.getNumber()))
+        if (dulDetail.getNumber().length() != 9 || !isPositiveDigit(dulDetail.getNumber()))
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
@@ -226,7 +230,7 @@ public class DulDetailService {
         String cyrillic = ".*[а-яА-Я]+.*";
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getNumber().length() != 6
-                || dulDetail.getSeries().length() < 3)
+                || dulDetail.getSeries().length() < 3 || !isPositiveDigit(dulDetail.getNumber()))
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
 
         if (dulDetail.getIdOfClient() != null && dulDetail.getIdOfClient() != 0L) {
@@ -249,7 +253,7 @@ public class DulDetailService {
         String latin = ".*[a-zA-Z]+.*";
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
-                || dulDetail.getNumber().length() > 7 || dulDetail.getNumber().length() < 6 || !isDigit(dulDetail.getNumber())
+                || dulDetail.getNumber().length() > 7 || dulDetail.getNumber().length() < 6 || !isPositiveDigit(dulDetail.getNumber())
                 || !dulDetail.getSeries().matches(cyrillic) || dulDetail.getSeries().matches(latin) || containsDigit(dulDetail.getSeries())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
@@ -261,7 +265,7 @@ public class DulDetailService {
         boolean latinOrCyrillicOrDigit = dulDetail.getSeries().matches(latin);
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getSeries().length() != 2
-                || dulDetail.getNumber().length() != 7 || !isDigit(dulDetail.getNumber())) {
+                || dulDetail.getNumber().length() != 7 || !isPositiveDigit(dulDetail.getNumber())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
         if (dulDetail.getSeries().matches(cyrillic)) {
@@ -279,7 +283,7 @@ public class DulDetailService {
 
     private boolean containsDigit(String str) {
         for (char c : str.toCharArray()) {
-            if (isDigit(Character.toString(c))) {
+            if (isPositiveDigit(Character.toString(c))) {
                 return true;
             }
         }
@@ -288,8 +292,9 @@ public class DulDetailService {
 
     private void validateForeignPassport(DulDetail dulDetail) throws DocumentValidateException {
         String cyrillic = ".*[а-яА-Я]+.*";
+        String pattern = "^[а-яА-Я0-9a-zA-Z]+$";
 
-        if (dulDetail.getNumber().length() < 5 || dulDetail.getNumber().length() > 14) {
+        if (dulDetail.getNumber().length() < 5 || dulDetail.getNumber().length() > 14 || differentRegex(pattern, dulDetail.getNumber())) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
         if (!containsDigit(dulDetail.getNumber()) && Pattern.compile(cyrillic).matcher(dulDetail.getNumber()).matches()) {
@@ -298,14 +303,17 @@ public class DulDetailService {
 
     }
 
-    private boolean isDigit(String number) {
-        return number.matches("\\d+");
+    private boolean isPositiveDigit(String number) {
+        if (number.matches("\\d+")) {
+            return Integer.parseInt(number) >= 0;
+        } else
+            return false;
     }
 
     private void validateSSSR(DulDetail dulDetail) throws Exception {
         String cyrillic = ".*[а-яА-Я]+.*";
 
-        if (isBlank(dulDetail.getSeries()) || !isDigit(dulDetail.getNumber())
+        if (isBlank(dulDetail.getSeries()) || !isPositiveDigit(dulDetail.getNumber())
                 || dulDetail.getNumber().length() != 6 || Integer.parseInt(dulDetail.getNumber()) < 500001
                 || Integer.parseInt(dulDetail.getNumber()) > 750000 || dulDetail.getSeries().length() < 3) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
@@ -315,18 +323,29 @@ public class DulDetailService {
 
     private void validateRoman(DulDetail dulDetail, String cyrillic) throws DocumentValidateException {
         try {
-            String russian = dulDetail.getSeries().substring(dulDetail.getSeries().length() - 2);
+            String russian = dulDetail.getSeries().substring(dulDetail.getSeries().length() - 2).trim();
             String roman = dulDetail.getSeries().substring(0, dulDetail.getSeries().length() - 2).trim();
 
-            if (!Pattern.compile(cyrillic).matcher(russian).matches()) {
+            if (russian.length() < 2 || differentRegex(cyrillic, russian)) {
                 throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
             }
+
             if (romanToInt(roman) < 1 || romanToInt(roman) > 35) {
                 throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
             }
         } catch (Exception e) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
         }
+    }
+
+    private boolean differentRegex(String regex, String text) {
+        for (char c : text.toCharArray()) {
+            String s = String.valueOf(c);
+            if (!s.matches(regex)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isBlank(String str) {
