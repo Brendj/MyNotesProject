@@ -81,14 +81,22 @@ public class KafkaListenerServiceImpl {
                 session.update(applicationForFoodDiscountActive);
             }
 
-            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            Long applicationVersion;
+            Long historyVersion;
+            applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
             ApplicationForFoodStatus status;
             if (confirm) {
                 status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED);
             } else {
+                ApplicationForFoodStatus statusResponse = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED);
+                updateApplicationForFoodWithSendStatus(session, applicationForFood, statusResponse, applicationVersion, historyVersion);
+
                 status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
             }
+            applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
             applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
 
             transaction.commit();
@@ -110,7 +118,13 @@ public class KafkaListenerServiceImpl {
         }
     }
 
-
+    private void updateApplicationForFoodWithSendStatus(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status,
+                                                        Long applicationVersion, Long historyVersion) throws Exception {
+        applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
+        RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
+                applicationForFood.getServiceNumber(),
+                applicationForFood.getStatus().getApplicationForFoodState());
+    }
 
     public ApplicationForFood processingPassportValidation(AbstractPullData data, String message)
     {
@@ -123,24 +137,34 @@ public class KafkaListenerServiceImpl {
             PassportValidityCheckingResponse passport = passportData.getPassport_validity_checking_response();
             AppMezhvedRequest appMezhvedRequest = updateMezved(passport.getRequest_id(), passport.getErrors(), message);
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
+            boolean modifiedStatus = false;
             if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+                Long applicationVersion;
+                Long historyVersion;
                 ApplicationForFoodStatus status;
                 if (passport.getPassport_validity_info() != null &&
                         Objects.equals(passport.getPassport_validity_info().getPassport_status_info().getPassport_status().toLowerCase(), "да")) {
                     status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
+                    //тут сначала нужно присвоить 7705.1 INFORMATION_RESPONSE_PASSPORT
+                    applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                    historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                    ApplicationForFoodStatus statusResponse = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_PASSPORT);
+                    updateApplicationForFoodWithSendStatus(session, applicationForFood, statusResponse, applicationVersion, historyVersion);
+                    //дальше 1080
                     status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT);
                     applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
-                Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
                 applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
                 session.update(applicationForFood);
+                modifiedStatus = true;
             }
             transaction.commit();
             transaction = null;
-            if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
+            if (modifiedStatus) {
                 RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
                         applicationForFood.getServiceNumber(),
                         applicationForFood.getStatus().getApplicationForFoodState());
@@ -172,17 +196,23 @@ public class KafkaListenerServiceImpl {
             ApplicationForFood applicationForFood = appMezhvedRequest.getApplicationForFood();
             if (!applicationForFood.getStatus().getApplicationForFoodState().getCode().startsWith("1080")) {
                 ApplicationForFoodStatus status;
+                Long applicationVersion;
+                Long historyVersion;
                 if (relatednessCheckingResponse.getRelatedness_info() != null &&
                         relatednessCheckingResponse.getRelatedness_info().getRelatedness_confirmation().toLowerCase().equals("да")) {
 
                     status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_GUARDIAN);
                     applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.CONFIRMED);
                 } else {
+                    applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                    historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                    ApplicationForFoodStatus statusResponse = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_GUARDIAN);
+                    updateApplicationForFoodWithSendStatus(session, applicationForFood, statusResponse, applicationVersion, historyVersion);
                     status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP);
                     applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.NO_INFO);
                 }
-                Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+                applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
                 applicationForFood = DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, applicationVersion, historyVersion);
                 RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(),
                         applicationForFood.getServiceNumber(),
