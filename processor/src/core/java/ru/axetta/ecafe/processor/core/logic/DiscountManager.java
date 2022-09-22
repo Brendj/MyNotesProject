@@ -224,7 +224,7 @@ public class DiscountManager {
             String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
             discountInfo = new ClientDtisznDiscountInfo(client, dtisznCode.longValue(), title,
                     ClientDTISZNDiscountStatus.CONFIRMED, startDate, endDate,
-                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, new Date());
             discountInfo.setArchived(false);
             session.save(discountInfo);
         } else {
