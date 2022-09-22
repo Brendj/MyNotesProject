@@ -2,7 +2,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitDocument;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,21 +25,8 @@ public class AppMezhvedResponseDocument {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); }
     };
 
-    public AppMezhvedResponseDocument(BenefitDocument benefitDocument, String requestId, AppMezhvedResponseDocDirection type) {
+    public AppMezhvedResponseDocument(String requestId, AppMezhvedResponseDocDirection type) {
         this.requestId = requestId;
-        if (benefitDocument.getBenefit_category_id() != null)
-            this.benefit_category_id = Long.valueOf(benefitDocument.getBenefit_category_id());
-        this.name = benefitDocument.getName();
-        this.series = benefitDocument.getSeries();
-        this.number = benefitDocument.getNumber();
-        if (benefitDocument.getIssue_date() != null) {
-            try {
-                this.issue_date = format.get().parse(benefitDocument.getIssue_date());
-            } catch (ParseException e) {
-                log.error("Error parse issue_date value = " + benefitDocument.getIssue_date(), e);
-            }
-        }
-        this.issuer = benefitDocument.getIssuer();
         this.type = type;
         this.createdate = new Date();
     }

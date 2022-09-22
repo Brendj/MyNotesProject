@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -20,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService.DATA_SOURCE_TYPE_MARKER_OU;
 
 public class DiscountManager {
 
@@ -79,6 +82,13 @@ public class DiscountManager {
         //long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
         //client.setClientRegistryVersion(clientRegistryVersion);
         //session.update(client);
+    }
+
+    public static CategoryDiscount getCategoryDiscountByDtisznCode(Session session, Integer dtisznCode) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("code", dtisznCode));
+        CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN)criteria.uniqueResult();
+        return categoryDiscountDSZN.getCategoryDiscount();
     }
 
     private static CategoryDiscount getCategoryDiscountByCode(Session session, Long idOfCategoryDiscount) {
@@ -202,6 +212,35 @@ public class DiscountManager {
             newAppointedMSP.setAppointedMSP(true);
             session.update(oldAppointedMSP);
             session.update(newAppointedMSP);
+        }
+    }
+
+    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate, boolean rebuild) throws Exception {
+        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+        Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+        if (null == discountInfo) {
+            CategoryDiscountDSZN categoryDiscountDSZN = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getCategoryDiscountDSZNByCode(dtisznCode);
+            String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
+            discountInfo = new ClientDtisznDiscountInfo(client, dtisznCode.longValue(), title,
+                    ClientDTISZNDiscountStatus.CONFIRMED, startDate, endDate,
+                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+            discountInfo.setArchived(false);
+            session.save(discountInfo);
+        } else {
+            discountInfo.setDateStart(startDate);
+            discountInfo.setDateEnd(endDate);
+            discountInfo.setArchived(false);
+            discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+            discountInfo.setLastUpdate(new Date());
+            discountInfo.setVersion(clientDTISZNDiscountVersion);
+            RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
+                    DiscountChangeHistory.MODIFY_IN_SERVICE);
+            session.update(discountInfo);
+        }
+        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), DiscountChangeHistory.MODIFY_IN_SERVICE);
+        if (rebuild) {
+            rebuildAppointedMSPByClient(session, client);
         }
     }
 

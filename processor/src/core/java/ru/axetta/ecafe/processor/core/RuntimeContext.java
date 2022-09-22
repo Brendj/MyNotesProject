@@ -856,6 +856,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CancelledFoodBoxService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CardUpdateSyncService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(ReSendKafkaService.class).scheduleSync();
             ((RegularPaymentSubscriptionService)RuntimeContext.getAppContext().getBean("regularPaymentSubscriptionService")).scheduleSync();
             //
             if (!isTestRunning()) {

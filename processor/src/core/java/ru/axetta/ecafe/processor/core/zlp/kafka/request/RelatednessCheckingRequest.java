@@ -2,17 +2,19 @@ package ru.axetta.ecafe.processor.core.zlp.kafka.request;
 
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
 
-public class RelatednessChecking2Request extends RequestHeader {
+public class RelatednessCheckingRequest extends RequestHeader {
     private LearnerInfo learnerInfo;
     private LearnerDocumentInfo learner_document_info;
+    private String learner_snils_info;
     private ParentInfo parent_info;
     private ParentPassportInfo parent_passport_info;
+    private String parent_snils_info;
 
-    public RelatednessChecking2Request() {
+    public RelatednessCheckingRequest() {
 
     }
 
-    public RelatednessChecking2Request(RequestValidationData data) {
+    public RelatednessCheckingRequest(RequestValidationData data) {
         super(data);
     }
 
@@ -46,5 +48,21 @@ public class RelatednessChecking2Request extends RequestHeader {
 
     public void setParent_passport_info(ParentPassportInfo parent_passport_info) {
         this.parent_passport_info = parent_passport_info;
+    }
+
+    public String getLearner_snils_info() {
+        return learner_snils_info;
+    }
+
+    public void setLearner_snils_info(String learner_snils_info) {
+        this.learner_snils_info = learner_snils_info;
+    }
+
+    public String getParent_snils_info() {
+        return parent_snils_info;
+    }
+
+    public void setParent_snils_info(String parent_snils_info) {
+        this.parent_snils_info = parent_snils_info;
     }
 }

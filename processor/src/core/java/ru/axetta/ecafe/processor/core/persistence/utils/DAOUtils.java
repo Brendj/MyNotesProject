@@ -4702,9 +4702,8 @@ public class DAOUtils {
         try {
             addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
         }
-        catch (Exception e)
-        {
-            logger.error(e.getMessage());
+        catch (Exception e) {
+            logger.error("Error in updateApplicationForFoodWithVersion: " + e.getMessage());
         }
         return applicationForFood;
     }
@@ -4761,7 +4760,7 @@ public class DAOUtils {
                 applicationForFood, status);
         if (applicationForFoodHistory != null) {
             String errorString = String
-                    .format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
+                    .format("Exist applicationForFoodHistory state = %s for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
                             applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                             applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
             throw new ApplicationForFoorStatusExistsException(errorString);
@@ -4777,7 +4776,7 @@ public class DAOUtils {
                     applicationForFood, status);
             if (applicationForFoodHistory != null) {
                 logger.warn(String.format(
-                        "Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s, ",
+                        "Exist applicationForFoodHistory state = %s for ApplicationForFood: clientContractID= %d , serviceNumber= %s, ",
                         applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
                         applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber()));
                 return;
@@ -4804,7 +4803,8 @@ public class DAOUtils {
         criteria.add(Restrictions.ne("status",
                 new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)));
         criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)));
-        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT)));
+        criteria.add(Restrictions.ne("status", new ApplicationForFoodStatus(ApplicationForFoodState.WITHDRAWN)));
         criteria.add(Restrictions.or(Restrictions.isNull("archived"), Restrictions.eq("archived", false)));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();
@@ -5183,6 +5183,15 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("dateEnd", startDate));
         criteria.add(Restrictions.lt("dateEnd", endDate));
         criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListAppointedBetweenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.eq("appointedMSP", true));
+        criteria.add(Restrictions.ne("archived", true));
         return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
 

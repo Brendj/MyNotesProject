@@ -30,8 +30,6 @@ import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.RequestValidationData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -349,10 +347,11 @@ public class ETPMVService {
 
     public static boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
+        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.WITHDRAWN)) return true; //1090 Отмененные
         if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_BENEFIT)
                 || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_GUARDIANSHIP)
-                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_OLD)) return true; //1080.1, 1080.2, 1080.3
+                || applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED_PASSPORT)) return true; //1080.1, 1080.2, 1080.3
         return false;
     }
 
@@ -405,12 +404,13 @@ public class ETPMVService {
     }
 
     private String createStatusMessage(String serviceNumber, ApplicationForFoodState status) throws Exception {
+        boolean isNewFomat = serviceNumber.contains(ETPMVService.NEW_ISPP_ID);
         ObjectFactory objectFactory = new ObjectFactory();
         CoordinateStatusMessage coordinateStatusMessage = objectFactory.createCoordinateStatusMessage();
         CoordinateStatusData coordinateStatusData = objectFactory.createCoordinateStatusData();
         StatusType statusType = objectFactory.createStatusType();
         statusType.setStatusCode(status.getPureCode());
-        statusType.setStatusTitle(status.getDescription());
+        statusType.setStatusTitle(isNewFomat ? status.getDescriptionNew() : status.getDescription());
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
         calendar.setTimezone(getTimeZoneOffsetInMinutes());
@@ -421,10 +421,22 @@ public class ETPMVService {
         if (status.getReason() != null) {
             DictionaryItem dictionaryItem = objectFactory.createDictionaryItem();
             dictionaryItem.setCode(status.getReason());
-            dictionaryItem.setName(status.getDescription());
+            dictionaryItem.setName(isNewFomat ? status.getDescriptionNew() : status.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
-        coordinateStatusData.setNote(status.getNote());
+        if ((status.equals(ApplicationForFoodState.OK) || status.equals(ApplicationForFoodState.END_BENEFIT_NOTIFICATION)) && isNewFomat) {
+            ApplicationForFood applicationForFood = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getApplicationForFoodWithPerson(serviceNumber);
+            String note = status.getNoteNew().replaceAll("%FIO%", applicationForFood.getClient().getPerson().getFullName());
+            ClientDtisznDiscountInfo info = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getClientDtisznDiscountInfoAppointed(applicationForFood.getClient());
+            if (status.equals(ApplicationForFoodState.OK)) {
+                note = note.replaceAll("%DATE%", info == null ? "31.12.2099" : CalendarUtils.dateToString(info.getDateEnd()));
+            }
+            coordinateStatusData.setNote(note);
+        } else {
+            coordinateStatusData.setNote(isNewFomat ? status.getNoteNew() : status.getNote());
+        }
 
         JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();
@@ -594,23 +606,6 @@ public class ETPMVService {
         messageDigest.update(source.getBytes(Charset.forName("UTF8")));
         final byte[] resultByte = messageDigest.digest();
         return new String(Hex.encodeHex(resultByte));
-    }
-
-    public void sendRequestForGuardianshipValidation(ApplicationForFood applicationForFood) {
-        if (applicationForFood.getValidGuardianShip()) {
-            //todo исполнение заявления?
-            return;
-        }
-        //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendGuardianshipValidationRequest(applicationForFood);
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
-    }
-
-    public void sendRequestForDocValidation(ApplicationForFood applicationForFood) {
-        if (applicationForFood.getValidDoc()) {
-            sendRequestForGuardianshipValidation(applicationForFood);
-            return;
-        }
-        RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
     }
 
     private void initAISContingentService() throws Exception {

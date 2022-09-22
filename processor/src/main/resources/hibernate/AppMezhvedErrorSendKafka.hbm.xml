@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.AppMezhvedErrorSendKafka" table="cf_mezhved_kafka_error">
+        <id name="idofmezhvedkafkaerror" column="idofmezhvedkafkaerror" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="msg" column="msg" type="string" not-null="true"/>
+        <property name="topic" column="topic" type="string" not-null="true"/>
+        <property name="error" column="error" type="string" not-null="true"/>
+
+        <many-to-one name="applicationForFood" class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFood" column="idofapplicationforfood"
+                     not-null="true" fetch="select"/>
+        <property name="type" column="type" type="integer"/>
+        <property name="createdate" column="createdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="updatedate" column="updatedate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

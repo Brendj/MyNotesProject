@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.pull.kafka.config;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -55,7 +56,27 @@ public class KafkaConsumerConfig {
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setBatchListener(false);
+        if (!isOn())
+        {
+            factory.setAutoStartup(false);
+        }
         return factory;
+    }
+
+
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().
+                getProperty("ecafe.processor.zlp.kafka.server", "1");
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance)
+                    && instance.trim().equals(node.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Bean

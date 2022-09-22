@@ -15,7 +15,7 @@ import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.BenefitKafkaService;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.BenefitResponse;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.ActiveBenefitCategoriesGettingResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.guardian.GuardianResponse;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.passport.PassportResponse;
 
@@ -39,21 +39,22 @@ public class KafkaListenerService {
 //            @PartitionOffset(partition = "0", initialOffset = "0")}))//for tests
     public void MezvedListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
+        logger.info(String.format("Response from kafka. Offset = %s, partitionId = %s, message = %s", offset, partitionId, message));
         AbstractPullData responseData = (AbstractPullData)objectMapper.readValue(message, getMessageType(message));
         RuntimeContext.getAppContext().getBean(KafkaListenerService.class).parseResponseMessage(responseData, message);
     }
 
     private Class getMessageType(String message) throws Exception {
-        if (message.contains("active_benefit_categories_getting_response")) return BenefitResponse.class;
-        if (message.contains("passport_by_serie_number_validity_checking_response")) return PassportResponse.class;
-        if (message.contains("relatedness_checking_2_response")) return GuardianResponse.class;
+        if (message.contains("benefit_categories")) return ActiveBenefitCategoriesGettingResponse.class;
+        if (message.contains("passport_validity_checking_response")) return PassportResponse.class;
+        if (message.contains("relatedness_checking_response")) return GuardianResponse.class;
         throw new Exception("Unknown message type");
     }
 
     @Async
     public void parseResponseMessage(AbstractPullData data, String message) {
         try {
-            if (data instanceof BenefitResponse) {
+            if (data instanceof ActiveBenefitCategoriesGettingResponse) {
                 //Обработка информации о льготных категориях
                 ApplicationForFood applicationForFood = kafkaService.processingActiveBenefitCategories(data, message);
                 if (applicationForFood != null) {
@@ -62,10 +63,14 @@ public class KafkaListenerService {
                     if (validDoc == null || !validDoc) {
                         //Отправка запроса на проверку паспорта заявителя
                         RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
-                    } else
-                    {
-                        //Исполнение заявления
-                        RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                    } else {
+                        Boolean validGuardianship = applicationForFood.getValidGuardianShip();
+                        if (validGuardianship == null || !validGuardianship) {
+                            RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
+                        } else {
+                            //Исполнение заявления
+                            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodKafkaService(applicationForFood);
+                        }
                     }
                 }
             }

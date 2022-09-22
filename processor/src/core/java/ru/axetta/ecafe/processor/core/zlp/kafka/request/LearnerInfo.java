@@ -15,6 +15,7 @@ public class LearnerInfo {
     public LearnerInfo(RequestValidationData data) {
         this.last_name = data.getChildLastName();
         this.first_name = data.getChildFirstName();
+        this.middle_name = data.getChildMiddleName();
         this.birth_date = data.getChildBirthDate();
     }
 

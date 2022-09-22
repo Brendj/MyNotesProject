@@ -9,15 +9,17 @@ import ru.axetta.ecafe.processor.core.zlp.kafka.response.benefit.LearnerInfo;
 
 import java.util.List;
 
-public class RelatednessChecking2Response extends ResponseHeader {
+public class RelatednessCheckingResponse extends ResponseHeader {
     private LearnerInfo learnerInfo;
     private LearnerDocumentInfo learner_document_info;
     private ParentInfo parent_info;
     private ParentPassportInfo parent_passport_info;
     private String parent_snils_info;
-    private RelatednessInfo relatednessInfo;
+    private String learner_snils_info;
+    private RelatednessInfo relatedness_info;
     private List<Errors> errors;
-    public RelatednessChecking2Response() {
+
+    public RelatednessCheckingResponse() {
 
     }
 
@@ -61,19 +63,27 @@ public class RelatednessChecking2Response extends ResponseHeader {
         this.parent_snils_info = parent_snils_info;
     }
 
-    public RelatednessInfo getRelatednessInfo() {
-        return relatednessInfo;
-    }
-
-    public void setRelatednessInfo(RelatednessInfo relatednessInfo) {
-        this.relatednessInfo = relatednessInfo;
-    }
-
     public List<Errors> getErrors() {
         return errors;
     }
 
     public void setErrors(List<Errors> errors) {
         this.errors = errors;
+    }
+
+    public String getLearner_snils_info() {
+        return learner_snils_info;
+    }
+
+    public void setLearner_snils_info(String learner_snils_info) {
+        this.learner_snils_info = learner_snils_info;
+    }
+
+    public RelatednessInfo getRelatedness_info() {
+        return relatedness_info;
+    }
+
+    public void setRelatedness_info(RelatednessInfo relatedness_info) {
+        this.relatedness_info = relatedness_info;
     }
 }

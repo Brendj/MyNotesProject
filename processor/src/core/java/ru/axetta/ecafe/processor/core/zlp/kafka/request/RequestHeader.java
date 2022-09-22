@@ -28,8 +28,8 @@ public class RequestHeader extends AbstractPushData {
 
     private String getRequestMethod() {
         if (this instanceof ActiveBenefitCategoriesGettingRequest) return BenefitKafkaService.REQUEST_METHOD_BENEFIT;
-        if (this instanceof RelatednessChecking2Request) return BenefitKafkaService.REQUEST_METHOD_GUARDIANSHIP;
-        if (this instanceof PassportBySerieNumberValidityCheckingRequest) return BenefitKafkaService.REQUEST_METHOD_DOC;
+        if (this instanceof RelatednessCheckingRequest) return BenefitKafkaService.REQUEST_METHOD_GUARDIANSHIP;
+        if (this instanceof PassportValidityCheckingRequest) return BenefitKafkaService.REQUEST_METHOD_DOC;
         return "";
     }
 

@@ -15,6 +15,7 @@ public class ParentInfo {
     public ParentInfo(RequestValidationData data) {
         this.last_name = data.getParentLastName();
         this.first_name = data.getParentFirstName();
+        this.middle_name = data.getParentMiddleName();
         this.birth_date = data.getParentBirthDate();
     }
 

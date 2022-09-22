@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import org.springframework.stereotype.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -10796,7 +10795,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         || applicationForFood.getStatus()
                         .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)) || applicationForFood.getStatus()
                         .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)) || applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_OLD))) {
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss");
@@ -10902,7 +10901,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "serviceNumber") String serviceNumber) {
         String code = stateCode.toString();
         if (declineReasonCode != null &&declineReasonCode > 0) {
-            code += declineReasonCode.toString();
+            code += "." + declineReasonCode.toString();
         }
         ApplicationForFoodState state = ApplicationForFoodState.fromCode(code);
         if (state == null) {
@@ -10925,12 +10924,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new Exception(
                         "Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
             }
-            RuntimeContext.getAppContext().getBean(ETPMVService.class)
-                    .sendStatus(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState());
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                    .sendStatusAsync(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState());
         } catch (Exception e) {
             logger.error(String.format("Can't update ApplicationForFood serviceNumber = %s", serviceNumber), e);
             result.resultCode = RC_INTERNAL_ERROR;

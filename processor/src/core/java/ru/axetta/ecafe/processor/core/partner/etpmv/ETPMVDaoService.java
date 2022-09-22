@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
@@ -259,7 +258,7 @@ public class ETPMVDaoService {
                 } else {
                     if (ApplicationForFoodState.DENIED_BENEFIT != applicationForFood.getStatus().getApplicationForFoodState()
                     && ApplicationForFoodState.DENIED_GUARDIANSHIP != applicationForFood.getStatus().getApplicationForFoodState()
-                    && ApplicationForFoodState.DENIED_OLD != applicationForFood.getStatus().getApplicationForFoodState()) {
+                    && ApplicationForFoodState.DENIED_PASSPORT != applicationForFood.getStatus().getApplicationForFoodState()) {
                         DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
                     }
                 }
@@ -325,6 +324,80 @@ public class ETPMVDaoService {
             return (ApplicationForFood) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
+        }
+    }
+
+    @Transactional
+    public ApplicationForFood getApplicationForFoodWithPerson(String serviceNumber) {
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join fetch c.person " +
+                "where a.serviceNumber = :serviceNumber");
+        query.setParameter("serviceNumber", serviceNumber);
+        return (ApplicationForFood)query.getSingleResult();
+    }
+
+    @Transactional
+    public ClientDtisznDiscountInfo getClientDtisznDiscountInfoAppointed(Client client) {
+        Query query = entityManager.createQuery("select info from ClientDtisznDiscountInfo info where info.client = :client " +
+                "and info.archived = false and info.appointedMSP = true");
+        query.setParameter("client", client);
+        query.setMaxResults(1);
+        try {
+            return (ClientDtisznDiscountInfo) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public CategoryDiscountDSZN getCategoryDiscountDSZNByCode(Integer code) {
+        Query query = entityManager.createQuery("select d from CategoryDiscountDSZN d where d.code=:code");
+        query.setParameter("code", code);
+        try {
+            return (CategoryDiscountDSZN) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+
+    @Transactional
+    public void saveMezvedKafkaError(String msg, String topic, Integer type, String error, Long idOfApplicationForFood) {
+        try{
+            ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+            AppMezhvedErrorSendKafka appMezhvedErrorSendKafka = new AppMezhvedErrorSendKafka(msg, topic, type, error, applicationForFood);
+            entityManager.persist(appMezhvedErrorSendKafka);
+        } catch (Exception e)
+        {
+            logger.error("Error in saveMezvedKafkaError: " + e);
+        }
+    }
+
+    @Transactional
+    public List<AppMezhvedErrorSendKafka> getMezvedKafkaError() {
+        try{
+            Query query = entityManager.createQuery("select a from AppMezhvedErrorSendKafka a join fetch a.applicationForFood c");
+            return query.getResultList();
+        } catch (Exception e)
+        {
+            logger.error("Error in getMezvedKafkaError: " + e);
+        }
+        return null;
+    }
+
+    @Transactional
+    public void updateMezhvedKafkaError(AppMezhvedErrorSendKafka appMezhvedErrorSendKafka, Boolean success) {
+        try {
+            if (!success) {
+                //Если не удалось отправить повторно, то просто обновляем время
+                appMezhvedErrorSendKafka.setUpdatedate(new Date());
+                entityManager.merge(appMezhvedErrorSendKafka);
+            } else {
+                //Если отправка успешна, то убираем запись из таблицы
+                entityManager.remove(appMezhvedErrorSendKafka);
+            }
+        } catch (Exception e)
+        {
+            logger.error("Error in updateMezhvedKafkaError: " + e);
         }
     }
 }

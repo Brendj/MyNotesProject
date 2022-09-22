@@ -18,15 +18,11 @@ import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
 import ru.axetta.ecafe.processor.core.push.model.BalanceData;
 import ru.axetta.ecafe.processor.core.push.model.BenefitData;
 import ru.axetta.ecafe.processor.core.push.model.EnterEventData;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.BenefitValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
-import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 
 import java.util.UUID;
 
-@Primary
 @Configuration
-@Service("KafkaService")
+@Service
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
     public static final String MESH_KAFKA_ENABLE_PROPERTY = "ecafe.processing.mesh.kafka.enable";
@@ -52,7 +48,7 @@ public class KafkaService {
         }
     }
 
-    protected String getTopicFromConfig(AbstractPushData data) throws Exception {
+    private String getTopicFromConfig(AbstractPushData data) throws Exception {
         String topicLink = null;
         if (data instanceof BalanceData)
             topicLink = AbstractPushData.BALANCE_TOPIC;
@@ -60,12 +56,6 @@ public class KafkaService {
             topicLink = AbstractPushData.ENTRANCE_TOPIC;
         else if (data instanceof BenefitData)
             topicLink = AbstractPushData.BENEFIT_TOPIC;
-        else if (data instanceof GuardianshipValidationRequest)
-            topicLink = AbstractPushData.GUARDIANSHIP_VALIDATION_REQUEST_TOPIC;
-        else if (data instanceof BenefitValidationRequest)
-            topicLink = AbstractPushData.BENEFIT_VALIDATION_REQUEST_TOPIC;
-        else if (data instanceof DocValidationRequest)
-            topicLink = AbstractPushData.DOC_VALIDATION_REQUEST_TOPIC;
         String address = RuntimeContext.getInstance().getConfigProperties().getProperty(topicLink, "");
         if (address.equals(""))
             throw new Exception(String.format("Kafka topic not specified, topicLink: %s", topicLink));

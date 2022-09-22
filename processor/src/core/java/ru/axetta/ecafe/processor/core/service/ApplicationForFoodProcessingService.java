@@ -139,6 +139,7 @@ public class ApplicationForFoodProcessingService {
                     .findApplicationsForFoodSendedBenefitRequest(session);
             ApplicationForFoodStatus sendedConfirmBenefitStatus = new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED);
             ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
+            ApplicationForFoodStatus responseGotStatus = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED);
             for (ApplicationForFood application : list) {
                 Date statusCreatedDate = null;
                 for (ApplicationForFoodHistory history : application.getApplicationForFoodHistories()) {
@@ -151,6 +152,11 @@ public class ApplicationForFoodProcessingService {
                 if (fireDate.after(dayX)) {
                     Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
                     Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, responseGotStatus, applicationVersion,
+                            historyVersion);
+                    RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState());
 
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);

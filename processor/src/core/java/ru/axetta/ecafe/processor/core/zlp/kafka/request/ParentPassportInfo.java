@@ -6,6 +6,7 @@ public class ParentPassportInfo {
     private String passport_series;
     private String passport_number;
     private String passport_issue_date;
+    private String passport_issuer_code;
 
     public ParentPassportInfo() {
 
@@ -15,6 +16,7 @@ public class ParentPassportInfo {
         this.passport_series = data.getParentPassportSeries();
         this.passport_number = data.getParentPassportNumber();
         this.passport_issue_date = data.getParentPassportIssueDate();
+        this.passport_issuer_code = data.getParentPassportIssuerCode();
     }
 
     public String getPassport_series() {
@@ -40,4 +42,13 @@ public class ParentPassportInfo {
     public void setPassport_issue_date(String passport_issue_date) {
         this.passport_issue_date = passport_issue_date;
     }
+
+    public String getPassport_issuer_code() {
+        return passport_issuer_code;
+    }
+
+    public void setPassport_issuer_code(String passport_issuer_code) {
+        this.passport_issuer_code = passport_issuer_code;
+    }
+
 }
