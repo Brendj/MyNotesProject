@@ -89,6 +89,7 @@ public class ReSendKafkaService {
 
     public void start() throws Exception {
         //Получаем все данные, которые не получилось отправить в прошлый раз
+        logger.info("Start resend kafka service");
         List<AppMezhvedErrorSendKafka> appMezhvedErrorSendKafkas =
                 RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getMezvedKafkaError();
         for (AppMezhvedErrorSendKafka appMezhvedErrorSendKafka: appMezhvedErrorSendKafkas) {
@@ -114,5 +115,6 @@ public class ReSendKafkaService {
                 future.addCallback(new ZlpLoggingListenableFutureCallback(message, msg, topic, type, data.getIdOfApplicationForFood(), applicationForFood.getServiceNumber(), appMezhvedErrorSendKafka));
             }
         }
+        logger.info("End resend kafka service");
     }
 }
