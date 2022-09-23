@@ -204,7 +204,7 @@ public class ETPMVDaoService {
 
     @Transactional
     public List<ApplicationForFood> getDataForAISContingent() {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join a.dtisznCodes codes "
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join fetch a.dtisznCodes codes "
                 + " where a.sendToAISContingent = false and a.serviceNumber like :old_format "
                 + " and ((codes.dtisznCode <> null and a.status = :statusDtiszn) or (codes.dtisznCode = null and a.status = :statusInoe)) "
                 + " and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :group_employees or c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :group_displaced)");
