@@ -41,6 +41,9 @@ public abstract class BaseDeclarant {
     protected ContactType type;
     @XmlElement(name = "Documents")
     protected ArrayOfServiceDocument documents;
+    @XmlElement(name = "SsoId")
+    protected String SsoId;
+
 
     /**
      * Gets the value of the type property.
@@ -90,4 +93,12 @@ public abstract class BaseDeclarant {
         this.documents = value;
     }
 
+
+    public String getSsoId() {
+        return SsoId;
+    }
+
+    public void setSsoId(String SsoId) {
+        this.SsoId = SsoId;
+    }
 }

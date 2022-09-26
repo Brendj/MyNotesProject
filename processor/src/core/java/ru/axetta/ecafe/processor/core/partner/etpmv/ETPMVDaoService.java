@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
+import ru.axetta.ecafe.processor.core.partner.etpmv.enums.MessageType;
+import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
+import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessageStatus;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -398,6 +402,64 @@ public class ETPMVDaoService {
         } catch (Exception e)
         {
             logger.error("Error in updateMezhvedKafkaError: " + e);
+        }
+    }
+
+    @Transactional
+    public void saveProactiveMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
+        try {
+            ProactiveMessage proactiveMessage = new ProactiveMessage();
+            proactiveMessage.setClient(client);
+            proactiveMessage.setGuardian(guardian);
+            proactiveMessage.setServicenumber(serviceNumber);
+            proactiveMessage.setSsoid(ssoid);
+            proactiveMessage.setMessage_type(MessageType.MOS);
+            proactiveMessage.setCreateddate(new Date());
+            proactiveMessage.setLastupdate(new Date());
+            entityManager.persist(proactiveMessage);
+        } catch (Exception e)
+        {
+            logger.error("Error in saveProactiveMessage: " + e);
+        }
+    }
+
+    @Transactional
+    public ProactiveMessage getProactiveMessage(String serviceNumber, String ssoid) {
+        Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
+                "d.servicenumber=:servicenumber and d.ssoid=:ssoid");
+        query.setParameter("servicenumber", serviceNumber);
+        query.setParameter("ssoid", ssoid);
+        try {
+            return (ProactiveMessage) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public void updateProactiveMessage(ProactiveMessage proactiveMessage, StatusETPMessageType statusETPMessageType) {
+        try {
+            proactiveMessage.setStatus(statusETPMessageType);
+            proactiveMessage.setLastupdate(new Date());
+            entityManager.persist(proactiveMessage);
+        } catch (Exception e)
+        {
+            logger.error("Error in updateProactiveMessage: " + e);
+        }
+    }
+
+    @Transactional
+    public void saveProactiveMessageStatus(ProactiveMessage proactiveMessage, StatusETPMessageType statusETPMessageType) {
+        try {
+            ProactiveMessageStatus proactiveMessageStatus = new ProactiveMessageStatus();
+            proactiveMessageStatus.setProactiveMessage(proactiveMessage);
+            proactiveMessageStatus.setStatus(statusETPMessageType);
+            proactiveMessageStatus.setCreateddate(new Date());
+            entityManager.persist(proactiveMessageStatus);
+            updateProactiveMessage(proactiveMessage, statusETPMessageType);
+        } catch (Exception e)
+        {
+            logger.error("Error in saveProactiveMessageStatus: " + e);
         }
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessageStatus" table="cf_proaktiv_message_status"
+           optimistic-lock="version">
+        <id name="idofproaktivmessagestatus" column="idofproaktivmessagestatus" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="proactiveMessage" class="ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage" column="idofproaktivmessage"
+                     not-null="true" fetch="select"/>
+        <property name="status" column="status">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType</param>
+                <param name="type">4</param>
+            </type>
+        </property>
+
+        <property name="createddate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+    </class>
+</hibernate-mapping>
