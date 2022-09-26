@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
@@ -16,6 +17,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.List;
 
 
 @Component
@@ -85,7 +87,7 @@ public class ETPMVProactiveService {
         daoService.saveProactiveMessageStatus(proactiveMessage, newStatus);
     }
 
-    public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid) throws Exception {
+    public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
         logger.info("Sending status to ETP Proactive with ServiceNumber = " + serviceNumber);
         try {
             RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(serviceNumber);
@@ -93,6 +95,20 @@ public class ETPMVProactiveService {
         } catch (Exception e) {
             logger.error("Error in sendMessage: ", e);
         }
+    }
+
+    public void sendMSPAssignedMessage(Client client, Client guardian, String ssoid) {
+
+    }
+
+    private String generateServiceNumber() {
+        //порядковый номер обращения (изменяемый) - генерим как select nextval('proaktiv_service_number_seq')
+
+        //<ns2:ServiceNumber>6508-9000022-880182-0000050/22</ns2:ServiceNumber> <!--6508-код ведомства ДОНМ;
+        // 9000022-код системы ИС ГУСОЭВ (ИС ПП является подсистемой);
+        // 880182-код услуги "Проактивное предоставление услуги питания за счет средств бюджета города Москвы";
+        // 0000050-порядковый номер обращения (изменяемый);
+        // 22-последние 2 цифры года.-->
     }
 }
 

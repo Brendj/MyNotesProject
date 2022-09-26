@@ -49,10 +49,10 @@ public class KafkaListenerService {
         RuntimeContext.getAppContext().getBean(KafkaListenerService.class).parseResponseMessage(responseData, message);
     }
 
-    @KafkaListener(topics = {AbstractPullData.BENEFIT_RESPONSE_TOPIC})
+    @KafkaListener(topics = {AbstractPullData.BENEFIT_PROACTIVE_TOPIC})
     public void MosBenefitListener(String message, @Header(KafkaHeaders.OFFSET) Long offset,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partitionId) throws Exception {
-        logger.info(String.format("Response from kafka. Offset = %s, partitionId = %s, message = %s", offset, partitionId, message));
+        logger.info(String.format("MoS response from kafka. Offset = %s, partitionId = %s, message = %s", offset, partitionId, message));
         PersonBenefitCategoryChanges responseData = objectMapper.readValue(message, PersonBenefitCategoryChanges.class);
         personBenefitCategoryService.parseResponseMessage(responseData);
     }
