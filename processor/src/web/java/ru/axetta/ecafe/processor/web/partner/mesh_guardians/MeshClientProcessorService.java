@@ -238,8 +238,7 @@ public class MeshClientProcessorService {
                     }
                 }
             }
-            List<Client> guardians = DAOReadExternalsService.getInstance()
-                    .findGuardiansByClient(child.getIdOfClient(), null);
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, child.getIdOfClient(), true);
 
             // Удаляем те связи, которых нет в МК, но есть в ИСПП
             for(Client guardian : guardians){
