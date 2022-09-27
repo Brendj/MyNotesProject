@@ -247,7 +247,8 @@ public class MeshClientProcessorService {
                                 noneMatch(i -> i.getPersonGUID().equals(guardian.getMeshGUID()))){
 
                     ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
-                            .findClientGuardianById(session, child.getIdOfClient(), guardian.getIdOfClient());
+                            .findClientGuardianByIdIncludeDisabled(
+                                    session, child.getIdOfClient(), guardian.getIdOfClient(), true);
                     clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
 
                     clientGuardian.delete(ClientManager.generateNewClientGuardianVersion(session));
