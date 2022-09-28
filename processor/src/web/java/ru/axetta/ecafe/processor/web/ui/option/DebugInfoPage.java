@@ -128,17 +128,22 @@ public class DebugInfoPage extends BasicWorkspacePage {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            ApplicationForFood applicationForFood = DAOUtils.findApplicationForFoodByServiceNumber(session, "0001-9300120-100101-00030058/22");
+            //ApplicationForFood applicationForFood = DAOUtils.findApplicationForFoodByServiceNumber(session, "0001-9300120-100101-00030058/22");
             //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, GuardianshipValidationRequest.class);
-            RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+            //RuntimeContext.getAppContext().getBean(BenefitKafkaService.class).sendRequest(applicationForFood, DocValidationRequest.class);
+            Client client = session.load(Client.class, 1179L);
+            DiscountManager.removeDtisznDiscount(session, client, 12, true);
             transaction.commit();
             transaction = null;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }*/
+        //logger.info(RuntimeContext.getAppContext().getBean(AupdPersonService.class).getSsoidByPersonId("55c455c7-dd3c-4f67-8596-6cd8d617ed46"));
+
 
         //RuntimeContext.getAppContext().getBean(ETPMVService.class).processIncoming("<ns4:CoordinateMessage xmlns:ns4=\"http://asguf.mos.ru/rkis_gu/coordinate/v6_1/\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" xmlns:ns5=\"http://mos.ru/gu/service/100101/\"><ns4:CoordinateDataMessage><ns4:Service><ns4:RegNum>156356534</ns4:RegNum><ns4:RegDate>2022-07-27T17:05:58.000+03:00</ns4:RegDate><ns4:ServiceNumber>0001-9300120-100101-00652432/22</ns4:ServiceNumber><ns4:Responsible><ns4:LastName>оператор Портала</ns4:LastName><ns4:FirstName>оператор Портала</ns4:FirstName><ns4:MiddleName>оператор Портала</ns4:MiddleName><ns4:JobTitle>оператор Портала</ns4:JobTitle><ns4:Phone>+7 (495) 539-55-55</ns4:Phone><ns4:Email>cpgu@mos.ru</ns4:Email></ns4:Responsible><ns4:Department><ns4:Name>Департамент информационных технологий города Москвы</ns4:Name><ns4:Code>2043</ns4:Code><ns4:Inn>7710878000</ns4:Inn><ns4:Ogrn>1107746943347</ns4:Ogrn><ns4:RegDate>2019-09-12T00:00:00</ns4:RegDate><ns4:SystemCode>9300003</ns4:SystemCode></ns4:Department><ns4:CreatedByDepartment><ns4:Name>ПГУ</ns4:Name><ns4:Code>1</ns4:Code><ns4:Inn>7710878000</ns4:Inn><ns4:Ogrn>1107746943347</ns4:Ogrn><ns4:RegDate>2019-09-12T00:00:00</ns4:RegDate><ns4:SystemCode>1</ns4:SystemCode></ns4:CreatedByDepartment><ns4:OutputKind>Portal</ns4:OutputKind><ns4:PortalNum>156178271</ns4:PortalNum></ns4:Service><ns4:SignService Id=\"ead3a0c5-a1c3-48ae-843e-92dda7ffb72e\"><ns4:ServiceType><ns4:Code>100101</ns4:Code><ns4:Name>Подача заявления о предоставлении питания за счет средств бюджета города Москвы</ns4:Name></ns4:ServiceType><ns4:Contacts><ns4:BaseDeclarant xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Id=\"3fe9b3ba-2c33-454b-96c2-4fab0efdc504\" xsi:type=\"ns4:RequestContact\"><ns4:Type>Child</ns4:Type><ns4:Documents><ns4:ServiceDocument><ns4:DocKind><ns4:Code>20017</ns4:Code><ns4:Name>Свидетельство о рождении</ns4:Name></ns4:DocKind><ns4:DocSerie>XX-ОГ</ns4:DocSerie><ns4:DocNumber>354535</ns4:DocNumber><ns4:DocDate>2022-07-14T00:00:00</ns4:DocDate><ns4:WhoSign>УФМС г.Москва</ns4:WhoSign><ns4:ListCount xsi:nil=\"true\"/><ns4:CopyCount xsi:nil=\"true\"/></ns4:ServiceDocument></ns4:Documents><ns4:LastName>Арабова</ns4:LastName><ns4:FirstName>Алсу</ns4:FirstName><ns4:MiddleName>Ильдаровна</ns4:MiddleName><ns4:Gender>Female</ns4:Gender><ns4:BirthDate>2009-02-02</ns4:BirthDate><ns4:Snils>830-838-265 12</ns4:Snils><ns4:CitizenshipType xsi:nil=\"true\"/></ns4:BaseDeclarant><ns4:BaseDeclarant xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Id=\"9cd0f9b9-1add-44dd-86d8-da9770cc8a08\" xsi:type=\"ns4:RequestContact\"><ns4:Type>Declarant</ns4:Type><ns4:Documents><ns4:ServiceDocument><ns4:DocKind><ns4:Code>20001</ns4:Code><ns4:Name>Паспорт гражданина РФ</ns4:Name></ns4:DocKind><ns4:DocSerie>4556</ns4:DocSerie><ns4:DocNumber>445566</ns4:DocNumber><ns4:DocDate>2022-07-08T00:00:00</ns4:DocDate><ns4:WhoSign>УФМС г.Москва</ns4:WhoSign><ns4:ListCount xsi:nil=\"true\"/><ns4:CopyCount xsi:nil=\"true\"/><ns4:DivisionCode>655-656</ns4:DivisionCode></ns4:ServiceDocument></ns4:Documents><ns4:LastName>Тришин</ns4:LastName><ns4:FirstName>Сергей</ns4:FirstName><ns4:MiddleName>Константинович</ns4:MiddleName><ns4:Gender>Male</ns4:Gender><ns4:BirthDate>1968-12-19</ns4:BirthDate><ns4:Snils>514-590-282 79</ns4:Snils><ns4:MobilePhone>5555555555</ns4:MobilePhone><ns4:EMail>atrishin@inform-tb.ru</ns4:EMail><ns4:CitizenshipType xsi:nil=\"true\"/><ns4:SsoId>01f7de71-7c87-4d2f-a570-41807710e437</ns4:SsoId></ns4:BaseDeclarant></ns4:Contacts><ns4:CustomAttributes><ns5:ServiceProperties><ns5:IsLegalRepresentative>true</ns5:IsLegalRepresentative><ns5:Validity>false</ns5:Validity><ns5:ValidationGuardianship>false</ns5:ValidationGuardianship><ns5:EduName>ГБПОУ ТК № 21</ns5:EduName><ns5:IDLink>5bfe2d7f-86f1-4768-96ea-966f95e27b93</ns5:IDLink><ns5:PreferentialCategory><ns5:LargeFamily>true</ns5:LargeFamily><ns5:LowIncomeFamily>true</ns5:LowIncomeFamily><ns5:WithoutParentalCare>true</ns5:WithoutParentalCare></ns5:PreferentialCategory></ns5:ServiceProperties></ns4:CustomAttributes></ns4:SignService></ns4:CoordinateDataMessage></ns4:CoordinateMessage>");
+        RuntimeContext.getAppContext().getBean(ETPMVService.class).processIncoming(result);
         //RuntimeContext.getAppContext().getBean(KafkaListenerService.class).MezvedListener("{\"request_id\":\"beb2bcaa-3b6c-4729-bb93-bfebf88c1fd0\",\"person_id\":\"a4ad805b-dc91-427d-bd35-19cfc93ad4a4\",\"errors\":null,\"benefit_categories\":[{\"id\":\"12\",\"name\":\"Одиноко проживающий неработающий собственник жилого помещения в городе Москве, достигший возраста 80 лет\",\"start_at\":\"2016-08-08T00:00\",\"end_at\":null}]}", 1L,2);
         /*RuntimeContext.getAppContext().getBean(KafkaListenerService.class).MezvedListener("{\n" +
                 "    \"passport_validity_checking_response\": {\n" +
@@ -169,7 +174,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
                 "        }\n" +
                 "    }\n" +
                 "}", 1L,2);*/
-        RuntimeContext.getAppContext().getBean(KafkaListenerService.class).MezvedListener("{\n" +
+        /*RuntimeContext.getAppContext().getBean(KafkaListenerService.class).MezvedListener("{\n" +
                 "    \"relatedness_checking_response\": {\n" +
                 "        \"request_id\": \"4650861c-c60f-47e8-8537-83cf41940761\",\n" +
                 "        \"requesting_system\": \"ou\",\n" +
@@ -203,7 +208,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
                 "            \"relatedness_confirmation\": \"Да\"\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", 1L,2);
+                "}", 1L,2);*/
         /*ApplicationForFoodProcessingService service = RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class);
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         Transaction transaction = session.beginTransaction();
