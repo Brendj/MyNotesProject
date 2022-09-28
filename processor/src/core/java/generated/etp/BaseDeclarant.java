@@ -29,7 +29,8 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BaseDeclarant", propOrder = {
     "type",
-    "documents"
+    "documents",
+    "SsoId"
 })
 @XmlSeeAlso({
     RequestContact.class,

@@ -123,7 +123,12 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
         init();
     }
 
-        public void sendMessage(String message) throws Exception {
+    public void sendMessage(String message) throws Exception {
+        TextMessage textMessage = jmsProducerSession.createTextMessage(message);
+        producer.send(textMessage);
+    }
+
+    public void sendStatus(String message) throws Exception {
         TextMessage textMessage = jmsProducerSession.createTextMessage(message);
         producer.send(textMessage);
     }

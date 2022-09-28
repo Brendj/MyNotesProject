@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVProactiveService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPProaktivClient;
+import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
@@ -56,7 +57,13 @@ public class PersonBenefitCategoryService {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
                 if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).before(new Date())) {
-                    //todo Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
+                    //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
+                    String serviceNumber = RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).generateServiceNumber();
+                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), serviceNumber, status);
+                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true);
+                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), serviceNumber, status2);
                 } else {
                     Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());

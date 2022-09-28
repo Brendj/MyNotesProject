@@ -215,6 +215,29 @@ public class DiscountManager {
         }
     }
 
+    //Удаляем льготу ДСЗН без привязке к ЗЛП
+    public static void removeDtisznDiscount(Session session, Client client, Integer dtisznCode, boolean rebuild) throws Exception {
+        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+        if (discountInfo != null && !discountInfo.getArchived()) {
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(discountInfo);
+            builder.withArchived(true);
+            builder.save(session, clientDTISZNDiscountVersion);
+            CategoryDiscount categoryDiscount = getCategoryDiscountByDtisznCode(session, dtisznCode);
+            if (categoryDiscount != null) {
+                for (CategoryDiscount cd : client.getCategories()) {
+                    if (cd.equals(categoryDiscount)) {
+                        deleteOneDiscount(session, client, cd);
+                        break;
+                    }
+                }
+            }
+            if (rebuild) {
+                rebuildAppointedMSPByClient(session, client);
+            }
+        }
+    }
+
     public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate, boolean rebuild) throws Exception {
         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
         Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
