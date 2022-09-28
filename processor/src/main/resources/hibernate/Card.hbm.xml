@@ -34,7 +34,7 @@
         <property name="cardPrintedNo" column="CardPrintedNo" type="long" update="false"/>
         <property name="externalId" column="ExternalId" type="string" length="32"/>
         <property name="cardSignCertNum" column="CardSignCertNum" type="integer" />
-        <many-to-one name="meshCardClientRef" class="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef" cascade="all-delete-orphan" lazy="proxy" column="idOfCard" unique="true"/>
+        <one-to-one name="meshCardClientRef" class="ru.axetta.ecafe.processor.core.persistence.MeshClientCardRef" cascade="all-delete-orphan"/>
         <set name="transactionsInternal" inverse="true" cascade="all">
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>
