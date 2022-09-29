@@ -35,8 +35,10 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
     private Session jmsStatusSession;
     private MessageProducer producer;
     private MessageConsumer consumerStatus;
+    private MessageProducer consumerBK;
     private Queue queueProducer;
     private Queue queueStatusConsumer;
+    private Queue bkQueueConsumer;
 
     private static final Logger logger = LoggerFactory.getLogger(ETPProaktivClient.class);
 
@@ -83,11 +85,14 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
             producer = jmsProducerSession.createProducer(queueProducer);
 
             //Создаем очередь на чтение
-            queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.status", "pp.notification_ack"));
+            queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.status", "PP.NOTIFICATION_ACK"));
             //Создаем читальщика
             consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
             //Указываем, что будем использовать метод onMessage из текущего класса
             consumerStatus.setMessageListener(this);
+
+            bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.bk", "PP.NOTIFICATION_ACK.BK"));
+            consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
 
             logger.info("End init ETP Proactive connection");
         } catch (Exception e) {
@@ -131,5 +136,10 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
     public void sendStatus(String message) throws Exception {
         TextMessage textMessage = jmsProducerSession.createTextMessage(message);
         producer.send(textMessage);
+    }
+
+    public void addToBKQueue(String message) throws Exception {
+        TextMessage textMessage = jmsProducerSession.createTextMessage(message);
+        consumerBK.send(textMessage);
     }
 }

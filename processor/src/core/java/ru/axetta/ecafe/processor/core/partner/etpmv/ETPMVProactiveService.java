@@ -36,6 +36,7 @@ import java.util.TimeZone;
 public class ETPMVProactiveService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVProactiveService.class);
     private final int COORDINATE_MESSAGE = 0;
+    private final int COORDINATE_STATUS_MESSAGE = 1;
     private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     private static final String RESPONSIBLE_STATUS_VALUE_PROPERTY = "ecafe.processor.proaktiv.responsible.status.value";
@@ -66,8 +67,13 @@ public class ETPMVProactiveService {
                 CoordinateMessage coordinateMessage = (CoordinateMessage) getCoordinateMessage(message);
                 processCoordinateMessage(coordinateMessage, message);
             }
+            if (type == COORDINATE_STATUS_MESSAGE) {
+                CoordinateStatusMessage coordinateStatusMessage = (CoordinateStatusMessage)getCoordinateMessage(message);
+                processCoordinateStatusMessage(coordinateStatusMessage, message);
+            }
         } catch (Exception e) {
             logger.error("Error in process incoming ETP Proactive message: ", e);
+            sendToBK(message);
         }
     }
 
@@ -75,9 +81,22 @@ public class ETPMVProactiveService {
         if (message.contains(":CoordinateMessage")) {
             return COORDINATE_MESSAGE;
         }
+        if (message.contains(":CoordinateStatusMessage")) {
+            return COORDINATE_STATUS_MESSAGE;
+        }
         throw new Exception("Unknown message type");
     }
 
+    private void sendToBK(String message) {
+        boolean success = false;
+        try {
+            RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).addToBKQueue(message);
+            success = true;
+        } catch (Exception e) {
+            logger.error("Error in sendBKStatus: ", e);
+        }
+        //RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
+    }
 
     public Object getCoordinateMessage(String message) throws Exception {
         JAXBContext jaxbContext = getJAXBContext();
@@ -115,6 +134,10 @@ public class ETPMVProactiveService {
         StatusETPMessageType newStatus = StatusETPMessageType.findStatusETPMessageType(statusCode.toString());
         //Сохранили новый статус
         daoService.saveProactiveMessageStatus(proactiveMessage, newStatus);
+    }
+
+    private void processCoordinateStatusMessage(CoordinateStatusMessage coordinateStatusMessage, String message) throws Exception {
+
     }
 
     public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
