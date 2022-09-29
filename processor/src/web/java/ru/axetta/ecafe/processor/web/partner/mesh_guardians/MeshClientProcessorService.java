@@ -151,7 +151,7 @@ public class MeshClientProcessorService {
 
             Client guardian = getGuardianByMeshGUID(session, personGuid);
             if (guardian == null ||
-                    (guardian != null && guardian.isDeletedOrLeaving() && !guardian.isParent())) {
+                    (guardian != null && (guardian.isDeletedOrLeaving() || !guardian.isParent()))) {
                 throw new NotFoundException("Not found guardian by MESH-GUID: " + personGuid);
             }
 
