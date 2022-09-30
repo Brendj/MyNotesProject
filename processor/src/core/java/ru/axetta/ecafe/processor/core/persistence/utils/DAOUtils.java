@@ -4941,12 +4941,13 @@ public class DAOUtils {
     }
 
     public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoByOrgIdSinceVersion(Session session, Long idOfOrg,
-            Long version) {
+            Long version, boolean archivedOnly) {
         List<Long> friendlyOrgIds = findFriendlyOrgIds(session, idOfOrg);
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.createAlias("client", "c");
         criteria.add(Restrictions.in("c.org.idOfOrg", friendlyOrgIds));
         criteria.add(Restrictions.gt("version", version));
+        if (archivedOnly) criteria.add(Restrictions.eq("archived", true));
         return criteria.list();
     }
 
