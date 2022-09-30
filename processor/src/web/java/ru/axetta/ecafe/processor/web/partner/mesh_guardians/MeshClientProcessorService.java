@@ -150,7 +150,8 @@ public class MeshClientProcessorService {
             transaction = session.beginTransaction();
 
             Client guardian = getGuardianByMeshGUID(session, personGuid);
-            if (guardian == null || (guardian != null && guardian.isDeletedOrLeaving())) {
+            if (guardian == null ||
+                    (guardian != null && (guardian.isDeletedOrLeaving() || !guardian.isParent()))) {
                 throw new NotFoundException("Not found guardian by MESH-GUID: " + personGuid);
             }
 
@@ -193,15 +194,16 @@ public class MeshClientProcessorService {
             }
             if (!guardianRelationInfo.getGuardianPersonGuids().isEmpty()) {
                 for (ClientInfo meshGuardian : guardianRelationInfo.getGuardianPersonGuids()) {
+                    Boolean activeRelation = false;
                     Client guardian = DAOUtils.findClientByMeshGuid(session, meshGuardian.getPersonGUID());
 
+                    ClientGuardian clientGuardian = null;
                     if (guardian == null) {
                         guardian = createGuardian(meshGuardian, child.getOrg(), session);
+                    } else {
+                        clientGuardian = DAOUtils
+                                .findClientGuardian(session, child.getIdOfClient(), guardian.getIdOfClient());
                     }
-
-                    ClientGuardian clientGuardian = DAOUtils
-                            .findClientGuardian(session, child.getIdOfClient(), guardian.getIdOfClient());
-
                     if (clientGuardian == null) {
                         Boolean disabled = meshGuardian.getAgentTypeId().equals(
                                 ClientGuardianRoleType.TRUSTED_REPRESENTATIVE.getCode());
@@ -210,6 +212,7 @@ public class MeshClientProcessorService {
                                 ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), disabled,
                                 child.getIdOfClient(), ClientCreatedFromType.DEFAULT,
                                 ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
+                        activeRelation = true;
                     } else {
                         if (clientGuardian.getDeletedState()) {
                             clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
@@ -228,6 +231,7 @@ public class MeshClientProcessorService {
                             }
                             clientGuardian.setDisabled(disabled);
                             session.merge(clientGuardian);
+                            activeRelation = true;
                         }
 
                         if (clientGuardian.getRoleType().getCode() != meshGuardian.getAgentTypeId()) {
@@ -235,6 +239,19 @@ public class MeshClientProcessorService {
                             clientGuardian.setRoleType(ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()));
                             session.merge(clientGuardian);
                         }
+                    }
+                    // Если представитель в группе "Выбывшие" и имеет активную связку с обучающимся,
+                    // то переводим представителю в группу "Родители"
+                    if(guardian.isLeaving() && activeRelation) {
+                        guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                        ClientManager.createClientGroupMigrationHistoryLite(
+                                session, guardian, child.getOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getValue(),
+                                ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
+                                        .concat(String.format(" (ид. ОО=%s)", child.getOrg().getIdOfOrg())));
+                        Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                        guardian.setClientRegistryVersion(nextClientVersion);
+                        guardian.setUpdateTime(new Date());
+                        session.merge(guardian);
                     }
                 }
             }
@@ -256,6 +273,27 @@ public class MeshClientProcessorService {
 
                     DAOUtils.disableCardRequest(session, guardian.getIdOfClient());
                     MigrantsUtils.disableMigrantRequestIfExists(session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
+
+                    session.flush();
+
+                    // Если представитель в группе "Родители" и у представителя не осталось детей, то переводим его
+                    // в группу "Выбывшие"
+                    if(guardian.isParent()) {
+                        List<Client> children = ClientManager.findChildsByClient(
+                                session, guardian.getIdOfClient(), true, false);
+                        if (children.isEmpty()) {
+                            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                            ClientManager.createClientGroupMigrationHistoryLite(
+                                    session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
+                                            .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
+
+                            Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+                            guardian.setClientRegistryVersion(nextClientVersion);
+                            guardian.setUpdateTime(new Date());
+                            session.merge(guardian);
+                        }
+                    }
                 }
             }
 
