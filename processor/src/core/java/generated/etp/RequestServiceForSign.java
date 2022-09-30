@@ -175,6 +175,8 @@ public class RequestServiceForSign {
      *     
      */
     public CustomAttributes getCustomAttributes() {
+        if (customAttributes == null)
+            customAttributes = new CustomAttributes();
         return customAttributes;
     }
 

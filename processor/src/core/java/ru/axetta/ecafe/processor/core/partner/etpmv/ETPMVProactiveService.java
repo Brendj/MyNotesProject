@@ -243,7 +243,7 @@ public class ETPMVProactiveService {
 
         coordinateMessage.setCoordinateDataMessage(coordinateData);
 
-        JAXBContext jaxbContext = getJAXBContextToSendStatus();
+        JAXBContext jaxbContext = JAXBContext.newInstance(CoordinateMessage.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter sw = new StringWriter();
         marshaller.marshal(coordinateMessage, sw);
