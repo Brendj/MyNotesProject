@@ -443,7 +443,7 @@ public class ETPMVDaoService {
         try {
             proactiveMessage.setStatus(statusETPMessageType);
             proactiveMessage.setLastupdate(new Date());
-            entityManager.persist(proactiveMessage);
+            entityManager.merge(proactiveMessage);
         } catch (Exception e)
         {
             logger.error("Error in updateProactiveMessage: " + e);
@@ -461,7 +461,7 @@ public class ETPMVDaoService {
             updateProactiveMessage(proactiveMessage, statusETPMessageType);
         } catch (Exception e)
         {
-            logger.error("Error in saveProactiveMessageStatus: " + e);
+            logger.error("Error in saveProactiveMessageStatus: ", e);
         }
     }
 

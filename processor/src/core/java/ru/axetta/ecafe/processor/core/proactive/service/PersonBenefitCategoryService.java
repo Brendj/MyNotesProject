@@ -61,10 +61,10 @@ public class PersonBenefitCategoryService {
                     //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
                     String serviceNumber = RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).generateServiceNumber();
                     StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
-                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), serviceNumber, status);
+                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status);
                     DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true);
                     StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
-                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), serviceNumber, status2);
+                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2);
                 } else {
                     Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());

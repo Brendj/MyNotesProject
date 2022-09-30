@@ -56,6 +56,11 @@ public enum StatusETPMessageType {
         }
     }
 
+    @Override
+    public String toString() {
+        return getCode();
+    }
+
     public String getCode() {
         return code;
     }

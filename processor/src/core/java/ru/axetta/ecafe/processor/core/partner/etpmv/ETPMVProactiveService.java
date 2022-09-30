@@ -243,7 +243,7 @@ public class ETPMVProactiveService {
 
         coordinateMessage.setCoordinateDataMessage(coordinateData);
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(CoordinateMessage.class);
+        JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter sw = new StringWriter();
         marshaller.marshal(coordinateMessage, sw);
@@ -254,8 +254,8 @@ public class ETPMVProactiveService {
         sendMessage(client, guardian, generateServiceNumber(), ssoid, client.getPerson().getFullName(), expiration_date);
     }
 
-    public void sendStatus(long begin_time, String serviceNumber, StatusETPMessageType status) throws Exception {
-        serviceNumber = serviceNumber == null ? generateServiceNumber() : serviceNumber;
+    public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status) throws Exception {
+        String serviceNumber = proactiveMessage == null ? generateServiceNumber() : proactiveMessage.getServicenumber();
         logger.info("Sending status to proaktiv ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status);
         boolean success = false;
@@ -269,7 +269,9 @@ public class ETPMVProactiveService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        //RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status));
+        if (success) {
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessageStatus(proactiveMessage, status);
+        }
     }
 
     private String createStatusMessage(String serviceNumber, StatusETPMessageType status) throws Exception {
