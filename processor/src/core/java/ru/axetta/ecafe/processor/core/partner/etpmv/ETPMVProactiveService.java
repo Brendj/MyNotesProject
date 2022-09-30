@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
@@ -19,16 +21,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
+import java.util.*;
 
 
 @Component
@@ -45,6 +47,7 @@ public class ETPMVProactiveService {
     private static final String DEPARTMENT_CODE_PROPERTY = "ecafe.processor.proaktiv.department.code";
     private static final String DEPARTMENT_INN_PROPERTY = "ecafe.processor.proaktiv.department.inn";
     private static final String DEPARTMENT_OGRN_PROPERTY = "ecafe.processor.proaktiv.department.ogrn";
+    private static final String DEPARTMENT_REGDATE_PROPERTY = "ecafe.processor.proaktiv.department.regdate";
     private static final String DEPARTMENT_SYSTEM_CODE_PROPERTY = "ecafe.processor.proaktiv.department.system.code";
 
     private final static String RESPONSIBLE_STATUS_VALUE = "ИС ПП";
@@ -53,7 +56,10 @@ public class ETPMVProactiveService {
     private static final String DEPARTMENT_CODE = "6508";
     private static final String DEPARTMENT_INN = "7719028495";
     private static final String DEPARTMENT_ORGN = "1027700386625";
+    private static final String DEPARTMENT_REGDATE = "981417600000";//2001-02-06T00:00:00.000+03:00
     private static final String DEPARTMENT_SYSTEM_CODE = "9000022";
+    private static final String PROACTIVE_CODE = "880182";
+    private static final String PROACTIVE_NAME = "Проактивное предоставление услуги питания за счет средств бюджета города Москвы"
     private final int PAUSE_IN_MILLIS = 1000;
 
     JAXBContext jaxbConsumerContext;
@@ -143,15 +149,109 @@ public class ETPMVProactiveService {
     public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
         logger.info("Sending status to ETP Proactive with ServiceNumber = " + serviceNumber);
         try {
-            RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(serviceNumber);
+            String msg = createCoordinateMessage(serviceNumber, ssoid);
+            RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(msg);
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, serviceNumber, ssoid);
         } catch (Exception e) {
             logger.error("Error in sendMessage: ", e);
         }
     }
 
-    public void sendMSPAssignedMessage(Client client, Client guardian, String ssoid) {
+    private String createCoordinateMessage(String serviceNumber, String ssoid) throws Exception
+    {
+        Properties configProperties = RuntimeContext.getInstance().getConfigProperties();
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        ObjectFactory objectFactory = new ObjectFactory();
+        CoordinateMessage coordinateMessage = objectFactory.createCoordinateMessage();
+        CoordinateData coordinateData = objectFactory.createCoordinateData();
 
+        RequestService requestService = objectFactory.createRequestService();
+        XMLGregorianCalendar calendarRequest = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
+        calendarRequest.setTimezone(getTimeZoneOffsetInMinutes());
+        requestService.setRegDate(calendarRequest);
+        requestService.setServiceNumber(serviceNumber);
+
+        Department department = objectFactory.createDepartment();
+        department.setName(configProperties.getProperty(DEPARTMENT_NAME_PROPERTY, DEPARTMENT_NAME));
+        department.setCode(configProperties.getProperty(DEPARTMENT_CODE_PROPERTY, DEPARTMENT_CODE));
+        department.setInn(configProperties.getProperty(DEPARTMENT_INN_PROPERTY, DEPARTMENT_INN));
+        department.setOgrn(configProperties.getProperty(DEPARTMENT_OGRN_PROPERTY, DEPARTMENT_ORGN));
+        Long regDateDep;
+        try {
+            regDateDep = Long.valueOf(configProperties.getProperty(DEPARTMENT_REGDATE_PROPERTY, DEPARTMENT_REGDATE));
+        } catch (Exception e)
+        {
+            regDateDep = Long.valueOf(DEPARTMENT_REGDATE);
+        }
+        XMLGregorianCalendar calendarDepartment = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date(regDateDep)));
+        calendarDepartment.setTimezone(getTimeZoneOffsetInMinutes());
+        department.setRegDate(calendarDepartment);
+        department.setSystemCode(objectFactory.createDepartmentSystemCode(configProperties.getProperty(DEPARTMENT_SYSTEM_CODE_PROPERTY, DEPARTMENT_SYSTEM_CODE)));
+        requestService.setDepartment(department);
+        requestService.setCreatedByDepartment(department);
+
+        requestService.setOutputKind(OutputKindType.PORTAL);
+
+        coordinateData.setService(requestService);
+
+        RequestServiceForSign requestServiceForSign = objectFactory.createRequestServiceForSign();
+        requestServiceForSign.setId("0731");
+        DictionaryItem dictionaryItem = objectFactory.createDictionaryItem();
+        dictionaryItem.setCode(PROACTIVE_CODE);
+        dictionaryItem.setName(PROACTIVE_NAME);
+        requestServiceForSign.setServiceType(dictionaryItem);
+
+        RequestContact requestContact = objectFactory.createRequestContact();
+        requestContact.setType(ContactType.DECLARANT);
+        requestContact.setSsoId(ssoid);
+        ArrayOfBaseDeclarant arrayOfBaseDeclarant = objectFactory.createArrayOfBaseDeclarant();
+        arrayOfBaseDeclarant.getBaseDeclarant().add(requestContact);
+        requestServiceForSign.setContacts(arrayOfBaseDeclarant);
+
+        RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
+
+        DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document document = documentBuilder.newDocument();
+        Node serviceProperties = document.createElement("ServiceProperties");
+
+        Node method_informing = document.createElement("method_informing");
+
+        Element val1 = document.createElement("value");
+        val1.appendChild(document.createTextNode("1"));
+        method_informing.appendChild(val1);
+
+        Element val2 = document.createElement("value");
+        val2.appendChild(document.createTextNode("4"));
+        method_informing.appendChild(val2);
+
+        serviceProperties.appendChild(method_informing);
+        customAttributes.setAny(serviceProperties);
+
+        coordinateData.setSignService(requestServiceForSign);
+
+        RequestStatus requestStatus = objectFactory.createRequestStatus();
+
+        StatusType statusType = objectFactory.createStatusType();
+        statusType.setStatusCode(0);
+        statusType.setStatusDate(calendarRequest);
+        requestStatus.setStatus(statusType);
+        requestStatus.setReasonText("Вашему ребенку (ФИО) назначено питание за счет средств бюджета города Москвы, " +
+                "которое будет предоставляться с ближайшего дня поступления в школу питания на вашего ребенка. " +
+                "При необходимости Вы можете отказаться от получения услуги до конца срока действия льготной категории " +
+                "(expiration_date) в личном кабинете на Mos.ru.");
+        coordinateData.setStatus(requestStatus);
+
+        coordinateMessage.setCoordinateDataMessage(coordinateData);
+
+        JAXBContext jaxbContext = getJAXBContextToSendStatus();
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(coordinateMessage, sw);
+        return sw.toString();
+    }
+
+    public void sendMSPAssignedMessage(Client client, Client guardian, String ssoid) {
+        sendMessage(client, guardian, generateServiceNumber(), ssoid);
     }
 
     public void sendStatus(long begin_time, String serviceNumber, StatusETPMessageType status) throws Exception {
@@ -233,15 +333,21 @@ public class ETPMVProactiveService {
         return TimeZone.getTimeZone("Europe/Moscow").getRawOffset()/60000; //значение часового сдвига в мс выражаем в минутах
     }
 
+    //порядковый номер обращения (изменяемый) - генерим как select nextval('proaktiv_service_number_seq')
+    //<ns2:ServiceNumber>6508-9000022-880182-0000050/22</ns2:ServiceNumber> <!--6508-код ведомства ДОНМ;
+    // 9000022-код системы ИС ГУСОЭВ (ИС ПП является подсистемой);
+    // 880182-код услуги "Проактивное предоставление услуги питания за счет средств бюджета города Москвы";
+    // 0000050-порядковый номер обращения (изменяемый);
+    // 22-последние 2 цифры года.-->
     public String generateServiceNumber() {
-        return "";
-        //порядковый номер обращения (изменяемый) - генерим как select nextval('proaktiv_service_number_seq')
-
-        //<ns2:ServiceNumber>6508-9000022-880182-0000050/22</ns2:ServiceNumber> <!--6508-код ведомства ДОНМ;
-        // 9000022-код системы ИС ГУСОЭВ (ИС ПП является подсистемой);
-        // 880182-код услуги "Проактивное предоставление услуги питания за счет средств бюджета города Москвы";
-        // 0000050-порядковый номер обращения (изменяемый);
-        // 22-последние 2 цифры года.-->
+        Long newNumber = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNextServiceNumber();
+        String number = newNumber.toString();
+        int size = number.length();
+        for (int i = size; i < 7; i++) {
+            number = "0" + number;
+        }
+        Integer year = Calendar.getInstance().get(Calendar.YEAR);
+        return DEPARTMENT_CODE + "-" + DEPARTMENT_SYSTEM_CODE + "-" + PROACTIVE_CODE + "-" + number + "/" + (year.toString()).substring(2);
     }
 }
 

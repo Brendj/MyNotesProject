@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
+import org.hibernate.query.NativeQuery;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.MessageType;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
 import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
@@ -461,5 +463,18 @@ public class ETPMVDaoService {
         {
             logger.error("Error in saveProactiveMessageStatus: " + e);
         }
+    }
+
+    @Transactional
+    public Long getNextServiceNumber() {
+        try {
+            Session session = entityManager.unwrap(Session.class);
+            NativeQuery nativeQuery = session.createNativeQuery("select nextval('proaktiv_service_number_seq')");
+            return HibernateUtils.getDbLong(nativeQuery.getSingleResult());
+        } catch (Exception e)
+        {
+            logger.error("Error in getNextServiceNumber: " + e);
+        }
+        return null;
     }
 }
