@@ -47,6 +47,7 @@ public class PersonBenefitCategoryService {
         boolean sendToPortal = false;
         Client client = null;
         List<Client> guardians = null;
+        Date endDate = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -67,7 +68,7 @@ public class PersonBenefitCategoryService {
                 } else {
                     Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());
-                    Date endDate = format.get().parse(benefit.getEnd_date());
+                    endDate = format.get().parse(benefit.getEnd_date());
                     DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true);
                     guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient(), false);
                     sendToPortal = true;
@@ -82,15 +83,15 @@ public class PersonBenefitCategoryService {
             HibernateUtils.close(session, log);
         }
         if (sendToPortal) {
-            sendNotificationBenefitCreated(client, guardians);
+            sendNotificationBenefitCreated(client, guardians, endDate);
         }
     }
 
-    public void sendNotificationBenefitCreated(Client client, List<Client> guardians) {
+    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, Date expiration_date) {
         try {
             for (Client guardian : guardians) {
                 String ssoid = aupdPersonService.getSsoidByPersonId(client.getMeshGUID());
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, ssoid);
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, ssoid, expiration_date);
             }
         } catch (Exception e) {
             log.error("Error in sendNotificationBenefitCreated: ", e);
