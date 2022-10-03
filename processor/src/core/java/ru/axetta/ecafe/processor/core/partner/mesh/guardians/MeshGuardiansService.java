@@ -108,7 +108,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                                                        Integer agentTypeId,
                                                        Integer relation,
                                                        Integer typeOfLegalRepresent,
-                                                       Boolean informing) {
+                                                       Boolean informing) throws Exception {
         try {
             Client guardian = createGuardianInternal(persistenceSession, idOfOrg, firstName, patronymic, lastName,
                     genderId, birthDate, snils, mobile, child, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing, email);
@@ -132,7 +132,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             return new MeshAgentResponse().internalErrorResponse("Mesh service connection timeout");
         } catch (Exception e) {
             logger.error("Error in createPersonWithEducation: ", e);
-            return new MeshAgentResponse().internalErrorResponse();
+            if (e instanceof DocumentExistsException) {
+                throw e;
+            } else if (e instanceof DocumentValidateException) {
+                throw e;
+            } else {
+                return new MeshAgentResponse().internalErrorResponse();
+            }
         }
     }
 
