@@ -1418,7 +1418,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private void updateClientToMK() throws Exception {
         PersonResponse personResponse = getMeshGuardiansService()
                 .changePerson(this.meshGUID, this.person.firstName, this.person.secondName,
-                        this.person.surname, this.gender, this.birthDate, this.san);
+                        this.person.surname, this.gender == 0? 2:1, this.birthDate, this.san);
         if (personResponse != null && !personResponse.getCode().equals(GuardianResponse.OK)) {
             logger.error(String.format("code: %s message: %s", personResponse.getCode(), personResponse.getMessage()));
             throw new Exception(String.format("Ошибка изменения представителя в МК: %s", personResponse.getMessage()));

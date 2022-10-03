@@ -113,6 +113,8 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             Client guardian = createGuardianInternal(persistenceSession, idOfOrg, firstName, patronymic, lastName,
                     genderId, birthDate, snils, mobile, child, dulDetails, relation, typeOfLegalRepresent, agentTypeId, informing, email);
             ObjectMapper objectMapper = new ObjectMapper();
+            //конвертируем в мк тип
+            genderId = genderId == 0? 2:1;
             PersonAgent personAgent = buildPersonAgent(firstName, patronymic, lastName, genderId, birthDate, snils, mobile,
                     email, dulDetails, agentTypeId);
             String json = objectMapper.writeValueAsString(personAgent);
