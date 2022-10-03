@@ -2911,12 +2911,14 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             persistenceSession.close();
         } catch (Exception e) {
-            if (e instanceof DocumentValidateException) {
-                return new DocumentUpdateResponse(DocumentCreateResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
-            }
             logger.error("Error in updateDocumentForClient", e);
-            return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_INTERNAL,
-                    DocumentUpdateResponse.ERROR_INTERNAL_MESSAGE);
+            if (e instanceof DocumentExistsException) {
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
+            } else if (e instanceof DocumentValidateException) {
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
+            } else {
+                return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3144,7 +3146,13 @@ public class FrontController extends HttpServlet {
             persistenceSession.close();
         } catch (Exception e) {
             logger.error("Error in createMeshPerson", e);
-            return new GuardianMeshGuidResponse(GuardianResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            if (e instanceof DocumentExistsException) {
+                return new GuardianMeshGuidResponse(GuardianMeshGuidResponse.ERROR_DOCUMENT_EXISTS, e.getMessage());
+            } else if (e instanceof DocumentValidateException) {
+                return new GuardianMeshGuidResponse(GuardianMeshGuidResponse.ERROR_DOCUMENT_VALIDATION, e.getMessage());
+            } else {
+                return new GuardianMeshGuidResponse(GuardianMeshGuidResponse.ERROR_INTERNAL, GuardianResponse.ERROR_INTERNAL_MESSAGE);
+            }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

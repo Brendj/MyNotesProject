@@ -108,7 +108,7 @@ public class DulDetailService {
         try {
             if (isBlank(dulDetail.getNumber()))
                 throw new DocumentValidateException("Не заполнено поле \"Номер\" документа", dulDetail.getDocumentTypeId());
-            validateDulNumberAndSeries(session, dulDetail);
+            validateDulNumberAndSeries(dulDetail);
             if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
                 throw new DocumentValidateException("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»", dulDetail.getDocumentTypeId());
             if (checkAnotherClient) {
@@ -126,7 +126,7 @@ public class DulDetailService {
         }
     }
 
-    public void validateDulNumberAndSeries(Session session, DulDetail dulDetail) throws Exception {
+    public void validateDulNumberAndSeries(DulDetail dulDetail) throws Exception {
         if ((!isBlank(dulDetail.getSeries()) && dulDetail.getSeries().startsWith("-"))
                 || dulDetail.getNumber().startsWith("-")) {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
@@ -142,7 +142,7 @@ public class DulDetailService {
         } else if (dulDetail.getDocumentTypeId().equals(19L)) {
             validateSailorPassport(dulDetail);
         } else if (dulDetail.getDocumentTypeId().equals(3L)) {
-            validateBirthCertificate(session, dulDetail);
+            validateBirthCertificate(dulDetail);
         } else if (dulDetail.getDocumentTypeId().equals(6L)) {
             validateMilitaryPassport(dulDetail);
         } else if (dulDetail.getDocumentTypeId().equals(18L)) {
@@ -226,25 +226,13 @@ public class DulDetailService {
             throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
     }
 
-    private void validateBirthCertificate(Session session, DulDetail dulDetail) throws DocumentValidateException {
+    private void validateBirthCertificate(DulDetail dulDetail) throws DocumentValidateException {
         String cyrillic = ".*[а-яА-Я]+.*";
 
         if (isBlank(dulDetail.getSeries()) || dulDetail.getNumber().length() != 6
-                || dulDetail.getSeries().length() < 3 || !isPositiveDigit(dulDetail.getNumber()))
-            throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
-
-        if (dulDetail.getIdOfClient() != null && dulDetail.getIdOfClient() != 0L) {
-            Client client = session.get(Client.class, dulDetail.getIdOfClient());
-            if (client != null && client.getBirthDate() != null) {
-                LocalDate birthDate = client.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                LocalDate currentDate = LocalDate.now();
-                int age = Period.between(birthDate, currentDate).getYears() * 12 + Period.between(birthDate, currentDate).getMonths();
-                if (age > 170) {
-                    throw new DocumentValidateException("Снилс разрешен для пассажиров, возраст " +
-                            "которых не превышает 14 лет и 2 месяцев", dulDetail.getDocumentTypeId());
-                }
-            }
-        }
+                || dulDetail.getSeries().length() < 3 || !isPositiveDigit(dulDetail.getNumber())) {
+        throw new DocumentValidateException(validateError, dulDetail.getDocumentTypeId());
+    }
         validateRoman(dulDetail, cyrillic);
     }
 
