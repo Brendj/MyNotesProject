@@ -3204,6 +3204,7 @@ public class FrontController extends HttpServlet {
             persistenceSession.update(client);
 
             if (client.getMeshGUID() != null) {
+                genderId = genderId == 0? 2:1;
                 PersonResponse personResponse = getMeshGuardiansService()
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
                 if (!personResponse.getCode().equals(GuardianResponse.OK)) {
