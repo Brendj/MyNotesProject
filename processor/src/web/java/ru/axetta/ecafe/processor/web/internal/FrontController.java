@@ -3087,6 +3087,9 @@ public class FrontController extends HttpServlet {
                     relation, typeOfLegalRepresent, informing, documents)) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+            if (genderId != 0 && genderId != 1)
+                throw new Exception("Неверный пол");
+
             List<DulDetail> dulDetails = new ArrayList<>();
             if (!CollectionUtils.isEmpty(documents)) {
                 for (DocumentItem item : documents) {
@@ -3187,6 +3190,9 @@ public class FrontController extends HttpServlet {
             if (idOfClient == null || lastName == null || firstName == null || birthDate == null || genderId == null)
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+
+            if (genderId != 0 && genderId != 1)
+                throw new Exception("Неверный пол");
 
             Client client = persistenceSession.get(Client.class, idOfClient);
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
