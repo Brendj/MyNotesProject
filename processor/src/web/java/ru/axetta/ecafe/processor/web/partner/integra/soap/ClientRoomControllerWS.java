@@ -2205,15 +2205,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             throws DatatypeConfigurationException {
         int nRecs = 0;
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
-        Criteria ordersCriteria = session.createCriteria(Order.class);
-        ordersCriteria.add(Restrictions.eq("client", client));
-        ordersCriteria.add(Restrictions.ge("createTime", startDate));
-        ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+        String orderTypeCondition = (orderType == null ? "" : " and o.orderType = :orderType ");
+        Query query = session.createQuery("select o from Order o where o.client.idOfClient = :client and o.createTime >= :startDate " +
+                "and o.createTime < :endDate " + orderTypeCondition+ " order by o.createTime");
+        query.setParameter("client", client.getIdOfClient());
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", nextToEndDate);
         if (orderType != null) {
-            ordersCriteria.add(Restrictions.eq("orderType", orderType));
+            query.setParameter("orderType", orderType);
         }
-        ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-        List ordersList = ordersCriteria.list();
+        List ordersList = query.getResultList();
         PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
         for (Object o : ordersList) {
             if (nRecs++ > MAX_RECS_getPurchaseList) {
