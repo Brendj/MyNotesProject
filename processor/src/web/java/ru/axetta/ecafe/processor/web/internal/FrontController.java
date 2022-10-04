@@ -3017,6 +3017,10 @@ public class FrontController extends HttpServlet {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+            if (genderId != 0 && genderId != 1) {
+                throw new Exception("Неверный пол");
+            }
+            genderId = genderId == 0 ? 2 : 1;
             List<DulDetail> dulDetails = new ArrayList<>();
             if (documents != null)
                 for (DocumentItem item : documents) {
@@ -3210,7 +3214,7 @@ public class FrontController extends HttpServlet {
             persistenceSession.update(client);
 
             if (client.getMeshGUID() != null) {
-                genderId = genderId == 0? 2:1;
+                genderId = genderId == 0 ? 2 : 1;
                 PersonResponse personResponse = getMeshGuardiansService()
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
                 if (!personResponse.getCode().equals(GuardianResponse.OK)) {
