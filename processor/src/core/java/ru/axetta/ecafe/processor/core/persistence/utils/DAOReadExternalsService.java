@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.OrderItem;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -166,37 +167,47 @@ public class DAOReadExternalsService {
         return ClientManager.allowedGuardianshipNotification(session, guardianId, clientId, notifyType);
     }
 
-    public List<Order> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
+    public List<OrderItem> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
         /*Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
                 + ":startTime and :endTime order by createTime");
         query.setParameter("client", client);
         query.setParameter("startTime", startTime);
         query.setParameter("endTime", endTime);
         return query.getResultList();*/
-        Query query = entityManager.createNativeQuery("SELECT idoforg, idoforder FROM (SELECT idoforg, idoforder, createddate FROM CF_Orders order0_ WHERE order0_.IdOfClient = :client) qq "
-                + "WHERE (cast(CreatedDate AS NUMERIC) BETWEEN :startTime AND :endTime)");
+        Query query = entityManager.createNativeQuery("SELECT idOfOrg, idOfOrder, idOfCard, sumByCard, socDiscount, trdDiscount, " +
+                "grantSum, rSum, sumByCash, createddate as createTime, state " +
+                "FROM (SELECT idOfOrg, idOfOrder, idOfCard, sumByCard, socDiscount, trdDiscount, " +
+                "grantSum, rSum, sumByCash, createddate, state " +
+                "FROM CF_Orders order0_ WHERE order0_.IdOfClient = :client) qq "
+                + "WHERE (cast(CreatedDate AS NUMERIC) BETWEEN :startTime AND :endTime) order by createTime");
         query.setParameter("client", client.getIdOfClient());
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
         List list = query.getResultList();
 
-        List<Order> result = new ArrayList<>();
-        if (list.size() == 0) return result;
+        List<OrderItem> result = new ArrayList<>();
 
-        List<CompositeIdOfOrder> list2 = new ArrayList<>();
         for (Object obj : list) {
             Object[] row = (Object[]) obj;
             long idOfOrg = HibernateUtils.getDbLong(row[0]);
             long idOfOrder = HibernateUtils.getDbLong(row[1]);
-            list2.add(new CompositeIdOfOrder(idOfOrg, idOfOrder));
+            Long idOfCard = HibernateUtils.getDbLong(row[2]);
+            long sumByCard = HibernateUtils.getDbLong(row[3]);
+            long socDiscount = HibernateUtils.getDbLong(row[4]);
+            long trdDiscount = HibernateUtils.getDbLong(row[5]);
+            long grantSum = HibernateUtils.getDbLong(row[6]);
+            Long rSum = HibernateUtils.getDbLong(row[7]);
+            long sumByCash = HibernateUtils.getDbLong(row[8]);
+            Date createTime = new Date(HibernateUtils.getDbLong(row[9]));
+            int state = HibernateUtils.getDbInt(row[10]);
+            result.add(new OrderItem(idOfOrg, idOfOrder, idOfCard, sumByCard, socDiscount, trdDiscount,
+                    grantSum, rSum, sumByCash, createTime, state));
         }
-        Query q = entityManager.createQuery("select order from Order order where order.compositeIdOfOrder in :list order by createTime");
-        q.setParameter("list", list2);
-        return q.getResultList();
+        return result;
     }
 
-    public List<OrderDetail> getOrderDetailsByOrders(List<Order> orders) {
-        Query query = entityManager.createQuery("select detail from OrderDetail detail where detail.order in :orders");
+    public List<OrderDetail> getOrderDetailsByOrders(List<CompositeIdOfOrder> orders) {
+        Query query = entityManager.createQuery("select detail from OrderDetail detail where detail.order.compositeIdOfOrder in :orders");
         query.setParameter("orders", orders);
         return query.getResultList();
     }
