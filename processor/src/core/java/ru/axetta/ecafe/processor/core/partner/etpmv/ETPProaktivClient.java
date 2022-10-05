@@ -36,9 +36,11 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
     private MessageProducer producer;
     private MessageConsumer consumerStatus;
     private MessageProducer consumerBK;
+    private MessageProducer consumerNotificationStatus;
     private Queue queueProducer;
     private Queue queueStatusConsumer;
     private Queue bkQueueConsumer;
+    private Queue queueNotificationStatus;
 
     private static final Logger logger = LoggerFactory.getLogger(ETPProaktivClient.class);
 
@@ -94,6 +96,9 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
             bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.bk", "PP.NOTIFICATION_ACK.BK"));
             consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
 
+            queueNotificationStatus = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.out.notification.status", "PP.NOTIFICATION_STATUS_OUT"));
+            consumerNotificationStatus = jmsProducerSession.createProducer(queueNotificationStatus);
+
             logger.info("End init ETP Proactive connection");
         } catch (Exception e) {
             logger.error("Error in ETP Proactive connection init: ", e);
@@ -141,5 +146,10 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
     public void addToBKQueue(String message) throws Exception {
         TextMessage textMessage = jmsProducerSession.createTextMessage(message);
         consumerBK.send(textMessage);
+    }
+
+    public void sendNotificationStatus(String message) throws Exception {
+        TextMessage textMessage = jmsProducerSession.createTextMessage(message);
+        consumerNotificationStatus.send(textMessage);
     }
 }

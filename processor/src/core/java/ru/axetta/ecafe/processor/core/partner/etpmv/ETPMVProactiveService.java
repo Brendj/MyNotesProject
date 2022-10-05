@@ -69,10 +69,6 @@ public class ETPMVProactiveService {
     public void processIncoming(String message) {
         try {
             int type = getMessageType(message);
-            if (type == COORDINATE_MESSAGE) {
-                CoordinateMessage coordinateMessage = (CoordinateMessage) getCoordinateMessage(message);
-                processCoordinateMessage(coordinateMessage, message);
-            }
             if (type == COORDINATE_STATUS_MESSAGE) {
                 CoordinateStatusMessage coordinateStatusMessage = (CoordinateStatusMessage)getCoordinateMessage(message);
                 processCoordinateStatusMessage(coordinateStatusMessage, message);
@@ -118,32 +114,31 @@ public class ETPMVProactiveService {
         return jaxbConsumerContext;
     }
 
-    private void processCoordinateMessage(CoordinateMessage coordinateMessage, String message) throws Exception {
+    private void processCoordinateStatusMessage(CoordinateStatusMessage coordinateStatusMessage, String message) throws Exception {
+        CoordinateStatusData coordinateStatusData = coordinateStatusMessage.getCoordinateStatusDataMessage();
+        String serviceNumber = coordinateStatusData.getServiceNumber();
+        StatusType statusType = coordinateStatusData.getStatus();
+        Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
-
-        CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
-        RequestService requestService = coordinateData.getService();
-        String serviceNumber = requestService.getServiceNumber();
-        logger.info("Incoming ETP Proactive message with ServiceNumber = " + serviceNumber);
-        RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
-        ArrayOfBaseDeclarant arrayOfBaseDeclarant = requestServiceForSign.getContacts();
-        String ssoid = arrayOfBaseDeclarant.getBaseDeclarant().get(0).getSsoId();
-        ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber, ssoid);
-        if (proactiveMessage == null)
-        {
-            logger.info("Not found proactiveMessage for ServiceNumber = " + serviceNumber + " and ssoid = " + ssoid);
+        ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
+        //Если адресату сообщение не доставлено, то ИСПП получает и сохраняет статус 1030. Окончание процесса Проактив МоС.
+        if (StatusETPMessageType.NOT_DELIVERED_TO_ADDRESSEE.getCode().equals(code.toString())) {
+            daoService.updateProactiveMessage(proactiveMessage, StatusETPMessageType.NOT_DELIVERED_TO_ADDRESSEE);
             return;
         }
-
-        RequestStatus requestStatus = coordinateData.getStatus();
-        Integer statusCode = requestStatus.getStatus().getStatusCode();
-        StatusETPMessageType newStatus = StatusETPMessageType.findStatusETPMessageType(statusCode.toString());
-        //Сохранили новый статус
-        daoService.saveProactiveMessageStatus(proactiveMessage, newStatus);
-    }
-
-    private void processCoordinateStatusMessage(CoordinateStatusMessage coordinateStatusMessage, String message) throws Exception {
-
+        else {
+            //Если адресату сообщение доставлено, то ИСПП получает и сохраняет статус 1040
+            if (StatusETPMessageType.DELIVERED_TO_ADDRESSEE.getCode().equals(code.toString())) {
+                daoService.updateProactiveMessage(proactiveMessage, StatusETPMessageType.DELIVERED_TO_ADDRESSEE);
+                //ИСПП формирует и отправляет порталу сообщение о возможности отказа от услуги со статусом 8021 через очередь ЕТП МВ pp.notification_status_out
+                sendStatus(new Date().getTime(), proactiveMessage,  StatusETPMessageType.POSSIBLE_REJECTION, true);
+            }
+            else
+            {
+                //если другой статус - вернуть ошибку на портал
+                sendToBK(message);
+            }
+        }
     }
 
     public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid, String fio, Date expiration_date) {
@@ -254,7 +249,7 @@ public class ETPMVProactiveService {
         sendMessage(client, guardian, generateServiceNumber(), ssoid, client.getPerson().getFullName(), expiration_date);
     }
 
-    public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status) throws Exception {
+    public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotification) throws Exception {
         String serviceNumber = proactiveMessage == null ? generateServiceNumber() : proactiveMessage.getServicenumber();
         logger.info("Sending status to proaktiv ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status);
@@ -263,7 +258,12 @@ public class ETPMVProactiveService {
             if (System.currentTimeMillis() - begin_time < PAUSE_IN_MILLIS) {
                 Thread.sleep(PAUSE_IN_MILLIS - (System.currentTimeMillis() - begin_time)); //пауза между получением заявления и ответом, или между двумя статусами не менее секунды
             }
-            RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendStatus(message);
+            if (isNotification) {
+                RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendNotificationStatus(message);
+            } else
+            {
+                RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendStatus(message);
+            }
             logger.info("Status with ServiceNumber = " + serviceNumber + " sent to proaktiv ETP. Status = " + status.getCode());
             success = true;
         } catch (Exception e) {

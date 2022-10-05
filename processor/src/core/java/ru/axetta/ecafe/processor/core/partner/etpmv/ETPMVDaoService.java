@@ -426,11 +426,10 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public ProactiveMessage getProactiveMessage(String serviceNumber, String ssoid) {
+    public ProactiveMessage getProactiveMessage(String serviceNumber) {
         Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
-                "d.servicenumber=:servicenumber and d.ssoid=:ssoid");
+                "d.servicenumber=:servicenumber");
         query.setParameter("servicenumber", serviceNumber);
-        query.setParameter("ssoid", ssoid);
         try {
             return (ProactiveMessage) query.getSingleResult();
         } catch (NoResultException e) {
