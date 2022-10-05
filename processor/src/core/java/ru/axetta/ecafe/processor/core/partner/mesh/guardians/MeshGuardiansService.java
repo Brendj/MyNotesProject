@@ -304,6 +304,13 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
      * Если новое значение пустое, то удаляем контакт (удаление).
      */
     public MeshContactResponse savePersonContact(String meshGuid, List<ModifyContactsItem> contacts) {
+        //Убираем Null значения
+        for (ModifyContactsItem contact : contacts) {
+            if (contact.getNewValue() == null)
+                contact.setNewValue("");
+            if (contact.getOldValue() == null)
+                contact.setOldValue("");
+        }
         //Убираем контакты где old и new равны. Конвертируем контакты для мк
         contacts = contacts
                 .stream()
