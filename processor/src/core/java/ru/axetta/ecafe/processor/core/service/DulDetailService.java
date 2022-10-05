@@ -177,7 +177,7 @@ public class DulDetailService {
     }
 
     private void validateResidentCard(DulDetail dulDetail) throws DocumentValidateException {
-        String pattern = "^[а-я0-9a-z-]+$";
+        String pattern = "^[а-яА-Я0-9a-zA-Z-]+$";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(dulDetail.getNumber());
 
@@ -193,7 +193,7 @@ public class DulDetailService {
     }
 
     private void validateTemporaryResidence(DulDetail dulDetail) throws DocumentValidateException {
-        String pattern = "^[а-я0-9a-z-]+$";
+        String pattern = "^[а-яА-Я0-9a-zA-Z-]+$";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(dulDetail.getNumber());
 
