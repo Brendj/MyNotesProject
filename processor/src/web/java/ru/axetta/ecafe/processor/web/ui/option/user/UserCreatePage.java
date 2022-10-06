@@ -479,6 +479,12 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         return role.equals(User.DefaultRole.SUPPLIER);
     }
 
+    public Boolean getIsFoodSupplierApplicationManager () {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER);
+    }
+
     public Boolean getIsSupplierReport() {
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);

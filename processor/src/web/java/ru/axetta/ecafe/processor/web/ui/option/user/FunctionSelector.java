@@ -202,52 +202,26 @@ public class FunctionSelector {
         List<Function> allFunctions = allFunctionsCriteria.list();
         Set<Function> supplierFunctions = new HashSet<Function>();
         for (Function function : allFunctions) {
-            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_CARD_REPORTS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_CLIENT_REPORTS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_FINANCIAL_CONTROL) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_INFORM_REPORTS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_DOCS) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_SALES_REPORTS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_TRANSACTIONS_REPORT)
                 /*|| function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT)*/) {
                 supplierFunctions.add(function);
             }
         }
 
         for (Item item : onlineReportItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : organizationItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : contragentItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : clientItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : wayBillItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
                 supplierFunctions.add(function);
@@ -262,7 +236,10 @@ public class FunctionSelector {
         List<Function> allFunctions = allFunctionsCriteria.list();
         Set<Function> supplierReportFunctions = new HashSet<Function>();
         for (Function function : allFunctions) {
-            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_CLIENT_REPORTS) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT)) {
                 supplierReportFunctions.add(function);
             }
             //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
