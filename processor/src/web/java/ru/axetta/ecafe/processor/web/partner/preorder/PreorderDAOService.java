@@ -1296,6 +1296,9 @@ public class PreorderDAOService {
                     if (wtDishes == null || wtDishes.size() == 0) {
                         throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
                     }
+                    if (!wtComplex.getIsPortal()) {
+                        throw new MenuDetailNotExistsException("Комплекс с ид.=" + idOfComplex.toString() + " не доступен для портала");
+                    }
                     complexName = wtComplex.getName();
                     complexPrice = wtComplex.getPrice() == null ? 0L : wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                 }
