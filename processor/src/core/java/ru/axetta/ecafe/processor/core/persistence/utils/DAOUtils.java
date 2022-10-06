@@ -5646,15 +5646,21 @@ public class DAOUtils {
 
     public static List<Card> getNotRegistryInMeshCardsByOrg(Session session, Org org){
         Query query = session.createQuery("select crd from Card as crd "
-                + " left join crd.meshCardClientRef as ref "
-                + " where (crd.client.meshGUID not like '' and crd.client.meshGUID is not null) "
-                + " and ref is null "
+                + " where not exists(select 1 from MeshClientCardRef as ref where ref.idOfCard = crd.idOfCard)"
+                + " and (crd.client.meshGUID not like '' and crd.client.meshGUID is not null) "
                 + " and crd.org = :org and crd.state = :state "
         );
         query.setParameter("org", org);
         query.setParameter("state", Card.ACTIVE_STATE);
 
         return query.list();
+    }
+
+    public static MeshClientCardRef findMeshClientCardRefByCard(Session persistenceSession, Long idOfCard) {
+        Criteria criteria = persistenceSession.createCriteria(MeshClientCardRef.class);
+        criteria.add(Restrictions.eq("idOfCard", idOfCard));
+        criteria.setMaxResults(1);
+        return (MeshClientCardRef) criteria.uniqueResult();
     }
 
     public static SmartWatchVendor getVendorByApiKey(String apiKey, Session session) {
