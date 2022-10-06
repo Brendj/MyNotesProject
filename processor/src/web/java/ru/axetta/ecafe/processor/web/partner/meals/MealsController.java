@@ -135,7 +135,7 @@ public class MealsController extends Application {
                         return mealsPOJO.getResponseEntity();
 
                     //Логика всех проверок по клиенту
-                    mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.CREATE_FOODBOX, mealsPOJO);
+                    mealsPOJO = mealsService.validateByClientInfo(client, mealsPOJO);
                     if (mealsPOJO.getResponseEntity() != null)
                         return mealsPOJO.getResponseEntity();
 
@@ -274,10 +274,10 @@ public class MealsController extends Application {
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
-        //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.GET_BUFET, mealsPOJO);
-        if (mealsPOJO.getResponseEntity() != null)
-            return mealsPOJO.getResponseEntity();
+//        //Логика всех проверок по клиенту
+//        mealsPOJO = mealsService.validateByClientInfo(client, MealsFunctions.GET_BUFET, mealsPOJO);
+//        if (mealsPOJO.getResponseEntity() != null)
+//            return mealsPOJO.getResponseEntity();
 
         //Логика запросов к бд
         mealsService.getDataFromDAO(mealsPOJO.getClient(), MealsFunctions.GET_BUFET);
@@ -353,10 +353,10 @@ public class MealsController extends Application {
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
-        //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO);
-        if (mealsPOJO.getResponseEntity() != null)
-            return mealsPOJO.getResponseEntity();
+//        //Логика всех проверок по клиенту
+//        mealsPOJO = mealsService.validateByClientAllowed(mealsPOJO);
+//        if (mealsPOJO.getResponseEntity() != null)
+//            return mealsPOJO.getResponseEntity();
 
         //Логика получения флага
         return mealsService.getFoodBoxAllowed(mealsPOJO.getClient(), mealsPOJO.getFoodBoxAvailable());

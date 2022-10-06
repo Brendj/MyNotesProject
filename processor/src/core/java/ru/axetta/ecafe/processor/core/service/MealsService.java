@@ -86,7 +86,7 @@ public class MealsService {
     @Autowired
     private DAOService daoService;
 
-    public MealsPOJO validateByClientInfo(Client client, MealsController.MealsFunctions fun, MealsPOJO mealsPOJO)
+    public MealsPOJO validateByClientInfo(Client client, MealsPOJO mealsPOJO)
     {
         boolean errorOrg = false;
         try {
@@ -115,10 +115,6 @@ public class MealsService {
                     body(responseResult.clientNoFoodbox()));
             return mealsPOJO;
         }
-
-        if (MealsController.MealsFunctions.GET_BUFET == fun)
-            //На этом этапе закончиваются проверки для буфета
-            return mealsPOJO;
 
         List<FoodBoxPreorder> foodBoxPreorders = daoReadonlyService.getActiveFoodBoxPreorderForClient(client);
         if (foodBoxPreorders != null && !foodBoxPreorders.isEmpty()) {
