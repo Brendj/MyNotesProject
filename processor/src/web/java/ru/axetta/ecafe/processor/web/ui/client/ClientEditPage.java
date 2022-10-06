@@ -1357,22 +1357,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     throw new Exception(String.format("Ошибка удаления документов в МК: %s", meshDocumentResponse.getMessage()));
                 }
             } else {
-
                 try {
-                    MeshDocumentResponse meshDocumentResponse;
+                    MeshDocumentResponse meshDocumentResponse = null;
                     if (dulDetail.getNew()) {
                         meshDocumentResponse = getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client, safeToMk);
-                    } else {
+                        dulDetail.setNew(false);
+                    } else if (isDulChange(dulDetail, client)){
                         meshDocumentResponse = getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client, safeToMk);
                     }
-                    if (!meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                    if (meshDocumentResponse != null && !meshDocumentResponse.getCode().equals(PersonResponse.OK_CODE)) {
                         throw new Exception(String.format("Ошибка сохранения документов в МК: %s", meshDocumentResponse.getMessage()));
                     }
                 } catch (DocumentExistsException e) {
                     documentExceptionProcess(persistenceSession, e.getDocumentTypeId(), e.getMessage());
                 }
             }
-            dulDetail.setNew(false);
         }
 
         if (!this.dulDetail.isEmpty())
@@ -1397,6 +1396,19 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private boolean isDulChange(DulDetail dulDetail, Client client) {
+        Set<DulDetail> originDulDetails = new HashSet<>();
+        if (client.getDulDetail() != null) {
+            originDulDetails = client.getDulDetail().stream()
+                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
+                    .collect(Collectors.toSet());
+        }
+        for (DulDetail originDul : originDulDetails)
+            if (dulDetail.equals(originDul))
+                return false;
+        return true;
     }
 
     private void documentExceptionProcess(Session persistenceSession, Long documentTypeId, String message) throws Exception {
