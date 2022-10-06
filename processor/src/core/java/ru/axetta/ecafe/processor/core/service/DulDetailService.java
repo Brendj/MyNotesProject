@@ -34,10 +34,7 @@ public class DulDetailService {
      * {@link #validateDul(Session, DulDetail, boolean)
      * Использовать валидацию перед сохранением документа.}
      */
-    public MeshDocumentResponse updateDulDetail(Session session, DulDetail dulDetail, Client client, boolean saveToMK) throws Exception {
-        if (!isChange(dulDetail, client)) {
-            return new MeshDocumentResponse().okResponse();
-        }
+    public MeshDocumentResponse updateDulDetail(Session session, DulDetail dulDetail, Client client, boolean saveToMK) {
         dulDetail.setLastUpdate(new Date());
         MeshDocumentResponse documentResponse = new MeshDocumentResponse().okResponse();
         if (saveToMK && client.getMeshGUID() != null) {
@@ -83,19 +80,6 @@ public class DulDetailService {
         }
         session.merge(dulDetail);
         return documentResponse;
-    }
-
-    private boolean isChange(DulDetail dulDetail, Client client) {
-        Set<DulDetail> originDulDetails = new HashSet<>();
-        if (client.getDulDetail() != null) {
-            originDulDetails = client.getDulDetail().stream()
-                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
-                    .collect(Collectors.toSet());
-        }
-        for (DulDetail originDul : originDulDetails)
-            if (dulDetail.equals(originDul))
-                return false;
-        return true;
     }
 
     public void validateDulList(Session session, List<DulDetail> dulDetail, boolean checkAnotherClient) throws Exception {
