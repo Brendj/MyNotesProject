@@ -646,33 +646,33 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
-        Boolean errorOrg = false;
-        try {
-            if (!client.getOrg().getUsedFoodbox()) {
-                errorOrg = true;
-            }
-        } catch (Exception e) {
-            errorOrg = true;
-        }
-        if (errorOrg) {
-            logger.error("У организации не включен функционал фудбокса");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
-        }
-        //Проверяем параллель клиента
-        if (!new ClientParallel().verifyParallelForClient(client))
-        {
-            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
-        }
-        if (!client.getFoodboxAvailability()) {
-            logger.error("У клиента не включен функционал фудбокса");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
-        }
+//        Boolean errorOrg = false;
+//        try {
+//            if (!client.getOrg().getUsedFoodbox()) {
+//                errorOrg = true;
+//            }
+//        } catch (Exception e) {
+//            errorOrg = true;
+//        }
+//        if (errorOrg) {
+//            logger.error("У организации не включен функционал фудбокса");
+//            result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
+//            result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
+//            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+//        }
+//        //Проверяем параллель клиента
+//        if (!new ClientParallel().verifyParallelForClient(client))
+//        {
+//            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+//            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+//            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+//        }
+//        if (!client.getFoodboxAvailability()) {
+//            logger.error("У клиента не включен функционал фудбокса");
+//            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.getCode().toString());
+//            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_CLIENT.toString());
+//            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+//        }
         //Собираем данные для орг
         List<WtDish> wtDishes = daoReadonlyService.getWtDishesByOrgandDate(client.getOrg(), onDate);
         //Получаем количество доступных блюд для орг
@@ -974,20 +974,20 @@ public class MealsController extends Application {
             result.setDescription(ResponseCodes.RC_NOT_FOUND_CLIENT.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
         }
-        Boolean errorOrg = false;
-        try {
-            if (!client.getOrg().getUsedFoodbox()) {
-                errorOrg = true;
-            }
-        } catch (Exception e) {
-            errorOrg = true;
-        }
-        if (errorOrg) {
-            logger.error("У организации не включен функционал фудбокса");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
-        }
+//        Boolean errorOrg = false;
+//        try {
+//            if (!client.getOrg().getUsedFoodbox()) {
+//                errorOrg = true;
+//            }
+//        } catch (Exception e) {
+//            errorOrg = true;
+//        }
+//        if (errorOrg) {
+//            logger.error("У организации не включен функционал фудбокса");
+//            result.setCode(ResponseCodes.RC_NOT_FOUND_ORG.getCode().toString());
+//            result.setDescription(ResponseCodes.RC_NOT_FOUND_ORG.toString());
+//            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+//        }
         ClientData clientData = new ClientData();
         clientData.getClientId().setContractId(client.getContractId());
         clientData.getClientId().setStaffId(null);
@@ -1003,20 +1003,20 @@ public class MealsController extends Application {
         clientData.setBalance(client.getBalance());
         clientData.setFoodboxAllowed(client.getFoodboxAvailability());
         clientData.setFoodboxAvailable(client.getOrg().getUsedFoodbox());
-
-        //Проверяем, что параллель клиента доступна для заказа фудбокса
-        if (!new ClientParallel().verifyParallelForClient(client))
-        {
-            logger.error("Клиент не входит в параллель");
-            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
-            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
-            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
-        }
-        else
-        {
-            logger.info("Клиент входит в параллель");
-            return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
-        }
+        return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
+//        //Проверяем, что параллель клиента доступна для заказа фудбокса
+//        if (!new ClientParallel().verifyParallelForClient(client))
+//        {
+//            logger.error("Клиент не входит в параллель");
+//            result.setCode(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.getCode().toString());
+//            result.setDescription(ResponseCodes.RC_NOT_FOUND_AVAILABLE_PARALLEL.toString());
+//            return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(result).build();
+//        }
+//        else
+//        {
+//            logger.info("Клиент входит в параллель");
+//            return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
+//        }
     }
 
 
