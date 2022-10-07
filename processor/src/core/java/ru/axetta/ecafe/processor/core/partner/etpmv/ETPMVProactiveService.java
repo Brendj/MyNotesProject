@@ -121,15 +121,27 @@ public class ETPMVProactiveService {
         Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
         ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
+        //Если получено сообщения о вручении адресату возможности отказа
+        if (StatusETPMessageType.HANDED_TO_THE_ADDRESSEE.getCode().equals(code.toString())) {
+            //Делаем проверку только для статуса 8021
+            if (StatusETPMessageType.POSSIBLE_REJECTION.equals(proactiveMessage.getStatus()))
+            {
+                daoService.saveProactiveMessageStatus(proactiveMessage, StatusETPMessageType.HANDED_TO_THE_ADDRESSEE);
+            }
+            else
+            {
+                sendToBK(message);
+            }
+            return;
+        }
         //Если адресату сообщение не доставлено, то ИСПП получает и сохраняет статус 1030. Окончание процесса Проактив МоС.
         if (StatusETPMessageType.NOT_DELIVERED_TO_ADDRESSEE.getCode().equals(code.toString())) {
-            daoService.updateProactiveMessage(proactiveMessage, StatusETPMessageType.NOT_DELIVERED_TO_ADDRESSEE);
-            return;
+            daoService.saveProactiveMessageStatus(proactiveMessage, StatusETPMessageType.NOT_DELIVERED_TO_ADDRESSEE);
         }
         else {
             //Если адресату сообщение доставлено, то ИСПП получает и сохраняет статус 1040
             if (StatusETPMessageType.DELIVERED_TO_ADDRESSEE.getCode().equals(code.toString())) {
-                daoService.updateProactiveMessage(proactiveMessage, StatusETPMessageType.DELIVERED_TO_ADDRESSEE);
+                daoService.saveProactiveMessageStatus(proactiveMessage, StatusETPMessageType.DELIVERED_TO_ADDRESSEE);
                 //ИСПП формирует и отправляет порталу сообщение о возможности отказа от услуги со статусом 8021 через очередь ЕТП МВ pp.notification_status_out
                 sendStatus(new Date().getTime(), proactiveMessage,  StatusETPMessageType.POSSIBLE_REJECTION, true);
             }
