@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -240,7 +241,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             for (MeshDocumentResponse document : documents) {
                 DulDetail dulDetail = client.getDulDetail()
                         .stream()
-                        .filter(dulDetailItem -> dulDetailItem.getIdMkDocument().equals(document.getId()))
+                        .filter(dulDetailItem -> ObjectUtils.equals(dulDetailItem.getIdMkDocument(), document.getId()))
                         .findFirst()
                         .orElse(null);
                 if (dulDetail == null) {
@@ -263,7 +264,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             boolean exists = false;
             if (documents != null || !documents.isEmpty()) {
                 exists = documents.stream()
-                        .anyMatch(di -> di.getId().equals(dulDetailItem.getIdMkDocument()));
+                        .anyMatch(di -> ObjectUtils.equals(di.getId(), dulDetailItem.getIdMkDocument()));
             }
             if (!exists) {
                 dulDetailItem.setLastUpdate(new Date());

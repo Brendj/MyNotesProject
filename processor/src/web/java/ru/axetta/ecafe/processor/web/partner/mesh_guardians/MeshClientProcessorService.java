@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.partner.mesh_guardians;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -312,7 +313,7 @@ public class MeshClientProcessorService {
         for(DocumentInfo di : documents){
             DulDetail d = dulDetails
                     .stream()
-                    .filter(dulDetail -> dulDetail.getIdMkDocument().equals(di.getIdMKDocument()))
+                    .filter(dulDetail -> ObjectUtils.equals(dulDetail.getIdMkDocument(),di.getIdMKDocument()))
                     .findFirst()
                     .orElse(null);
             if(d == null){
@@ -333,7 +334,7 @@ public class MeshClientProcessorService {
 
         for(DulDetail dulDetailItem : dulDetails){
             boolean exists = documents.stream()
-                    .anyMatch(di -> di.getIdMKDocument().equals(dulDetailItem.getIdMkDocument()));
+                    .anyMatch(di -> ObjectUtils.equals(di.getIdMKDocument(), dulDetailItem.getIdMkDocument()));
             if(!exists){
                 dulDetailItem.setLastUpdate(new Date());
                 dulDetailItem.setDeleteState(true);
