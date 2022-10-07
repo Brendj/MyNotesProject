@@ -245,8 +245,8 @@ public class ETPMVProactiveService {
         return sw.toString();
     }
 
-    public void sendMSPAssignedMessage(Client client, Client guardian, String ssoid, Date expiration_date) {
-        sendMessage(client, guardian, generateServiceNumber(), ssoid, client.getPerson().getFullName(), expiration_date);
+    public void sendMSPAssignedMessage(Client client, Client guardian, String clientFIO, String ssoid, Date expiration_date) {
+        sendMessage(client, guardian, generateServiceNumber(), ssoid, clientFIO, expiration_date);
     }
 
     public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotification) throws Exception {

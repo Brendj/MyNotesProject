@@ -48,12 +48,15 @@ public class PersonBenefitCategoryService {
         Client client = null;
         List<Client> guardians = null;
         Date endDate = null;
+        String fio = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             client = DAOUtils.findClientByMeshGuid(session, responseData.getPerson_id());
-            if (client == null)
+            if (client == null) {
+                log.info(String.format("Client with guid=%s not found", responseData.getPerson_id()));
                 return;
+            }
             for (BenefitCategoryChange benefit : responseData.getBenefit_category_changes()) {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
@@ -72,6 +75,7 @@ public class PersonBenefitCategoryService {
                     DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true);
                     guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient(), false);
                     sendToPortal = true;
+                    fio = client.getPerson().getFullName();
                 }
             }
             transaction.commit();
@@ -83,15 +87,15 @@ public class PersonBenefitCategoryService {
             HibernateUtils.close(session, log);
         }
         if (sendToPortal) {
-            sendNotificationBenefitCreated(client, guardians, endDate);
+            sendNotificationBenefitCreated(client, guardians, fio, endDate);
         }
     }
 
-    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, Date expiration_date) {
+    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, String clientFIO, Date expiration_date) {
         try {
             for (Client guardian : guardians) {
-                String ssoid = aupdPersonService.getSsoidByPersonId(client.getMeshGUID());
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, ssoid, expiration_date);
+                String ssoid = aupdPersonService.getSsoidByPersonId(guardian.getMeshGUID());
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, clientFIO, ssoid, expiration_date);
             }
         } catch (Exception e) {
             log.error("Error in sendNotificationBenefitCreated: ", e);
