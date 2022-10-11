@@ -14,7 +14,7 @@ public class PersonBenefitCheckRequest extends AbstractPushData {
     private String request_id;
     private String person_id;
     private String state_service_variety_code;
-    private Integer[] benefit_сategory_codes;
+    private Integer[] benefit_category_codes;
 
     public PersonBenefitCheckRequest() {
 
@@ -26,10 +26,10 @@ public class PersonBenefitCheckRequest extends AbstractPushData {
         this.request_id = UUID.randomUUID().toString();
         this.state_service_variety_code = RuntimeContext.getInstance()
                 .getPropertiesValue(BenefitKafkaService.STATE_SERVICE_VARIETY_CODE_PROPERTY, BenefitKafkaService.STATE_SERVICE_VARIETY_CODE_DEFAULT);
-        this.benefit_сategory_codes = new Integer[applicationForFood.getDtisznCodes().size()];
+        this.benefit_category_codes = new Integer[applicationForFood.getDtisznCodes().size()];
         int i = 0;
         for (ApplicationForFoodDiscount discount : applicationForFood.getDtisznCodes()) {
-            this.benefit_сategory_codes[i] = discount.getDtisznCode();
+            this.benefit_category_codes[i] = discount.getDtisznCode();
             i++;
         }
     }
@@ -58,11 +58,11 @@ public class PersonBenefitCheckRequest extends AbstractPushData {
         this.state_service_variety_code = state_service_variety_code;
     }
 
-    public Integer[] getBenefit_сategory_codes() {
-        return benefit_сategory_codes;
+    public Integer[] getBenefit_category_codes() {
+        return benefit_category_codes;
     }
 
-    public void setBenefit_сategory_codes(Integer[] benefit_сategory_codes) {
-        this.benefit_сategory_codes = benefit_сategory_codes;
+    public void setBenefit_category_codes(Integer[] benefit_category_codes) {
+        this.benefit_category_codes = benefit_category_codes;
     }
 }
