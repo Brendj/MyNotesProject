@@ -55,12 +55,18 @@ public class ClientDtisznDiscountInfo implements Comparable {
     @Override
     public int compareTo(Object o) {
         ClientDtisznDiscountInfo item = (ClientDtisznDiscountInfo) o;
+        if (this.isArchivedNullSafe() && !item.isArchivedNullSafe()) return -1;
+        if (!this.isArchivedNullSafe() && item.isArchivedNullSafe()) return 1;
         int res = this.dateEnd.compareTo(item.getDateEnd());
         if (res == 0) {
             return DiscountManager.getDiscountPriority(this.dtisznCode).compareTo(item.getDtisznCode().intValue());
         } else {
             return res;
         }
+    }
+
+    public boolean isArchivedNullSafe() {
+        return this.archived != null && this.archived;
     }
 
     @Override

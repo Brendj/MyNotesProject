@@ -272,11 +272,14 @@ public class DiscountManager {
     public static ClientDtisznDiscountInfo getAppointedClientDtisznDiscount(Client client) {
         if (CollectionUtils.isEmpty(client.getCategoriesDSZN())) return null;
         ClientDtisznDiscountInfo info = client.getCategoriesDSZN().stream()
-                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP()).findFirst().orElse(null);
+                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP() && (i.getArchived() == null || !i.getArchived())).findFirst().orElse(null);
         if (info != null) return info;
         List<ClientDtisznDiscountInfo> infos = new ArrayList(client.getCategoriesDSZN());
         Collections.sort(infos);
-        return infos.get(infos.size() - 1);
+        for (int i = infos.size()-1; i >= 0; i--) {
+            if (!infos.get(i).isArchivedNullSafe()) return infos.get(i);
+        }
+        return null;
     }
 
     public static void archiveApplicationForFood(Session session, ApplicationForFood applicationForFood, Long newVersion) {
