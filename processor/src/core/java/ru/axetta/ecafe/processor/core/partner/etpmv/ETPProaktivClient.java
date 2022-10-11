@@ -47,8 +47,8 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
     @PostConstruct
     private synchronized void init() {
         //Настройка активности сервиса ЕТП для Проактива
-        if (!RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.queue.out.notification.isOn", "false").equals("true")) return;
-        String nodes = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.queue.out.notification.nodes", "");
+        if (!RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.proactive.isOn", "false").equals("true")) return;
+        String nodes = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.proactive.nodes", "");
         if (StringUtils.isEmpty(nodes)) return;
         String[] arr = nodes.split(",");
         List<String> nodesList = Arrays.asList(arr);
@@ -80,23 +80,26 @@ public class ETPProaktivClient implements MessageListener,ExceptionListener {
             //Создаем сессию для получения статусов
             jmsStatusSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             //Создаем саму очередь
-            queueProducer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.out.notification", "PP.NOTIFICATION_OUT"));
+            queueProducer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.proactive.queue.out.notification", "PP.NOTIFICATION_OUT"));
             //Запуск соединения
             jmsConnection.start();
             //Создаем отправщика в очередь
             producer = jmsProducerSession.createProducer(queueProducer);
 
-            //Создаем очередь на чтение
-            queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.status", "PP.NOTIFICATION_ACK"));
-            //Создаем читальщика
-            consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
-            //Указываем, что будем использовать метод onMessage из текущего класса
-            consumerStatus.setMessageListener(this);
+            String consumerNode = properties.getProperty("ecafe.processor.etp.proactive.consumer.node", "");
+            if (RuntimeContext.getInstance().getNodeName().equals(consumerNode)) {
+                //Создаем очередь на чтение
+                queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.proactive.queue.in.notification.status", "PP.NOTIFICATION_ACK"));
+                //Создаем читальщика
+                consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
+                //Указываем, что будем использовать метод onMessage из текущего класса
+                consumerStatus.setMessageListener(this);
 
-            bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.notification.bk", "PP.NOTIFICATION_ACK.BK"));
-            consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
+                bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.proactive.queue.in.notification.bk", "PP.NOTIFICATION_ACK.BK"));
+                consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
+            }
 
-            queueNotificationStatus = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.out.notification.status", "PP.NOTIFICATION_STATUS_OUT"));
+            queueNotificationStatus = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.proactive.queue.out.notification.status", "PP.NOTIFICATION_STATUS_OUT"));
             consumerNotificationStatus = jmsProducerSession.createProducer(queueNotificationStatus);
 
             logger.info("End init ETP Proactive connection");
