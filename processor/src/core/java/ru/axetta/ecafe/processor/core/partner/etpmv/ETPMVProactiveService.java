@@ -17,12 +17,10 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
@@ -274,7 +272,7 @@ public class ETPMVProactiveService {
         sendMessage(client, guardian, generateServiceNumber(), ssoid, clientFIO, expiration_date);
     }
 
-    public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotification) throws Exception {
+    public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotificationStatus) throws Exception {
         String serviceNumber = proactiveMessage == null ? generateServiceNumber() : proactiveMessage.getServicenumber();
         logger.info("Sending status to proaktiv ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status);
@@ -283,7 +281,7 @@ public class ETPMVProactiveService {
             if (System.currentTimeMillis() - begin_time < PAUSE_IN_MILLIS) {
                 Thread.sleep(PAUSE_IN_MILLIS - (System.currentTimeMillis() - begin_time)); //пауза между получением заявления и ответом, или между двумя статусами не менее секунды
             }
-            if (isNotification) {
+            if (isNotificationStatus) {
                 RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendNotificationStatus(message);
             } else
             {
