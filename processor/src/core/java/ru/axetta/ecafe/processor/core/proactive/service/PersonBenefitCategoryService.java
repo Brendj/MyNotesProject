@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
@@ -72,7 +73,7 @@ public class PersonBenefitCategoryService {
                     Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());
                     endDate = format.get().parse(benefit.getEnd_date());
-                    DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true);
+                    DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true, DiscountChangeHistory.MODIFY_BY_PROACTIVE);
                     guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient(), false);
                     sendToPortal = true;
                     fio = client.getPerson().getFullName();

@@ -96,7 +96,7 @@ public class ETPMVProactiveService {
         } catch (Exception e) {
             logger.error("Error in sendBKStatus: ", e);
         }
-        //RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveBKStatus(message, success);
     }
 
     public Object getCoordinateMessage(String message) throws Exception {

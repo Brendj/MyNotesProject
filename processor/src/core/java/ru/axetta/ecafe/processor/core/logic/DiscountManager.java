@@ -238,7 +238,8 @@ public class DiscountManager {
         }
     }
 
-    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate, boolean rebuild) throws Exception {
+    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate,
+                                         boolean rebuild, String discountComment) throws Exception {
         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
         Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
         if (null == discountInfo) {
@@ -259,10 +260,10 @@ public class DiscountManager {
             discountInfo.setVersion(clientDTISZNDiscountVersion);
             discountInfo.setActive(true);
             RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
-                    DiscountChangeHistory.MODIFY_IN_SERVICE);
+                    discountComment);
             session.update(discountInfo);
         }
-        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), DiscountChangeHistory.MODIFY_IN_SERVICE);
+        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), discountComment);
         if (rebuild) {
             rebuildAppointedMSPByClient(session, client);
         }

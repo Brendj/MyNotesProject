@@ -326,11 +326,11 @@ public class DTSZNDiscountsReviseService {
                 if (!discount.getConfirmed()) continue;
                 if (discount.equals(infomax)) continue;
                 DiscountManager.addDtisznDiscount(session, client, discount.getDtisznCode(), discount.getStartDate(),
-                        discount.getEndDate(), false);
+                        discount.getEndDate(), false, DiscountChangeHistory.MODIFY_IN_SERVICE);
             }
             if (infomax != null) {
                 DiscountManager.addDtisznDiscount(session, client, infomax.getDtisznCode(), infomax.getStartDate(),
-                        infomax.getEndDate(), true);
+                        infomax.getEndDate(), true, DiscountChangeHistory.MODIFY_IN_SERVICE);
                 applicationForFood.setDiscountDateStart(infomax.getStartDate());
                 applicationForFood.setDiscountDateEnd(infomax.getEndDate());
             } else {
