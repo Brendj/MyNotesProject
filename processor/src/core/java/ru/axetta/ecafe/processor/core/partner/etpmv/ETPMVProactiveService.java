@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
@@ -121,6 +122,18 @@ public class ETPMVProactiveService {
         Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
         ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
+
+        //Пользователь портала отказывается от ЛП для обучающегося.
+        if (StatusETPMessageType.REFUSAL.getCode().equals(code.toString())) {
+            if (proactiveMessage.getClient() != null) {
+                DiscountManager.disableAllDiscounts(proactiveMessage.getClient());
+                //ИСПП отправляет сообщение порталу об отказе от услуги ЛП пользователем со статусом 1080.1 через очередь ЕТП МВ pp.notification_status_out
+                sendStatus(new Date().getTime(), proactiveMessage, StatusETPMessageType.REFUSE_USER, true);
+            } else {
+                sendToBK(message);
+            }
+            return;
+        }
         //Если получено сообщения о вручении адресату возможности отказа
         if (StatusETPMessageType.HANDED_TO_THE_ADDRESSEE.getCode().equals(code.toString())) {
             //Делаем проверку только для статуса 8021
