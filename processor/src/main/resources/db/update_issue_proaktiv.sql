@@ -29,3 +29,8 @@ CREATE TABLE  cf_proaktiv_message_status (
       REFERENCES cf_proaktiv_message (idofproaktivmessage) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Параметры в конфигурацию
+--ecafe.processor.etp.proactive.isOn=true
+--ecafe.processor.etp.proactive.nodes=NNN - отправка в очереди проактива етп
+--ecafe.processor.etp.proactive.consumer.node=NNN - слушатель входящей очереди проактива етп
