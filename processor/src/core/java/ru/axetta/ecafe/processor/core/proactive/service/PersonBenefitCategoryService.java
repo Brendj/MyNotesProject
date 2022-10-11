@@ -117,8 +117,9 @@ public class PersonBenefitCategoryService {
                     .getExpiredDTISZNDiscountInfoByDayAndCode(session, startDate, endDate, Long.parseLong(DSZN_MOS_CODE));
 
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : info) {
-                //todo Добавть архивацию льгот
-                //todo Нужно добавить вызов "переход к удалению ЛК, п.6.2 БФТ Проактив МоС;" после готовности метода https://yt.iteco.dev/issue/ISPP-1149
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, StatusETPMessageType.REFUSE_TIMEOUT, true);
+                DiscountManager.removeDtisznDiscount(session, clientDtisznDiscountInfo.getClient(), clientDtisznDiscountInfo.getDtisznCode().intValue(), true);
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, StatusETPMessageType.REFUSE_SYSTEM, true);
             }
             transaction.commit();
             transaction = null;
