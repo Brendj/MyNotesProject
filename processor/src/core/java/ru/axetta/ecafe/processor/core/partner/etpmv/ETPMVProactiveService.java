@@ -16,12 +16,10 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
@@ -117,9 +115,11 @@ public class ETPMVProactiveService {
     private void processCoordinateStatusMessage(CoordinateStatusMessage coordinateStatusMessage, String message) throws Exception {
         CoordinateStatusData coordinateStatusData = coordinateStatusMessage.getCoordinateStatusDataMessage();
         String serviceNumber = coordinateStatusData.getServiceNumber();
+        logger.info(String.format("Incoming ETP proactive message with ServiceNumber = %s", serviceNumber));
         StatusType statusType = coordinateStatusData.getStatus();
         Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
+        daoService.saveEtpPacket("+" + serviceNumber, message);
         ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
         //Если получено сообщения о вручении адресату возможности отказа
         if (StatusETPMessageType.HANDED_TO_THE_ADDRESSEE.getCode().equals(code.toString())) {
@@ -281,6 +281,7 @@ public class ETPMVProactiveService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage("+" + serviceNumber, message, success, "");
         if (success) {
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessageStatus(proactiveMessage, status);
         }

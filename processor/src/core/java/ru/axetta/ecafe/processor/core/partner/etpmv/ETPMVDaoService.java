@@ -408,6 +408,22 @@ public class ETPMVDaoService {
     }
 
     @Transactional
+    public void saveProactiveOutgoingMessage(String messageId, String messageText, Boolean isSent, String errorMessage) {
+        try {
+            EtpOutgoingMessage etpOutgoingMessage = new EtpOutgoingMessage();
+            etpOutgoingMessage.setEtpMessageId(messageId);
+            etpOutgoingMessage.setCreatedDate(new Date());
+            etpOutgoingMessage.setEtpMessagePayload(messageText);
+            etpOutgoingMessage.setIsSent(isSent);
+            etpOutgoingMessage.setErrorMessage(errorMessage);
+            etpOutgoingMessage.setLastUpdate(new Date());
+            entityManager.merge(etpOutgoingMessage);
+        } catch (Exception e) {
+            logger.error("Error in saving outgoing proactive ETP message: ", e);
+        }
+    }
+
+    @Transactional
     public void saveProactiveMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
         try {
             ProactiveMessage proactiveMessage = new ProactiveMessage();
