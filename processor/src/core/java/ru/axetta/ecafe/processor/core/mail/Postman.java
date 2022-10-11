@@ -40,12 +40,16 @@ public class Postman implements AutoReportPostman {
     private static final Logger logger = LoggerFactory.getLogger(Postman.class);
 
     public static class SmtpSettings {
+        public static final int defaultTimeout = 60000;
+        public static final int defaultConnectionTimeout = 10000;
 
         private final String host;
         private final int port;
         private final boolean startTLS;
         private final String user;
         private final String password;
+        private final int timeout;
+        private final int connectionTimeout;
 
         public SmtpSettings(String host, int port) {
             this.host = host;
@@ -53,6 +57,8 @@ public class Postman implements AutoReportPostman {
             this.startTLS = false;
             this.user = null;
             this.password = null;
+            this.timeout = defaultTimeout;
+            this.connectionTimeout = defaultConnectionTimeout;
         }
 
         public SmtpSettings(String host, int port, String user, String password) {
@@ -61,14 +67,19 @@ public class Postman implements AutoReportPostman {
             this.startTLS = false;
             this.user = user;
             this.password = password;
+            this.timeout = defaultTimeout;
+            this.connectionTimeout = defaultConnectionTimeout;
         }
 
-        public SmtpSettings(String host, int port, boolean startTLS, String user, String password) {
+        public SmtpSettings(String host, int port, boolean startTLS, String user, String password, int timeout,
+                            int connectionTimeout) {
             this.host = host;
             this.port = port;
             this.startTLS = startTLS;
             this.user = user;
             this.password = password;
+            this.timeout = timeout;
+            this.connectionTimeout = connectionTimeout;
         }
 
         public String getHost() {
@@ -89,6 +100,14 @@ public class Postman implements AutoReportPostman {
 
         public String getPassword() {
             return password;
+        }
+
+        public int getTimeout() {
+            return timeout;
+        }
+
+        public int getConnectionTimeout() {
+            return connectionTimeout;
         }
     }
 
@@ -148,8 +167,8 @@ public class Postman implements AutoReportPostman {
         properties.put("mail.smtp.ssl.trust", "*");
         properties.put("mail.smtp.host", smtpSettings.getHost());
         properties.put("mail.smtp.port", Integer.toString(smtpSettings.getPort()));
-        properties.put("mail.smtp.timeout", "600000");
-        properties.put("mail.smtp.connectiontimeout", "600000");
+        properties.put("mail.smtp.timeout", Integer.toString(smtpSettings.getTimeout()));
+        properties.put("mail.smtp.connectiontimeout", Integer.toString(smtpSettings.getConnectionTimeout()));
         if (smtpSettings.isStartTLS()) {
             properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.socketFactory.port", smtpSettings.getPort());

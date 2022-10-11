@@ -1338,10 +1338,15 @@ public class RuntimeContext implements ApplicationContextAware {
     private static Postman.MailSettings readMailSettings(Properties properties, String baseParam) throws Exception {
         String smtpBaseParam = baseParam + ".smtp";
         String startTLS = properties.getProperty(smtpBaseParam + ".starttls");
-        Postman.SmtpSettings smtpSettings = new Postman.SmtpSettings(properties.getProperty(smtpBaseParam + ".host"),
+        String timeout = properties.getProperty(smtpBaseParam + ".timeout");
+        String connectiontimeout = properties.getProperty(smtpBaseParam + ".connectiontimeout");
+        Postman.SmtpSettings smtpSettings = new Postman.SmtpSettings(
+                properties.getProperty(smtpBaseParam + ".host"),
                 Integer.parseInt(properties.getProperty(smtpBaseParam + ".port", "25")),
                 StringUtils.equals(startTLS, "true"), properties.getProperty(smtpBaseParam + ".user"),
-                properties.getProperty(smtpBaseParam + ".password"));
+                properties.getProperty(smtpBaseParam + ".password"),
+                timeout != null ? Integer.parseInt(timeout) : Postman.SmtpSettings.defaultTimeout,
+                connectiontimeout != null ? Integer.parseInt(connectiontimeout) : Postman.SmtpSettings.defaultConnectionTimeout);
         String copyAddress = properties.getProperty(baseParam + ".copy");
         return new Postman.MailSettings(smtpSettings, new InternetAddress(properties.getProperty(baseParam + ".from")),
                 null == copyAddress ? null : new InternetAddress(copyAddress));
