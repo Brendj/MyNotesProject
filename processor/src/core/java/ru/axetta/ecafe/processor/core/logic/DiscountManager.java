@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService.DATA_SOURCE_TYPE_MARKER_OU;
 
@@ -29,6 +30,7 @@ public class DiscountManager {
     private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
     public static final String DELETE_COMMENT = "Удаление категории льгот";
     public static final String DELETE_INOE_COMMENT = "Удалено по причине окончания периода";
+    public static final String DELETE_DTISZN_COMMENT = "Удалено в результате деактивации льготы ДТИСЗН";
     public static final String RESERV_DISCOUNT = "Резерв";
     private static final String PROPERTY_DOU_DISCOUNT_DELETE = "ecafe.processor.clientMigrationHistory.dou.discountDelete";
     private static Map<Integer, Integer> discountPriorityMap = null;
@@ -276,7 +278,7 @@ public class DiscountManager {
         if (info != null) return info;
         List<ClientDtisznDiscountInfo> infos = new ArrayList(client.getCategoriesDSZN());
         Collections.sort(infos);
-        for (int i = infos.size()-1; i >= 0; i--) {
+        for (int i = infos.size() - 1; i >= 0; i--) {
             if (!infos.get(i).isArchivedNullSafe()) return infos.get(i);
         }
         return null;
@@ -512,6 +514,24 @@ public class DiscountManager {
         renewDiscounts(session, client, newDiscounts, oldDiscounts, DELETE_COMMENT);
     }
 
+    private static void deleteDiscountsByIds(Session session, Client client, List<Long> idOfCategoryDiscountList, String comment) throws Exception {
+        Set<CategoryDiscount> oldDiscounts = client.getCategories();
+        Set<CategoryDiscount> newDiscounts = new HashSet<>();
+        for (CategoryDiscount cd : oldDiscounts) {
+            if (!idOfCategoryDiscountList.contains(cd.getIdOfCategoryDiscount()))
+                newDiscounts.add(cd);
+        }
+        renewDiscounts(session, client, newDiscounts, oldDiscounts, comment);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Long> getIdOfCategoryDiscountByDtisznCode(Session session, List<Long> dtisznCodeList) {
+        Query query = session.createSQLQuery("SELECT t.idofcategorydiscount FROM cf_categorydiscounts_dszn t " +
+                "WHERE t.code IN (:dtisznCodeList)");
+        query.setParameterList("dtisznCodeList", dtisznCodeList);
+        return query.list();
+    }
+
     public static void disableAllDiscounts(Client client) {
         Session session = null;
         Transaction transaction = null;
@@ -519,14 +539,19 @@ public class DiscountManager {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             List<ClientDtisznDiscountInfo> list = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             if (list.size() == 0)
                 return;
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : list) {
                 clientDtisznDiscountInfo.setActive(false);
                 clientDtisznDiscountInfo.setLastUpdate(new Date());
-                clientDtisznDiscountInfo.setVersion(clientDtisznDiscountInfo.getVersion() + 1);
+                clientDtisznDiscountInfo.setVersion(clientDTISZNDiscountVersion);
                 session.update(clientDtisznDiscountInfo);
             }
+            List<Long> dtisznCodeList = list.stream().map(ClientDtisznDiscountInfo::getDtisznCode).collect(Collectors.toList());
+            List<Long> idOfCategoryDiscountList = getIdOfCategoryDiscountByDtisznCode(session, dtisznCodeList);
+            deleteDiscountsByIds(session, client, idOfCategoryDiscountList, DELETE_DTISZN_COMMENT);
+
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
