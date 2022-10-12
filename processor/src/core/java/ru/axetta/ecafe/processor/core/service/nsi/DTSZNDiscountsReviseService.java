@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientDiscountHistoryService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
-import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
@@ -327,11 +326,11 @@ public class DTSZNDiscountsReviseService {
                 if (!discount.getConfirmed()) continue;
                 if (discount.equals(infomax)) continue;
                 DiscountManager.addDtisznDiscount(session, client, discount.getDtisznCode(), discount.getStartDate(),
-                        discount.getEndDate(), false);
+                        discount.getEndDate(), false, DiscountChangeHistory.MODIFY_IN_SERVICE);
             }
             if (infomax != null) {
                 DiscountManager.addDtisznDiscount(session, client, infomax.getDtisznCode(), infomax.getStartDate(),
-                        infomax.getEndDate(), true);
+                        infomax.getEndDate(), true, DiscountChangeHistory.MODIFY_IN_SERVICE);
                 applicationForFood.setDiscountDateStart(infomax.getStartDate());
                 applicationForFood.setDiscountDateEnd(infomax.getEndDate());
             } else {
@@ -724,6 +723,9 @@ public class DTSZNDiscountsReviseService {
                 .filter(i -> i.getClient().equals(client)).collect(Collectors.toList());
     }*/
 
+    //todo Нужно добавить "Процессинг проверяет наличие признака "отменена" у ЛК
+    // 3.1. если признак установлен - далее п. 4."
+
     public void runTaskDB(String guid) throws Exception {
         ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
         ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
@@ -838,7 +840,7 @@ public class DTSZNDiscountsReviseService {
                     discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(), item.getTitle(),
                             item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
                                     : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
-                            item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt());
+                            item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt(), true);
                     discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                             || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                     session.save(discountInfo);
@@ -868,6 +870,7 @@ public class DTSZNDiscountsReviseService {
                                         || discountInfo.getArchived())) {
                             discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
                             discountInfo.setArchived(false);
+                            discountInfo.setActive(true);
                             wasModified = true;
                         }
                         if (!item.getBenefitConfirm() && (
@@ -883,6 +886,7 @@ public class DTSZNDiscountsReviseService {
                             wasModified = true;
                         } else if (item.getBenefitConfirm() && discountInfo.getArchived()) {
                             discountInfo.setArchived(false);
+                            discountInfo.setActive(true);
                             wasModified = true;
                         }
                         discountInfo.setLastReceivedDate(new Date());
@@ -912,7 +916,7 @@ public class DTSZNDiscountsReviseService {
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
                                 item.getTitle(), item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
                                 : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
-                                item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt());
+                                item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt(), true);
                         discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                                 || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                         session.save(discountInfo);

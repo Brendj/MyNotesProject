@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage" table="cf_proaktiv_message">
+        <id name="idofproaktivmessage" column="idofproaktivmessage" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclient"
+                     not-null="true" fetch="select"/>
+
+        <many-to-one name="guardian" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofguardian"
+                     not-null="true" fetch="select"/>
+
+        <property name="servicenumber" column="servicenumber" type="string" length="128" unique="true" not-null="true"/>
+        <property name="ssoid" column="ssoid" type="string"/>
+        <property name="status" column="status" type="ru.axetta.ecafe.processor.core.persistence.ProactiveStatusType"/>
+        <property name="message_type" column="message_type">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.partner.etpmv.enums.MessageType</param>
+                <param name="type">4</param>
+            </type>
+        </property>
+        <property name="createddate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastupdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+    </class>
+</hibernate-mapping>

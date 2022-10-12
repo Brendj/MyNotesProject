@@ -34,8 +34,8 @@ public class DiscountManager {
     private static Map<Integer, Integer> discountPriorityMap = null;
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
-            Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
-            Integer oldDiscountMode, Integer newDiscountMode, String comment) {
+                                           Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
+                                           Integer oldDiscountMode, Integer newDiscountMode, String comment) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode, oldDiscountMode,
                 extractCategoryIdsFromDiscountSet(newDiscounts), extractCategoryIdsFromDiscountSet(oldDiscounts));
         discountChangeHistory.setComment(comment);
@@ -45,7 +45,7 @@ public class DiscountManager {
     }
 
     private static void saveNewClientDiscountHistoryRecord(Session session, Client client,
-            Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
+                                                           Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts, String comment) {
         ClientDiscountHistoryService service = RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class);
         service.saveClientDiscountHistoryByOldScheme(session, client, oldDiscounts, newDiscounts, comment);
     }
@@ -87,14 +87,14 @@ public class DiscountManager {
     public static CategoryDiscount getCategoryDiscountByDtisznCode(Session session, Integer dtisznCode) {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.eq("code", dtisznCode));
-        CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN)criteria.uniqueResult();
+        CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) criteria.uniqueResult();
         return categoryDiscountDSZN.getCategoryDiscount();
     }
 
     private static CategoryDiscount getCategoryDiscountByCode(Session session, Long idOfCategoryDiscount) {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
         criteria.add(Restrictions.eq("idOfCategoryDiscount", idOfCategoryDiscount));
-        return (CategoryDiscount)criteria.uniqueResult();
+        return (CategoryDiscount) criteria.uniqueResult();
     }
 
     public static void addOtherDiscountForClient(Session session, Client client) throws Exception {
@@ -138,13 +138,13 @@ public class DiscountManager {
             }
         }
         client.getCategories().clear();
-        if(!discountsAfterRemove.isEmpty()) {
+        if (!discountsAfterRemove.isEmpty()) {
             client.setCategories(discountsAfterRemove);
         }
 
         String newDiscounts = "";
-        for(CategoryDiscount discount : client.getCategories()){
-            if(!newDiscounts.isEmpty()){
+        for (CategoryDiscount discount : client.getCategories()) {
+            if (!newDiscounts.isEmpty()) {
                 newDiscounts += ",";
             }
             newDiscounts += discount.getIdOfCategoryDiscount();
@@ -203,7 +203,7 @@ public class DiscountManager {
         ClientDtisznDiscountInfo oldAppointedMSP = list.stream()
                 .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP()).findFirst().orElse(null);
         Collections.sort(list);
-        ClientDtisznDiscountInfo newAppointedMSP = list.get(list.size()-1);
+        ClientDtisznDiscountInfo newAppointedMSP = list.get(list.size() - 1);
         if (oldAppointedMSP == null) {
             newAppointedMSP.setAppointedMSP(true);
             session.update(newAppointedMSP);
@@ -215,7 +215,31 @@ public class DiscountManager {
         }
     }
 
-    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate, boolean rebuild) throws Exception {
+    //Удаляем льготу ДСЗН без привязке к ЗЛП
+    public static void removeDtisznDiscount(Session session, Client client, Integer dtisznCode, boolean rebuild) throws Exception {
+        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+        if (discountInfo != null && !discountInfo.getArchived()) {
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(discountInfo);
+            builder.withArchived(true);
+            builder.save(session, clientDTISZNDiscountVersion);
+            CategoryDiscount categoryDiscount = getCategoryDiscountByDtisznCode(session, dtisznCode);
+            if (categoryDiscount != null) {
+                for (CategoryDiscount cd : client.getCategories()) {
+                    if (cd.equals(categoryDiscount)) {
+                        deleteOneDiscount(session, client, cd);
+                        break;
+                    }
+                }
+            }
+            if (rebuild) {
+                rebuildAppointedMSPByClient(session, client);
+            }
+        }
+    }
+
+    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate,
+                                         boolean rebuild, String discountComment) throws Exception {
         ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
         Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
         if (null == discountInfo) {
@@ -224,7 +248,7 @@ public class DiscountManager {
             String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
             discountInfo = new ClientDtisznDiscountInfo(client, dtisznCode.longValue(), title,
                     ClientDTISZNDiscountStatus.CONFIRMED, startDate, endDate,
-                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, new Date());
+                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, new Date(), true);
             discountInfo.setArchived(false);
             session.save(discountInfo);
         } else {
@@ -234,11 +258,12 @@ public class DiscountManager {
             discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
             discountInfo.setLastUpdate(new Date());
             discountInfo.setVersion(clientDTISZNDiscountVersion);
+            discountInfo.setActive(true);
             RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
-                    DiscountChangeHistory.MODIFY_IN_SERVICE);
+                    discountComment);
             session.update(discountInfo);
         }
-        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), DiscountChangeHistory.MODIFY_IN_SERVICE);
+        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), discountComment);
         if (rebuild) {
             rebuildAppointedMSPByClient(session, client);
         }
@@ -285,7 +310,7 @@ public class DiscountManager {
         return result;
     }
 
-    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
+    public static boolean atLeastOneDiscountEligibleToDelete(Client client) {
         Set<CategoryDiscount> discounts = client.getCategories();
         for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
@@ -296,8 +321,8 @@ public class DiscountManager {
     }
 
     public static void renewDiscounts(Session session, Client client,
-            Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
-            String historyComment, boolean upVersion) throws Exception {
+                                      Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
+                                      String historyComment, boolean upVersion) throws Exception {
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode =
                 newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
@@ -315,8 +340,8 @@ public class DiscountManager {
     }
 
     public static void renewDiscounts(Session session, Client client,
-            Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
-            String historyComment) throws Exception {
+                                      Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
+                                      String historyComment) throws Exception {
         renewDiscounts(session, client, newDiscounts, oldDiscounts, historyComment, true);
     }
 
@@ -386,7 +411,7 @@ public class DiscountManager {
     }
 
     private static String getISPPDiscounts(Client client, ClientDtisznDiscountInfo info,
-                                    List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+                                           List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
         String result = "";
         for (CategoryDiscount cd : client.getCategories()) {
             if (categoryDiscountDSZNList.stream().anyMatch(cdDszn -> cdDszn.getCategoryDiscount().equals(cd)
@@ -398,7 +423,7 @@ public class DiscountManager {
             }
         }
         if (result.length() > 0) {
-            result = result.substring(0, result.length()-1);
+            result = result.substring(0, result.length() - 1);
         }
         return result;
     }
@@ -409,7 +434,7 @@ public class DiscountManager {
             result += cd.getIdOfCategoryDiscount() + ",";
         }
         if (result.length() > 0) {
-            result = result.substring(0, result.length()-1);
+            result = result.substring(0, result.length() - 1);
         }
         return result;
     }
@@ -422,7 +447,7 @@ public class DiscountManager {
             }
         }
         if (result.length() > 0) {
-            result = result.substring(0, result.length()-1);
+            result = result.substring(0, result.length() - 1);
         }
         return result;
     }
@@ -485,6 +510,31 @@ public class DiscountManager {
                 newDiscounts.add(cd);
         }
         renewDiscounts(session, client, newDiscounts, oldDiscounts, DELETE_COMMENT);
+    }
+
+    public static void disableAllDiscounts(Client client) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<ClientDtisznDiscountInfo> list = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+            if (list.size() == 0)
+                return;
+            for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : list) {
+                clientDtisznDiscountInfo.setActive(false);
+                clientDtisznDiscountInfo.setLastUpdate(new Date());
+                clientDtisznDiscountInfo.setVersion(clientDtisznDiscountInfo.getVersion() + 1);
+                session.update(clientDtisznDiscountInfo);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in disableAllDiscounts", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public static List<CategoryDiscount> getCategoryDiscounts(Session session) {

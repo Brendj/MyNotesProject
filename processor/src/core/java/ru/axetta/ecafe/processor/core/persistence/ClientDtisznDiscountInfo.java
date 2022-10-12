@@ -29,9 +29,10 @@ public class ClientDtisznDiscountInfo implements Comparable {
     private Date archiveDate;
     private Date updatedAt;
     private Boolean appointedMSP;
+	private Boolean active;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
-            Date dateStart, Date dateEnd, Date createdDate, String source, Long version, Date updatedAt) {
+            Date dateStart, Date dateEnd, Date createdDate, String source, Long version, Date updatedAt, Boolean active) {
         this.client = client;
         this.dtisznCode = dtisznCode;
         this.dtisznDescription = dtisznDescription;
@@ -46,6 +47,7 @@ public class ClientDtisznDiscountInfo implements Comparable {
         this.lastReceivedDate = new Date();
         this.source = source;
         this.updatedAt = updatedAt;
+		this.active = active;
     }
 
     public ClientDtisznDiscountInfo() {
@@ -225,5 +227,13 @@ public class ClientDtisznDiscountInfo implements Comparable {
 
     public void setAppointedMSP(Boolean appointedMSP) {
         this.appointedMSP = appointedMSP;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
