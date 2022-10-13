@@ -424,11 +424,12 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void saveProactiveMessage(Client client, Client guardian, String serviceNumber, String ssoid) {
+    public void saveProactiveMessage(Client client, Client guardian, Integer dtisznCode, String serviceNumber, String ssoid) {
         try {
             ProactiveMessage proactiveMessage = new ProactiveMessage();
             proactiveMessage.setClient(client);
             proactiveMessage.setGuardian(guardian);
+            proactiveMessage.setDtisznCode(dtisznCode);
             proactiveMessage.setServicenumber(serviceNumber);
             proactiveMessage.setSsoid(ssoid);
             proactiveMessage.setMessage_type(MessageType.MOS);
@@ -448,6 +449,32 @@ public class ETPMVDaoService {
         query.setParameter("servicenumber", serviceNumber);
         try {
             return (ProactiveMessage) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public ProactiveMessage getProactiveMessage(Client client, Client guardian, Integer dtisznCode) {
+        Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
+                "d.client=:client and d.guardian=:guardian and d.dtisznCode=:dtisznCode");
+        query.setParameter("client", client);
+        query.setParameter("guardian", guardian);
+        query.setParameter("dtisznCode", dtisznCode);
+        try {
+            return (ProactiveMessage) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public ArrayList<ProactiveMessage> getProactiveMessageStatus(StatusETPMessageType statusETPMessageType) {
+        Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
+                "d.status=:status");
+        query.setParameter("status", statusETPMessageType);
+        try {
+            return (ArrayList<ProactiveMessage>)query.getResultList();
         } catch (NoResultException e) {
             return null;
         }

@@ -15,7 +15,7 @@
 
         <many-to-one name="guardian" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofguardian"
                      not-null="true" fetch="select"/>
-
+        <property name="dtisznCode" column="dtisznCode" type="integer"/>
         <property name="servicenumber" column="servicenumber" type="string" length="128" unique="true" not-null="true"/>
         <property name="ssoid" column="ssoid" type="string"/>
         <property name="status" column="status" type="ru.axetta.ecafe.processor.core.persistence.ProactiveStatusType"/>

@@ -30,9 +30,14 @@ CREATE TABLE  cf_proaktiv_message_status (
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+ALTER TABLE public.cf_proaktiv_message ADD dtiszncode int4 NULL;
+
 --Параметры в конфигурацию
 --ecafe.processor.etp.proactive.isOn=true
 --ecafe.processor.etp.proactive.nodes=NNN - отправка в очереди проактива етп
 --ecafe.processor.etp.proactive.consumer.node=NNN - слушатель входящей очереди проактива етп
 --ecafe.processor.aupd.api.address=адрес сервиса аупд. по умолчанию пром https://mes-api.mos.ru/aupd
 --ecafe.processor.aupd.api.apikey=api key сервиса аупд, по умолчанию пром 229a2b81-c7af-4efa-80f7-33629fab3137
+--ecafe.processor.zlp.check_benefit_expiration=крон выражение переодичности проверки на истекающий срок льготы
+--ecafe.processor.zlp.delete_benefit_expiration=крон выражение переодичности удаления льгот с истекшим сроком
+--ecafe.processor.zlp.delete.node=NNN - проверка и удаление льготы с истекшим сроком

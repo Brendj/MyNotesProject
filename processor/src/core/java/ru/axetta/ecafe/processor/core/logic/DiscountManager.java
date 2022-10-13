@@ -218,8 +218,12 @@ public class DiscountManager {
     }
 
     //Удаляем льготу ДСЗН без привязке к ЗЛП
-    public static void removeDtisznDiscount(Session session, Client client, Integer dtisznCode, boolean rebuild) throws Exception {
-        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+    public static void removeDtisznDiscount(Session session, Client client, Integer dtisznCode, boolean rebuild, ClientDtisznDiscountInfo clientDtisznDiscountInfo) throws Exception {
+        ClientDtisznDiscountInfo discountInfo;
+        if (clientDtisznDiscountInfo == null)
+            discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+        else
+            discountInfo = clientDtisznDiscountInfo;
         if (discountInfo != null && !discountInfo.getArchived()) {
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(discountInfo);

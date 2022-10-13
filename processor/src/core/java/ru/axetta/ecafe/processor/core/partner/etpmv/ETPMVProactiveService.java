@@ -166,12 +166,12 @@ public class ETPMVProactiveService {
         }
     }
 
-    public void sendMessage(Client client, Client guardian, String serviceNumber, String ssoid, String fio, Date expiration_date) {
+    public void sendMessage(Client client, Client guardian, Integer dtisznCode, String serviceNumber, String ssoid, String fio, Date expiration_date) {
         logger.info("Sending status to ETP Proactive with ServiceNumber = " + serviceNumber);
         try {
             String msg = createCoordinateMessage(serviceNumber, ssoid, fio, expiration_date);
             RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(msg);
-            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, serviceNumber, ssoid);
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, dtisznCode, serviceNumber, ssoid);
         } catch (Exception e) {
             logger.error("Error in sendMessage: ", e);
         }
@@ -270,8 +270,8 @@ public class ETPMVProactiveService {
         return sw.toString();
     }
 
-    public void sendMSPAssignedMessage(Client client, Client guardian, String clientFIO, String ssoid, Date expiration_date) {
-        sendMessage(client, guardian, generateServiceNumber(), ssoid, clientFIO, expiration_date);
+    public void sendMSPAssignedMessage(Client client, Client guardian, Integer dtisznCode, String clientFIO, String ssoid, Date expiration_date) {
+        sendMessage(client, guardian, dtisznCode, generateServiceNumber(), ssoid, clientFIO, expiration_date);
     }
 
     public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotificationStatus) throws Exception {
