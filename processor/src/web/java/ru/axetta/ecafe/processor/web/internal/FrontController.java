@@ -3261,7 +3261,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
+            if (StringUtils.isBlank(meshGuid) || StringUtils.isBlank(childMeshGuid) || agentTypeId == null || relation == null
                     || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
@@ -3332,7 +3332,7 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (agentMeshGuid == null || childMeshGuid == null) {
+            if (StringUtils.isBlank(agentMeshGuid) || StringUtils.isBlank(childMeshGuid)) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
@@ -3351,20 +3351,22 @@ public class FrontController extends HttpServlet {
             }
             ClientGuardian clientGuardian = getClientGuardian(persistenceSession, guardian, child);
 
-            if (clientGuardian != null) {
-                MessageContext mc = wsContext.getMessageContext();
-                HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-                ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-                clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
-                clientGuardianHistory.setWebAdress(req.getRemoteAddr());
+            if (clientGuardian == null) {
+                return new GuardianResponse(GuardianResponse.ERROR_GUARDIAN,
+                        GuardianResponse.ERROR_GUARDIAN_MESSAGE);
+            }
+            MessageContext mc = wsContext.getMessageContext();
+            HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+            ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+            clientGuardianHistory.setReason("Удалена связка арм методом \"deleteGuardianToClient\"");
+            clientGuardianHistory.setWebAdress(req.getRemoteAddr());
 
-                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
-                ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
-                        newGuardiansVersions, clientGuardianHistory);
-                MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
-                if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
-                    return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
-                }
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+            ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
+                    newGuardiansVersions, clientGuardianHistory);
+            MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
+            if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
+                return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
