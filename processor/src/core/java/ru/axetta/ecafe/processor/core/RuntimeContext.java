@@ -31,6 +31,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.proactive.config.BenefitSchedulerService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
@@ -834,6 +835,7 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CancelledFoodBoxService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(ReSendKafkaService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(BenefitSchedulerService.class).scheduleSync();
             ((RegularPaymentSubscriptionService)RuntimeContext.getAppContext().getBean("regularPaymentSubscriptionService")).scheduleSync();
             //
             if (!isTestRunning()) {
