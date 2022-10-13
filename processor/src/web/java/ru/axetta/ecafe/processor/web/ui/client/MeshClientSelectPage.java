@@ -57,10 +57,9 @@ public class MeshClientSelectPage extends BasicPage implements DulSelectPage.Com
             this.san = this.san.replaceAll("[\\D]", "");
             if (!ClientManager.checkSanNumber(san))
                 throw new Exception("Неверный номер СНИЛС");
-        } else {
-            throw new Exception("Не заполнено поле \"СНИЛС\"");
         }
-        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, true);
+        this.dulDetail = this.dulDetail.stream().filter(dulDetail -> dulDetail.getDeleteState() == null || !dulDetail.getDeleteState()).collect(Collectors.toList());
+        RuntimeContext.getAppContext().getBean(DulDetailService.class).validateDulList(session, this.dulDetail, false);
         ClientManager.validateFio(this.surname, this.firstName, this.secondName);
         this.mobileNumber = Client.checkAndConvertMobile(this.mobileNumber);
 
