@@ -81,7 +81,7 @@ public class MealsController extends Application {
 
     @PostMapping(value = "orders/foodbox", produces = APPLICATION_JSON_VALUE)
     @Transactional
-    public ResponseEntity<?> addPersonFoodboxOrder(@Context HttpServletRequest request, FoodboxOrder foodboxOrders) throws InterruptedException {
+    public ResponseEntity<?> addPersonFoodboxOrder(@Context HttpServletRequest request, @RequestBody  FoodboxOrder foodboxOrders) throws InterruptedException {
         Long id = new Date().getTime();
         Long idT = Thread.currentThread().getId();
         logger.info("new id = " + id + " th = " + idT);
