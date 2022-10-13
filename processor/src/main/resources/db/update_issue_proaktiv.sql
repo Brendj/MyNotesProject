@@ -34,3 +34,5 @@ CREATE TABLE  cf_proaktiv_message_status (
 --ecafe.processor.etp.proactive.isOn=true
 --ecafe.processor.etp.proactive.nodes=NNN - отправка в очереди проактива етп
 --ecafe.processor.etp.proactive.consumer.node=NNN - слушатель входящей очереди проактива етп
+--ecafe.processor.aupd.api.address=адрес сервиса аупд. по умолчанию пром https://mes-api.mos.ru/aupd
+--ecafe.processor.aupd.api.apikey=api key сервиса аупд, по умолчанию пром 229a2b81-c7af-4efa-80f7-33629fab3137
