@@ -2803,7 +2803,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentCreateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+            if (client.getIdOfClientGroup() < 1100000000L) {
                 return new DocumentCreateResponse(DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentCreateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
@@ -2864,7 +2864,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentUpdateResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+            if (client.getIdOfClientGroup() < 1100000000L) {
                 return new DocumentUpdateResponse(DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentUpdateResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
@@ -2920,7 +2920,7 @@ public class FrontController extends HttpServlet {
                 return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_CLIENT_NOT_FOUND,
                         DocumentDeleteResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
             }
-            if (client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+            if (client.getIdOfClientGroup() < 1100000000L) {
                 return new DocumentDeleteResponse(DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT,
                         DocumentDeleteResponse.ERROR_CLIENT_IS_STUDENT_MESSAGE);
             }
