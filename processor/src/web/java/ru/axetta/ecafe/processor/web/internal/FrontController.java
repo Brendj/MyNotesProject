@@ -3292,13 +3292,13 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org org = persistenceSession.get(Org.class, idOfOrg);
 
             if (meshGuid == null || childMeshGuid == null || agentTypeId == null || relation == null
                     || typeOfLegalRepresent == null || idOfOrg == null || informing == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+            Org org = persistenceSession.get(Org.class, idOfOrg);
 
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("meshGUID", meshGuid));
