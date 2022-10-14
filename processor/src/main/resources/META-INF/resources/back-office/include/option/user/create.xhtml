@@ -162,7 +162,7 @@
                             var="organizationItems"
                             rendered="#{mainPage.userCreatePage.isDefault}">
                 <rich:column>
-                    <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text"/>
+                    <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text"/>4
                 </rich:column>
                 <rich:column>
                     <h:outputText escape="true" value="#{organizationItems.functionName}" styleClass="output-text"/>
@@ -329,7 +329,7 @@
                           rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier ||
                           mainPage.userCreatePage.isSupplierReport || mainPage.userCreatePage.isFoodSupplierApplicationManager}"/>
             <rich:dataTable
-                    value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierReport)}"
+                    value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierSupplierReportFoodSupplierApplicationManager)}"
                     var="onlineReportItems"
                     rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport ||
                     mainPage.userCreatePage.isFoodSupplierApplicationManager}">
