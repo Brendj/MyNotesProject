@@ -1317,8 +1317,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                             .createPersonOnlyMK(this.person.getFirstName(), this.person.getSecondName(),
                                     this.person.getSurname(), this.gender, this.birthDate, this.san, this.mobile, this.email,
                                     this.dulDetail, clientWardItems.get(0).getRole(), clientWardItems.get(0).getMeshGuid());
-                    if (meshAgentResponse.getCode().equals(PersonResponse.OK_CODE))
+                    if (meshAgentResponse.getCode().equals(PersonResponse.OK_CODE)) {
                         client.setMeshGUID(meshAgentResponse.getAgentPerson().getMeshGuid());
+                        for (DulDetail dulDetail : this.dulDetail) {
+                            for (MeshDocumentResponse meshDocumentResponse : meshAgentResponse.getAgentPerson().getDocument()) {
+                                if (meshDocumentResponse.getDocumentTypeId() == dulDetail.getDocumentTypeId()) {
+                                    dulDetail.setIdMkDocument(meshDocumentResponse.getId());
+                                    persistenceSession.update(dulDetail);
+                                }
+                            }
+                        }
+                    }
                     else {
                         logger.error(String.format("code: %s message: %s", meshAgentResponse.getCode(), meshAgentResponse.getMessage()));
                         throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", meshAgentResponse.getMessage()));

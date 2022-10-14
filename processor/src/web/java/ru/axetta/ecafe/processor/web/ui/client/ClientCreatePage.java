@@ -821,11 +821,19 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     .createPersonOnlyMK(this.person.getFirstName(), this.person.getSecondName(),
                             this.person.getSurname(), this.gender, this.birthDate, this.san, this.mobile, this.email,
                             this.dulDetail, this.clientWardItems.get(0).getRole(), this.clientWardItems.get(0).getMeshGuid());
-            if (personResponse.getCode().equals(PersonResponse.OK_CODE))
+            if (personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 client.setMeshGUID(personResponse.getAgentPerson().getMeshGuid());
+                for (DulDetail dulDetail : this.dulDetail) {
+                    for (MeshDocumentResponse meshDocumentResponse : personResponse.getAgentPerson().getDocument()) {
+                        if (meshDocumentResponse.getDocumentTypeId() == dulDetail.getDocumentTypeId()) {
+                            dulDetail.setIdMkDocument(meshDocumentResponse.getId());
+                            persistenceSession.update(dulDetail);
+                        }
+                    }
+                }
+            }
             else
                 throw new Exception(String.format("Ошибка сохранения представителя в МК: %s", personResponse.getMessage()));
-
         }
 
         persistenceSession.update(client);
@@ -1054,7 +1062,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public Boolean isStudentGroup() {
         if (this.idOfClientGroup != null)
-            return this.idOfClientGroup < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
+            return this.idOfClientGroup < 1100000000L;
         return false;
     }
 
