@@ -345,7 +345,7 @@ public class Client {
             return mobilePhone;
         }
         mobilePhone = mobilePhone.replaceAll("[+ \\-()]", "");
-        if (mobilePhone.startsWith("8")) {
+        if (mobilePhone.startsWith("8") && mobilePhone.length() != 10) {
             mobilePhone = "7" + mobilePhone.substring(1);
         }
         if (mobilePhone.length() == 10) {
