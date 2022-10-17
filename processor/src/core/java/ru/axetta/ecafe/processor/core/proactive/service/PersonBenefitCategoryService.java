@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.proactive.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVProactiveService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPProaktivClient;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
@@ -17,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
+import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
@@ -24,6 +27,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +54,7 @@ public class PersonBenefitCategoryService {
         List<Client> guardians = null;
         Date endDate = null;
         String fio = null;
+        Integer categoryCode = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -66,11 +71,11 @@ public class PersonBenefitCategoryService {
                     String serviceNumber = RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).generateServiceNumber();
                     StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
                     RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
-                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true);
+                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
                     StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
                     RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
                 } else {
-                    Integer categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
+                    categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());
                     endDate = format.get().parse(benefit.getEnd_date());
                     DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true, DiscountChangeHistory.MODIFY_BY_PROACTIVE);
@@ -88,15 +93,19 @@ public class PersonBenefitCategoryService {
             HibernateUtils.close(session, log);
         }
         if (sendToPortal) {
-            sendNotificationBenefitCreated(client, guardians, fio, endDate);
+            sendNotificationBenefitCreated(client, guardians, categoryCode, fio, endDate);
         }
     }
 
-    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, String clientFIO, Date expiration_date) {
+    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, Integer dtisznCode, String clientFIO, Date expiration_date) {
         try {
             for (Client guardian : guardians) {
                 String ssoid = aupdPersonService.getSsoidByPersonId(guardian.getMeshGUID());
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, clientFIO, ssoid, expiration_date);
+                if (StringUtils.isEmpty(ssoid)) {
+                    log.info("Aupd ssoid is empty");
+                    return;
+                }
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, dtisznCode, clientFIO, ssoid, expiration_date);
             }
         } catch (Exception e) {
             log.error("Error in sendNotificationBenefitCreated: ", e);
@@ -118,14 +127,46 @@ public class PersonBenefitCategoryService {
                     .getExpiredDTISZNDiscountInfoByDayAndCode(session, startDate, endDate, Long.parseLong(DSZN_MOS_CODE));
 
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo : info) {
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, StatusETPMessageType.REFUSE_TIMEOUT, true);
-                DiscountManager.removeDtisznDiscount(session, clientDtisznDiscountInfo.getClient(), clientDtisznDiscountInfo.getDtisznCode().intValue(), true);
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, StatusETPMessageType.REFUSE_SYSTEM, true);
+                //Получаем список АКТИВНЫХ представителей
+                List<Client> clients = ClientManager.findGuardiansByClient(session, clientDtisznDiscountInfo.getClient().getIdOfClient(), false);
+                for (Client guard: clients)
+                {
+                    //Получаем данные по льготе, созданные ранее
+                    ProactiveMessage proactiveMessage = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getProactiveMessage(clientDtisznDiscountInfo.getClient(), guard, clientDtisznDiscountInfo.getDtisznCode().intValue());
+                    if (proactiveMessage != null)
+                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, StatusETPMessageType.REFUSE_TIMEOUT, true);
+                }
             }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
             log.error("Error in checkEndDateForBenefitCategory: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
+
+    @Async
+    public void deleteBenefitCategory() {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            ArrayList<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getProactiveMessageStatus(StatusETPMessageType.REFUSE_TIMEOUT);
+            for (ProactiveMessage proactiveMessage: proactiveMessages)
+            {
+                 ClientDtisznDiscountInfo info = DAOUtils
+                        .getDTISZNDiscountInfoByClientAndCode(session, proactiveMessage.getClient(), proactiveMessage.getDtisznCode().longValue());
+                DiscountManager.removeDtisznDiscount(session, info.getClient(), info.getDtisznCode().intValue(), true, info);
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, StatusETPMessageType.REFUSE_SYSTEM, true);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            log.error("Error in deleteBenefitCategory: ", e);
         } finally {
             HibernateUtils.rollback(transaction, log);
             HibernateUtils.close(session, log);

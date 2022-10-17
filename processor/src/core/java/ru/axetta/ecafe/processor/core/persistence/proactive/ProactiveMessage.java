@@ -10,6 +10,7 @@ public class ProactiveMessage {
     private Long idofproaktivmessage;
     private Client client;
     private Client guardian;
+    private Integer dtisznCode;
     private String servicenumber;
     private String ssoid;
     private StatusETPMessageType status;
@@ -87,5 +88,13 @@ public class ProactiveMessage {
 
     public void setLastupdate(Date lastupdate) {
         this.lastupdate = lastupdate;
+    }
+
+    public Integer getDtisznCode() {
+        return dtisznCode;
+    }
+
+    public void setDtisznCode(Integer dtisznCode) {
+        this.dtisznCode = dtisznCode;
     }
 }
