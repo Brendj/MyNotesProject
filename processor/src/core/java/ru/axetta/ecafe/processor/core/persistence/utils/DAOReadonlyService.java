@@ -1336,15 +1336,20 @@ public class DAOReadonlyService {
                 Object[] row = (Object[]) o;
                 Long startDate = ((Timestamp) row[1]).getTime();
                 Long endDate = ((Timestamp) row[2]).getTime();
-                if (date.getTime() >= startDate && date.getTime() <= endDate)
-                    dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+                if (date.getTime() >= startDate && date.getTime() <= endDate) {
+                    WtDish wtDish = entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue());
+                    if (!dishes.contains(wtDish))
+                        dishes.add(wtDish);
+                }
             }
         }
         else
         {
             for (Object o : list) {
                 Object[] row = (Object[]) o;
-                dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+                WtDish wtDish = entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue());
+                if (!dishes.contains(wtDish))
+                    dishes.add(wtDish);
             }
         }
         return dishes;
