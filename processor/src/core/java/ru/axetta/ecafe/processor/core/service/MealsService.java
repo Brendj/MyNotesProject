@@ -709,6 +709,7 @@ public class MealsService {
     public void getDataFromDAO(Client client, MealsController.MealsFunctions fun)
     {
         if (MealsController.MealsFunctions.CREATE_FOODBOX == fun) {
+            countFree = 0;
             Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
             countunlocketed = daoReadonlyService.getFoodBoxPreordersUnallocated(client.getOrg());
             for (FoodBoxCells foodBoxCells1 : foodBoxCells) {
