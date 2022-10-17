@@ -2084,6 +2084,7 @@ public class ClientManager {
             clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
+            clientGuardian.setDeleteDate(null);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setRepresentType(representType);
