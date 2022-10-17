@@ -90,11 +90,16 @@ public class DulDetailService {
 
     public void validateDul(Session session, DulDetail dulDetail, boolean checkAnotherClient) throws Exception {
         try {
-            if (isBlank(dulDetail.getNumber()))
+            if (isBlank(dulDetail.getNumber())) {
                 throw new DocumentValidateException("Не заполнено поле \"Номер\" документа", dulDetail.getDocumentTypeId());
+            }
             validateDulNumberAndSeries(dulDetail);
-            if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued()))
-                throw new DocumentValidateException("Дата истечения срока действия документа, должна быть больше значения «Когда выдан»", dulDetail.getDocumentTypeId());
+            if (dulDetail.getExpiration() != null && dulDetail.getIssued() == null) {
+                throw new DocumentValidateException("Поле \"Когда выдан\" обязательно для заполнения, если заполнено поле \"Дата истечения срока действия\"", dulDetail.getDocumentTypeId());
+            }
+            if (dulDetail.getExpiration() != null && dulDetail.getIssued() != null && dulDetail.getExpiration().before(dulDetail.getIssued())) {
+                throw new DocumentValidateException("Дата истечения срока действия документа, должна быть больше значения \"Когда выдан\"", dulDetail.getDocumentTypeId());
+            }
             if (checkAnotherClient) {
                 List<Long> ids = checkAnotherClient(session, dulDetail);
                 if (!ids.isEmpty())
