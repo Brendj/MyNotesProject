@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.proactive.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -100,6 +101,10 @@ public class PersonBenefitCategoryService {
         try {
             for (Client guardian : guardians) {
                 String ssoid = aupdPersonService.getSsoidByPersonId(guardian.getMeshGUID());
+                if (StringUtils.isEmpty(ssoid)) {
+                    log.info("Aupd ssoid is empty");
+                    return;
+                }
                 RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, dtisznCode, clientFIO, ssoid, expiration_date);
             }
         } catch (Exception e) {
