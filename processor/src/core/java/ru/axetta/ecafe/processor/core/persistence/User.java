@@ -240,7 +240,7 @@ public class User {
     public enum DefaultRole{
         DEFAULT(0,"Настраиваемая роль"),
         ADMIN(1,"Администратор"),
-        SUPPLIER(2,"Поставщик питания"),
+        SUPPLIER(2,"Технолог поставщика питания"),
         MONITORING(3,"Мониторинг"),
         ADMIN_SECURITY(4, "Администратор ИБ"),
         SUPPLIER_REPORT(5, "Отчетность поставщика питания"),
@@ -251,7 +251,8 @@ public class User {
         CLASSROOM_TEACHER(10,"Классный руководитель"),
         CLASSROOM_TEACHER_WITH_FOOD_PAYMENT(11,"Классный руководитель с оплатой питания"),
         WA_ADMIN_SECURITY(12, "Администратор ИБ (веб арм админа)"),
-        SFC(13, "Служба финансового контроля");
+        SFC(13, "Служба финансового контроля"),
+        FOOD_SUPPLIES_APPLICATION_MANAGER(14, "Менеджер по заявкам поставщика питания");
 
         private Integer identification;
         private String description;

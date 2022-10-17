@@ -316,6 +316,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
+            if (role != null && role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER)) {
+                user.setFunctions(functionSelector.getFoodSupplierApplicationManager(session));
+                user.setRoleName(role.toString());
+            }
             if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
                     || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
                     || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR)
@@ -477,6 +481,17 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER);
+    }
+
+    public Boolean getIsFoodSupplierApplicationManager () {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER);
+    }
+    public User.DefaultRole getIsSupplierSupplierReportFoodSupplierApplicationManager() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return null;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role;
     }
 
     public Boolean getIsSupplierReport() {

@@ -588,6 +588,18 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return role.equals(User.DefaultRole.SUPPLIER_REPORT);
     }
 
+    public Boolean getIsFoodSupplierApplicationManager () {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER);
+    }
+
+    public User.DefaultRole getIsSupplierSupplierReportFoodSupplierApplicationManager() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return null;
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role;
+    }
+
     public Boolean getIsCardOperator() {
         if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);

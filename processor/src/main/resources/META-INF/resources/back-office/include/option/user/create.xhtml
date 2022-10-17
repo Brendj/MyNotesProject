@@ -157,12 +157,12 @@
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Организации" styleClass="output-text"
-                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+                          rendered="#{mainPage.userCreatePage.isDefault}"/>
             <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.organizationItems}"
                             var="organizationItems"
-                            rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
+                            rendered="#{mainPage.userCreatePage.isDefault}">
                 <rich:column>
-                    <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text"/>
+                    <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text"/>4
                 </rich:column>
                 <rich:column>
                     <h:outputText escape="true" value="#{organizationItems.functionName}" styleClass="output-text"/>
@@ -172,9 +172,9 @@
                 </rich:column>
             </rich:dataTable>
             <h:outputText escape="true" value="Контрагенты" styleClass="output-text"
-                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+                          rendered="#{mainPage.userCreatePage.isDefault}"/>
             <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.contragentItems}" var="contragentItems"
-                            rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
+                            rendered="#{mainPage.userCreatePage.isDefault}">
                 <rich:column>
                     <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text"/>
                 </rich:column>
@@ -186,9 +186,9 @@
                 </rich:column>
             </rich:dataTable>
             <h:outputText escape="true" value="Клиенты" styleClass="output-text"
-                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+                          rendered="#{mainPage.userCreatePage.isDefault}"/>
             <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.clientItems}" var="clientItems"
-                            rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
+                            rendered="#{mainPage.userCreatePage.isDefault}">
                 <rich:column>
                     <h:selectBooleanCheckbox value="#{clientItems.selected}" styleClass="output-text"/>
                 </rich:column>
@@ -228,9 +228,9 @@
                 </rich:column>
             </rich:dataTable>
             <h:outputText escape="true" value="Товарный учет" styleClass="output-text"
-                          rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+                          rendered="#{mainPage.userCreatePage.isDefault}"/>
             <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.wayBillItems}" var="wayBillItems"
-                            rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
+                            rendered="#{mainPage.userCreatePage.isDefault}">
                 <rich:column>
                     <h:selectBooleanCheckbox value="#{wayBillItems.selected}" styleClass="output-text"/>
                 </rich:column>
@@ -327,11 +327,12 @@
             </rich:dataTable>
             <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text"
                           rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier ||
-                          mainPage.userCreatePage.isSupplierReport}"/>
+                          mainPage.userCreatePage.isSupplierReport || mainPage.userCreatePage.isFoodSupplierApplicationManager}"/>
             <rich:dataTable
-                    value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierReport)}"
+                    value="#{mainPage.userCreatePage.functionSelector.onlineReportItemsAll(mainPage.userCreatePage.isSupplierSupplierReportFoodSupplierApplicationManager)}"
                     var="onlineReportItems"
-                    rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
+                    rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport ||
+                    mainPage.userCreatePage.isFoodSupplierApplicationManager}">
                 <rich:column>
                     <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text"/>
                 </rich:column>
