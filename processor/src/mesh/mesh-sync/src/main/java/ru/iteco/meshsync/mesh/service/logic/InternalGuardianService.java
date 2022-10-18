@@ -63,38 +63,78 @@ public class InternalGuardianService {
         return new RestTemplate(requestFactory);
     }
 
-    public void deleteClient(String personGUID) {
+    public Boolean checkClient(String personGUID) {
         try {
             Map<String, String> params = new HashMap<>();
-            params.put("guardianMeshGuid", personGUID);
+            params.put("personGuid", personGUID);
+            HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    targetUrl + "/client?personGuid={personGuid}",
+                    HttpMethod.GET,
+                    request, Void.class, params);
+            return response.getStatusCode().equals(HttpStatus.OK);
+        } catch (HttpClientErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.checkClient:", personGUID);
+            return false;
+        } catch (HttpServerErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.checkClient:", personGUID);
+            return false;
+        }
+    }
+
+    public Boolean checkGuardian(String personGUID) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("personGuid", personGUID);
+            HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    targetUrl + "/guardian?personGuid={personGuid}",
+                    HttpMethod.GET,
+                    request, Void.class, params);
+            return response.getStatusCode().equals(HttpStatus.OK);
+        } catch (HttpClientErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.checkGuardian:", personGUID);
+            return false;
+        } catch (HttpServerErrorException ex) {
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.checkGuardian:", personGUID);
+            return false;
+        }
+    }
+
+    public void deleteGuardian(String personGUID) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("personGuid", personGUID);
 
             HttpEntity<Void> request = new HttpEntity<>(httpHeaders);
             ResponseEntity<Void> response = restTemplate.exchange(
-                    targetUrl + "/client?guardianMeshGuid={guardianMeshGuid}",
+                    targetUrl + "/guardian?personGuid={personGuid}",
                     HttpMethod.DELETE,
                     request, Void.class, params);
         }
         catch (HttpClientErrorException ex) {
-            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteGuardian:", personGUID);
         }
         catch (HttpServerErrorException ex) {
-            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteClient:", personGUID);
+            processStatusCode(ex.getStatusCode(),"InternalGuardianService.deleteGuardian:", personGUID);
         }
     }
 
-    public void updateClient(PersonInfo info, Integer operation) throws Exception {
+    public void updateGuardian(PersonInfo info, Integer operation) throws Exception {
         try {
             ClientRestDTO dto = ClientRestDTO.build(info, operation);
 
             HttpEntity<ClientRestDTO> request = new HttpEntity<>(dto, httpHeaders);
-            ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/client", HttpMethod.PUT,
+            ResponseEntity<Void> response = restTemplate.exchange(targetUrl + "/guardian", HttpMethod.PUT,
                     request, Void.class);
         }
         catch (HttpClientErrorException ex) {
-            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateClient:", info.getPersonId().toString());
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateGuardian:", info.getPersonId().toString());
         }
         catch (HttpServerErrorException ex) {
-            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateClient:", info.getPersonId().toString());
+            processStatusCode(ex.getStatusCode(), "InternalGuardianService.updateGuardian:", info.getPersonId().toString());
         }
     }
 

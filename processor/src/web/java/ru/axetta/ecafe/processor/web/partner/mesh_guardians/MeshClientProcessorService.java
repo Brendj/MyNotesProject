@@ -50,8 +50,42 @@ public class MeshClientProcessorService {
         expenditureLimit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
         limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
     }
-
-
+    public Boolean isClientExistsByMeshGUID(String personGuid) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
+            transaction.commit();
+            transaction = null;
+            session.close();
+            return client != null;
+        }  catch (Exception e){
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
+    public Boolean isGuardianExistsByMeshGUID(String personGuid) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Client guardian = getGuardianByMeshGUID(session, personGuid);
+            transaction.commit();
+            transaction = null;
+            session.close();
+            return guardian != null;
+        }  catch (Exception e){
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, log);
+            HibernateUtils.close(session, log);
+        }
+    }
     public Client getGuardianByMeshGUID(Session session, String personGuid) throws Exception {
         Client guardian = null;
         Client client = DAOUtils.findClientByMeshGuid(session, personGuid);
@@ -90,7 +124,7 @@ public class MeshClientProcessorService {
         return guardian;
     }
 
-    public void updateClient(ClientInfo info) throws Exception {
+    public void updateGuardian(ClientInfo info) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try{
@@ -143,7 +177,7 @@ public class MeshClientProcessorService {
     }
 
 
-    public void deleteClient(String personGuid) throws Exception {
+    public void deleteGuardian(String personGuid) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -151,21 +185,11 @@ public class MeshClientProcessorService {
             transaction = session.beginTransaction();
 
             Client guardian = getGuardianByMeshGUID(session, personGuid);
-            if (guardian == null ||
-                    (guardian != null && (guardian.isDeletedOrLeaving() || !guardian.isParent()))) {
+            if (guardian == null || (guardian.isDeletedOrLeaving() || !guardian.isParent())) {
                 throw new NotFoundException("Not found guardian by MESH-GUID: " + personGuid);
             }
 
-            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            ClientManager.createClientGroupMigrationHistoryLite(
-                    session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
-                            .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
-
-            Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-            guardian.setClientRegistryVersion(nextClientVersion);
-            guardian.setUpdateTime(new Date());
-            session.merge(guardian);
+            deleteClientInternal(session, guardian);
 
             transaction.commit();
             transaction = null;
@@ -283,16 +307,7 @@ public class MeshClientProcessorService {
                         List<Client> children = ClientManager.findChildsByClient(
                                 session, guardian.getIdOfClient(), true, false);
                         if (children.isEmpty()) {
-                            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-                            ClientManager.createClientGroupMigrationHistoryLite(
-                                    session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
-                                            .concat(String.format(" (ид. ОО=%s)", guardian.getOrg().getIdOfOrg())));
-
-                            Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
-                            guardian.setClientRegistryVersion(nextClientVersion);
-                            guardian.setUpdateTime(new Date());
-                            session.merge(guardian);
+                            deleteClientInternal(session, guardian);
                         }
                     }
                 }
@@ -362,5 +377,18 @@ public class MeshClientProcessorService {
         newDulDetail.setSubdivisionCode(di.getSubdivisionCode());
 
         session.save(newDulDetail);
+    }
+
+    private void deleteClientInternal(Session session, Client client) throws Exception{
+        client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        ClientManager.createClientGroupMigrationHistoryLite(
+                session, client, client.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_ISPP
+                        .concat(String.format(" (ид. ОО=%s)", client.getOrg().getIdOfOrg())));
+
+        Long nextClientVersion = DAOUtils.updateClientRegistryVersion(session);
+        client.setClientRegistryVersion(nextClientVersion);
+        client.setUpdateTime(new Date());
+        session.merge(client);
     }
 }
