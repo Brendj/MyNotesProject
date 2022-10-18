@@ -4,12 +4,12 @@ import org.springframework.http.ResponseEntity;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 
-import javax.ws.rs.core.Response;
 import java.util.Date;
 
 public class MealsPOJO {
     private ResponseEntity<?> responseEntity;
     private Long contractId;
+    private String personId;
     private Client client;
     private Long availableMoney;
     private Date from;
@@ -115,5 +115,13 @@ public class MealsPOJO {
 
     public void setCreated(Boolean created) {
         this.created = created;
+    }
+
+    public String getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(String personId) {
+        this.personId = personId;
     }
 }
