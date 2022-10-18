@@ -108,6 +108,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean preorderlp;
     private Boolean useLongCardNo;
     private Boolean usedfoodbox;
+    private Boolean disableSocCardsReg;
     private List<FoodBoxParallelUI> foodBoxParallelUIS;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
@@ -323,6 +324,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.goodDateCheck = org.getGooddatecheck();
         this.governmentContract = org.getGovernmentContract() != null && org.getGovernmentContract();
         this.useLongCardNo = org.getUseLongCardNo();
+        this.disableSocCardsReg = org.getDisableSocCardsReg();
         this.usedfoodbox = org.getUsedFoodbox();
         if (this.usedfoodbox) {
             //Подготавливаем список параллелей
@@ -931,8 +933,16 @@ public class OrgViewPage extends BasicWorkspacePage {
     public void setUseMealSchedule(Boolean useMealSchedule) {
         this.useMealSchedule = useMealSchedule;
     }
+	
+    public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
 
-    public Boolean getUsedfoodbox() {
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
+    }
+	
+	public Boolean getUsedfoodbox() {
         return usedfoodbox;
     }
 
@@ -940,11 +950,11 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.usedfoodbox = usedfoodbox;
     }
 
-    public Boolean getNewСashierMode() {
-        return newСashierMode;
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
     }
 
-    public void setNewСashierMode(Boolean newСashierMode) {
-        this.newСashierMode = newСashierMode;
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
     }
 }

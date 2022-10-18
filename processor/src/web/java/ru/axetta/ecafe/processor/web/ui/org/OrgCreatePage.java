@@ -101,8 +101,9 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long orgIdFromNsi = null;
     private Boolean governmentContract = false;
     private Boolean useLongCardId = false;
-    private Boolean usedfoodbox = false;
+    private Boolean disableSocCardsReg;
     private Boolean newСashierMode;
+    private Boolean usedfoodbox = false;
     private List<FoodBoxParallelUI> foodBoxParallelUIS = null;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
@@ -352,20 +353,20 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.subordination = subordination;
     }
 
-    public Boolean getUsedfoodbox() {
-        return usedfoodbox;
-    }
-
-    public void setUsedfoodbox(Boolean usedfoodbox) {
-        this.usedfoodbox = usedfoodbox;
-    }
-
-    public Boolean getNewСashierMode() {
+	public Boolean getNewСashierMode() {
         return newСashierMode;
     }
 
     public void setNewСashierMode(Boolean newСashierMode) {
         this.newСashierMode = newСashierMode;
+    }
+	
+	public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
     }
 
     public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
@@ -375,7 +376,15 @@ public class OrgCreatePage extends BasicWorkspacePage
     public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
         this.foodBoxParallelUIS = foodBoxParallelUIS;
     }
-	
+
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
+    }
+
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
+    }
+
     public static class ContragentItem {
 
         private final Long idOfContragent;
@@ -747,8 +756,9 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
-        org.setUsedFoodbox(usedfoodbox);
+        org.setDisableSocCardsReg(disableSocCardsReg);
         org.setNewСashierMode(newСashierMode);
+		org.setUsedFoodbox(usedfoodbox);
         session.save(org);
 		FoodBoxOrgParallel foodBoxOrgParallel;
         if (usedfoodbox)

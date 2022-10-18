@@ -83,6 +83,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_IS_STUDENT_MESSAGE = "Клиент является учеником";
 
 
+    public static final String ERROR_DISABLE_SOC_CARDS_REG_MESSAGE = "Регистрация социальных карт приостановлена по техническим причинам";
     public int code;
     public String message;
 

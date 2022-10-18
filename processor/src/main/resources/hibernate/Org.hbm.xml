@@ -293,13 +293,14 @@
         <property name="gooddatecheck" column="gooddatecheck" type="boolean"/>
         <property name="governmentContract" column="governmentContract" type="boolean"/>
         <property name="useLongCardNo" column="useLongCardNo" type="boolean"/>
-	    <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
-        <property name="usedFoodbox" column="usedFoodbox" type="boolean"/>
+        <property name="useWebArmAdmin" column="useWebArmAdmin" type="boolean"/>
+        <property name="newСashierMode" column="newСashierMode" type="boolean"/>
+	    <property name="usedFoodbox" column="usedFoodbox" type="boolean"/>
+        <property name="disableSocCardsReg" column="disableSocCardsReg" not-null="true" type="boolean"/>
         <set name="foodBoxParallels" inverse="true" cascade="all">
             <key column="idoforg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel"/>
         </set>
-        <property name="newСashierMode" column="newСashierMode" type="boolean"/>
     </class>
 </hibernate-mapping>
 

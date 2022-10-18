@@ -99,6 +99,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean workInSummerTime;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
+    private Boolean disableSocCardsReg;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -150,7 +151,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean participantOP;
     private Boolean preorderlp;
     private Boolean usedfoodbox;
-	private List<FoodBoxParallelUI> foodBoxParallelUIS;
+    private List<FoodBoxParallelUI> foodBoxParallelUIS;
     private Boolean useWebArm;
     private Boolean useWebArmAdmin;
     private Boolean goodDateCheck;
@@ -459,7 +460,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi == null ? null : orgIdFromNsi.equals(0L) ? null : orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardNo);
-        org.setUsedFoodbox(usedfoodbox);
+        org.setNewСashierMode(newСashierMode);
+		org.setUsedFoodbox(usedfoodbox);
+		org.setDisableSocCardsReg(disableSocCardsReg);
         //Параллели для фудбокса
 
         if (!usedfoodbox) {
@@ -563,7 +566,7 @@ public class OrgEditPage extends BasicWorkspacePage
                         globalparallelsNew, org.getIdOfOrg());
             }
         }
-		
+
 		org.setNewСashierMode(newСashierMode);
         manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.USE_MEAL_SCHEDULE, useMealSchedule, session,
                 lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
@@ -624,6 +627,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.workInSummerTime = org.getIsWorkInSummerTime();
         this.useLongCardNo = org.getUseLongCardNo() == null ? false : org.getUseLongCardNo();
+        this.disableSocCardsReg = org.getDisableSocCardsReg();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -732,8 +736,8 @@ public class OrgEditPage extends BasicWorkspacePage
         OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
         Boolean mealSchedule = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.USE_MEAL_SCHEDULE);
         this.useMealSchedule = mealSchedule != null && mealSchedule;
-		this.newСashierMode = org.getNewСashierMode();
-        this.usedfoodbox = org.getUsedFoodbox();
+        this.newСashierMode = org.getNewСashierMode();
+		this.usedfoodbox = org.getUsedFoodbox();
         prepareParallels();
         if (org.getFoodBoxParallels() != null) {
             //Если есть настройки для данной орг, то мы их считываем
@@ -1447,14 +1451,6 @@ public class OrgEditPage extends BasicWorkspacePage
         this.goodDateCheck = goodDateCheck;
     }
 
-    public Boolean getUsedfoodbox() {
-        return usedfoodbox;
-    }
-
-    public void setUsedfoodbox(Boolean usedfoodbox) {
-        this.usedfoodbox = usedfoodbox;
-    }
-
     public Boolean getNewСashierMode() {
         return newСashierMode;
     }
@@ -1463,12 +1459,28 @@ public class OrgEditPage extends BasicWorkspacePage
         this.newСashierMode = newСashierMode;
     }
 
+    public Boolean getUsedfoodbox() {
+        return usedfoodbox;
+    }
+
+    public void setUsedfoodbox(Boolean usedfoodbox) {
+        this.usedfoodbox = usedfoodbox;
+    }
+
     public List<FoodBoxParallelUI> getFoodBoxParallelUIS() {
         return foodBoxParallelUIS;
     }
 
     public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
         this.foodBoxParallelUIS = foodBoxParallelUIS;
+    }
+
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
+    }
+
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
     }
 
     public static class ContragentItem {

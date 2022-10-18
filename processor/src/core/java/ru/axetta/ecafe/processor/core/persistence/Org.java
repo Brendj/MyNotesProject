@@ -179,9 +179,10 @@ public class Org implements Serializable {
     private Boolean gooddatecheck;
     private Boolean governmentContract;
     private Boolean useLongCardNo;
+	private Boolean newСashierMode;
     private Boolean usedFoodbox;
-    private Boolean newСashierMode;
-	private Set<FoodBoxOrgParallel> foodBoxParallels;
+    private Boolean disableSocCardsReg;
+    private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
     public void sendInvalidateCache() {
@@ -263,6 +264,7 @@ public class Org implements Serializable {
         this.governmentContract = false;
         this.useLongCardNo = false;
         this.usedFoodbox = false;
+        this.disableSocCardsReg = true;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1427,7 +1429,15 @@ public class Org implements Serializable {
         this.foodApplicationSyncParam = foodApplicationSyncParam;
     }
 
-    public Boolean getUsedFoodbox() {
+	public Boolean getNewСashierMode() {
+        return newСashierMode;
+    }
+
+    public void setNewСashierMode(Boolean newСashierMode) {
+        this.newСashierMode = newСashierMode;
+    }
+	
+	public Boolean getUsedFoodbox() {
         if (usedFoodbox == null)
             return false;
         return usedFoodbox;
@@ -1437,19 +1447,19 @@ public class Org implements Serializable {
         this.usedFoodbox = usedFoodbox;
     }
 
-    public Boolean getNewСashierMode() {
-        return newСashierMode;
-    }
-
-    public void setNewСashierMode(Boolean newСashierMode) {
-        this.newСashierMode = newСashierMode;
-    }
-	
-	public Set<FoodBoxOrgParallel> getFoodBoxParallels() {
+    public Set<FoodBoxOrgParallel> getFoodBoxParallels() {
         return foodBoxParallels;
     }
 
     public void setFoodBoxParallels(Set<FoodBoxOrgParallel> foodBoxParallels) {
         this.foodBoxParallels = foodBoxParallels;
+    }
+
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
+    }
+
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
     }
 }
