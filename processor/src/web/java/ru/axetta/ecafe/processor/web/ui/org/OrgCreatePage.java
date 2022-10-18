@@ -101,6 +101,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long orgIdFromNsi = null;
     private Boolean governmentContract = false;
     private Boolean useLongCardId = false;
+    private Boolean disableSocCardsReg;
     private Boolean newСashierMode;
     private Boolean usedfoodbox = false;
     private List<FoodBoxParallelUI> foodBoxParallelUIS = null;
@@ -374,6 +375,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setFoodBoxParallelUIS(List<FoodBoxParallelUI> foodBoxParallelUIS) {
         this.foodBoxParallelUIS = foodBoxParallelUIS;
+    }
+
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
+    }
+
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
     }
 
     public static class ContragentItem {
@@ -747,6 +756,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setOrgIdFromNsi(orgIdFromNsi);
         org.setGovernmentContract(governmentContract);
         org.setUseLongCardNo(useLongCardId);
+        org.setDisableSocCardsReg(disableSocCardsReg);
         org.setNewСashierMode(newСashierMode);
 		org.setUsedFoodbox(usedfoodbox);
         session.save(org);

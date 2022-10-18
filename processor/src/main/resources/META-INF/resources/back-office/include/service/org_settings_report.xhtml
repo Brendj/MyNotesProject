@@ -229,6 +229,9 @@
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
                             <h:outputText escape="true" value="ЭЦП для карт" />
                         </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
+                            <h:outputText escape="true" value="Запрет выдачи социальных карт" />
+                        </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}" colspan="1">
                             <h:outputText escape="true" value="Заявки на посещение других ОО" />
                         </rich:column>
@@ -305,6 +308,11 @@
                         <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allNeedVerifyCardSign}" disabled="false">
                                 <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(9)}"/>
+                            </h:selectBooleanCheckbox>
+                        </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
+                            <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allDisableSocCardsReg}" disabled="false">
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(16)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}">
@@ -469,6 +477,11 @@
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
                     <h:selectBooleanCheckbox value="#{item.needVerifyCardSign}" styleClass="checkboxes">
+                        <a4j:ajax event="change" listener="#{item.change()}" />
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
+                    <h:selectBooleanCheckbox value="#{item.disableSocCardsReg}" styleClass="checkboxes">
                         <a4j:ajax event="change" listener="#{item.change()}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
