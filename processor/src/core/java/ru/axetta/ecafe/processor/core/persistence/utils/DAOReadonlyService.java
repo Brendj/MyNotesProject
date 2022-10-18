@@ -1578,6 +1578,16 @@ public class DAOReadonlyService {
         }
     }
 
+    public Client getClientWithOrgByMeshGuid(String meshguid) {
+        try {
+            Query query = entityManager.createQuery("select c from Client c join fetch c.org where c.meshGUID = :meshguid");
+            query.setParameter("meshguid", meshguid);
+            return (Client) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public FoodBoxOrgReq getFooboxOrgReq (Org org) {
         try {
             Query query = entityManager.createQuery("select fb from FoodBoxOrgReq fb where fb.org=:org");

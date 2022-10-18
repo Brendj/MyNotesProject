@@ -91,11 +91,16 @@ public class MealsController extends Application {
         }
 
         String contractIdStr = "";
+        String personIdStr = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
                 break;
+            }
+            if (currParam.getKey().toLowerCase().equals("personid")) {
+                personIdStr = currParam.getValue();
+                continue;
             }
         }
 
@@ -113,7 +118,7 @@ public class MealsController extends Application {
         boolean val;
         long counter = 1L;
         //Получаем клиента
-        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr, personIdStr);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
         Client client = mealsPOJO.getClient();
@@ -178,6 +183,7 @@ public class MealsController extends Application {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
         }
         String contractIdStr = "";
+        String personIdStr = "";
         String fromStr = "";
         String toStr = "";
         String sortStr = "";
@@ -204,13 +210,17 @@ public class MealsController extends Application {
                 contractIdStr = currParam.getValue();
                 continue;
             }
+            if (currParam.getKey().toLowerCase().equals("personid")) {
+                personIdStr = currParam.getValue();
+                continue;
+            }
         }
         //Логика проверки корректности запроса
-        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(contractIdStr, fromStr, toStr, sortStr);
+        MealsPOJO mealsPOJO = mealsService.validateByFormalInfoGetFoodbox(contractIdStr, personIdStr, fromStr, toStr, sortStr);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId());
+        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId());
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
@@ -245,12 +255,17 @@ public class MealsController extends Application {
         }
 
         String contractIdStr = "";
+        String personIdStr = "";
         String onDateStr = "";
 
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("personid")) {
+                personIdStr = currParam.getValue();
                 continue;
             }
             if (currParam.getKey().toLowerCase().equals("ondate")) {
@@ -264,7 +279,7 @@ public class MealsController extends Application {
         }
 
         //Получаем клиента
-        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr, personIdStr);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
         Client client = mealsPOJO.getClient();
@@ -295,11 +310,16 @@ public class MealsController extends Application {
         }
 
         String contractIdStr = "";
+        String personIdStr = "";
         String foodBoxAvailableStr = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
+                continue;
+            }
+            if (currParam.getKey().toLowerCase().equals("personid")) {
+                personIdStr = currParam.getValue();
                 continue;
             }
             if (currParam.getKey().toLowerCase().equals("foodboxallowed")) {
@@ -309,7 +329,7 @@ public class MealsController extends Application {
         }
 
         //Получаем клиента
-        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr, personIdStr);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
@@ -335,16 +355,21 @@ public class MealsController extends Application {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseResult.errorAuth());
         }
         String contractIdStr = "";
+        String personIdStr = "";
         Map<String, String> params = parseParams(request);
         for (Map.Entry<String, String> currParam : params.entrySet()) {
             if (currParam.getKey().toLowerCase().equals("contractid")) {
                 contractIdStr = currParam.getValue();
                 continue;
             }
+            if (currParam.getKey().toLowerCase().equals("personid")) {
+                personIdStr = currParam.getValue();
+                continue;
+            }
         }
 
         //Получаем клиента
-        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr);
+        MealsPOJO mealsPOJO = mealsService.getClient(contractIdStr, personIdStr);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
