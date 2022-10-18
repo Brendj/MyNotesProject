@@ -30,46 +30,85 @@ public class InternalClientRestController extends Application {
         service = RuntimeContext.getAppContext().getBean(MeshClientProcessorService.class);
     }
 
+    @GET
+    @Path(value = "client")
+    public Response checkClient(@QueryParam(value = "personGuid") String personGuid) {
+        try {
+            checkParameter("personGuid", personGuid);
+            Boolean exists = service.isClientExistsByMeshGUID(personGuid);
+            if (exists) {
+                return Response.status(HttpURLConnection.HTTP_OK).build();
+            }
+            return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
+        } catch (IllegalArgumentException e) {
+            log.error("InternalClientRestController.checkClient: " + e.getMessage());
+            return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
+        } catch (Exception e) {
+            log.error("InternalClientRestController.checkClient: Error while processing client with MESH-GUID: "
+                    + personGuid, e);
+            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
+        }
+    }
+
+    @GET
+    @Path(value = "guardian")
+    public Response checkGuardian(@QueryParam(value = "personGuid") String personGuid) {
+        try {
+            checkParameter("personGuid", personGuid);
+            Boolean exists = service.isGuardianExistsByMeshGUID(personGuid);
+            if (exists) {
+                return Response.status(HttpURLConnection.HTTP_OK).build();
+            }
+            return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
+        } catch (IllegalArgumentException e) {
+            log.error("InternalClientRestController.checkGuardian: " + e.getMessage());
+            return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
+        } catch (Exception e) {
+            log.error("InternalClientRestController.checkGuardian: Error while processing client with MESH-GUID: "
+                    + personGuid, e);
+            return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
+        }
+    }
 
     @PUT
-    @Path(value = "client")
+    @Path(value = "guardian")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateClient(@RequestBody ClientInfo info){
+    public Response updateGuardian(@RequestBody ClientInfo info){
         try {
             checkParameterClientInfo(info);
             checkParameterUpdateOperation(info.getUpdateOperation());
-            service.updateClient(info);
+            service.updateGuardian(info);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("InternalClientRestController.updateClient: " + e.getMessage());
+            log.error("InternalClientRestController.updateGuardian: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NotFoundException e) {
-            //log.error("InternalClientRestController.updateClient: "+ e.getMessage());
+            log.error("InternalClientRestController.updateGuardian: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("InternalClientRestController.updateClient: Error while processing client with MESH-GUID: "
+            log.error("InternalClientRestController.updateGuardian: Error while processing client with MESH-GUID: "
                     + info.getPersonGUID(), e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
     }
 
     @DELETE
-    @Path(value = "client")
-    public Response deleteClient(@QueryParam(value = "guardianMeshGuid") String personGuid){
+    @Path(value = "guardian")
+    public Response deleteGuardian(@QueryParam(value = "personGuid") String personGuid){
         try {
-            checkParameter("guardianMeshGuid", personGuid);
-            service.deleteClient(personGuid);
+            checkParameter("personGuid", personGuid);
+            service.deleteGuardian(personGuid);
 
             return Response.status(HttpURLConnection.HTTP_OK).build();
         } catch (IllegalArgumentException e) {
-            log.error("InternalClientRestController.deleteClient: " + e.getMessage());
+            log.error("InternalClientRestController.deleteGuardian: " + e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorMsg.badRequest());
         } catch (NotFoundException e) {
-            //log.error("InternalClientRestController.deleteClient: "+ e.getMessage());
+            log.error("InternalClientRestController.deleteGuardian: "+ e.getMessage());
             return generateResponse(HttpURLConnection.HTTP_NOT_FOUND, ErrorMsg.notFound());
         } catch (Exception e){
-            log.error("InternalClientRestController.deleteClient: Error while processing client with MESH-GUID: "
+            log.error("InternalClientRestController.deleteGuardian: Error while processing client with MESH-GUID: "
                     + personGuid, e);
             return generateResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, ErrorMsg.internalError());
         }
