@@ -1911,7 +1911,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public Boolean isStudentGroup() {
         if (this.idOfClientGroup != null)
-            return this.idOfClientGroup < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
+            return this.idOfClientGroup < 1100000000L;
         return false;
     }
 
