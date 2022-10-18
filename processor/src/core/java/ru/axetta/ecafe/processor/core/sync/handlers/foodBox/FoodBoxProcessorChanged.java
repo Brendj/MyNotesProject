@@ -54,6 +54,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 resFoodBoxChangedItem.setId(foodBoxPreorder.getIdFoodBoxPreorder());
                 resFoodBoxChangedItem.setRes(0);
                 resFoodBoxChangedItem.setVersion(version + 1);
+                resFoodBoxChangedItem.setState(foodBoxPreorder.getState().getValue());
                 resFoodBoxChanged.getItems().add(resFoodBoxChangedItem);
                 continue;
             }
@@ -113,6 +114,7 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             resFoodBoxChangedItem.setId(foodBoxPreorder.getIdFoodBoxPreorder());
             resFoodBoxChangedItem.setRes(0);
             resFoodBoxChangedItem.setVersion(version + 1);
+            resFoodBoxChangedItem.setState(foodBoxPreorder.getState().getValue());
             resFoodBoxChanged.getItems().add(resFoodBoxChangedItem);
         }
         for (FoodBoxCells foodBoxCells : foodBoxCellsList) {
