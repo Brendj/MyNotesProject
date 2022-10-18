@@ -170,7 +170,7 @@ public class MeshService {
 
         try {
             if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
-                internalGuardianService.deleteClient(entityChanges.getPersonGUID());
+                internalGuardianService.deleteGuardian(entityChanges.getPersonGUID());
             } else {
                 Integer operation = null;
                 if (entityChanges.getEntity().equals(EntityType.PERSON)) {
@@ -181,8 +181,10 @@ public class MeshService {
                     operation = UpdateOperation.CONTACTS_UPDATE_OPERATION.getCode();
                 }
                 if (operation != null) {
-                    PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
-                    internalGuardianService.updateClient(info, operation);
+                    if (internalGuardianService.checkGuardian(entityChanges.getPersonGUID())) {
+                        PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
+                        internalGuardianService.updateGuardian(info, operation);
+                    }
                 }
             }
 
@@ -303,8 +305,10 @@ public class MeshService {
 
     private CompletableFuture<Boolean> processGuardianRelations(EntityChanges entityChanges) {
         try {
-            PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), PERSONS_SEARCH_EXPAND);
-            internalGuardianService.processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
+            if (internalGuardianService.checkClient(entityChanges.getPersonGUID())) {
+                PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), PERSONS_SEARCH_EXPAND);
+                internalGuardianService.processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
+            }
             return CompletableFuture.completedFuture(true);
         } catch (ApiException e) {
             log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
