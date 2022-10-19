@@ -444,6 +444,37 @@
                     </f:facet>
                     <h:outputText escape="true" value="#{clientDiscount.lastDiscountsUpdate}" styleClass="output-text"/>
                 </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Категории ДТиСЗН"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{clientDiscount.printedCategoriesDiscountsDSZN}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата начала"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{clientDiscount.dateStart}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Дата окончания"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{clientDiscount.dateEnd}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Статус"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="Действующая" rendered="#{!clientDiscount.active  &amp;&amp; clientDiscount.active != null}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="Активная" rendered="#{clientDiscount.active}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Назначена МСП"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="Назначенная ЛК" rendered="#{clientDiscount.appointedMSP}" styleClass="output-text"/>
+                </rich:column>
                 <f:facet name="footer">
                     <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}"
                                        render="modalCategoryListSelectorPanel"

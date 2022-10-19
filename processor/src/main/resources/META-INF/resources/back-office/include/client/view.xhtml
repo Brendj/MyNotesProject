@@ -394,18 +394,19 @@
                 </f:facet>
                 <h:outputText escape="true" value="#{clientDiscount.dateEnd}" styleClass="output-text"/>
             </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Статус" />
-                </f:facet>
-                <h:outputText escape="true" value="#{clientDiscount.status}" styleClass="output-text"/>
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Назначена МСП" />
-                </f:facet>
-                <h:outputText escape="true" value="#{clientDiscount.appointedMSP}" styleClass="output-text"/>
-            </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус"/>
+            </f:facet>
+            <h:outputText escape="true" value="Действующая" rendered="#{!clientDiscount.active  &amp;&amp; clientDiscount.active != null}" styleClass="output-text"/>
+            <h:outputText escape="true" value="Активная" rendered="#{clientDiscount.active}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Назначена МСП"/>
+            </f:facet>
+            <h:outputText escape="true" value="Назначенная ЛК" rendered="#{clientDiscount.appointedMSP}" styleClass="output-text"/>
+        </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам" styleClass="output-text" />
