@@ -2,7 +2,6 @@ package ru.axetta.ecafe.processor.core.partner.mesh.guardians;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
@@ -237,11 +237,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
     public void processDocumentsInternal(
             Session session, Client client, List<MeshDocumentResponse> documents) throws Exception {
         // Создаем документы, которых нет в испп, обновляем документы, которые есть в ИСПП и МК
-        if (documents != null || !documents.isEmpty()) {
+        if (!ObjectUtils.isEmpty(documents)) {
             for (MeshDocumentResponse document : documents) {
                 DulDetail dulDetail = client.getDulDetail()
                         .stream()
-                        .filter(dulDetailItem -> ObjectUtils.equals(dulDetailItem.getIdMkDocument(), document.getId()))
+                        .filter(dulDetailItem -> Objects.equals(dulDetailItem.getIdMkDocument(), document.getId()))
                         .findFirst()
                         .orElse(null);
                 if (dulDetail == null) {
@@ -262,9 +262,9 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
         // Удаляем те документы, которых уже нет в МК, но есть с ИСПП
         for (DulDetail dulDetailItem : client.getDulDetail()) {
             boolean exists = false;
-            if (documents != null || !documents.isEmpty()) {
+            if (!ObjectUtils.isEmpty(documents)) {
                 exists = documents.stream()
-                        .anyMatch(di -> ObjectUtils.equals(di.getId(), dulDetailItem.getIdMkDocument()));
+                        .anyMatch(di -> Objects.equals(di.getId(), dulDetailItem.getIdMkDocument()));
             }
             if (!exists) {
                 dulDetailItem.setLastUpdate(new Date());
