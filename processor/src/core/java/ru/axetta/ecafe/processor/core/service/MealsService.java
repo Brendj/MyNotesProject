@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ClientParallel;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.MeshTrainingForm;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.*;
@@ -32,11 +31,9 @@ import ru.axetta.ecafe.processor.web.partner.meals.ResponseResult;
 import ru.axetta.ecafe.processor.web.partner.meals.models.*;
 
 import javax.transaction.Transactional;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -185,11 +182,16 @@ public class MealsService {
         session.update(foodBoxOrgReq);
     }
 
-    public MealsPOJO verifyClient(Long contractId)
+    public MealsPOJO verifyClient(Long contractId, String personId)
     {
         MealsPOJO mealsPOJO = new MealsPOJO();
         Client client = null;
-        client = daoReadonlyService.getClientWithOrgByContractId(contractId);
+        if (contractId != null) {
+            client = daoReadonlyService.getClientWithOrgByContractId(contractId);
+        } else
+        {
+            client = daoReadonlyService.getClientWithOrgByMeshGuid(personId);
+        }
         if (client == null) {
             mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
                     body(responseResult.noClient()));
@@ -199,15 +201,15 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    public MealsPOJO getClient (String contractIdStr)
+    public MealsPOJO getClient (String contractIdStr, String personIdStr)
     {
         MealsPOJO mealsPOJO = new MealsPOJO();
 
-        verifyContractId(contractIdStr, mealsPOJO);
+        verifyClientId(contractIdStr, personIdStr, mealsPOJO);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO;
 
-        mealsPOJO = verifyClient(mealsPOJO.getContractId());
+        mealsPOJO = verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId());
 
         return mealsPOJO;
     }
@@ -246,7 +248,8 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    public MealsPOJO validateByFormalInfoGetFoodbox(String contractIdStr, String fromStr, String toStr, String sortStr)
+    public MealsPOJO validateByFormalInfoGetFoodbox(String contractIdStr, String personIdStr, String fromStr,
+                                                    String toStr, String sortStr)
     {
         MealsPOJO mealsPOJO = new MealsPOJO();
         Long contract = null;
@@ -254,7 +257,7 @@ public class MealsService {
         Date to = null;
         Boolean sortDesc = true;
 
-        verifyContractId(contractIdStr, mealsPOJO);
+        verifyClientId(contractIdStr, personIdStr, mealsPOJO);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO;
 
@@ -343,23 +346,27 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    private void verifyContractId(String contractIdStr, MealsPOJO mealsPOJO)
+    private void verifyClientId(String contractIdStr, String personIdStr, MealsPOJO mealsPOJO)
     {
-        if (contractIdStr.isEmpty()) {
+        if (contractIdStr.isEmpty() && personIdStr.isEmpty()) {
             mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                    body(responseResult.emptyContractId()));
+                    body(responseResult.emptyContractIdAndPersonId()));
             return;
         }
-
-        Long contractId;
-        try {
-            contractId = Long.parseLong(contractIdStr);
-        } catch (Exception e) {
-            mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                    body(responseResult.wrongFormatContractId(contractIdStr, e)));
-            return;
+        if (!contractIdStr.isEmpty()) {
+            Long contractId;
+            try {
+                contractId = Long.parseLong(contractIdStr);
+            } catch (Exception e) {
+                mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                        body(responseResult.wrongFormatContractId(contractIdStr, e)));
+                return;
+            }
+            mealsPOJO.setContractId(contractId);
+        } else
+        {
+            mealsPOJO.setPersonId(personIdStr);
         }
-        mealsPOJO.setContractId(contractId);
     }
 
     public MealsPOJO mainLogicNewPreorder(Session session, FoodboxOrder foodboxOrders, Client client, String xrequestStr, MealsPOJO mealsPOJO)
