@@ -84,6 +84,7 @@ public class ResponseItem implements Serializable {
 
 
     public static final String ERROR_DISABLE_SOC_CARDS_REG_MESSAGE = "Регистрация социальных карт временно приостановлена по техническим причинам";
+    public static final String ERROR_WRONG_TRANSITION_STATE_MESSAGE = "Карта выведена из оборота по техническим причинам или передана в пользование другой ОО";
     public int code;
     public String message;
 

@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
+import ru.axetta.ecafe.processor.core.persistence.service.card.*;
 import sun.security.provider.X509Factory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -17,10 +18,6 @@ import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundException;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardUidGivenAwayException;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
@@ -2294,6 +2291,10 @@ public class FrontController extends HttpServlet {
             logger.error("Error in unblockOrReturnCard", e);
             responseItem.code = ResponseItem.ERROR_CARD_NOT_FOUND;
             responseItem.message = ResponseItem.ERROR_SPECIAL_CARD_NOT_FOUND_MESSAGE;
+        } catch (CardTransitionStateException e) {
+            logger.error("Error in unblockOrReturnCard", e);
+            responseItem.code = ResponseItem.ERROR_CARD_WRONG_STATE;
+            responseItem.message = ResponseItem.ERROR_WRONG_TRANSITION_STATE_MESSAGE;
         } catch (CardWrongStateException e) {
             logger.error("Error in unblockOrReturnCard", e);
             responseItem.code = ResponseItem.ERROR_CARD_WRONG_STATE;
