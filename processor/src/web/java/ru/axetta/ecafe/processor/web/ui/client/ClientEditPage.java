@@ -1817,7 +1817,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 for (Long idOfCategory : categoryMap.keySet()) {
                     idOfCategoryList.add(idOfCategory);
                     ClientDiscountItem item = new ClientDiscountItem(idOfCategory, categoryMap.get(idOfCategory), null,
-                            null, null, null, null, null, lastDiscountsUpdate, discountMode, null);
+                            null, null, null, null, null, lastDiscountsUpdate, discountMode, null, null);
                     newClientDiscountItems.add(item);
                     clientDiscountItems = newClientDiscountItems;
                 }
