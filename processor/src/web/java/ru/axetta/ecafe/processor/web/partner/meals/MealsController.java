@@ -302,6 +302,7 @@ public class MealsController extends Application {
     }
 
     @PutMapping(value = "clients/foodboxAllowed", produces = APPLICATION_JSON_VALUE)
+    @Transactional
     public ResponseEntity<?> setPersonFoodboxAllowed(@Context HttpServletRequest request) {
         Result result = new Result();
         //Контроль безопасности
