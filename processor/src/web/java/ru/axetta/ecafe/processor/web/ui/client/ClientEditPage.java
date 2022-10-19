@@ -1075,36 +1075,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setSan(this.san);
         client.setBalanceToNotify(this.balanceToNotify);
 
-        if (this.externalId == null || this.externalId == 0) {
-            client.setExternalId(null);
-        } else {
-            client.setExternalId(this.externalId);
-        }
-        if (StringUtils.isEmpty(clientGUID)) {
-            client.setClientGUID(null);
-        } else {
-            client.setClientGUID(this.clientGUID);
-        }
-
-        if (StringUtils.isEmpty(meshGUID)) {
-            client.setMeshGUID(null);
-        } else {
-            client.setMeshGUID(meshGUID);
-        }
-        if (client.getClearedSsoid()) {
-            clientSSOID = "";
-            client.setClearedSsoid(false);
-        }
-        if (StringUtils.isEmpty(clientSSOID)) {
-            client.setSsoid(null);
-        } else {
-            client.setSsoid(clientSSOID);
-        }
-        if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
-            client.setIacRegId(null);
-        } else {
-            client.setIacRegId(this.clientIacRegId);
-        }
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
