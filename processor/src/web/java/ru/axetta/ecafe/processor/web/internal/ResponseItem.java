@@ -70,6 +70,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE = "Не указан longCardNo для организации "
             + "с включенным флагом использования длинных UID";
     public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
+    public static final String ERROR_WRONG_TRANSITION_STATE_MESSAGE = "Карта выведена из оборота по техническим причинам или передана в пользование другой ОО";
     public int code;
     public String message;
 

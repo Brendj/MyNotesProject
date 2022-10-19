@@ -237,6 +237,11 @@ public class CardService {
             );
         }
 
+        if (card.getTransitionState().equals(CardTransitionState.GIVEN_AWAY.getCode())) {
+            throw new CardTransitionStateException(
+                    String.format("UnblockOrReturnCard error: transition state = 1, cardNo=%d and idOfOrg=%d", cardNo, idOfOrg)
+            );
+        }
         if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
             unblock(card);
         } else if ((CardState.BLOCKED.getValue() == card.getState()) || (CardState.TEMPISSUED.getValue() == card.getState()) ||
