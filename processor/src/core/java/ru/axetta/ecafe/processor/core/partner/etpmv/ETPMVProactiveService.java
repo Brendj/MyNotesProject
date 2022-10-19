@@ -172,6 +172,7 @@ public class ETPMVProactiveService {
             String msg = createCoordinateMessage(serviceNumber, ssoid, fio, expiration_date);
             RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(msg);
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, dtisznCode, serviceNumber, ssoid);
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage("+" + serviceNumber, msg, true, "");
         } catch (Exception e) {
             logger.error("Error in sendMessage: ", e);
         }
