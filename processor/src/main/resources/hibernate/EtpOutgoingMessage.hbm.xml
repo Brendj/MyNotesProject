@@ -18,5 +18,6 @@
         <property name="isSent" column="isSent"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="errorMessage" column="errorMessage" type="string"/>
+        <property name="messageType" column="messageType" type="integer"/>
     </class>
 </hibernate-mapping>

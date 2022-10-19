@@ -14,5 +14,6 @@
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="isProcessed" column="isProcessed"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="messageType" column="messageType" type="integer"/>
     </class>
 </hibernate-mapping>

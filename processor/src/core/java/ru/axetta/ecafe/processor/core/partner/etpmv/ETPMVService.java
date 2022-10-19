@@ -132,7 +132,7 @@ public class ETPMVService {
 
         boolean newFormat = getCoordinateMessageFormat(message);
 
-        daoService.saveEtpPacket(serviceNumber, message);
+        daoService.saveEtpPacket(serviceNumber, message, ETPMessageType.ZLP);
 
         RequestServiceForSign requestServiceForSign = coordinateData.getSignService();
         RequestServiceForSign.CustomAttributes customAttributes = requestServiceForSign.getCustomAttributes();
@@ -265,7 +265,7 @@ public class ETPMVService {
                 logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
                 if (!serviceNumber.contains(ISPP_ID) && !serviceNumber.contains(NEW_ISPP_ID))
                     throw new Exception("Wrong ISPP_ID in Service Number");
-                daoService.saveEtpPacket(serviceNumber, message);
+                daoService.saveEtpPacket(serviceNumber, message, ETPMessageType.ZLP);
 
                 //Находим заявления по номеру
                 ApplicationForFood applicationForFood = daoService.getApplicationForFoodWithDtisznCodes(serviceNumber);
@@ -487,6 +487,7 @@ public class ETPMVService {
         List<EtpOutgoingMessage> messages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNotSendedMessages();
         int counter = 1;
         for (EtpOutgoingMessage message : messages) {
+            if (!message.getMessageType().equals(ETPMessageType.ZLP.getCode())) continue;
             logger.info(String.format("Resend status %s from %s", counter, messages.size()));
             boolean success = false;
             try {

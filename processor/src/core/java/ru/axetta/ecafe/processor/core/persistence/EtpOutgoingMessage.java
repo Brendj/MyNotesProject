@@ -17,6 +17,7 @@ public class EtpOutgoingMessage {
     private Date lastUpdate;
     private Boolean isSent;
     private String errorMessage;
+    private Integer messageType;
 
     public EtpOutgoingMessage() {
 
@@ -76,5 +77,13 @@ public class EtpOutgoingMessage {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Integer getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(Integer messageType) {
+        this.messageType = messageType;
     }
 }
