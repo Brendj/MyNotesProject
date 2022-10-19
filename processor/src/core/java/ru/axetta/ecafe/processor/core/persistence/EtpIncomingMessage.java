@@ -15,6 +15,7 @@ public class EtpIncomingMessage {
     private Date createdDate;
     private Date lastUpdate;
     private Boolean isProcessed;
+    private Integer messageType;
 
     public EtpIncomingMessage() {
 
@@ -58,5 +59,13 @@ public class EtpIncomingMessage {
 
     public void setIsProcessed(Boolean processed) {
         isProcessed = processed;
+    }
+
+    public Integer getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(Integer messageType) {
+        this.messageType = messageType;
     }
 }

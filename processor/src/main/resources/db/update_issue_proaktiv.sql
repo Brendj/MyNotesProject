@@ -32,6 +32,9 @@ CREATE TABLE  cf_proaktiv_message_status (
 
 ALTER TABLE public.cf_proaktiv_message ADD dtiszncode int4 NULL;
 
+alter table cf_etp_outgoing_message add column messagetype integer NOT NULL DEFAULT 0;
+alter table cf_etp_incoming_message add column messagetype integer NOT NULL DEFAULT 0;
+
 --Параметры в конфигурацию
 --ecafe.processor.etp.proactive.isOn=true
 --ecafe.processor.etp.proactive.nodes=NNN - отправка в очереди проактива етп

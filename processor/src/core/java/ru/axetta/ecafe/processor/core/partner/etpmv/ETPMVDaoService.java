@@ -45,7 +45,7 @@ public class ETPMVDaoService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVDaoService.class);
 
     @Transactional
-    public void saveEtpPacket(String messageId, String messageText) {
+    public void saveEtpPacket(String messageId, String messageText, ETPMessageType messageType) {
         Query query = entityManager.createQuery("select count(m.etpMessageId) from EtpIncomingMessage m where m.etpMessageId like :messageId");
         query.setParameter("messageId", messageId + "%");
         Long res = (Long)query.getSingleResult();
@@ -56,6 +56,7 @@ public class ETPMVDaoService {
         etpIncomingMessage.setEtpMessagePayload(messageText);
         etpIncomingMessage.setCreatedDate(new Date());
         etpIncomingMessage.setIsProcessed(false);
+        etpIncomingMessage.setMessageType(messageType.getCode());
         entityManager.persist(etpIncomingMessage);
     }
 
@@ -79,6 +80,7 @@ public class ETPMVDaoService {
             etpOutgoingMessage.setIsSent(isSent);
             etpOutgoingMessage.setErrorMessage(errorMessage);
             etpOutgoingMessage.setLastUpdate(new Date());
+            etpOutgoingMessage.setMessageType(ETPMessageType.ZLP.getCode());
             entityManager.merge(etpOutgoingMessage);
             if (isSent) {
                 Query query = entityManager.createQuery("select h from ApplicationForFoodHistory h where h.applicationForFood.serviceNumber = :serviceNumber and status = :status");
@@ -417,6 +419,7 @@ public class ETPMVDaoService {
             etpOutgoingMessage.setIsSent(isSent);
             etpOutgoingMessage.setErrorMessage(errorMessage);
             etpOutgoingMessage.setLastUpdate(new Date());
+            etpOutgoingMessage.setMessageType(ETPMessageType.PROACTIVE.getCode());
             entityManager.merge(etpOutgoingMessage);
         } catch (Exception e) {
             logger.error("Error in saving outgoing proactive ETP message: ", e);

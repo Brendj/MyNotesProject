@@ -120,7 +120,7 @@ public class ETPMVProactiveService {
         StatusType statusType = coordinateStatusData.getStatus();
         Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
-        daoService.saveEtpPacket("+" + serviceNumber, message);
+        daoService.saveEtpPacket(serviceNumber, message, ETPMessageType.PROACTIVE);
         ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
 
         //Пользователь портала отказывается от ЛП для обучающегося.
@@ -172,7 +172,7 @@ public class ETPMVProactiveService {
             String msg = createCoordinateMessage(serviceNumber, ssoid, fio, expiration_date);
             RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(msg);
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, dtisznCode, serviceNumber, ssoid);
-            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage("+" + serviceNumber, msg, true, "");
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage(serviceNumber, msg, true, "");
         } catch (Exception e) {
             logger.error("Error in sendMessage: ", e);
         }
@@ -295,7 +295,7 @@ public class ETPMVProactiveService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage("+" + serviceNumber, message, success, "");
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage(serviceNumber, message, success, "");
         if (success) {
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessageStatus(proactiveMessage, status);
         }
