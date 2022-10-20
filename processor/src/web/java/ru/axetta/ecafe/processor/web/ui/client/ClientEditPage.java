@@ -1290,32 +1290,33 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
             //Создание представителя в МК
             if (client.getMeshGUID() == null) {
-                //Удаляем документы в ИСПП выбранные пользователем для удаления
-                deleteDocuments(persistenceSession, client, false);
                 if (this.clientWardItems.size() > 1) {
                     throw new Exception("Нельзя добавить больше одного опекаемого за один раз");
                 }
+                //Удаляем документы в ИСПП выбранные пользователем для удаления
+                deleteDocuments(persistenceSession, client, false);
+                //Сохраняем документы в ИСПП
+                for (DulDetail dulDetail : this.dulDetail) {
+                    if (dulDetail.getNew()) {
+                        getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client, false);
+                    } else {
+                        getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client, false);
+                    }
+                }
+
                 MeshAgentResponse meshAgentResponse = getMeshGuardiansService()
                         .createPersonOnlyMK(this.person.getFirstName(), this.person.getSecondName(),
                                 this.person.getSurname(), this.gender == 0 ? 2 : 1, this.birthDate, this.san, this.mobile, this.email,
                                 this.dulDetail, this.clientWardItems.get(0).getRole(), clientWardItems.get(0).getMeshGuid());
                 if (meshAgentResponse.getCode().equals(PersonResponse.OK_CODE)) {
                     client.setMeshGUID(meshAgentResponse.getAgentPerson().getMeshGuid());
-                    for (ClientGuardianItem clientWardItem : this.clientWardItems) {
-                        clientWardItem.setIsNew(false);
-                        clientWardItem.setChange(false);
-                    }
                     for (DulDetail dulDetail : dulDetail) {
-                        //Сохранение документов в ИСПП
+                        //Присваеваем MKid документу
                         for (MeshDocumentResponse meshDocumentResponse : meshAgentResponse.getAgentPerson().getDocument()) {
                             if (meshDocumentResponse.getDocumentTypeId() == dulDetail.getDocumentTypeId()) {
                                 dulDetail.setIdMkDocument(meshDocumentResponse.getId());
-                                if (dulDetail.getNew()) {
-                                    getMeshDulDetailService().saveDulDetail(persistenceSession, dulDetail, client, false);
-                                } else {
-                                    getMeshDulDetailService().updateDulDetail(persistenceSession, dulDetail, client, false);
-                                }
                                 dulDetail.setNew(false);
+                                persistenceSession.merge(dulDetail);
                             }
                         }
                     }
@@ -1330,13 +1331,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
                 //Изменение контактов представителя в МК
                 updateContactToMK(oldMobile, oldEmail);
+                //Удаление связи с опекаемыми в МК
+                removeWardsMK(client);
+                //Создание связи с опекаемыми в МК
+                addWardsMK(client);
             }
         }
 
-        //Удаление связи с опекаемыми в МК
-        removeWardsMK(client);
-        //Создание связи с опекаемыми в МК
-        addWardsMK(client);
         //Удаление связи с опекунами в МК
         removeGuardiansMK(client);
         //Создание связи с опекунами в МК
