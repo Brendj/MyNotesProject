@@ -1292,16 +1292,19 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if (client.getMeshGUID() == null) {
                 //Удаляем документы в ИСПП выбранные пользователем для удаления
                 deleteDocuments(persistenceSession, client, false);
-
+                if (this.clientWardItems.size() > 1) {
+                    throw new Exception("Нельзя добавить больше одного опекаемого за один раз");
+                }
                 MeshAgentResponse meshAgentResponse = getMeshGuardiansService()
                         .createPersonOnlyMK(this.person.getFirstName(), this.person.getSecondName(),
                                 this.person.getSurname(), this.gender == 0 ? 2 : 1, this.birthDate, this.san, this.mobile, this.email,
-                                this.dulDetail, clientWardItems.get(0).getRole(), clientWardItems.get(0).getMeshGuid());
-                for (ClientGuardianItem clientWardItem : this.clientWardItems) {
-                    clientWardItem.setIsNew(false);
-                }
+                                this.dulDetail, this.clientWardItems.get(0).getRole(), clientWardItems.get(0).getMeshGuid());
                 if (meshAgentResponse.getCode().equals(PersonResponse.OK_CODE)) {
                     client.setMeshGUID(meshAgentResponse.getAgentPerson().getMeshGuid());
+                    for (ClientGuardianItem clientWardItem : this.clientWardItems) {
+                        clientWardItem.setIsNew(false);
+                        clientWardItem.setChange(false);
+                    }
                     for (DulDetail dulDetail : dulDetail) {
                         //Сохранение документов в ИСПП
                         for (MeshDocumentResponse meshDocumentResponse : meshAgentResponse.getAgentPerson().getDocument()) {
@@ -1366,8 +1369,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private void setClientGuardianItemChange(List<ClientGuardianItem> originalClientWardItems, List<ClientGuardianItem> clientGuardianItem) {
         for (ClientGuardianItem originalClientWardItem : originalClientWardItems) {
             for (ClientGuardianItem clientWardItem : clientGuardianItem) {
-                if (originalClientWardItem.getIdOfClient().equals(clientWardItem.getIdOfClient()) &&
-                        !originalClientWardItem.getRole().equals(clientWardItem.getRole())) {
+                try {
+                    if (originalClientWardItem.getIdOfClient().equals(clientWardItem.getIdOfClient()) &&
+                            !originalClientWardItem.getRole().equals(clientWardItem.getRole())) {
+                        clientWardItem.setChange(true);
+                    }
+                } catch (NullPointerException e) {
                     clientWardItem.setChange(true);
                 }
             }
@@ -1424,16 +1431,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     private boolean isDulChange(DulDetail dulDetail, Client client) {
-        Set<DulDetail> originDulDetails = new HashSet<>();
-        if (client.getDulDetail() != null) {
-            originDulDetails = client.getDulDetail().stream()
-                    .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
-                    .collect(Collectors.toSet());
+        try {
+            Set<DulDetail> originDulDetails = new HashSet<>();
+            if (client.getDulDetail() != null) {
+                originDulDetails = client.getDulDetail().stream()
+                        .filter(d -> d.getDeleteState() == null || !d.getDeleteState())
+                        .collect(Collectors.toSet());
+            }
+            for (DulDetail originDul : originDulDetails)
+                if (dulDetail.equals(originDul))
+                    return false;
+            return true;
+        } catch (Exception e) {
+            return true;
         }
-        for (DulDetail originDul : originDulDetails)
-            if (dulDetail.equals(originDul))
-                return false;
-        return true;
     }
 
     private void documentExceptionProcess(Session persistenceSession, Long documentTypeId, String message) throws Exception {
