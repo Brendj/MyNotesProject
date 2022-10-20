@@ -93,11 +93,11 @@ public class PersonBenefitCategoryService {
             HibernateUtils.close(session, log);
         }
         if (sendToPortal) {
-            sendNotificationBenefitCreated(client, guardians, categoryCode, fio, endDate);
+            sendNotificationBenefitCreated(client, guardians, categoryCode, fio);
         }
     }
 
-    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, Integer dtisznCode, String clientFIO, Date expiration_date) {
+    public void sendNotificationBenefitCreated(Client client, List<Client> guardians, Integer dtisznCode, String clientFIO) {
         try {
             for (Client guardian : guardians) {
                 String ssoid = aupdPersonService.getSsoidByPersonId(guardian.getMeshGUID());
@@ -105,7 +105,7 @@ public class PersonBenefitCategoryService {
                     log.info("Aupd ssoid is empty");
                     return;
                 }
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, dtisznCode, clientFIO, ssoid, expiration_date);
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendMSPAssignedMessage(client, guardian, dtisznCode, clientFIO, ssoid);
             }
         } catch (Exception e) {
             log.error("Error in sendNotificationBenefitCreated: ", e);
