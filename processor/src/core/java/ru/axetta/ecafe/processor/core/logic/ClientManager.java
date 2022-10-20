@@ -2612,7 +2612,7 @@ public class ClientManager {
 
     //todo уточнить как найти представителя
     public static boolean isClientGuardian(Session session, Client client) {
-        if (client.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
+        if (client.getIdOfClientGroup() < 1100000000L)
             return false;
         if (Objects.equals(client.getIdOfClientGroup(), ClientGroup.Predefined.CLIENT_DELETED.getValue()))
             return false;
