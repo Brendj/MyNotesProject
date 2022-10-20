@@ -1378,9 +1378,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     private Boolean checkChangePersonForSaveMk(Client client, Person person) {
-        return !(person.getFirstName().equals(this.person.firstName) && person.getSecondName().equals(this.person.secondName) &&
-                person.getSurname().equals(this.person.surname) && client.getGender().equals(this.gender) &&
-                client.getBirthDate().equals(this.birthDate) && client.getSan().equals(this.san) && client.getMeshGUID().equals(this.meshGUID));
+        try {
+            return !(person.getFirstName().equals(this.person.firstName) && person.getSecondName().equals(this.person.secondName) &&
+                    person.getSurname().equals(this.person.surname) && client.getGender().equals(this.gender) &&
+                    Objects.equals(client.getBirthDate(), this.birthDate) && client.getSan().equals(this.san));
+        } catch (NullPointerException e) {
+            return true;
+        }
     }
 
     private void saveDocuments(Session persistenceSession, Client client, boolean safeToMk) throws Exception {
