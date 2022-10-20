@@ -30,6 +30,7 @@ public class ClientGuardianItem {
     private Integer representativeType;
     private Integer role;
     private String meshGuid;
+    private Boolean isChange = false;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -234,5 +235,13 @@ public class ClientGuardianItem {
                 }
             }
         }
+    }
+
+    public Boolean getChange() {
+        return isChange;
+    }
+
+    public void setChange(Boolean change) {
+        isChange = change;
     }
 }
