@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxCells;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxPreorder;
 import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxStateTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -138,7 +139,14 @@ public class CancelledFoodBoxService {
                 FoodBoxPreorder foodBoxPreorder = daoReadonlyService.findFoodBoxPreorderById(entry.getKey());
                 foodBoxPreorder.setCancelReason(2);
                 foodBoxPreorder.setState(FoodBoxStateTypeEnum.CANCELED);
-                foodBoxPreorder.setPosted(2);
+                if (foodBoxPreorder.getPosted() == 1)
+                {
+                    //Освобождаем ячейку, если у заказа окончен срок жизни
+                    FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(foodBoxPreorder.getOrg(), foodBoxPreorder.getIdOfFoodBox());
+                    foodBoxCells.setBusycells(foodBoxCells.getBusycells() - 1);
+                    session.merge(foodBoxCells);
+                    foodBoxPreorder.setPosted(2);
+                }
                 session.merge(foodBoxPreorder);
                 it.remove();
                 logger.info("Удаление фудбокс заказа " + foodBoxPreorder.getIdFoodBoxPreorder());

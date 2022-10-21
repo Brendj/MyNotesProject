@@ -46,9 +46,9 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                         foodBoxPreorderChangedItem.getId()));
                 return resFoodBoxChanged;
             }
-            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED) && foodBoxPreorder.getCancelReason().equals(4))
+            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED) && foodBoxPreorder.getCancelReason().equals(2))
             {
-                //Если предзаказ уже был отменен по окончанию срока жизни
+                //Если предзаказ уже был отменен по окончанию срока жизни на процессинге
                 ResFoodBoxChangedItem resFoodBoxChangedItem = new ResFoodBoxChangedItem();
                 resFoodBoxChangedItem.setError("");
                 resFoodBoxChangedItem.setId(foodBoxPreorder.getIdFoodBoxPreorder());
