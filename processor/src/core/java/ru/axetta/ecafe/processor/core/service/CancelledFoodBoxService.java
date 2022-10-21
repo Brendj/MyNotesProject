@@ -145,8 +145,8 @@ public class CancelledFoodBoxService {
                     FoodBoxCells foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrgAndFoodBoxId(foodBoxPreorder.getOrg(), foodBoxPreorder.getIdOfFoodBox());
                     foodBoxCells.setBusycells(foodBoxCells.getBusycells() - 1);
                     session.merge(foodBoxCells);
-                    foodBoxPreorder.setPosted(2);
                 }
+                foodBoxPreorder.setPosted(2);
                 session.merge(foodBoxPreorder);
                 it.remove();
                 logger.info("Удаление фудбокс заказа " + foodBoxPreorder.getIdFoodBoxPreorder());
