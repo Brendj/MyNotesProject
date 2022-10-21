@@ -20,6 +20,11 @@
                              cols="64"/>
             <h:outputText escape="true" value="Код льготы ЕТП" styleClass="output-text"/>
             <h:inputText value="#{categoryDiscountDSZNEditPage.ETPCode}" maxlength="32" styleClass="input-text"/>
+            <h:outputText escape="true" value="Новый (текстовый) код льготы ЕТП" styleClass="output-text"/>
+            <h:inputText value="#{categoryDiscountDSZNEditPage.ETPTextCode}" maxlength="32" styleClass="input-text"/>
+            <h:outputText escape="true" value="Приоритет" styleClass="output-text"/>
+            <h:inputText value="#{categoryDiscountDSZNEditPage.priority}" maxlength="16" styleClass="input-text"
+                         converterMessage="Приоритет может быть только числовым"/>
             <h:outputText escape="true" value="Льгота ИСПП" styleClass="output-text"/>
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{categoryDiscountDSZNEditPage.categoryName}" readonly="true"

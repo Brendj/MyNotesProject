@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgReq;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1092,6 +1093,12 @@ public class DAOService {
         q.executeUpdate();
     }
 
+    public int setOrgCardSyncParam(List<Long> orgs) {
+        return entityManager.createQuery("update Org set cardSyncParam = true where idOfOrg in (:orgs)")
+                .setParameter("orgs", orgs)
+                .executeUpdate();
+    }
+
     @Transactional
     public void setSverkaEnabled(Boolean value) {
         String val_str = value ? "1" : "0";
@@ -1290,14 +1297,14 @@ public class DAOService {
         q.executeUpdate();
     }
 
-	public boolean orgNotExistsByNsiId(Integer organizationId) {
-        if(organizationId == null){
+	public Boolean orgNotExistsByNsiId(Integer organizationId) {
+        if(organizationId == null) {
             return true;
         }
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_orgs WHERE organizationidfromnsi = :organizationId");
-        q.setParameter("organizationId", organizationId);
+        Query query = entityManager.createNativeQuery("SELECT NOT EXISTS(SELECT 1 FROM cf_orgs where organizationidfromnsi = :organizationId)");
+        query.setParameter("organizationId", organizationId);
 
-        return HibernateUtils.getDbLong(q.getSingleResult()) == 0;
+        return (Boolean)query.getSingleResult();
     }
 	
 	public void deleteOldFoodBoxAvailable(Org org, Long idOfDish) {
@@ -1311,6 +1318,15 @@ public class DAOService {
         Query query = entityManager.createQuery("delete from FoodBoxCells where foodboxesid=:foodboxesid");
         query.setParameter("foodboxesid", foodboxesid);
         query.executeUpdate();
+    }
+
+    public FoodBoxOrgReq saveFoodBoxOrgLock(Org org) {
+        FoodBoxOrgReq foodBoxOrgReq = new FoodBoxOrgReq();
+        foodBoxOrgReq.setOrg(org);
+        foodBoxOrgReq.setVersion(0L);
+        foodBoxOrgReq.setCurrentversion(0L);
+        entityManager.persist(foodBoxOrgReq);
+        return foodBoxOrgReq;
     }
 }
 

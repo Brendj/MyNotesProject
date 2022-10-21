@@ -38,6 +38,13 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_GUARDIAN = 460;
     public static final int ERROR_LONG_CARDNO_MATCH_ORG = 470;
     public static final int ERROR_LONG_CARDNO_NOT_UNIQUE = 480;
+    public static final int ERROR_MESH_DOCUMENT_NOT_SAVE = 490;
+    public static final int ERROR_DOCUMENT_EXISTS = 491;
+    public static final int ERROR_DOCUMENT_NOT_FOUND = 510;
+    public static final int ERROR_SNILS_EXISTS = 520;
+    public static final int ERROR_DOCUMENT_VALIDATION = 530;
+    public static final int ERROR_CLIENT_IS_STUDENT = 540;
+
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
     public static final String ERROR_WRONG_KEY_MESSAGE_EMIAS = "Доступ запрещен";
@@ -70,6 +77,14 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE = "Не указан longCardNo для организации "
             + "с включенным флагом использования длинных UID";
     public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
+    public static final String ERROR_MESH_DOCUMENT_NOT_SAVE_MESSAGE = "Ошибка сохранения в методе МЭШ Контингент";
+    public static final String ERROR_DOCUMENT_NOT_FOUND_MESSAGE = "Документы по запросу не найдены";
+    public static final String ERROR_SNILS_EXISTS_MESSAGE = "Указанный снилс уже существует в системе";
+    public static final String ERROR_CLIENT_IS_STUDENT_MESSAGE = "Клиент является учеником";
+
+
+    public static final String ERROR_DISABLE_SOC_CARDS_REG_MESSAGE = "Регистрация социальных карт временно приостановлена по техническим причинам";
+    public static final String ERROR_WRONG_TRANSITION_STATE_MESSAGE = "Карта выведена из оборота по техническим причинам или передана в пользование другой ОО";
     public int code;
     public String message;
 

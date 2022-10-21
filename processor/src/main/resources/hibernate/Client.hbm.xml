@@ -97,8 +97,6 @@
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
         <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
         <property name="meshGUID" column="meshguid" type="string" length="36"/>
-        <property name="passportNumber" column="PassportNumber" type="string" length="20" not-null="false"/>
-        <property name="passportSeries" column="PassportSeries" type="string" length="20" not-null="false"/>
         <property name="balanceToNotify" column="BalanceToNotify" type="long" not-null="false"/>
         <property name="lastConfirmMobile" column="LastConfirmMobile"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -213,6 +211,12 @@
                 <column name="IdOfClient"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
+        </set>
+        <set name="dulDetail" lazy="true" inverse="true">
+            <key>
+                <column name="IdOfClient"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DulDetail"/>
         </set>
     </class>
 </hibernate-mapping>

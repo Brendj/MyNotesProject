@@ -404,6 +404,17 @@ public class MigrantsUtils {
         return criteria.list();
     }
 
+    public static Migrant findMigrantByClientAndGroupId(Session session, Long groupId, Long clientMigrateId) {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", clientMigrateId));
+        criteria.add(Restrictions.eq("resolutionCodeGroup", groupId));
+        List<Migrant> migrantList = criteria.list();
+        if (migrantList.isEmpty()) {
+            return null;
+        }
+        return (Migrant) migrantList.get(0);
+    }
+
     public static List<ESZMigrantsRequest> getRequestsByExternalIdAndGroupId(Session session, Long externalId, Long groupId) {
         Criteria criteria = session.createCriteria(ESZMigrantsRequest.class);
         criteria.add(Restrictions.eq("idOfESZ", externalId));
@@ -516,6 +527,19 @@ public class MigrantsUtils {
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.add(Restrictions.eq("orgVisit.idOfOrg", orgVisitId));
         criteria.add(Restrictions.eq("clientMigrate.idOfClient", clientMigrateId));
+        criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
+        List<Migrant> migrantList = criteria.list();
+        if (migrantList.isEmpty()) {
+            return null;
+        }
+        return (Migrant) migrantList.get(0);
+    }
+
+    public static Migrant findActiveMigrant(Session session, Long orgVisitId, Long clientMigrateId) {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", orgVisitId));
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", clientMigrateId));
+        criteria.add(Restrictions.gt("visitEndDate", new Date()));
         criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
         List<Migrant> migrantList = criteria.list();
         if (migrantList.isEmpty()) {

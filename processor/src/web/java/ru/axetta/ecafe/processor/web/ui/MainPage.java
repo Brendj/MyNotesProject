@@ -39,6 +39,8 @@ import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvid
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.LoadingElementsOfBasicGoodsPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulSelectPage;
+import ru.axetta.ecafe.processor.web.ui.dul.DulViewPage;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
@@ -90,6 +92,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.el.MethodBinding;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
@@ -99,7 +102,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -500,10 +502,11 @@ public class MainPage implements Serializable {
     private final ClientCreateByCardOperatorPage clientRegistrationByCardOperatorPage = new ClientCreateByCardOperatorPage();
     private final AutoEnterEventReportPage autoEnterEventReportPage = new AutoEnterEventReportPage();
     private final EnterEventJournalReportPage enterEventJournalReportPage = new EnterEventJournalReportPage();
-
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
-
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
+    private final DulSelectPage dulSelectPage = new DulSelectPage();
+    private final DulViewPage dulViewPage = new DulViewPage();
+    private final MeshClientSelectPage meshClientSelectPage = new MeshClientSelectPage();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3893,6 +3896,134 @@ public class MainPage implements Serializable {
         return showClientSelectPage(true);
     }
 
+    public Object showDulSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+//        if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                dulSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof DulSelectPage.CompleteHandler) {
+                    dulSelectPage.pushCompleteHandler((DulSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(dulSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill dul selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора документа: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+            }
+//        }
+        return null;
+    }
+
+    public Object showDulViewPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof DulViewPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                dulViewPage.fill();
+                modalPages.push(dulViewPage);
+                dulViewPage.pushCompleteHandler((DulViewPage.CompleteHandler) currentTopMostPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill dul view page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы просмотра документов: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object completeDulSelectSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dulSelectPage.completeDulSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора документа: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object cancelDulSelectSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            dulSelectPage.cancelDulSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора документа: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object completeDulViewSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            dulViewPage.completeDulViewSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == dulViewPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete dul view", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке просмотра документов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+        return null;
+    }
+
     public Object showClientSelectPage(boolean doClear) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientSelectPage.CompleteHandler) {
@@ -3919,9 +4050,52 @@ public class MainPage implements Serializable {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-
-
             }
+        }
+        return null;
+    }
+
+    public Object showMeshClientSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof MeshClientSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                meshClientSelectPage.fill(persistenceSession);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                meshClientSelectPage.pushCompleteHandler((MeshClientSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(meshClientSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill mesh client selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора клиента МК: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object cancelMeshClientSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            meshClientSelectPage.cancelMeshClientSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == meshClientSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete mesh client selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента МК: " + e.getMessage(), null));
         }
         return null;
     }
@@ -4082,6 +4256,57 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateMeshClientSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            meshClientSelectPage.searchMeshPerson(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill mesh client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object completeMeshClientSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            meshClientSelectPage.completeMeshClientSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == meshClientSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete mesh client selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента МК: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
     public Object completeClientSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -4106,8 +4331,6 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }
@@ -11263,4 +11486,15 @@ public class MainPage implements Serializable {
         return espHelpdeskGroupPage;
     }
 
+    public DulSelectPage getDulSelectPage() {
+        return dulSelectPage;
+    }
+
+    public DulViewPage getDulViewPage() {
+        return dulViewPage;
+    }
+
+    public MeshClientSelectPage getMeshClientSelectPage() {
+        return meshClientSelectPage;
+    }
 }

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <rich:popupPanel modal="true" id="modalMeshClientSelectorPanel" autosized="false" width="1000" height="700" headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('modalMeshClientSelectorPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="Выбор представителя мк"/>
+        </f:facet>
+        <h:form id="modalMeshClientSelectorForm"
+                styleClass="borderless-form" eventsQueue="modalMeshClientSelectorFormEventsQueue">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: left;">
+                        <h:panelGrid styleClass="borderless-grid">
+                            <h:inputText value="#{mainPage.meshClientSelectPage.meshGuardianPersonStr}" size="90"
+                                         readonly="true"
+                                         styleClass="input-text"/>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <rich:togglePanel id="modalMeshClientSelectorFilterPanel"
+                                          label="Фильтр (#{mainPage.clientSelectPage.clientFilter.status})"
+                                          switchType="client" eventsQueue="mainFormEventsQueue" opened="true"
+                                          headerClass="filter-panel-header">
+                            <h:panelGrid columns="2" styleClass="borderless-grid">
+                                <h:outputText escape="true" value="Фамилия" styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.meshClientSelectPage.surname}"
+                                             maxlength="128" styleClass="input-text"/>
+                                <h:outputText escape="true" value="Имя" styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.meshClientSelectPage.firstName}"
+                                             maxlength="64" styleClass="input-text"/>
+                                <h:outputText escape="true" value="Отчество" styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.meshClientSelectPage.secondName}"
+                                             maxlength="128" styleClass="input-text"/>
+                                <h:outputText escape="true" value="Снилс" styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.meshClientSelectPage.san}"
+                                             maxlength="128" styleClass="input-text"/>
+                                <h:outputText escape="true" value="Номер мобильного" styleClass="output-text"/>
+                                <h:inputText value="#{mainPage.meshClientSelectPage.mobileNumber}"
+                                             maxlength="128" styleClass="input-text"/>
+                                <h:outputText escape="true" value="Дата рождения" styleClass="output-text"/>
+                                <rich:calendar value="#{mainPage.meshClientSelectPage.birthDate}"
+                                               datePattern="dd.MM.yyyy"
+                                               converter="dateConverter" styleClass="date-input"
+                                               inputClass="input-text" showWeeksBar="false"/>
+                                <h:outputText escape="true" value="Пол" styleClass="output-text"/>
+                                <h:selectOneMenu value="#{mainPage.meshClientSelectPage.gender}"
+                                                 styleClass="input-text">
+                                    <f:selectItems value="#{mainPage.meshClientSelectPage.clientGenderMenu.items}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <rich:collapsiblePanel header="Добавить документы" switchType="client" expanded="false"
+                                                   styleClass="borderNone" id="dulDetailSelectPanel"
+                                                   headerClass="imageNone borderNone linkClass"
+                                                   bodyClass="imageNone borderNone">
+                                <rich:dataTable id="dulDetailSelectTable"
+                                                value="#{mainPage.meshClientSelectPage.dulDetail}"
+                                                var="dul" render="modalMeshClientSelectorPanel"
+                                                columnClasses="left-aligned-column, center-aligned-column, center-aligned-column,
+                                                 center-aligned-column, center-aligned-column, center-aligned-column,
+                                                  center-aligned-column, center-aligned-column, center-aligned-column"
+                                                footerClass="data-table-footer-center">
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Название документа" />
+                                        </f:facet>
+                                        <h:outputText escape="true" value="#{dul.dulGuide.name}"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Серия"/>
+                                        </f:facet>
+                                        <h:inputText value="#{dul.series}" maxlength="64" size="7" styleClass="input-text"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Номер"/>
+                                        </f:facet>
+                                        <h:inputText value="#{dul.number}" maxlength="64" size="7" styleClass="input-text"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Код подразделения"/>
+                                        </f:facet>
+                                        <h:inputText value="#{dul.subdivisionCode}" maxlength="64" size="10"
+                                                     styleClass="input-text"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Кем выдан"/>
+                                        </f:facet>
+                                        <h:inputText value="#{dul.issuer}" maxlength="64" styleClass="input-text" />
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}"
+                                                 styleClass="date-table">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" styleClass="" value="Когда выдан"/>
+                                        </f:facet>
+                                        <rich:calendar value="#{dul.issued}" datePattern="dd.MM.yyyy"
+                                                       converter="dateConverter"
+                                                       inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}"
+                                                 styleClass="date-table">
+                                        <f:facet name="header">
+                                            <h:outputText escape="true" value="Дата истечения срока действия"/>
+                                        </f:facet>
+                                        <rich:calendar value="#{dul.expiration}" datePattern="dd.MM.yyyy"
+                                                       converter="dateConverter"
+                                                       inputClass="input-text" inputSize="6" showWeeksBar="false"/>
+                                    </rich:column>
+
+                                    <rich:column headerClass="column-header" rendered="#{!dul.deleteState}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Удалить" escape="true"/>
+                                        </f:facet>
+                                        <a4j:commandLink styleClass="command-link"
+                                                         render="dulDetailSelectTable">
+                                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
+                                            <f:setPropertyActionListener value="true"
+                                                                         target="#{dul.deleteState}"/>
+                                        </a4j:commandLink>
+                                    </rich:column>
+
+                                    <f:facet name="footer">
+                                        <a4j:commandButton value="Добавить" action="#{mainPage.showDulSelectPage}"
+                                                           render="modalDulSelectorPanel"
+                                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulSelectorPanel')}.show();"
+                                                           styleClass="command-link">
+                                            <f:setPropertyActionListener
+                                                    value="#{mainPage.meshClientSelectPage.dulDetail}"
+                                                    target="#{mainPage.dulSelectPage.dulDetailList}"/>
+                                        </a4j:commandButton>
+                                    </f:facet>
+                                </rich:dataTable>
+                            </rich:collapsiblePanel>
+                            <h:panelGrid columns="3" styleClass="borderless-grid">
+                                <a4j:commandButton value="Применить" action="#{mainPage.updateMeshClientSelectPage}"
+                                                   render="modalMeshClientSelectorForm" styleClass="command-button"
+                                                   onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                                   id="applyButtonSelectClient"/>
+                                <a4j:commandButton value="Очистить" action="#{mainPage.meshClientSelectPage.clear}"
+                                                   render="modalMeshClientSelectorForm" ajaxSingle="true"
+                                                   styleClass="command-button"
+                                                   onclick="disableButtons(true);" oncomplete="disableButtons(false)"
+                                                   id="clearButtonSelectClient"/>
+                                <a4j:status id="cardTableGenerateStatus">
+                                    <f:facet name="start">
+                                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                                    </f:facet>
+                                </a4j:status>
+                            </h:panelGrid>
+
+                        </rich:togglePanel>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center;">
+                        <br>
+                        </br>
+                        <rich:dataTable width="100%" align="center" id="meshPersonSelectorTable"
+                                        value="#{mainPage.meshClientSelectPage.meshGuardianPersonList}" var="item"
+                                        rows="20"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column, left-aligned-column,
+                        left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                        left-aligned-column, center-aligned-column, center-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('detail')}.click();">
+
+                            <rich:column width="1">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" value=""/>
+                                </f:facet>
+                                <a4j:commandButton id="detail" execute="@this" value="" style="display: none;"
+                                                   render="modalMeshClientSelectorForm">
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{mainPage.meshClientSelectPage.meshGuardianPerson}"/>
+                                </a4j:commandButton>
+                            </rich:column>
+
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Фамилия"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.surname}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Имя"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.firstName}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Отчество"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.secondName}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Пол"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.meshGender}" styleClass="output-text"
+                                              converter="genderTypeConverter"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Дата рождения"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.birthDate}" datePattern="dd.MM.yyyy"
+                                              converter="dateConverter" styleClass="output-text" showWeeksBar="false"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Номер телефона"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.mobile}" styleClass="output-text"
+                                              showWeeksBar="false"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Документы"/>
+                                </f:facet>
+                                <a4j:commandButton value="Открыть" action="#{mainPage.showDulViewPage}"
+                                                   disabled="#{mainPage.meshClientSelectPage.meshGuardianPerson.document == null}"
+                                                   render="modalDulViewPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulViewPanel')}.show();"
+                                                   styleClass="command-link">
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{mainPage.dulViewPage.meshGuardianPerson}"/>
+                                </a4j:commandButton>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Наличие в ИСПП"/>
+                                </f:facet>
+                                <h:graphicImage value="/images/taloons/applied.png"
+                                                rendered="#{item.alreadyInISPP}"/>
+                            </rich:column>
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <br>
+                        </br>
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Добавить представителя" action="#{mainPage.completeMeshClientSelection}"
+                                               render="#{mainPage.topMostPage.pageComponent.id}"
+                                               style="margin-right: 4px;"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.hide();"
+                                               styleClass="command-link">
+                            </a4j:commandButton>
+                            <a4j:commandButton value="Отмена" action="#{mainPage.cancelMeshClientSelection}"
+                                               render="#{mainPage.topMostPage.pageComponent.id}"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalMeshClientSelectorPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px;">
+                                <f:setPropertyActionListener value="#{null}"
+                                                             target="#{mainPage.meshClientSelectPage.meshGuardianPerson}"/>
+                            </a4j:commandButton>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+    </rich:popupPanel>
+</ui:composition>

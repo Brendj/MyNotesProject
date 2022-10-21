@@ -36,6 +36,7 @@ public class ClientGuardian {
     private CardRequest cardRequest;
     private ClientGuardianRepresentType representType;
     private ClientGuardianHistory clientGuardianHistory = null;
+    private ClientGuardianRoleType roleType;
 
     public void initializateClientGuardianHistory(ClientGuardianHistory clientGuardianHistory)
     {
@@ -115,8 +116,25 @@ public class ClientGuardian {
         this.guardianType = guardianType;
     }
 
+    public ClientGuardianRoleType getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(ClientGuardianRoleType roleType) {
+        if (clientGuardianHistory != null) {
+            if ((this.roleType != null || roleType != null))
+                if ((this.roleType == null || roleType == null) || !roleType.equals(this.roleType))
+                {
+                    createNewClientGuardianHistory(clientGuardianHistory, ClientGuardionHistoryAction.REPRESENT_TYPE.nativedescription,
+                            ClientGuardionHistoryAction.ROLE_TYPE.description, this.roleType == null ? null :
+                                    this.roleType.getDescription(),
+                            roleType == null ? null : roleType.getDescription());
+                }
+        }
+        this.roleType = roleType;
+    }
+
     public void disable(Long version) {
-        this.setDeletedState(true);
         this.setDisabled(true);
         this.setVersion(version);
         this.setLastUpdate(new Date());
@@ -137,9 +155,23 @@ public class ClientGuardian {
         this.setVersion(version);
         this.setLastUpdate(new Date());
         if (enableSpecialNotification) {
-            getNotificationSettings().add(new ClientGuardianNotificationSetting(this,
-                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()));
+            ClientGuardianNotificationSetting notificationSetting = new ClientGuardianNotificationSetting(this,
+                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue());
+            if(!isNotifyExist(this.notificationSettings, notificationSetting))
+                this.notificationSettings.add(notificationSetting);
         }
+    }
+
+    private boolean isNotifyExist(Set<ClientGuardianNotificationSetting> notificationSet,
+                                  ClientGuardianNotificationSetting notificationSetting){
+        for (ClientGuardianNotificationSetting notify : notificationSet) {
+            if (notify.getNotifyType().equals(notificationSetting.getNotifyType())
+                    && notify.getClientGuardian().getIdOfClientGuardian()
+                    .equals(notificationSetting.getClientGuardian().idOfClientGuardian)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Boolean isDisabled() {
@@ -325,7 +357,8 @@ public class ClientGuardian {
         REPRESENT_TYPE(3, "representType", "Изменение флага \"Законный представитель\""),
         RELATION(4, "relation", "Изменение типа родственной связи"),
         DELETED_DATE(5, "deleteDate", "Изменение Даты удаления"),
-        CARD_REQUEST(6, "idofcardrequest", "Изменение идентификатора Заявления на выдачу карты");
+        CARD_REQUEST(6, "idofcardrequest", "Изменение идентификатора Заявления на выдачу карты"),
+        ROLE_TYPE(7, "idOfRole", "Изменение вида представительства");
 
         private final int code;
         private final String description;

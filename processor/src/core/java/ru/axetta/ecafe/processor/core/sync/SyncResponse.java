@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.Clients.ExemptionVisitingClient;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.ExemptionVisiting.ExemptionVisitingSectionForARMAnswer;
@@ -414,8 +415,9 @@ public class SyncResponse {
             private final String parallel;
             private final String ssoId;
             private final Long expenditureLimit;
+            private final Boolean dontShowToExternal;
 
-            public Item(Client client, int clientType) {
+            public Item(Client client, int clientType, List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
                 this.idOfClient = client.getIdOfClient();
                 this.version = client.getClientRegistryVersion();
@@ -432,7 +434,8 @@ public class SyncResponse {
                 this.contractState = client.getContractState();
                 this.contractId = client.getContractId();
                 this.freePayMaxCount = client.getFreePayMaxCount();
-                this.categoriesDiscounts = DiscountManager.getClientDiscountsAsString(client);
+                String[] discounts = DiscountManager.getClientDiscountsAsArray(client, categoryDiscountDSZNList);
+                this.categoriesDiscounts = discounts[0]; //DiscountManager.getClientDiscountsAsString(client);
                 this.clientGroup=client.getClientGroup();
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
@@ -448,7 +451,7 @@ public class SyncResponse {
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
                 this.gender = client.getGender();
                 this.birthDate = client.getBirthDate();
-                this.categoriesDiscountsDSZN = DiscountManager.getClientDiscountsDSZNAsString(client);
+                this.categoriesDiscountsDSZN = discounts[1]; //DiscountManager.getClientDiscountsDSZNAsString(client);
                 this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
                 this.disablePlanCreationDate = client.getDisablePlanCreationDate();
                 this.disablePlanEndDate = client.getDisablePlanEndDate();
@@ -456,16 +459,19 @@ public class SyncResponse {
                 this.balanceToNotify = client.getBalanceToNotify();
                 this.san = client.getSan();
                 this.specialMenu = client.getSpecialMenu();
-                this.passportNumber = client.getPassportNumber();
-                this.passportSeries = client.getPassportSeries();
+                DulDetail dulDetailPassport = RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .getPassportDulDetailByClient(client, Client.PASSPORT_RF_TYPE);
+                this.passportNumber = dulDetailPassport == null ? "" : dulDetailPassport.getNumber();
+                this.passportSeries = dulDetailPassport == null ? "" : dulDetailPassport.getSeries();
                 this.multiCardMode = client.activeMultiCardMode();
                 this.parallel = client.getParallel();
                 this.ssoId = client.getSsoid();
                 this.expenditureLimit = client.getExpenditureLimit();
+                this.dontShowToExternal = client.isDontShowToExternal();
             }
 
-            public Item(Client client, int clientType, boolean tempClient) {
-                this(client, clientType);
+            public Item(Client client, int clientType, boolean tempClient, List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+                this(client, clientType, categoryDiscountDSZNList);
                 this.tempClient = tempClient;
             }
 
@@ -673,6 +679,9 @@ public class SyncResponse {
                 }
                 if (this.expenditureLimit != null) {
                     element.setAttribute("MaxDailyLimit", String.valueOf(expenditureLimit));
+                }
+                if (this.dontShowToExternal != null) {
+                    element.setAttribute("DontShowToExternal", this.dontShowToExternal ? "1" : "0");
                 }
                 return element;
             }

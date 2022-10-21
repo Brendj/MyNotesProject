@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -21,10 +22,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class ApplicationForFoodProcessingService {
@@ -34,6 +33,10 @@ public class ApplicationForFoodProcessingService {
     public static final String NODE_PROPERTY = "ecafe.processor.application.food.processing.node";
     public static final String TRIGGER_DAY_COUNT = "ecafe.processor.application.food.processing.days";
     public static final String TRIGGER_DAY_COUNT_DEFAULT_VALUE = "5";
+    public static final String TRIGGER_DAY_BENEFIT_REQUEST_COUNT = "ecafe.processor.application.food.processing.benefit_request.days";
+    public static final String TRIGGER_DAY_BENEFIT_REQUEST_COUNT_DEFAULT_VALUE = "1";
+    public static final String TRIGGER_DAY_MEZHVED_REQUEST_COUNT = "ecafe.processor.application.food.processing.mezhved_request.days";
+    public static final String TRIGGER_DAY_MEZHVED_REQUEST_COUNT_DEFAULT_VALUE = "5";
 
     public void run() throws Exception {
         if (!isOn())
@@ -52,6 +55,139 @@ public class ApplicationForFoodProcessingService {
         return true;
     }
 
+    public void runMezhvedTaskForDoc_GuardianshipDates() {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            logger.info("Start processing applications for food mezhved waiting doc and guardianship");
+            Integer daysCount;
+            try {
+                daysCount = Integer.parseInt(
+                        RuntimeContext.getInstance().getConfigProperties().getProperty(TRIGGER_DAY_MEZHVED_REQUEST_COUNT, TRIGGER_DAY_MEZHVED_REQUEST_COUNT_DEFAULT_VALUE));
+            } catch (NumberFormatException e) {
+                logger.error("Incorrect config value for days count - " +
+                        RuntimeContext.getInstance().getConfigProperties().getProperty(TRIGGER_DAY_MEZHVED_REQUEST_COUNT, ""));
+                daysCount = Integer.parseInt(TRIGGER_DAY_MEZHVED_REQUEST_COUNT_DEFAULT_VALUE);
+            }
+            Date fireDate = new Date();
+
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .findApplicationsForFoodSendedMezhvedRequest(session);
+            ApplicationForFoodStatus sendedConfirmDocStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DOC_VALIDITY_REQUEST_SENDED);
+            ApplicationForFoodStatus sendedConfirmGuardianshipStatus = new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_VALIDITY_REQUEST_SENDED);
+            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
+            for (ApplicationForFood application : list) {
+                Date statusDocCreatedDate = null;
+                Date statusGuardianshipCreatedDate = null;
+                for (ApplicationForFoodHistory history : application.getApplicationForFoodHistories()) {
+                    if (history.getStatus().equals(sendedConfirmDocStatus)) {
+                        statusDocCreatedDate = history.getCreatedDate();
+                    }
+                    if (history.getStatus().equals(sendedConfirmGuardianshipStatus)) {
+                        statusGuardianshipCreatedDate = history.getCreatedDate();
+                    }
+                }
+                Date firstStatusDate = (statusDocCreatedDate == null) ? statusGuardianshipCreatedDate : statusDocCreatedDate;
+
+                Date dayX = getTriggerDateByProductionCalendarMezhved(session, firstStatusDate, daysCount);
+                if (fireDate.after(dayX)) {
+                    Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                    Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
+                            historyVersion);
+                    RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState());
+                }
+            }
+
+            transaction.commit();
+            transaction = null;
+            logger.info("End processing applications for food mezhved waiting doc and guardianship");
+        } catch (Exception e) {
+            logger.error("Error in runMezhvedTask2: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void runMezhvedTaskForBenefitsDates() {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            logger.info("Start processing applications for food mezhved waiting benefits");
+            Integer daysCount;
+            try {
+                daysCount = Integer.parseInt(
+                        RuntimeContext.getInstance().getConfigProperties().getProperty(TRIGGER_DAY_BENEFIT_REQUEST_COUNT, TRIGGER_DAY_BENEFIT_REQUEST_COUNT_DEFAULT_VALUE));
+            } catch (NumberFormatException e) {
+                logger.error("Incorrect config value for days count - " +
+                        RuntimeContext.getInstance().getConfigProperties().getProperty(TRIGGER_DAY_BENEFIT_REQUEST_COUNT, ""));
+                daysCount = Integer.parseInt(TRIGGER_DAY_BENEFIT_REQUEST_COUNT_DEFAULT_VALUE);
+            }
+            Date fireDate = new Date();
+
+
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .findApplicationsForFoodSendedBenefitRequest(session);
+            ApplicationForFoodStatus sendedConfirmBenefitStatus = new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED);
+            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
+            ApplicationForFoodStatus responseGotStatus = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_RESPONSE_BENEFIT_CONFIRMED);
+            for (ApplicationForFood application : list) {
+                Date statusCreatedDate = null;
+                for (ApplicationForFoodHistory history : application.getApplicationForFoodHistories()) {
+                    if (history.getStatus().equals(sendedConfirmBenefitStatus)) {
+                        statusCreatedDate = history.getCreatedDate();
+                        break;
+                    }
+                }
+                Date dayX = getTriggerDateByProductionCalendarMezhved(session, statusCreatedDate, daysCount);
+                if (fireDate.after(dayX)) {
+                    Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                    Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, responseGotStatus, applicationVersion,
+                            historyVersion);
+                    RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState());
+
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
+                            historyVersion);
+                    RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState());
+                }
+            }
+
+            transaction.commit();
+            transaction = null;
+            logger.info("End processing applications for food mezhved waiting benefits");
+        } catch (Exception e) {
+            logger.error("Error in runMezhvedTask: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private Date getTriggerDateByProductionCalendarMezhved(Session session, Date statusCreatedDate, Integer daysCount) {
+        Date pcDate = getTriggerDateByProductionCalendar(session, statusCreatedDate, daysCount);
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(statusCreatedDate);
+        Calendar calendarResult = new GregorianCalendar();
+        calendarResult.setTime(CalendarUtils.addDays(pcDate, -1));
+        calendarResult.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+        calendarResult.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
+        calendarResult.set(Calendar.SECOND, calendar.get(Calendar.SECOND));
+        return calendarResult.getTime();
+    }
+
     public void runTask() throws Exception {
         RuntimeContext context = RuntimeContext.getInstance();
         Session session = null;
@@ -62,7 +198,7 @@ public class ApplicationForFoodProcessingService {
             session = context.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            ApplicationForFoodStatus pausedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null);
+            ApplicationForFoodStatus pausedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED);
 
             List<ApplicationForFood> applicationForFoodList =
                     DAOUtils.getApplicationForFoodListByStatus(session, pausedStatus, true, null);
@@ -83,9 +219,8 @@ public class ApplicationForFoodProcessingService {
 
             Date fireDate = new Date();
 
-            ApplicationForFoodStatus resumeStatus = new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null);
-            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                    ApplicationForFoodDeclineReason.NO_DOCS);
+            ApplicationForFoodStatus resumeStatus = new ApplicationForFoodStatus(ApplicationForFoodState.RESUME);
+            ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT);
 
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
@@ -118,13 +253,11 @@ public class ApplicationForFoodProcessingService {
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, resumeStatus, applicationVersion,
                             historyVersion);
                     service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
-                            application.getStatus().getApplicationForFoodState(),
-                            application.getStatus().getDeclineReason());
+                            application.getStatus().getApplicationForFoodState());
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);
                     service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
-                            application.getStatus().getApplicationForFoodState(),
-                            application.getStatus().getDeclineReason());
+                            application.getStatus().getApplicationForFoodState());
                 }
 
                 transaction.commit();
@@ -140,6 +273,8 @@ public class ApplicationForFoodProcessingService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        runMezhvedTaskForBenefitsDates();
+        runMezhvedTaskForDoc_GuardianshipDates();
     }
 
     public Date getTriggerDateByProductionCalendar(Session session, Date statusCreatedDate, Integer daysCount) {

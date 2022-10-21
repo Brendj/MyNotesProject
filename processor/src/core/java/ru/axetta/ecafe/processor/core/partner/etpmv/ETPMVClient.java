@@ -47,14 +47,19 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
     private Connection jmsConnection;
     private Session jmsConsumerSession;
     private Session jmsProducerSession;
+    private Session jmsStatusSession;
     private MessageConsumer consumer;
     private MessageProducer producer;
     private MessageProducer consumerBK;
+    private MessageProducer producerStatusBK;
     private MessageConsumer producerBK;
+    private MessageConsumer consumerStatus;
     private Queue queueConsumer;
     private Queue queueProducer;
     private Queue bkQueueConsumer;
+    private Queue bkStatusQueueConsumer;
     private Queue bkQueueProducer;
+    private Queue queueStatusConsumer;
 
     private static final Logger logger = LoggerFactory.getLogger(ETPMVClient.class);
 
@@ -90,6 +95,7 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
             jmsConnection = jmsConnectionFactory.createConnection();
             jmsConsumerSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             jmsProducerSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            jmsStatusSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             queueProducer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.out", "SAMPLE.APPLICATION_OUT"));
             //bkQueueProducer = jmsConsumerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.out", "SAMPLE.APPLICATION_OUT"));
@@ -103,8 +109,15 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
                 consumer.setMessageListener(this);
                 jmsConnection.setExceptionListener(this);
 
+                queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status", "SAMPLE.STATUS_INC"));
+                consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
+                consumerStatus.setMessageListener(this);
+
                 bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.bk", "SAMPLE.APPLICATION_INC.BK"));
                 consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
+
+                bkStatusQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status.bk", "SAMPLE.STATUS_INC.BK"));
+                producerStatusBK = jmsProducerSession.createProducer(bkStatusQueueConsumer);
             }
 
             producer = jmsProducerSession.createProducer(queueProducer);
@@ -157,5 +170,10 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
     public void addToBKQueue(String message) throws Exception {
         TextMessage textMessage = jmsProducerSession.createTextMessage(message);
         consumerBK.send(textMessage);
+    }
+
+    public void addToStatusBKQueue(String message) throws Exception {
+        TextMessage textMessage = jmsProducerSession.createTextMessage(message);
+        producerStatusBK.send(textMessage);
     }
 }

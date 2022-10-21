@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core;
 
+import com.google.common.base.Splitter;
+import org.springframework.beans.factory.annotation.Value;
+import ru.axetta.ecafe.processor.core.card.CardBlockPeriodConfig;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientAuthenticator;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -31,6 +34,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.proactive.config.BenefitSchedulerService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
@@ -182,6 +186,10 @@ public class RuntimeContext implements ApplicationContextAware {
         this.useQueueForAllSyncs = useQueueForAllSyncs;
     }
 
+    public CardBlockPeriodConfig getCardBlockPeriodConfig() {
+        return cardBlockPeriodConfig;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -198,6 +206,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public String getOkuApiKey() {
         return okuApiKey;
+    }
+
+    public String getInternalRestApiKey(){
+        return internalRestApiKey;
     }
 
     public String getFrontControllerApiKey() {
@@ -236,6 +248,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
     private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String INTERNAL_API_KEY = PROCESSOR_PARAM_BASE + ".rest.internal.apikey";
     private static final String FRONT_CONTROLLER_API_KEY = PROCESSOR_PARAM_BASE + ".frontController.api.key";
     private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
@@ -246,7 +259,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final Object INSTANCE_LOCK = new Object();
 
     private String instanceName;
-    private int roleNode = NODE_ROLE_MAIN;
+    private int nodeRole = NODE_ROLE_MAIN;
     private String nodeName;
     // Application wide executor service
     private ExecutorService executorService;
@@ -296,6 +309,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private String geoplanerApiKey;
 
     private String okuApiKey;
+    private String internalRestApiKey;
     private String extendCardServiceApiKey;
     private String frontControllerApiKey;
 
@@ -306,6 +320,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private SBRTConfig partnerSbrtConfig;
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
+    private CardBlockPeriodConfig cardBlockPeriodConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
     private static SessionFactory sessionFactory;
@@ -361,6 +376,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private String[] methodsInfoService;
 
     private SettingsConfig settingsConfig;
+
+    @Value("${processing.node}")
+    private String nodeInfo;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
@@ -673,27 +691,30 @@ public class RuntimeContext implements ApplicationContextAware {
             if (System.getProperty(NODE_INFO_FILE)!=null) {
                 nodeRoleFile = System.getProperty(NODE_INFO_FILE);
             }
-            if (nodeRoleFile != null) {
-                try {
+
+            String role = "processor";
+            try {
+                if(nodeRoleFile != null) {
                     BufferedReader buf = new BufferedReader(new FileReader(nodeRoleFile));
-                    String role = buf.readLine();
+                    role = buf.readLine();
                     nodeName = buf.readLine();
-                    if (role.equalsIgnoreCase("main")) {
-                        roleNode = NODE_ROLE_MAIN;
-                    } else if (role.equalsIgnoreCase("processor")) {
-                        roleNode = NODE_ROLE_PROCESSOR;
-                    } else {
-                        throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
-                    }
-                    logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
-                } catch (FileNotFoundException x) {
-                    nodeName = "UNKNOWN";
-                    roleNode = NODE_ROLE_PROCESSOR;
-                } catch (Exception e) {
-                    logger.error("Failed to load node info", e);
-                    throw e;
                 }
+                else throw new FileNotFoundException();
+            } catch (FileNotFoundException x){
+                Map<String, String> node = Splitter.on(";")
+                        .withKeyValueSeparator(":")
+                        .split(nodeInfo);
+                role = node.get("role");
+                nodeName = node.get("name");
             }
+            if (role.equalsIgnoreCase("main")) {
+                nodeRole = NODE_ROLE_MAIN;
+            } else if (role.equalsIgnoreCase("processor")) {
+                nodeRole = NODE_ROLE_PROCESSOR;
+            } else {
+                throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
+            }
+            logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
 
             if (!isTestRunning()) {
 
@@ -725,6 +746,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
             this.okuApiKey = properties.getProperty(OKU_API_KEY);
+            this.internalRestApiKey = properties.getProperty(INTERNAL_API_KEY);
             this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
 
             this.frontControllerApiKey = properties.getProperty(FRONT_CONTROLLER_API_KEY);
@@ -751,6 +773,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 logger.error("Failed to load std pay config: " + e);
                 criticalErrors = true;
             }
+            this.cardBlockPeriodConfig = new CardBlockPeriodConfig(properties);
             try {
                 this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
@@ -833,6 +856,9 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(PreorderCancelNotificationService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(ArchivedExeptionService.class).scheduleSync();
             RuntimeContext.getAppContext().getBean(CancelledFoodBoxService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(CardUpdateSyncService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(ReSendKafkaService.class).scheduleSync();
+            RuntimeContext.getAppContext().getBean(BenefitSchedulerService.class).scheduleSync();
             ((RegularPaymentSubscriptionService)RuntimeContext.getAppContext().getBean("regularPaymentSubscriptionService")).scheduleSync();
             //
             if (!isTestRunning()) {
@@ -1338,10 +1364,15 @@ public class RuntimeContext implements ApplicationContextAware {
     private static Postman.MailSettings readMailSettings(Properties properties, String baseParam) throws Exception {
         String smtpBaseParam = baseParam + ".smtp";
         String startTLS = properties.getProperty(smtpBaseParam + ".starttls");
-        Postman.SmtpSettings smtpSettings = new Postman.SmtpSettings(properties.getProperty(smtpBaseParam + ".host"),
+        String timeout = properties.getProperty(smtpBaseParam + ".timeout");
+        String connectiontimeout = properties.getProperty(smtpBaseParam + ".connectiontimeout");
+        Postman.SmtpSettings smtpSettings = new Postman.SmtpSettings(
+                properties.getProperty(smtpBaseParam + ".host"),
                 Integer.parseInt(properties.getProperty(smtpBaseParam + ".port", "25")),
                 StringUtils.equals(startTLS, "true"), properties.getProperty(smtpBaseParam + ".user"),
-                properties.getProperty(smtpBaseParam + ".password"));
+                properties.getProperty(smtpBaseParam + ".password"),
+                timeout != null ? Integer.parseInt(timeout) : Postman.SmtpSettings.defaultTimeout,
+                connectiontimeout != null ? Integer.parseInt(connectiontimeout) : Postman.SmtpSettings.defaultConnectionTimeout);
         String copyAddress = properties.getProperty(baseParam + ".copy");
         return new Postman.MailSettings(smtpSettings, new InternetAddress(properties.getProperty(baseParam + ".from")),
                 null == copyAddress ? null : new InternetAddress(copyAddress));
@@ -1658,6 +1689,9 @@ public class RuntimeContext implements ApplicationContextAware {
             return false;
     }
 
+    public boolean isNSI3() {
+        return getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3);
+    }
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }
@@ -1944,7 +1978,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public boolean isMainNode() {
-        return roleNode == NODE_ROLE_MAIN;
+        return nodeRole == NODE_ROLE_MAIN;
     }
 
     public RegularPaymentSubscriptionService getRegularPaymentSubscriptionService() {

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -20,9 +19,7 @@ import ru.axetta.ecafe.processor.beans.authentication.provider.ProcessingJaasAut
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.login.ProcessingLoginModule;
 import ru.axetta.ecafe.processor.web.partner.meals.security.MealsJwtFilter;
-import ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationManager;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtConfigurer;
-import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 
 /**
  * Created by nuc on 26.10.2020.
@@ -59,6 +56,23 @@ public class SecurityConfiguration {
                     .and().apply(jwtConfigurer);
         }
     }
+
+    /*@Order(2)
+    @Configuration
+    public static class InternalRestConfiguration extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(HttpSecurity security) throws Exception {
+            security
+                    .authorizeRequests()
+                    .antMatchers("/mash-controller/**")
+                    .permitAll()
+                    .and()
+                    .cors()
+                    .and()
+                    .csrf().disable();
+        }
+    }*/
 
 
     @Order(3)
@@ -145,7 +159,7 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity security) throws Exception {
             security
-                    .antMatcher("/ispp/meals/**")
+                    .antMatcher("/ispp/meals/v1/**")
                     .cors()
                     .and()
                     .httpBasic().disable()

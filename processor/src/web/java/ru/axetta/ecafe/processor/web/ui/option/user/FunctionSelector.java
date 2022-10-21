@@ -10,6 +10,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class FunctionSelector {
 
     private List<Item> onlineReportItems = Collections.emptyList();
     private List<Item> onlineReportItemsSupplierReport = Collections.emptyList();
+    private List<Item> foodSupplierApplicationManagerItems = Collections.emptyList();
     private List<Item> organizationItems = Collections.emptyList();
     private List<Item> contragentItems = Collections.emptyList();
     private List<Item> clientItems = Collections.emptyList();
@@ -95,16 +97,27 @@ public class FunctionSelector {
                     Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_MANUAL_REPORT,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
     private static final List<String> onlineReportFuncsForSupplierReport = Arrays
-            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
-                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT,
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_COUNT_CURRENT_POSITIONS,
                     Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
-                    Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS, Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL,
+                    Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT, Function.FUNC_FEEDING_SETTINGS_ADMIN,
+                    Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
+                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT,
                     Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
-                    Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL, Function.FUNC_RESTRICT_CLIENT_REPORTS,
-                    Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SALES_REPORTS,
-                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_COVERAGENUTRITION,
-                    Function.FUNC_RESTRICT_TRANSACTIONS_REPORT, Function.FUNC_COUNT_CURRENT_POSITIONS,
-                    Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_FEEDING_SETTINGS_ADMIN);
+                    Function.FUNC_RESTRICT_CLIENT_REPORTS, Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES,
+                    Function.FUNC_RESTRICT_SALES_REPORTS, Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT,
+                    Function.FUNC_RESTRICT_TRANSACTIONS_REPORT, Function.FUNC_COVERAGENUTRITION);
+    private static final List<String> foodSupplierApplicationManagerFunc = Arrays
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_COUNT_CURRENT_POSITIONS,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX, Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS, Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL,
+                    Function.FUNCD_WORK_ONLINE_REPORT_MENU_REPORT, Function.FUNC_FEEDING_SETTINGS_ADMIN,
+                    Function.FUNC_FEEDING_SETTINGS_SUPPLIER, Function.FUNC_WORK_ONLINE_REPORT_DOCS,
+                    Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT, Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT,
+                    Function.FUNC_RESTRICT_PAID_FOOD_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
+                    Function.FUNC_RESTRICT_CLIENT_REPORTS, Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES,
+                    Function.FUNC_RESTRICT_SALES_REPORTS, Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT,
+                    Function.FUNC_RESTRICT_TRANSACTIONS_REPORT, Function.FUNC_COVERAGENUTRITION);
     private static final List<String> blockedForSupplierReport = Arrays
             .asList(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT, Function.FUNC_RESTRICT_FINANCIAL_CONTROL,
                     Function.FUNC_RESTRICT_INFORM_REPORTS, Function.FUNC_RESTRICT_CARD_REPORTS,
@@ -112,17 +125,75 @@ public class FunctionSelector {
                     Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_MANUAL_REPORT,
                     Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO, Function.FUNC_RESTRICT_ONLINE_REPORT_CALENDAR);
 
+    private static final List<String> selectedOnlineReportFuncsFunctions = Arrays
+            .asList(Function.FUNC_RESTRICT_CARD_REPORTS, Function.FUNC_RESTRICT_CLIENT_REPORTS,
+                    Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT, Function.FUNC_RESTRICT_ENTER_EVENT_REPORT,
+                    Function.FUNC_RESTRICT_FINANCIAL_CONTROL, Function.FUNC_RESTRICT_INFORM_REPORTS,
+                    Function.FUNC_RESTRICT_MANUAL_REPORT, Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO,
+                    Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY,
+                    Function.FUNC_RESTRICT_SALES_REPORTS, Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES,
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+    private static final List<String> selectedOnlineReportFuncsForSupplierFunctions = Arrays
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING,
+                    Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+    private static final List<String> selectedFoodSupplierApplicationManagerFunctions = Arrays
+            .asList(Function.FUNC_WORK_ONLINE_REPORT, Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX,
+                    Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS, Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL,
+                    Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT, Function.FUNC_RESTRICT_PAID_FOOD_REPORT,
+                    Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING, Function.FUNC_RESTRICT_CLIENT_REPORTS,
+                    Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES, Function.FUNC_RESTRICT_SALES_REPORTS,
+                    Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT, Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
     }
 
-    public List<Item> onlineReportItemsAll(Boolean supplierReport) {
-        if (supplierReport) {
+    public List<Item> onlineReportEditItems(User.DefaultRole role) {
+        if (role.equals(User.DefaultRole.SUPPLIER)) {
+            return onlineReportItems;
+        } else
+        if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
             return onlineReportItemsSupplierReport;
+        } else
+        if (role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER)) {
+            return foodSupplierApplicationManagerItems;
         }
         return onlineReportItems;
     }
 
+    public List<Item> onlineReportItemsAll(User.DefaultRole role) {
+        if (role.equals(User.DefaultRole.DEFAULT)) {
+            for (Item item : onlineReportItems) {
+                item.setSelected(false);
+            }
+            return onlineReportItems;
+        } else
+        if (role.equals(User.DefaultRole.SUPPLIER)) {
+            for (Item item : onlineReportItems) {
+                item.setSelected(false);
+                if (selectedOnlineReportFuncsFunctions.contains(item.getFunctionName()))
+                    item.setSelected(true);
+            }
+            return onlineReportItems;
+        } else
+        if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+            for (Item item : onlineReportItemsSupplierReport) {
+                item.setSelected(false);
+                if (selectedOnlineReportFuncsForSupplierFunctions.contains(item.getFunctionName()))
+                    item.setSelected(true);
+            }
+            return onlineReportItemsSupplierReport;
+        } else
+        if (role.equals(User.DefaultRole.FOOD_SUPPLIES_APPLICATION_MANAGER)) {
+            for (Item item : foodSupplierApplicationManagerItems) {
+                item.setSelected(false);
+                if (selectedFoodSupplierApplicationManagerFunctions.contains(item.getFunctionName()))
+                    item.setSelected(true);
+            }
+            return foodSupplierApplicationManagerItems;
+        }
+        return null;
+    }
 
     public List<Item> getOrganizationItems() {
         return organizationItems;
@@ -172,6 +243,23 @@ public class FunctionSelector {
         return optionsItems;
     }
 
+    public List<Item> getSupplier() {
+        return onlineReportItems;
+    }
+    public List<Item> getSupplierReport() {
+        return onlineReportItemsSupplierReport;
+    }
+    public List<Item> getFoodSupplier() {
+        return foodSupplierApplicationManagerItems;
+    }
+    public List<Item> getSupplierItems() {
+        return onlineReportItems;
+    }
+
+    public List<Item> getSupplierReportItems() {
+        return onlineReportItemsSupplierReport;
+    }
+
     public Set<Function> getSecurityAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions.in("functionName", securityAdminFunctions));
@@ -202,19 +290,7 @@ public class FunctionSelector {
         List<Function> allFunctions = allFunctionsCriteria.list();
         Set<Function> supplierFunctions = new HashSet<Function>();
         for (Function function : allFunctions) {
-            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_DOCS) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_EE_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT_MENU_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
-                /*|| function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT)*/) {
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
                 supplierFunctions.add(function);
             }
         }
@@ -225,35 +301,6 @@ public class FunctionSelector {
                 supplierFunctions.add(function);
             }
         }
-
-        for (Item item : organizationItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : contragentItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : clientItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
-        for (Item item : wayBillItems) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                supplierFunctions.add(function);
-            }
-        }
-
         return supplierFunctions;
     }
 
@@ -278,8 +325,31 @@ public class FunctionSelector {
                 supplierReportFunctions.add(function);
             }
         }
-
         return supplierReportFunctions;
+    }
+
+    public Set<Function> getFoodSupplierApplicationManager(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List<Function> allFunctions = allFunctionsCriteria.list();
+        Set<Function> foodSupplierApplicationManager = new HashSet<Function>();
+        for (Function function : allFunctions) {
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
+                foodSupplierApplicationManager.add(function);
+            }
+            //Добавляем функции, которые должны быть у Отчетность поставщика питания (911)
+            if (blockedForSupplierReport.contains(function.getFunctionName()))
+            {
+                foodSupplierApplicationManager.add(function);
+            }
+        }
+
+        for (Item item : foodSupplierApplicationManagerItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                foodSupplierApplicationManager.add(function);
+            }
+        }
+        return foodSupplierApplicationManager;
     }
 
     public Set<Function> getCardOperatorFunctions(Session session) {
@@ -315,6 +385,7 @@ public class FunctionSelector {
 
         List<Item> onlineReportItems = new LinkedList<>();
         List<Item> onlineReportItemsSupplierReport = new LinkedList<>();
+        List<Item> foodSupplierApplicationManager = new LinkedList<>();
         List<Item> organizationItems = new LinkedList<>();
         List<Item> contragentItems = new LinkedList<>();
         List<Item> clientItems = new LinkedList<>();
@@ -361,12 +432,15 @@ public class FunctionSelector {
                 if (onlineReportFuncsForSupplierReport.contains(item.getFunctionName())) {
                     onlineReportItemsSupplierReport.add(item);
                 }
+                if (foodSupplierApplicationManagerFunc.contains(item.getFunctionName())) {
+                    foodSupplierApplicationManager.add(item);
+                }
             }
-
         }
 
         Collections.sort(onlineReportItems);
         Collections.sort(onlineReportItemsSupplierReport);
+        Collections.sort(foodSupplierApplicationManager);
         Collections.sort(organizationItems);
         Collections.sort(contragentItems);
         Collections.sort(clientItems);
@@ -376,6 +450,7 @@ public class FunctionSelector {
 
         this.onlineReportItems = onlineReportItems;
         this.onlineReportItemsSupplierReport = onlineReportItemsSupplierReport;
+        this.foodSupplierApplicationManagerItems = foodSupplierApplicationManager;
         this.organizationItems = organizationItems;
         this.contragentItems = contragentItems;
         this.clientItems = clientItems;
@@ -393,6 +468,7 @@ public class FunctionSelector {
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
         List<Item> onlineReportItems = new LinkedList<>();
         List<Item> onlineReportItemsSupplierReport = new LinkedList<>();
+        List<Item> foodSupplierApplicationManager = new LinkedList<>();
         List<Item> organizationItems = new LinkedList<>();
         List<Item> contragentItems = new LinkedList<>();
         List<Item> clientItems = new LinkedList<>();
@@ -485,9 +561,18 @@ public class FunctionSelector {
                     }
                     onlineReportItemsSupplierReport.add(item);
                 }
+                if (foodSupplierApplicationManagerFunc.contains(item.getFunctionName())) {
+                    if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                        item.setSelected(true);
+                    }
+                    foodSupplierApplicationManager.add(item);
+                }
             }
 
-        } Collections.sort(onlineReportItems);
+        }
+        Collections.sort(onlineReportItems);
+        Collections.sort(onlineReportItemsSupplierReport);
+        Collections.sort(foodSupplierApplicationManager);
         Collections.sort(organizationItems);
         Collections.sort(contragentItems);
         Collections.sort(clientItems);
@@ -497,6 +582,7 @@ public class FunctionSelector {
 
         this.onlineReportItems = onlineReportItems;
         this.onlineReportItemsSupplierReport = onlineReportItemsSupplierReport;
+        this.foodSupplierApplicationManagerItems = foodSupplierApplicationManager;
         this.organizationItems = organizationItems;
         this.contragentItems = contragentItems;
         this.clientItems = clientItems;
@@ -507,7 +593,7 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
-        this.espItems=espItems;
+        this.espItems = espItems;
         this.optionsItems = optionsItems;
     }
 

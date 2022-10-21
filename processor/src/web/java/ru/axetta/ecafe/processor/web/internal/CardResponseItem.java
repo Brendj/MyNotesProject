@@ -52,4 +52,10 @@ public class CardResponseItem extends ResponseItem {
             super(message);
         }
     }
+
+    public static class DisableSocCardsRegException extends Exception {
+        public DisableSocCardsRegException(String message) {
+            super(message);
+        }
+    }
 }

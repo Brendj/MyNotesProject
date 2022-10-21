@@ -162,8 +162,6 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.preordersEnabled}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.preorderlp}" styleClass="input-text" disabled="true" />
-    <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.newСashierMode}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Использовать фудбокс" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.usedfoodbox}" styleClass="input-text" disabled="true" />
     <h:panelGrid styleClass="borderless-grid">
@@ -182,6 +180,8 @@
         </rich:dataTable>
     </h:panelGrid>
     <h:panelGroup />
+    <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.newСashierMode}" styleClass="input-text" disabled="true" />
 </h:panelGrid>
 <br />
 
@@ -266,6 +266,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useLongCardNo}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Запрет на регистрацию социальных карт" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.disableSocCardsReg}" styleClass="input-text" disabled="true"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

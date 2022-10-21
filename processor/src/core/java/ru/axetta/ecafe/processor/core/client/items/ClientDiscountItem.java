@@ -26,13 +26,15 @@ public class ClientDiscountItem {
     private String dateStart;
     private String dateEnd;
     private String status;
+    private Boolean appointedMSP;
+    private Boolean active;
 
     private final DateFormat CLIENT_DISCOUNTS_DATA_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final DateFormat DSZN_DISCOUNTS_DATA_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     public ClientDiscountItem(Long idOfCategoryDiscount, String categoryName, Long idOfClientDTiSZNDiscountInfo,
             Long code, String descriptionDSZN, Integer status, Date dateStart, Date dateEnd,
-            Date lastDiscountsUpdate, Integer discountMode) {
+            Date lastDiscountsUpdate, Integer discountMode, Boolean appointedMSP, Boolean active) {
         this.discountMode = discountMode;
         this.idOfCategoryDiscount = idOfCategoryDiscount;
         this.categoryDiscountName = StringUtils.defaultString(categoryName, "-");
@@ -49,7 +51,8 @@ public class ClientDiscountItem {
 
         printedCategoriesDiscounts = idOfCategoryDiscount == null ? "-" : idOfCategoryDiscount + " - " + categoryName;
         printedCategoriesDiscountsDSZN =  code == null ? "-" : code + " - " + descriptionDSZN;
-
+        this.appointedMSP = appointedMSP;
+        this.active = active;
     }
 
     public Integer getDiscountMode() {
@@ -146,5 +149,21 @@ public class ClientDiscountItem {
 
     public void setIdOfCategoryDiscount(Long idOfCategoryDiscount) {
         this.idOfCategoryDiscount = idOfCategoryDiscount;
+    }
+
+    public Boolean getAppointedMSP() {
+        return appointedMSP;
+    }
+
+    public void setAppointedMSP(Boolean appointedMSP) {
+        this.appointedMSP = appointedMSP;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

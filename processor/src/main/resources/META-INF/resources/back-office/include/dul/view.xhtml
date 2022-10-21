@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <rich:popupPanel modal="true" id="modalDulViewPanel" autosized="true" minHeight="300" headerClass="modal-panel-header">
+        <rich:hotKey key="esc" handler="#{rich:component('modalDulViewPanel')}.hide();return false;"/>
+        <f:facet name="header">
+            <h:outputText escape="true" value="#{mainPage.dulViewPage.header}"/>
+        </f:facet>
+        <h:form id="modalDulViewForm"
+                styleClass="borderless-form" eventsQueue="modalDulViewFormEventsQueue">
+            <h:panelGrid columns="3" styleClass="borderless-grid">
+                <h:outputText escape="true" value="СНИЛС" styleClass="output-text-strong"/>
+                <h:outputText escape="true" value="#{mainPage.dulViewPage.meshGuardianPerson.snils}" converter="dulNumberConverter"
+                              styleClass="output-text-strong"/>
+                <h:graphicImage value="/images/taloons/applied.png"
+                                rendered="#{mainPage.dulViewPage.meshGuardianPerson.validationStateId == 1}"/>
+            </h:panelGrid>
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: center;">
+                        <rich:dataTable width="100%" align="center" id="modalDulViewTable"
+                                        value="#{mainPage.dulViewPage.meshGuardianPerson.document}" var="item" rows="15"
+                                        footerClass="data-table-footer" columnClasses="left-aligned-column, left-aligned-column,
+                                        left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                                        left-aligned-column, center-aligned-column"
+                                        rowClasses="select-panel-row"
+                                        onrowmouseover="this.style.backgroundColor='#e6e6e6'"
+                                        onrowmouseout="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                                        onrowclick="#{rich:element('detail')}.click();">
+
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Документ"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.documentName}"
+                                              styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Серия документа"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.series}" converter="dulNumberConverter" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Номер документа"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.number}" converter="dulNumberConverter" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Код подразделения"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.subdivisionCode}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Истечение срока действия"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.expiration}" converter="dateConverter"
+                                              styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Дата выдачи"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.issued}" converter="dateConverter"
+                                              styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Кем выдан"/>
+                                </f:facet>
+                                <h:outputText escape="true" value="#{item.issuer}" styleClass="output-text"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <f:facet name="header">
+                                    <h:outputText escape="true" styleClass="" value="Подтверждение"/>
+                                </f:facet>
+                                <h:graphicImage value="/images/taloons/applied.png"
+                                                rendered="#{item.validationStateId == 1}"/>
+                            </rich:column>
+
+                            <f:facet name="footer">
+                                <rich:dataScroller for="modalDulViewTable" renderIfSinglePage="false"
+                                                   maxPages="5" fastControls="hide" stepControls="auto"
+                                                   boundaryControls="hide">
+                                    <f:facet name="previous">
+                                        <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                                    </f:facet>
+                                    <f:facet name="next">
+                                        <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                                    </f:facet>
+                                </rich:dataScroller>
+                            </f:facet>
+
+                        </rich:dataTable>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Закрыть" action="#{mainPage.completeDulViewSelection}"
+                                               render="#{mainPage.topMostPage.pageComponent.id}"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalDulViewPanel')}.hide();"
+                                               styleClass="command-button" style="width: 80px;">
+                            </a4j:commandButton>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
+</ui:composition>

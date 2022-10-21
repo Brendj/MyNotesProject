@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.cardblock.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.SmartWatchVendorNotificationManager;
@@ -1521,6 +1522,10 @@ public class Processor implements SyncProcessor {
                     }
                     case ForMigrants: {
                         result = accountsRegistryHandler.handlerMigrants(request.getIdOfOrg());
+                        break;
+                    }
+                    case ForCardsUpdated: {
+                        result = accountsRegistryHandler.handlerCardsUpdate(request.getIdOfOrg(), requestSection.getCardLastUpdate());
                     }
                 }
                 if (result != null) {
@@ -5747,12 +5752,6 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getBalanceToNotify() != null) {
                     client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
                 }
-                if (clientParamItem.getPassportNumber() != null) {
-                    client.setPassportNumber(clientParamItem.getPassportNumber());
-                }
-                if (clientParamItem.getPassportSeries() != null) {
-                    client.setPassportSeries(clientParamItem.getPassportSeries());
-                }
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
@@ -5803,6 +5802,16 @@ public class Processor implements SyncProcessor {
             client.setUpdateTime(new Date());
             persistenceSession.update(client);
 
+            if (clientParamItem.getPassportNumber() != null && clientParamItem.getPassportSeries() != null) {
+                DulDetail dulDetail = new DulDetail();
+                dulDetail.setNumber(clientParamItem.getPassportNumber());
+                dulDetail.setSeries(clientParamItem.getPassportSeries());
+                dulDetail.setIdOfClient(client.getIdOfClient());
+                dulDetail.setDocumentTypeId(Client.PASSPORT_RF_TYPE);
+
+                RuntimeContext.getAppContext().getBean(DulDetailService.class)
+                        .saveDulOnlyISPP(persistenceSession, Collections.singletonList(dulDetail), client.getIdOfClient());
+            }
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -6256,6 +6265,7 @@ public class Processor implements SyncProcessor {
         Org organization;
         List<Org> orgList;
         Set<Long> activeClientsId;
+        List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6280,9 +6290,9 @@ public class Processor implements SyncProcessor {
 
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
                 } else {
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1, categoryDiscountDSZNList));
                 }
             }
             activeClientsId = new HashSet<>(findActiveClientsId(persistenceSession, orgList));
@@ -6293,7 +6303,7 @@ public class Processor implements SyncProcessor {
                 boolean isTempClient = entry.getKey().equals("TemporaryClients");
                 for (Client cl : entry.getValue()) {
                     if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, 2, isTempClient));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, 2, isTempClient, categoryDiscountDSZNList));
                     }
                     activeClientsId.add(cl.getIdOfClient());
                 }
@@ -6334,9 +6344,9 @@ public class Processor implements SyncProcessor {
                 for (Client client : errorClients) {
                     client.setClientGroup(clientGroup);
                     if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
                     } else {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1, categoryDiscountDSZNList));
                     }
                 }
             }
@@ -6352,6 +6362,7 @@ public class Processor implements SyncProcessor {
 
     private SyncResponse.ClientRegistry processSyncClientRegistryForMigrants(Long idOfOrg) throws Exception {
         SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
+        List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -6361,7 +6372,7 @@ public class Processor implements SyncProcessor {
             List<Client> clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
 
             for (Client client : clients) {
-                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0, categoryDiscountDSZNList));
             }
 
             persistenceTransaction.commit();
@@ -8493,8 +8504,7 @@ public class Processor implements SyncProcessor {
             for (ResRequestFeedingETPStatuses etpStatus : resRequestFeeding.getStatuses()) {
                 RuntimeContext.getAppContext().getBean(ETPMVService.class)
                         .sendStatusAsync(time, etpStatus.getApplicationForFood().getServiceNumber(),
-                                etpStatus.getStatus().getApplicationForFoodState(),
-                                etpStatus.getStatus().getDeclineReason());
+                                etpStatus.getStatus().getApplicationForFoodState());
                 time += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
             }
         } finally {

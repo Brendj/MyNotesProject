@@ -46,6 +46,20 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(props));
     }
 
+    @Bean
+    public KafkaTemplate<String, String> kafkaStringJsonBenefitTemplate() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+        props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
+        props.put(SaslConfigs.SASL_JAAS_CONFIG,
+                String.format("org.apache.kafka.common.security.plain.PlainLoginModule required " +
+                        "username=\"%s\" password=\"%s\";", getServiceLogin(), getServicePassword()));
+        return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(props));
+    }
+
     private String getServiceAddress() {
         String address = RuntimeContext.getInstance().getConfigProperties()
                 .getProperty(MESH_KAFKA_ADDRESS_PROPERTY, "");

@@ -66,7 +66,7 @@ public class ResponsePersons {
     @JsonProperty("citizenship_id")
     private Integer citizenshipId;
     @JsonProperty("validation_state_id")
-    private Object validationStateId;
+    private Integer validationStateId;
     @JsonProperty("validated_at")
     private Object validatedAt;
     @JsonProperty("actual_from")
@@ -84,9 +84,9 @@ public class ResponsePersons {
     @JsonProperty("addresses")
     private Object addresses;
     @JsonProperty("documents")
-    private Object documents;
+    private List<PersonDocument> documents = null;
     @JsonProperty("contacts")
-    private Object contacts;
+    private List<Contact> contacts = null;
     @JsonProperty("preventions")
     private Object preventions;
     @JsonProperty("categories")
@@ -94,9 +94,9 @@ public class ResponsePersons {
     @JsonProperty("ids")
     private Object ids;
     @JsonProperty("agents")
-    private Object agents;
+    private List<PersonAgent> agents = null;
     @JsonProperty("children")
-    private Object children;
+    private List<PersonAgent> children = null;
     @JsonProperty("education")
     private List<Education> education = null;
     @JsonProperty("citizenship")
@@ -219,12 +219,12 @@ public class ResponsePersons {
     }
 
     @JsonProperty("validation_state_id")
-    public Object getValidationStateId() {
+    public Integer getValidationStateId() {
         return validationStateId;
     }
 
     @JsonProperty("validation_state_id")
-    public void setValidationStateId(Object validationStateId) {
+    public void setValidationStateId(Integer validationStateId) {
         this.validationStateId = validationStateId;
     }
 
@@ -309,22 +309,22 @@ public class ResponsePersons {
     }
 
     @JsonProperty("documents")
-    public Object getDocuments() {
+    public List<PersonDocument> getDocuments() {
         return documents;
     }
 
     @JsonProperty("documents")
-    public void setDocuments(Object documents) {
+    public void setDocuments(List<PersonDocument> documents) {
         this.documents = documents;
     }
 
     @JsonProperty("contacts")
-    public Object getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 
     @JsonProperty("contacts")
-    public void setContacts(Object contacts) {
+    public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
     }
 
@@ -359,22 +359,21 @@ public class ResponsePersons {
     }
 
     @JsonProperty("agents")
-    public Object getAgents() {
+    public List<PersonAgent> getAgents() {
         return agents;
     }
-
     @JsonProperty("agents")
-    public void setAgents(Object agents) {
+    public void setAgents(List<PersonAgent> agents) {
         this.agents = agents;
     }
 
     @JsonProperty("children")
-    public Object getChildren() {
+    public List<PersonAgent> getChildren() {
         return children;
     }
 
     @JsonProperty("children")
-    public void setChildren(Object children) {
+    public void setChildren(List<PersonAgent> children) {
         this.children = children;
     }
 

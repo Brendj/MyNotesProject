@@ -414,7 +414,7 @@ public class SummaryCalculationService {
                 Integer qty = ((Integer) row[1]).intValue();
                 Long rprice = ((BigInteger) row[2]).longValue();
                 Long sum = qty * rprice;
-                String menu = OrderDetailFRationTypeWTdiet.getDescription(((Integer) row[3]).intValue());
+                String menu = row[3] == null ? (String) row[5] : OrderDetailFRationTypeWTdiet.getDescription(((Integer) row[3]).intValue());
                 Integer menyType = ((Integer) row[4]).intValue();
                 String menudetailname = (String) row[5];
 

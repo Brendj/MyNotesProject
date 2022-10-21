@@ -82,33 +82,34 @@ public class MeshCardNotifyTaskExecutor {
             Date lastProcessing = getProcessingTime();
             session = RuntimeContext.getInstance().createPersistenceSession();
             List<Card> cards = DAOUtils.getAllCardForMESHByTime(session, lastProcessing);
-            for(Card c : cards){
-                if(c.getClient() != null && StringUtils.isEmpty(c.getClient().getMeshGUID())){
+            for(Card card : cards){
+                if(card.getClient() != null && StringUtils.isEmpty(card.getClient().getMeshGUID())){
                     continue;
                 }
 
                 try {
                     transaction = session.beginTransaction();
 
-                    errorCorrection(c, session); // Устранение ошибок дублей связок и неоднозначности связей
+                    MeshClientCardRef ref = DAOUtils.findMeshClientCardRefByCard(session, card.getIdOfCard());
 
-                    if(c.refNotExists() && c.getClient() != null) { // Client exists, but no ref
-                        MeshClientCardRef ref = meshClientCardRefService.createRef(c);
-                        c.setMeshCardClientRef(ref);
-                    } else if(c.getClient() == null){ // Ref exists, but card without owner
-                        if(c.getMeshCardClientRef() == null){
-                            continue;
-                        }
-                        MeshClientCardRef ref = meshClientCardRefService.deleteRef(c.getMeshCardClientRef());
-                        c.setMeshCardClientRef(null);
+                    errorCorrection(card, ref, session); // Устранение ошибок дублей связок и неоднозначности связей
 
-                        session.delete(ref);
-                    } else if(!c.getClient().equals(c.getMeshCardClientRef().getClient())){ // If the card owner has changed
-                        meshClientCardRefService.changeRef(c);
-                    } else {
-                        meshClientCardRefService.updateRef(c.getMeshCardClientRef());
+                    if(ref == null && card.getClient() == null) {
+                        continue;
                     }
-                    session.update(c);
+                    if(ref == null && card.getClient() != null) { // Client exists, but no ref
+                        MeshClientCardRef newRef = meshClientCardRefService.createRef(card);
+                        session.save(newRef);
+                    } else if(card.getClient() == null){ // Ref exists, but card without owner
+                        MeshClientCardRef deletedRef = meshClientCardRefService.deleteRef(ref);
+                        session.delete(deletedRef);
+                    } else if(!card.getClient().equals(ref.getClient())){ // If the card owner has changed
+                        MeshClientCardRef changeRef = meshClientCardRefService.changeRef(ref);
+                        session.merge(changeRef);
+                    } else {
+                        MeshClientCardRef updatedRef = meshClientCardRefService.updateRef(ref);
+                        session.merge(updatedRef);
+                    }
 
                     transaction.commit();
                     transaction = null;
@@ -127,14 +128,13 @@ public class MeshCardNotifyTaskExecutor {
         }
     }
 
-    private void errorCorrection(Card card, Session session) {
-        if(card.getMeshCardClientRef() == null){
+    private void errorCorrection(Card card, MeshClientCardRef ref, Session session) {
+        if(ref == null){
             return;
         }
-        MeshClientCardRef ref = (MeshClientCardRef) session.merge(card.getMeshCardClientRef());
 
-        List<Category> categories = getDuplicateCards(meshClientCardRefService.getCardCategoryByClient(ref.getClient()),
-                card);
+        List<Category> categories = getDuplicateCards(
+                meshClientCardRefService.getCardCategoryByClient(ref.getClient()), card);
         if(CollectionUtils.isEmpty(categories)){
             return;
         }
@@ -144,7 +144,6 @@ public class MeshCardNotifyTaskExecutor {
                 meshClientCardRefService.deleteRef(category.getId(), ref.getClient().getMeshGUID());
             }
             session.delete(ref);
-            card.setMeshCardClientRef(null);
         } else {
             for(Category category : categories){
                 if(category.getId().equals(ref.getIdOfRefInExternalSystem())){

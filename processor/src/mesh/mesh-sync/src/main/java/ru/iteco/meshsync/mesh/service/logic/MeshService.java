@@ -1,14 +1,14 @@
 package ru.iteco.meshsync.mesh.service.logic;
 
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.client.RestClientException;
 import org.threeten.bp.LocalDate;
 import ru.iteco.client.ApiException;
-import ru.iteco.client.model.ModelClass;
-import ru.iteco.client.model.PersonCategory;
-import ru.iteco.client.model.PersonEducation;
-import ru.iteco.client.model.PersonInfo;
+import ru.iteco.client.model.*;
 import ru.iteco.meshsync.enums.ActionType;
 import ru.iteco.meshsync.enums.EntityType;
 import ru.iteco.meshsync.enums.ServiceType;
+import ru.iteco.meshsync.enums.UpdateOperation;
 import ru.iteco.meshsync.error.EducationNotFoundException;
 import ru.iteco.meshsync.error.NoRequiredDataException;
 import ru.iteco.meshsync.error.UnknownActionTypeException;
@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +42,14 @@ public class MeshService {
             EntityType.CATEGORY.getApiField()
     );
     private static final String EXPAND = StringUtils.join(INNER_OBJ_FOR_INIT, ",");
+    public static final String PERSONS_SEARCH_EXPAND = "documents,contacts,agents.documents,agents.contacts";
+
+    private static final String GUARDIAN_EXPAND = StringUtils.join(
+            Arrays.asList(
+                    EntityType.PERSON_CONTACT.getApiField(),
+                    EntityType.PERSON_DOCUMENT.getApiField()
+            ),
+            ",");
 
     private static final List<Integer> notInOrganization = Arrays.asList(
             ServiceType.ATTESTATION.getCode(),
@@ -53,22 +62,46 @@ public class MeshService {
             ServiceType.ACADEMIC_LEAVE.getCode()
     );
 
+    private static final List<EntityType> acceptablyChangesForChild = Arrays.asList(
+            EntityType.PERSON,
+            EntityType.PERSON_EDUCATION,
+            EntityType.CATEGORY,
+            EntityType.PERSON_AGENT
+    );
+
+    private static final List<EntityType> acceptablyChangesForGuardian = Arrays.asList(
+            EntityType.PERSON,
+            EntityType.PERSON_CONTACT,
+            EntityType.PERSON_DOCUMENT
+    );
+
     private final PersonRepo personRepo;
     private final RestService restService;
     private final CatalogService catalogService;
     private final ServiceJournalService serviceJournalService;
     private final ClassService classService;
+    private final InternalGuardianService internalGuardianService;
 
     public MeshService(PersonRepo personRepo,
                        RestService restService,
                        CatalogService catalogService,
                        ServiceJournalService serviceJournalService,
-                       ClassService classService) {
+                       ClassService classService,
+                       InternalGuardianService internalGuardianService) {
         this.personRepo = personRepo;
         this.restService = restService;
         this.catalogService = catalogService;
         this.serviceJournalService = serviceJournalService;
         this.classService = classService;
+        this.internalGuardianService = internalGuardianService;
+    }
+
+    public void processMsg(EntityChanges entityChanges) {
+        if (entityChanges.getEntity().equals(EntityType.CLASS)) {
+            processClassChanges(entityChanges);
+        } else {
+            processEntityChanges(entityChanges);
+        }
     }
 
     @Transactional
@@ -99,20 +132,85 @@ public class MeshService {
                     throw new UnknownActionTypeException();
             }
         } catch (ApiException e) {
-        log.error(String.format("Catch error from MESH-Server when process Class ID: %s :\n Code: %d \n Body: %s",
-                entityChanges.getUid(), e.getCode(), e.getResponseBody()));
-        }catch (Exception e) {
+            log.error(String.format("Catch error from MESH-Server when process Class ID: %s :\n Code: %d \n Body: %s",
+                    entityChanges.getUid(), e.getCode(), e.getResponseBody()));
+        } catch (Exception e) {
             log.error("Cant process ModelClass change", e);
             return false;
         }
         return true;
     }
 
-    @Transactional
-    public boolean processEntityChanges(EntityChanges entityChanges) {
+    public void processEntityChanges(EntityChanges entityChanges) {
         if (entityChanges == null) {
             log.warn("Get entityChanges param as NULL");
-            return false;
+            return;
+        }
+
+        CompletableFuture.allOf(
+                this.processPersonAsChild(entityChanges),
+                this.processPersonAsGuardian(entityChanges)
+        ).exceptionally(e -> {
+            log.error(e.getMessage(), e);
+            return null;
+        }).join();
+    }
+
+    @Async(value = "GuardianProcess")
+    @Transactional
+    public CompletableFuture<Boolean> processPersonAsGuardian(EntityChanges entityChanges) {
+        if (!acceptablyChangesForGuardian.contains(entityChanges.getEntity())) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        if (entityChanges.getEntity().equals(EntityType.PERSON) &&
+                (entityChanges.getAction().equals(ActionType.create) || entityChanges.getAction().equals(ActionType.merge))) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        try {
+            if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
+                internalGuardianService.deleteGuardian(entityChanges.getPersonGUID());
+            } else {
+                Integer operation = null;
+                if (entityChanges.getEntity().equals(EntityType.PERSON)) {
+                    operation = UpdateOperation.FULL_UPDATE_OPERATION.getCode();
+                } else if (entityChanges.getEntity().equals(EntityType.PERSON_DOCUMENT)) {
+                    operation = UpdateOperation.DOCUMENTS_UPDATE_OPERATION.getCode();
+                } else if (entityChanges.getEntity().equals(EntityType.PERSON_CONTACT)) {
+                    operation = UpdateOperation.CONTACTS_UPDATE_OPERATION.getCode();
+                }
+                if (operation != null) {
+                    if (internalGuardianService.checkGuardian(entityChanges.getPersonGUID())) {
+                        PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), GUARDIAN_EXPAND);
+                        internalGuardianService.updateGuardian(info, operation);
+                    }
+                }
+            }
+
+            return CompletableFuture.completedFuture(true);
+        } catch (ApiException e) {
+            log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
+                    entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
+            return CompletableFuture.completedFuture(false);
+        } catch (RestClientException ex) {
+            log.error(ex.getMessage());
+            return CompletableFuture.completedFuture(false);
+        } catch (Exception e) {
+            log.error("Can't process changes for Guardian with PersonGUID: " + entityChanges.getPersonGUID(), e);
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
+    @Async(value = "ChildrenProcess")
+    @Transactional
+    public CompletableFuture<Boolean> processPersonAsChild(EntityChanges entityChanges) {
+        if (!acceptablyChangesForChild.contains(entityChanges.getEntity())) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        if (entityChanges.getEntity().equals(EntityType.PERSON_AGENT)) {
+            return processGuardianRelations(entityChanges);
         }
 
         boolean inSupportedOrg = true;
@@ -126,8 +224,8 @@ public class MeshService {
                 throw new UnknownActionTypeException();
             } else if (entityChanges.getEntity().equals(EntityType.PERSON) && entityChanges.getAction().equals(ActionType.delete)) {
                 if (person == null) {
-                    log.warn("Get action DELETE from Kafka for person GUID: " + entityChanges.getPersonGUID()
-                            + ", but in our DB not data about this person");
+                    log.warn("Unable to delete person as child with PersonGUID: " + entityChanges.getPersonGUID()
+                            + "because he is not in DB");
                 } else {
                     person.setDeleteState(true);
                     serviceJournalService.writeMessage("Из Apache Kafka получен пакет с меткой \"Удален\"",
@@ -165,7 +263,6 @@ public class MeshService {
                                 "Person %s in the organization %d, this person no in DB and this OO not support ISPP " +
                                         "or no data about OrganizationID from NSI",
                                 entityChanges.getPersonGUID(), actualEdu.getOrganizationId()));
-                        return true;
                     }
 
                     String lastGuid = getLastGuid(info);
@@ -178,24 +275,15 @@ public class MeshService {
                 info = null;
             }
 
-            invalidData = false;
             serviceJournalService.decideAllRowsForPerson(entityChanges.getPersonGUID());
         } catch (EducationNotFoundException e) {
             // Возможно сотрудник ОО
             log.warn(String
                     .format("Catch EducationNotFoundException for Person ID: %s ", entityChanges.getPersonGUID()));
-            invalidData = false;
         } catch (ApiException e) {
             log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
                     entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
             serviceJournalService.writeErrorWithUserMsg(e, e.getResponseBody(), entityChanges.getPersonGUID());
-            if (e.getResponseBody().contains("удален")) { // Нет точного признака удаления
-                if (person != null) {
-                    person.setDeleteState(true);
-                }
-            } else {
-                invalidData = true;
-            }
         } catch (NoRequiredDataException e) {
             log.warn("Catch NoRequiredDataException, person marks as with invalid data Except: " + e.getMessage());
             serviceJournalService.writeError(e, entityChanges.getPersonGUID());
@@ -212,11 +300,31 @@ public class MeshService {
                 person = null;
             }
         }
-        return !invalidData;
+        return CompletableFuture.completedFuture(!invalidData);
+    }
+
+    private CompletableFuture<Boolean> processGuardianRelations(EntityChanges entityChanges) {
+        try {
+            if (internalGuardianService.checkClient(entityChanges.getPersonGUID())) {
+                PersonInfo info = restService.getPersonInfoByGUIDAndExpand(entityChanges.getPersonGUID(), PERSONS_SEARCH_EXPAND);
+                internalGuardianService.processGuardianRelations(entityChanges.getPersonGUID(), info.getAgents());
+            }
+            return CompletableFuture.completedFuture(true);
+        } catch (ApiException e) {
+            log.error(String.format("Catch error from MESH-Server when process Person ID: %s :\n Code: %d \n Body: %s",
+                    entityChanges.getPersonGUID(), e.getCode(), e.getResponseBody()));
+            return CompletableFuture.completedFuture(false);
+        } catch (RestClientException ex) {
+            log.error(ex.getMessage());
+            return CompletableFuture.completedFuture(false);
+        } catch (Exception e) {
+            log.error("Can't process guardian relations for child with PersonGUID " + entityChanges.getPersonGUID(), e);
+            return CompletableFuture.completedFuture(false);
+        }
     }
 
     private boolean isHomeStudy(PersonEducation actualEdu) throws Exception {
-        if(actualEdu.getServiceTypeId().equals(ServiceType.EDUCATION.getCode())){
+        if (actualEdu.getServiceTypeId().equals(ServiceType.EDUCATION.getCode())) {
             return catalogService.educationFormIsHomeStudy(actualEdu);
         }
         return true;
@@ -320,13 +428,13 @@ public class MeshService {
                 .collect(Collectors.toList());
         allEdu.sort(Comparator.comparing(PersonEducation::getTrainingEndAt));
 
-        if(allEdu.isEmpty()){
+        if (allEdu.isEmpty()) {
             return null;
         }
 
         PersonEducation result = null;
         if (allEdu.size() > 1) {
-            for(PersonEducation e : allEdu) {
+            for (PersonEducation e : allEdu) {
                 if (e.getServiceTypeId().equals(ServiceType.EDUCATION.getCode())) { //"Образование"
                     return e;
                 } else if (notInOrganization.contains(e.getServiceTypeId())) {

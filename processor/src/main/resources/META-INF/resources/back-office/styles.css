@@ -452,3 +452,10 @@
 .column-width-500 {
     width: 500px;
 }
+.date-table{
+    width: 130px;
+}
+
+.date-input{
+    width: 96px;
+}

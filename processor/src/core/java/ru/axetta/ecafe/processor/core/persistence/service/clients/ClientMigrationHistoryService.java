@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientMigrationHistoryRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -49,7 +50,6 @@ public class ClientMigrationHistoryService {
         return repository.findAll(org, client);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
     public void processOrgChange() {
         if (!isOnBalanceOrDiscount()) { return; }
         logger.info("Start process Org change service");
@@ -58,7 +58,7 @@ public class ClientMigrationHistoryService {
         List<ClientMigration> list = repository.findAllSinceDate(lastProcess);
         int counter = 0;
         if (isOn(NODE_BALANCE_CHANGE_ORG)) {
-            balanceChange(list);
+            RuntimeContext.getAppContext().getBean(ClientMigrationHistoryService.class).balanceChange(list);
         }
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
@@ -79,7 +79,8 @@ public class ClientMigrationHistoryService {
                 list.size()));
     }
 
-    private void balanceChange(List<ClientMigration> list) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
+    public void balanceChange(List<ClientMigration> list) {
         int counter = 0;
         for (ClientMigration clientMigration : list) {
             if (clientMigration.getOldContragent() != null && clientMigration.getNewContragent() != null
@@ -281,7 +282,7 @@ public class ClientMigrationHistoryService {
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, clientMigration.getClient().getIdOfClient(), true);
                 for (Client guardian : guardians) {
                     boolean hasChildrenInOtherOrg = false;
-                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient(), true);
+                    List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient(), true, false);
                     for (Client child : children) {
                         if (!child.equals(clientMigration.getClient()) && !DAOUtils.isFriendlyOrganizations(session, child.getOrg(), clientMigration.getOrg())) {
                             hasChildrenInOtherOrg = true;
@@ -298,11 +299,19 @@ public class ClientMigrationHistoryService {
 
                         ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), null, clientMigration.getOrg(),
                                 guardian, ClientGroupMigrationHistory.MODIFY_AUTO_MODE, guardian.getClientGroup().getGroupName());
+
+                        MigrantsUtils.disableMigrantRequestIfExists(
+                                session, clientMigration.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                     }
                     if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {
                         //есть дети в других ОО, создаем заявку на посещение
-                        ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(),
-                                MigrantInitiatorEnum.INITIATOR_PROCESSING, 12);
+                        if(!DAOUtils.isFriendlyOrganizations(session, guardian.getOrg(), clientMigration.getOrg()) &&
+                                MigrantsUtils.findActiveMigrant(session, clientMigration.getOrg().getIdOfOrg(), guardian.getIdOfClient()) == null &&
+                                !guardian.getOrg().getIdOfOrg().equals(clientMigration.getOrg().getIdOfOrg())) {
+
+                            ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(),
+                                    MigrantInitiatorEnum.INITIATOR_PROCESSING, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+                        }
                     }
                 }
             }

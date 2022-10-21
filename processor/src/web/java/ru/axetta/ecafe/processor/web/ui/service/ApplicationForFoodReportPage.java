@@ -66,13 +66,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         List<SelectItem> items = new ArrayList<SelectItem>(states.length);
         items.add(new SelectItem("Все", "Все"));
         for (ApplicationForFoodState state : states) {
-            if (!state.equals(ApplicationForFoodState.DENIED)) {
-                items.add(new SelectItem(state.getCode().toString(), state.getCode().toString()));
-            } else {
-                items.add(new SelectItem("1080.1", "1080.1"));
-                items.add(new SelectItem("1080.2", "1080.2"));
-                items.add(new SelectItem("1080.3", "1080.3"));
-            }
+            items.add(new SelectItem(state.getCode(), state.getCode()));
         }
         return items;
     }
@@ -116,9 +110,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             transaction = session.beginTransaction();
             ApplicationForFoodStatus statusCondition = null;
             if (!status.equals("Все")) {
-                String[] arr = status.split("\\.");
-                statusCondition = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(Integer.parseInt(arr[0])),
-                        arr.length == 1 ? null : ApplicationForFoodDeclineReason.fromInteger(Integer.parseInt(arr[1])));
+                statusCondition = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(status));
             }
             Long benefitCondition = null;
             if (benefit > ALL_BENEFITS) {
@@ -133,13 +125,15 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
-                ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(session, applicationForFood);
-                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient());
-                if (info != null) {
-                    item.setStartDate(info.getDateStart());
-                    item.setEndDate(info.getDateEnd());
+                for (ApplicationForFoodDiscount discount : applicationForFood.getDtisznCodes()) {
+                    ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood, discount.getDtisznCode());
+                    ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient());
+                    if (info != null) {
+                        item.setStartDate(info.getDateStart());
+                        item.setEndDate(info.getDateEnd());
+                    }
+                    items.add(item);
                 }
-                items.add(item);
             }
             transaction.commit();
             transaction = null;
@@ -152,18 +146,18 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void makeResume() {
-        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null));
+        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESUME));
         needAction = true;
     }
 
     public void makeOK() {
-        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null));
-        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING));
+        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.OK));
         needAction = true;
     }
 
     public void makeDenied() {
-        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
+        setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT));
         needAction = true;
     }
 
@@ -251,7 +245,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     for (ApplicationForFoodStatus status : item.getStatuses()) {
                         DAOUtils.updateApplicationForFoodWithVersion(session, item.getApplicationForFood(), status, nextVersion, historyVersion);
                         RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis() + pause, item.getServiceNumber(),
-                                status.getApplicationForFoodState(), status.getDeclineReason());
+                                status.getApplicationForFoodState());
                         pause += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
                         if (status.getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
                             DiscountManager.addOtherDiscountForClient(session, item.getApplicationForFood().getClient());
@@ -336,7 +330,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.gt("createdDate", date));
-        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.OK);
         criteria.add(Restrictions.eq("status", status));
         return criteria.list().size() > 0;
     }
@@ -349,8 +343,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public String getStatusString(ApplicationForFoodStatus status) {
-        return status.getApplicationForFoodState().getCode().toString()
-                + (status.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? "." + status.getDeclineReason().getCode() : "");
+        return status.getApplicationForFoodState().getCode();
     }
 
     public String getBenefitText() {

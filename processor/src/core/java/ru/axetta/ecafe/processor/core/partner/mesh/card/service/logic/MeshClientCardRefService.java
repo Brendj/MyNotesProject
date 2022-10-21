@@ -84,15 +84,10 @@ public class MeshClientCardRefService {
         }
     }
 
-    public void changeRef(Card c) throws Exception {
+    public MeshClientCardRef changeRef(MeshClientCardRef ref) throws Exception {
         try {
-            meshCardService.deleteReferenceBetweenClientAndCard(c.getMeshCardClientRef());
-
-            MeshClientCardRef newRef = meshCardService.createReferenceBetweenClientAndCard(c);
-            c.getMeshCardClientRef().setClient(newRef.getClient());
-            c.getMeshCardClientRef().setIdOfRefInExternalSystem(newRef.getIdOfRefInExternalSystem());
-            c.getMeshCardClientRef().setLastUpdate(newRef.getLastUpdate());
-            c.getMeshCardClientRef().setSend(newRef.getSend());
+            meshCardService.deleteReferenceBetweenClientAndCard(ref);
+            return meshCardService.createReferenceBetweenClientAndCard(ref.getCard());
         } catch (Exception e){
             log.error("Can't change Ref", e);
             throw e;
@@ -123,9 +118,7 @@ public class MeshClientCardRefService {
                     log.info(String.format("Process %d cards", cards.size()));
                     for (Card c : cards) {
                         MeshClientCardRef ref = this.createRef(c);
-                        c.setMeshCardClientRef(ref);
-
-                        session.update(c);
+                        session.save(ref);
                     }
                     transaction.commit();
                     transaction = null;

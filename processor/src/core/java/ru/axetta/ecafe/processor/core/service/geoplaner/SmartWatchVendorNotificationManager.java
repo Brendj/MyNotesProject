@@ -55,6 +55,11 @@ public class SmartWatchVendorNotificationManager {
             }
 
             JsonEnterEventInfo info = buildJsonEnterEventInfo(session, enterEvent, client);
+
+            transaction.commit();
+            transaction = null;
+            session.close();
+
             statusCode = service.sendPost(info, EventType.ENTER_EVENTS, vendor);
 
             if(statusCode == null){
@@ -70,9 +75,6 @@ public class SmartWatchVendorNotificationManager {
                         + " idOfOrg: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
                         + " to Vendor " + vendor.getName());
             }
-
-            transaction.commit();
-            transaction = null;
         } catch (Exception e) {
             logger.error("Can't send EnterEventSendInfo to Vendor App: ", e);
             errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
@@ -109,6 +111,10 @@ public class SmartWatchVendorNotificationManager {
 
             JsonPurchasesInfo info = buildJsonPurchasesInfo(session, purchases, client);
 
+            hibernateTransaction.commit();
+            hibernateTransaction = null;
+            session.close();
+
             statusCode = service.sendPost(info, EventType.PURCHASES, vendor);
 
             if(statusCode == null){
@@ -119,9 +125,6 @@ public class SmartWatchVendorNotificationManager {
             } else {
                 logger.info("Sends PurchasesInfo of Order ID= " + purchases.getIdOfOrder() + " to Vendor ");
             }
-
-            hibernateTransaction.commit();
-            hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send PurchasesInfo to Vendor App: ", e);
             errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
@@ -158,6 +161,10 @@ public class SmartWatchVendorNotificationManager {
 
             JsonPaymentInfo info = buildJsonPaymentInfo(session, clientPayment, client);
 
+            hibernateTransaction.commit();
+            hibernateTransaction = null;
+            session.close();
+
             statusCode = service.sendPost(info, EventType.PAYMENTS, vendor);
             if(statusCode == null){
                 throw new Exception("Result code is null");
@@ -168,9 +175,6 @@ public class SmartWatchVendorNotificationManager {
             } else {
                 logger.info("Sends clientPayment of Order ID= " + clientPayment.getIdOfPayment() + " to Vendor ");
             }
-
-            hibernateTransaction.commit();
-            hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send clientPayment to Vendor App: ", e);
             errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());

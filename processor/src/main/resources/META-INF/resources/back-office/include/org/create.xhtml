@@ -203,9 +203,7 @@
                 <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text"/>
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preordersEnabled}" styleClass="input-text"/>
                 <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text" />
-		<h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.newСashierMode}" styleClass="input-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text"/>
                 <h:outputText escape="true" value="Использовать фудбокс" styleClass="output-text"/>
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.usedfoodbox}" styleClass="input-text">
                     <a4j:ajax event="click" render="foodboxPanel"/>
@@ -225,7 +223,9 @@
                         </rich:column>
                     </rich:dataTable>
                 </h:panelGrid>
-                <h:panelGroup />
+		<h:panelGroup />
+                <h:outputText escape="true" value="Новый режим выдачи (предзаказ)" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.newСashierMode}" styleClass="input-text"/>
             </h:panelGrid>
 
             <h:outputText escape="true" value="Настройки рассылки и уведомлений:" styleClass="output-text-strong"/>
@@ -279,6 +279,8 @@
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}" styleClass="input-text"/>
                 <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text"/>
                 <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.useLongCardId}" styleClass="input-text"/>
+                <h:outputText escape="true" value="Запрет на регистрацию социальных карт" styleClass="output-text"/>
+                <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.disableSocCardsReg}" styleClass="input-text"/>
             </h:panelGrid>
 
             <h:panelGrid id="orgCreateGrid_password" styleClass="borderless-grid" columns="2">

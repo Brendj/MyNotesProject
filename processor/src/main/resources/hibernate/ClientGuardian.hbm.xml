@@ -36,5 +36,6 @@
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <many-to-one name="cardRequest" class="ru.axetta.ecafe.processor.core.persistence.CardRequest" column="IdOfCardRequest" fetch="select"/>
         <property name="representType" column="isLegalRepresent" type="ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentSQLType"/>
+        <property name="roleType" column="IdOfRole" type="ru.axetta.ecafe.processor.core.persistence.ClientGuardianRoleSQLType"/>
     </class>
 </hibernate-mapping>

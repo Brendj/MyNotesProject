@@ -57,15 +57,14 @@ public class LimitFilter implements Filter {
                 String remoteAddress = request.getRemoteAddr();
                 String errorMsg =
                         ((Integer) SC_TOO_MANY_REQUESTS).toString() + ": " + SC_TOO_MANY_REQUESTS_MESSAGE + ": "
-                                + "Retry-After - " + String.valueOf(getLimitFilterParams().getSyncRetryAfter()) + ", Remote address : "
-                                + remoteAddress;
+                                + "Remote address : " + remoteAddress;
 
                 SyncCollector.setErrMessage(syncTime, errorMsg);
                 SyncCollector.registerSyncEnd(syncTime);
 
                 HttpServletResponse httpServletResponse = (HttpServletResponse) response;
                 httpServletResponse.setContentType("text/html");
-                httpServletResponse.addHeader("Retry-After", String.valueOf(getLimitFilterParams().getSyncRetryAfter()));
+                //httpServletResponse.addHeader("Retry-After", String.valueOf(getLimitFilterParams().getSyncRetryAfter()));
                 httpServletResponse.sendError(SC_TOO_MANY_REQUESTS, SC_TOO_MANY_REQUESTS_MESSAGE);
             }
         } finally {

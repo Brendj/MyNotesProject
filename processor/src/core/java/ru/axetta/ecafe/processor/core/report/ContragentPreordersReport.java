@@ -77,14 +77,14 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception {
+                                              List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception {
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
-            String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
+            String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) ";
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
             String simpleCondition = showOnlyUnpaidItems ? " where isPaid like 'Нет' " : "";
             Query query;
 
-            String getDataQuery  = "with contragent_preorders_table AS ( "
+            String getDataQuery = "with contragent_preorders_table AS ( "
                     + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                     + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
                     + "pc.complexName, cast(pl.qty as bigint) as amount, '' as dish, "
@@ -94,7 +94,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "coalesce(pc.usedsum, 0) as usedsum, "
                     + "case coalesce(ps.status, 0) when 0 then 'Нет' else 'Да' end as psStatus, "
                     + " '' as usedamounts, "
-                    + "case coalesce(gto.issixdaysworkweek, 0) when 0 then 'Нет' else 'Да' end as issixdaysworkweek,  '' as dishAmounts, c.idofclientgroup "
+                    + "case coalesce(gto.issixdaysworkweek, 0) when 0 then 'Нет' else 'Да' end as issixdaysworkweek,  '' as dishAmounts, c.idofclientgroup, gto.version as gtoVersion "
                     + "from cf_preorder_complex pc "
                     + "join cf_clients c on pc.idofclient = c.idofclient "
                     + "join cf_orgs o on pc.idoforgoncreate = o.idOfOrg "
@@ -104,7 +104,6 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction "
                     + "left join cf_canceledorders co on ord.idOfOrder = co.idOfOrder and ord.idOfOrg = co.idOfOrg "
                     + "left join cf_preorder_status ps on ps.guid = pc.guid "
-                    + "left join cf_specialdates sd on sd.idoforg = pc.idoforgoncreate "
                     + " left join cf_clientgroups cg on cg.idoforg = pc.idoforgoncreate and cg.idofclientgroup =  c.idofclientgroup "
                     + " left join cf_groupnames_to_orgs gto on gto.groupname = cg.groupname and gto.idOfOrg = pc.idoforgoncreate "
                     + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1 "
@@ -120,7 +119,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "cast(sum(pmd.usedsum) as bigint) as usedsum, "
                     + "case coalesce(ps.status, 0) when 0 then 'Нет' else 'Да' end as psStatus, "
                     + " array_to_string(array_agg(pmd.usedamount), '&&')  as usedamounts, "
-                    + " '' as issixdaysworkweek, array_to_string(array_agg(pmd.amount), '&&') as DishAounts, c.idofclientgroup "
+                    + " '' as issixdaysworkweek, array_to_string(array_agg(pmd.amount), '&&') as DishAounts, c.idofclientgroup, 0 as gtoVersion "
                     + " from cf_preorder_menudetail pmd "
                     + " join cf_clients c on pmd.idofclient = c.idofclient "
                     + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
@@ -135,7 +134,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pmd.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, psStatus, issixdaysworkweek, c.idofclientgroup"
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, psStatus, issixdaysworkweek, c.idofclientgroup, gtoVersion "
                     + " UNION "
                     + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                     + " o.shortNameInfoService, o.address, c.contractId, pc.preorderDate,"
@@ -145,15 +144,14 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "coalesce(pc.usedsum, 0) as usedsum, "
                     + "case coalesce(ps.status, 0) when 0 then 'Нет' else 'Да' end as psStatus, "
                     + "'' as usedamounts, "
-                    + "case coalesce(gto.issixdaysworkweek, 0) when 0 then 'Нет' else 'Да' end as issixdaysworkweek, '' as dishAmounts, c.idofclientgroup "
+                    + "case coalesce(gto.issixdaysworkweek, 0) when 0 then 'Нет' else 'Да' end as issixdaysworkweek, '' as dishAmounts, c.idofclientgroup, gto.version as gtoVersion "
                     + " from cf_preorder_complex pc "
                     + " join cf_clients c on pc.idofclient = c.idofclient "
                     + " join cf_orgs o on pc.idoforgoncreate = o.idOfOrg "
                     + " join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent"
                     + " left join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
-                    + " left join (select preorderguid, sum(qty) as payed from cf_preorder_linkod group by  preorderguid) q on q.preorderguid = pc.guid "
+                    + " left join lateral (select preorderguid, sum(qty) as payed from cf_preorder_linkod where preorderguid = pc.guid group by  preorderguid) q on q.preorderguid = pc.guid "
                     + " left join cf_preorder_status ps on ps.guid = pc.guid "
-                    + " left join cf_specialdates sd on sd.idoforg = pc.idoforgoncreate"
                     + " left join cf_clientgroups cg on cg.idoforg = pc.idoforgoncreate and cg.idofclientgroup =  c.idofclientgroup "
                     + " left join cf_groupnames_to_orgs gto on gto.groupname = cg.groupname and gto.idOfOrg = pc.idoforgoncreate "
                     + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1"
@@ -161,7 +159,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, psStatus, usedamounts, issixdaysworkweek, dishAmounts, c.idofclientgroup "
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, psStatus, usedamounts, issixdaysworkweek, dishAmounts, c.idofclientgroup, gtoVersion  "
                     + "union "
                     + "select ctg.idOfContragent, ctg.contragentName, o.idOfOrg,"
                     + "o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
@@ -171,7 +169,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "cast(sum(pmd.usedsum) as bigint) as usedsum, "
                     + "case coalesce(ps.status, 0) when 0 then 'Нет' else 'Да' end as psStatus, "
                     + " array_to_string(array_agg(pmd.usedamount), '&&')  as usedamounts, "
-                    + " '' as issixdaysworkweek, array_to_string(array_agg(pmd.amount), '&&')  as dishAounts, c.idofclientgroup "
+                    + " '' as issixdaysworkweek, array_to_string(array_agg(pmd.amount), '&&')  as dishAounts, c.idofclientgroup, 0 as gtoVersion "
                     + "from cf_preorder_menudetail pmd "
                     + "join cf_clients c on pmd.idofclient = c.idofclient "
                     + "join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
@@ -185,7 +183,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, psStatus, issixdaysworkweek, c.idofclientgroup )"
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, psStatus, issixdaysworkweek, c.idofclientgroup, gtoVersion  )"
                     + " select * from contragent_preorders_table "
                     + simpleCondition
                     + " order by 6 desc, 7, 1, 2, 3, 4 ";
@@ -250,15 +248,36 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             query = session.createSQLQuery(getDataQuery);
             query.setParameter("startDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime());
-            if(contragent != null) {
+            if (contragent != null) {
                 query.setParameter("idOfContragent", contragent.getIdOfContragent());
             }
-            if(!CollectionUtils.isEmpty(idOfOrgList)){
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
                 query.setParameterList("idOfOrgList", idOfOrgList);
             }
-            List<Object[]> dataFromDB = query.list();
-            if (CollectionUtils.isEmpty(dataFromDB)) {
+            List<Object[]> resultQuery = query.list();
+            if (CollectionUtils.isEmpty(resultQuery)) {
                 throw new Exception("Нет данных для построения отчета");
+            }
+
+            //удаление дубликатов вызванных несколькими версиями в cf_groupnames_to_orgs
+            List<Object[]> dataFromDB = new ArrayList<>();
+            for (Object[] rowCheck : resultQuery) {
+                if (rowCheck == null)
+                    continue;
+                Object[] objects = null;
+                for (int i = 0; i < resultQuery.size(); i++) {
+                    if (resultQuery.get(i) == null)
+                        continue;
+                    if (DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(resultQuery.get(i)[15])
+                            .equals(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(rowCheck[15]))) {
+                        if (objects == null || DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(objects[23])
+                                < DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(resultQuery.get(i)[23])) {
+                            objects = resultQuery.get(i);
+                        }
+                        resultQuery.set(i, null);
+                    }
+                }
+                dataFromDB.add(objects);
             }
 
             List<ContragentPreordersSubreportItem> subReportItem = new ArrayList<ContragentPreordersSubreportItem>();
@@ -275,7 +294,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             getSubReportItem(subReportItem, dataDish, dataDishAmount);
             subReportItem = showOnlyUnpaidItems ? null : getTotalPrice(getSort(subReportItem));
             Set<Long> idOfOrgSet = new HashSet<>();
-            for (Object[] row: dataFromDB)
+            for (Object[] row : dataFromDB)
                 idOfOrgSet.add(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]));
             List<SpecialDate> specialDates = getSpecialDate(session, idOfOrgSet, startTime, endTime);
 
@@ -314,14 +333,14 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return new JRBeanCollectionDataSource(result);
         }
 
-        private List<ContragentPreordersSubreportItem> getTotalPrice(List<ContragentPreordersSubreportItem> subReportItem){
+        private List<ContragentPreordersSubreportItem> getTotalPrice(List<ContragentPreordersSubreportItem> subReportItem) {
             List<ContragentPreordersSubreportItem> subReportItemNew = new ArrayList<>();
             int totalIndex = 0;
-            for (int s = 0; s < subReportItem.size() ; s++){
+            for (int s = 0; s < subReportItem.size(); s++) {
                 int totalCount = 0, totalPrice = 0;
-                if(s + 1 == subReportItem.size() || !subReportItem.get(s).getIdOfContragent().equals(subReportItem.get(s + 1).getIdOfContragent())){
+                if (s + 1 == subReportItem.size() || !subReportItem.get(s).getIdOfContragent().equals(subReportItem.get(s + 1).getIdOfContragent())) {
                     subReportItemNew.add(subReportItem.get(s));
-                    for(int g = totalIndex; g <= s; g++){
+                    for (int g = totalIndex; g <= s; g++) {
                         totalCount += subReportItem.get(g).getAmount();
                         totalPrice += subReportItem.get(g).getAmount() * subReportItem.get(g).getComplexPrice();
                     }
@@ -329,17 +348,16 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     ContragentPreordersSubreportItem item = new ContragentPreordersSubreportItem(subReportItem.get(s).getIdOfContragent(),
                             subReportItem.get(s).getContragentName(), null, null,
                             null, "Итого", totalCount, null,
-                            (long)totalPrice, "0");
+                            (long) totalPrice, "0");
                     subReportItemNew.add(item);
-                }
-                else subReportItemNew.add(subReportItem.get(s));
+                } else subReportItemNew.add(subReportItem.get(s));
             }
             return subReportItemNew;
         }
 
-        private List<SpecialDate> getSpecialDate(Session session, Set<Long> idOfOrgSet, Date startTime, Date endTime){
+        private List<SpecialDate> getSpecialDate(Session session, Set<Long> idOfOrgSet, Date startTime, Date endTime) {
             List<SpecialDate> specialDates = new ArrayList<>();
-            for (Long idOfOrg: idOfOrgSet) {
+            for (Long idOfOrg : idOfOrgSet) {
                 Criteria criteria = session.createCriteria(SpecialDate.class);
                 criteria.add(Restrictions.between("date", startTime, endTime));
                 criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
@@ -349,7 +367,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return specialDates;
         }
 
-        private String checkWeekend(List<SpecialDate> specialDates, Long idOfOrg, Date preorderDate, Long idOfClientGroup, String isSixDaysWorkWeek ){
+        private String checkWeekend(List<SpecialDate> specialDates, Long idOfOrg, Date preorderDate, Long idOfClientGroup, String isSixDaysWorkWeek) {
             String isWeekend = "Да";
             for (SpecialDate sp : specialDates)
                 if (sp.getIdOfClientGroup() == null && sp.getDate().compareTo(preorderDate) == 0 && sp.getIdOfOrg().equals(idOfOrg))
@@ -367,7 +385,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return isWeekend;
         }
 
-        private void getSubReportItem(List<ContragentPreordersSubreportItem> subReportItem, List<Object[]> dataComplex, List<Object[]> dataComplexAmount){
+        private void getSubReportItem(List<ContragentPreordersSubreportItem> subReportItem, List<Object[]> dataComplex, List<Object[]> dataComplexAmount) {
             for (Object[] row : dataComplex) {
                 Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                 String contragentName = (String) row[1];
@@ -382,7 +400,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                             complexName.equals(amount[5].toString()) && DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(amount[7]).intValue() > 0)
                         dishCount += DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(amount[7]).intValue();
                 }
-                if(dishCount > 0){
+                if (dishCount > 0) {
                     ContragentPreordersSubreportItem item = new ContragentPreordersSubreportItem(idOfContragent,
                             contragentName, idOfOrg, orgShortName, orgShortAddress, complexName, dishCount, complexPrice,
                             dishCount * complexPrice, "1");
@@ -391,8 +409,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             }
         }
 
-        private List<ContragentPreordersSubreportItem> getSort(List<ContragentPreordersSubreportItem> subReportItem){
-            for (ContragentPreordersSubreportItem row: subReportItem) {
+        private List<ContragentPreordersSubreportItem> getSort(List<ContragentPreordersSubreportItem> subReportItem) {
+            for (ContragentPreordersSubreportItem row : subReportItem) {
                 for (int s = 0; s < subReportItem.size() - 1; s++)
                     if (subReportItem.get(s).getIdOfContragent() > subReportItem.get(s + 1).getIdOfContragent())
                         Collections.swap(subReportItem, s, s + 1);
@@ -400,20 +418,20 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return subReportItem;
         }
 
-        private List<Object[]> setParam(Query query, Date startTime, Date endTime, List<Long> idOfOrgList){
+        private List<Object[]> setParam(Query query, Date startTime, Date endTime, List<Long> idOfOrgList) {
             query.setParameter("startDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime());
-            if(contragent != null) {
+            if (contragent != null) {
                 query.setParameter("idOfContragent", contragent.getIdOfContragent());
             }
-            if(!CollectionUtils.isEmpty(idOfOrgList)){
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
                 query.setParameterList("idOfOrgList", idOfOrgList);
             }
             return (List<Object[]>) query.list();
         }
 
-        private String paidDish(List<String> dish, List<String> usedAmount){
-            StringBuilder result = new StringBuilder ();
+        private String paidDish(List<String> dish, List<String> usedAmount) {
+            StringBuilder result = new StringBuilder();
             for (int s = 0; s < dish.size(); s++)
                 if (!usedAmount.get(s).equals("0") && dish.get(s).length() > 0)
                     result.append(dish.get(s)).append(" - ").append(usedAmount.get(s)).append(", ");
@@ -422,21 +440,23 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return result.toString();
         }
 
-        private String notPaidDish(List<String> dish, List<String> usedAmount, List<String> dishAmount){
-            StringBuilder result = new StringBuilder ();
+        private String notPaidDish(List<String> dish, List<String> usedAmount, List<String> dishAmount) {
+            StringBuilder result = new StringBuilder();
             try {
                 for (int s = 0; s < dish.size(); s++)
                     if (0 < Integer.parseInt(dishAmount.get(s)) - Integer.parseInt(usedAmount.get(s)) && dish.get(s).length() > 0)
                         result.append(dish.get(s)).append(" - ").append(Integer.parseInt(dishAmount.get(s)) - Integer.parseInt(usedAmount.get(s))).append(", ");
                 if (result.length() > 1)
                     result.setLength(result.length() - 2);
-            } catch (NumberFormatException ignore){};
+            } catch (NumberFormatException ignore) {
+            }
+            ;
             return result.toString();
         }
     }
 
     @Override
-    public Logger getLogger(){
+    public Logger getLogger() {
         return logger;
     }
 
@@ -455,3 +475,6 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         return new ContragentPreordersReport.Builder(templateFilename);
     }
 }
+
+
+

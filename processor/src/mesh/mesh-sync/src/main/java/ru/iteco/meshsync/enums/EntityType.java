@@ -9,13 +9,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum EntityType {
     PERSON("person", null),
-    PERSON_AGENT("person_agent", "agent"),
-    PERSON_ADDRESS("person_address", "address"),
-    PERSON_CONTACT("person_contact", "contact"),
-    PERSON_DOCUMENT("person_document", "document"),
-    PERSON_EDUCATION("person_education", "education"),
+    PERSON_AGENT("person_agent", "agents"),
+    PERSON_ADDRESS("person_address", "addresses"),
+    PERSON_CONTACT("person_contact", "contacts"),
+    PERSON_DOCUMENT("person_document", "documents"),
+    PERSON_EDUCATION("person_education", "educations"),
     CATEGORY("person_category", "categories"),
-    PERSON_PREVENTION("person_prevention", "prevention"),
+    PERSON_PREVENTION("person_prevention", "preventions"),
     CLASS("class","class");
 
     EntityType(String entityName, String apiField){

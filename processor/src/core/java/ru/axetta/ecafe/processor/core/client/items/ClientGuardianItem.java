@@ -28,6 +28,9 @@ public class ClientGuardianItem {
     private Boolean informedSpecialMenu;
     private Boolean allowedPreorders;
     private Integer representativeType;
+    private Integer role;
+    private String meshGuid;
+    private Boolean isChange = false;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -45,13 +48,14 @@ public class ClientGuardianItem {
                               List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
                               ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
                               Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType,
-                              Boolean allowedPreorders, Boolean getFullName){
+                              Boolean allowedPreorders, Boolean getFullName, ClientGuardianRoleType role){
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = getFullName != null && getFullName ? client.getPerson().getFullName() : client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
         this.relation = relation == null ? null : relation.getCode();
+        this.role = role == null ? null : role.getCode();
         this.notificationItems = notificationSettings;
         isNew = false;
         this.createdWhereClientGuardian = createdWhereClientGuardian;
@@ -60,14 +64,15 @@ public class ClientGuardianItem {
         this.informedSpecialMenu = informedSpecialMenu;
         this.representativeType = representativeType == null ? ClientGuardianRepresentType.UNKNOWN.getCode() : representativeType.getCode();
         this.allowedPreorders = allowedPreorders;
+        this.meshGuid = client.getMeshGUID();
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
             List<NotificationSettingItem> notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
             ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
-            Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders) {
+            Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders, ClientGuardianRoleType role) {
         this(client, disabled, relation, notificationSettings, createdWhereClientGuardian, createdWhereGuardian,
-                createdWhereGuardianDesc, informedSpecialMenu, representativeType, allowedPreorders, false);
+                createdWhereGuardianDesc, informedSpecialMenu, representativeType, allowedPreorders, false, role);
     }
 
     public String getCreatedWhereClientGuardianStr() {
@@ -202,6 +207,26 @@ public class ClientGuardianItem {
         this.representativeType = representativeType;
     }
 
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
+    public String getMeshGuid() {
+        return meshGuid;
+    }
+
+    public void setMeshGuid(String meshGuid) {
+        this.meshGuid = meshGuid;
+    }
+
+    public String getRoleStr() {
+        return role == null ? "" : ClientGuardianRoleType.fromInteger(role).toString();
+    }
+
     public void activateNotificationSpecial() {
         if(this.getEnabled() && RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_SPECIAL)){
             for(NotificationSettingItem i : notificationItems){
@@ -210,5 +235,13 @@ public class ClientGuardianItem {
                 }
             }
         }
+    }
+
+    public Boolean getChange() {
+        return isChange;
+    }
+
+    public void setChange(Boolean change) {
+        isChange = change;
     }
 }

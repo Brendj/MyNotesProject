@@ -548,22 +548,22 @@
         <url-pattern>/ispp/library/*</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>FoodBoxServlet</servlet-name>
-        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
-        <init-param>
-            <param-name>resteasy.resources</param-name>
-            <param-value>ru.axetta.ecafe.processor.web.partner.meals.MealsController</param-value>
-        </init-param>
-        <init-param>
-            <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/ispp/meals</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>FoodBoxServlet</servlet-name>
-        <url-pattern>/ispp/meals/*</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>FoodBoxServlet</servlet-name>-->
+<!--        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>-->
+<!--        <init-param>-->
+<!--            <param-name>resteasy.resources</param-name>-->
+<!--            <param-value>ru.axetta.ecafe.processor.web.partner.meals.MealsController</param-value>-->
+<!--        </init-param>-->
+<!--        <init-param>-->
+<!--            <param-name>resteasy.servlet.mapping.prefix</param-name>-->
+<!--            <param-value>/ispp/meals</param-value>-->
+<!--        </init-param>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>FoodBoxServlet</servlet-name>-->
+<!--        <url-pattern>/ispp/meals/*</url-pattern>-->
+<!--    </servlet-mapping>-->
 
     <servlet>
         <servlet-name>ESPServlet</servlet-name>
