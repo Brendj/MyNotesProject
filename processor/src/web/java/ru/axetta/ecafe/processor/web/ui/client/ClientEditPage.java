@@ -1256,6 +1256,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception(String.format("Нельзя выбрать группу \"%s\" для представителя", this.clientGroupName));
         }
 
+        //Удаляем связки у клиента без meshGuid без сохранения его в мк
+        if (clientWardItems.isEmpty() && client.getMeshGUID() == null && !this.removeListWardItems.isEmpty()) {
+            //Удаление связи с опекаемыми в ИСПП
+            removeWardsISPP(persistenceSession, client);
+            this.removeListWardItems = new ArrayList<>();
+        }
+
         //Поиск измененных элементов
         List<ClientGuardianItem> originalClientGuardianItems = loadGuardiansByClient(persistenceSession, idOfClient, true);
         List<ClientGuardianItem> originalClientWardItems = loadWardsByClient(persistenceSession, idOfClient, true);
