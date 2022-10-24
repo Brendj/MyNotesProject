@@ -2489,7 +2489,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         purchaseWithDetailsElementExt.setfRation(od.getfRation());
                     }
                     // если пришли с синхронизацией - od.idOfDish должно быть заполнено (od.idOfComplex?)
-                    if (od.getIdOfDish() != null) {
+                    if (od.getIdOfDish() != null && dishes != null) {
                         WtDish wtDish = findWtDishByOrderDetail(od.getIdOfDish(), dishes);
                         if (wtDish != null) {
                             purchaseWithDetailsElementExt
