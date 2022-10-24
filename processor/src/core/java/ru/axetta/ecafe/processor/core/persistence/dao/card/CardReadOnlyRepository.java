@@ -53,10 +53,14 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return query.getResultList();
     }
 
-    public List<Card> findAllFreeByOrg(List<Long> idOfOrgs){
+    public List<Card> findAllFreeAndBlockedWithTransitionStateByOrg(List<Long> idOfOrgs){
         Query query = entityManager
-                .createQuery("from Card c where c.org.idOfOrg in :idOfOrgs and c.state = :freeState ", Card.class)
-                .setParameter("idOfOrgs",idOfOrgs).setParameter("freeState", CardState.FREE.getValue());
+                .createQuery("from Card c where c.org.idOfOrg in :idOfOrgs " +
+                        "and (c.state = :freeState or (c.state = :blockedState and c.transitionState = :givenTransitionState and c.client is null)) ", Card.class)
+                .setParameter("idOfOrgs",idOfOrgs)
+                .setParameter("freeState", CardState.FREE.getValue())
+                .setParameter("blockedState", CardState.BLOCKED.getValue())
+                .setParameter("givenTransitionState", CardTransitionState.GIVEN_AWAY.getCode());
         return query.getResultList();
     }
 
@@ -76,16 +80,18 @@ public class CardReadOnlyRepository extends BaseJpaDao {
                 .getResultList();
     }
 
-    public List<Card> findAllFreeByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
+    public List<Card> findAllFreeByOrgAndUpdateDateAndBlockedWithTransitionState(List<Long> idOfOrgs, Date lastAccRegistrySync) {
         Query query = entityManager
                 .createQuery("select c from Card c "
                         + " where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and c.state = :freeState "
+                        + " and (c.state = :freeState or (c.state = :blockedState and c.transitionState = :givenTransitionState and c.client is null)) "
                         + " and c.updateTime >  :lastAccRegistrySync "
                         , Card.class)
                 .setParameter("idOfOrgs", idOfOrgs)
                 .setParameter("freeState",CardState.FREE.getValue())
-                .setParameter("lastAccRegistrySync", lastAccRegistrySync);
+                .setParameter("lastAccRegistrySync", lastAccRegistrySync)
+                .setParameter("blockedState", CardState.BLOCKED.getValue())
+                .setParameter("givenTransitionState", CardTransitionState.GIVEN_AWAY.getCode());
 
         return query.getResultList();
     }
