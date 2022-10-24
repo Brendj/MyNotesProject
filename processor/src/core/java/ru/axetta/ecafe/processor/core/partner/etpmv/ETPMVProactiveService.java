@@ -166,10 +166,10 @@ public class ETPMVProactiveService {
         }
     }
 
-    public void sendMessage(Client client, Client guardian, Integer dtisznCode, String serviceNumber, String ssoid, String fio, Date expiration_date) {
+    public void sendMessage(Client client, Client guardian, Integer dtisznCode, String serviceNumber, String ssoid, String fio) {
         logger.info("Sending status to ETP Proactive with ServiceNumber = " + serviceNumber);
         try {
-            String msg = createCoordinateMessage(serviceNumber, ssoid, fio, expiration_date);
+            String msg = createCoordinateMessage(serviceNumber, ssoid, fio);
             RuntimeContext.getAppContext().getBean(ETPProaktivClient.class).sendMessage(msg);
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessage(client, guardian, dtisznCode, serviceNumber, ssoid);
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage(serviceNumber, msg, true, "");
@@ -178,7 +178,7 @@ public class ETPMVProactiveService {
         }
     }
 
-    private String createCoordinateMessage(String serviceNumber, String ssoid, String fio, Date expiration_date) throws Exception
+    private String createCoordinateMessage(String serviceNumber, String ssoid, String fio) throws Exception
     {
         Properties configProperties = RuntimeContext.getInstance().getConfigProperties();
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
@@ -256,10 +256,8 @@ public class ETPMVProactiveService {
         statusType.setStatusCode(0);
         statusType.setStatusDate(calendarRequest);
         requestStatus.setStatus(statusType);
-        requestStatus.setReasonText("Вашему ребенку " + fio + " назначено питание за счет средств бюджета города Москвы, " +
-                "которое будет предоставляться с ближайшего дня поступления в школу питания на вашего ребенка. " +
-                "При необходимости Вы можете отказаться от получения услуги до конца срока действия льготной категории " +
-                format.format(expiration_date) + " в личном кабинете на Mos.ru.");
+        requestStatus.setReasonText("Вашему ребенку " + fio + " назначено питание за счет средств бюджета города Москвы, которое будет предоставляться с ближайшего дня поступления в школу питания на вашего ребенка.\n" +
+                "При необходимости Вы можете отказаться от получения услуги до конца срока действия льготной категории в личном кабинете на Mos.ru");
         coordinateData.setStatus(requestStatus);
 
         coordinateMessage.setCoordinateDataMessage(coordinateData);
@@ -271,8 +269,8 @@ public class ETPMVProactiveService {
         return sw.toString();
     }
 
-    public void sendMSPAssignedMessage(Client client, Client guardian, Integer dtisznCode, String clientFIO, String ssoid, Date expiration_date) {
-        sendMessage(client, guardian, dtisznCode, generateServiceNumber(), ssoid, clientFIO, expiration_date);
+    public void sendMSPAssignedMessage(Client client, Client guardian, Integer dtisznCode, String clientFIO, String ssoid) {
+        sendMessage(client, guardian, dtisznCode, generateServiceNumber(), ssoid, clientFIO);
     }
 
     public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotificationStatus) throws Exception {
