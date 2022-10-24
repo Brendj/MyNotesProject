@@ -77,7 +77,7 @@ public class AccountsRegistryHandler {
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
 
-        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrgs);
+        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeAndBlockedWithTransitionStateByOrg(idOfOrgs);
         for (Card card : allFreeByOrg) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
@@ -166,7 +166,7 @@ public class AccountsRegistryHandler {
             accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
         }*/
 
-        List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
+        List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDateAndBlockedWithTransitionState(idOfOrgs,lastAccRegistrySyncDate);
         for (Card card : freeCards) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
