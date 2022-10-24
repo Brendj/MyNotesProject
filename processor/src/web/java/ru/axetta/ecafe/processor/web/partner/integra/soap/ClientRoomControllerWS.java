@@ -2284,6 +2284,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         ObjectFactory objectFactory = new ObjectFactory();
         Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getOrgByContractId(contractId);
+        if(org == null) {
+            PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+            return result;
+        }
         if (!org.getUseWebArm()) {
             return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
         } else {
