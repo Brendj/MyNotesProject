@@ -1646,7 +1646,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         session.merge(clientGuardian);
                     }
                 }
-
+                if (guardian.isActiveAdultGroup()) {
+                    if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
+                        createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
+                    }
+                }
                 if (guardian.isLeaving()){
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
                     ClientManager.createClientGroupMigrationHistoryLite(
