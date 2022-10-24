@@ -2284,6 +2284,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         ObjectFactory objectFactory = new ObjectFactory();
         Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getOrgByContractId(contractId);
+        if(org == null) {
+            PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+            return result;
+        }
         if (!org.getUseWebArm()) {
             return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
         } else {
@@ -2482,7 +2488,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         purchaseWithDetailsElementExt.setfRation(od.getfRation());
                     }
                     // если пришли с синхронизацией - od.idOfDish должно быть заполнено (od.idOfComplex?)
-                    if (od.getIdOfDish() != null) {
+                    if (od.getIdOfDish() != null && dishes != null) {
                         WtDish wtDish = findWtDishByOrderDetail(od.getIdOfDish(), dishes);
                         if (wtDish != null) {
                             purchaseWithDetailsElementExt
