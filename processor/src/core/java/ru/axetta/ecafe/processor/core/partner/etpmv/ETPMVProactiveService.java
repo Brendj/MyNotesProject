@@ -256,7 +256,7 @@ public class ETPMVProactiveService {
         statusType.setStatusCode(0);
         statusType.setStatusDate(calendarRequest);
         requestStatus.setStatus(statusType);
-        requestStatus.setReasonText("Вашему ребенку " + fio + " назначено питание за счет средств бюджета города Москвы, которое будет предоставляться с ближайшего дня поступления в школу питания на вашего ребенка.\n" +
+        requestStatus.setReasonText("Вашему ребенку (" + fio + ") назначено питание за счет средств бюджета города Москвы, которое будет предоставляться с ближайшего дня поступления в школу питания на вашего ребенка.\n" +
                 "При необходимости Вы можете отказаться от получения услуги до конца срока действия льготной категории в личном кабинете на Mos.ru");
         coordinateData.setStatus(requestStatus);
 
