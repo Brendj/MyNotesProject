@@ -153,14 +153,15 @@ public class MealsController extends Application {
                         return mealsPOJO.getResponseEntity();
                     mealsService.setFoodBoxOrgReqCurr(persistenceSession, foodBoxOrgReq, foodBoxOrgReq.getCurrentversion() + 1);
                     persistenceTransaction.commit();
+                    persistenceTransaction = null;
                     CancelledFoodBoxService.currentFoodBoxPreorders.put(mealsPOJO.getFoodBoxPreorder().getIdFoodBoxPreorder(),
                             mealsPOJO.getFoodBoxPreorder().getCreateDate());
                     val = true;
                     return mealsPOJO.getResponseEntity();
                 } catch (Exception e) {
                     val = false;
-                    HibernateUtils.rollback(persistenceTransaction, logger);
                 } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
                     HibernateUtils.close(persistenceSession, logger);
                 }
                 logger.info("end id = " + id + " th = " + idT + " count = " + counter);
