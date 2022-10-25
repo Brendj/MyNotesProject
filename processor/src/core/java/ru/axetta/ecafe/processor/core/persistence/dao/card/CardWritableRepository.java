@@ -364,6 +364,31 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
+    //https://yt.iteco.dev/issue/ISPP-1283
+    public int fillClientOrVisitor(CardsOperationsRegistryItem o,  long idOfOrg, int mode) {
+        Client client = ClientReadOnlyRepository.getInstance().findById(o.getIdOfClient());
+        String condition = o.getOrgOwner() == null ? " and idOfOrg in :idOfOrgs" : " and idOfOrg = :idOfOrg";
+        String clientOrVisitor = (mode == 1 ? "client = :client, visitor = null," : "client = null, visitor = :client, ");
+        Query query = entityManager.createQuery("update Card set "
+                + clientOrVisitor
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime "
+                + " where cardNo = :cardNo"
+                + condition);
+
+        query.setParameter("client", client);
+        query.setParameter("issueTime", o.getOperationDate());
+        query.setParameter("updateTime", new Date());
+        query.setParameter("cardNo", o.getCardNo());
+        if (o.getOrgOwner() == null) {
+            query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
+        } else {
+            query.setParameter("idOfOrg", o.getOrgOwner());
+        }
+
+        return query.executeUpdate();
+    }
+
     public int issueToClient(CardsOperationsRegistryItem o,  long idOfOrg) {
         if (o.getRequestGuid() != null) {
             Card card = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
