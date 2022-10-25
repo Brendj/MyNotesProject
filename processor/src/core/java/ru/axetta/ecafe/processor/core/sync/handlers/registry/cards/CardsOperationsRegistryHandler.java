@@ -93,7 +93,7 @@ public class CardsOperationsRegistryHandler {
         }
         if (transitionState == CardTransitionState.GIVEN_AWAY.getCode() && state == CardState.BLOCKED.getValue()) {
             if (o.getType() == 7) {
-                return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+                return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
             }
             if (o.getType() == 1 || o.getType() == 2) {
                 return cardService.fillClient(o, idOfOrg);
