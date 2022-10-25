@@ -2272,6 +2272,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "longCardNo") Long longCardNo)
             throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
+        logger.info(String.format("Incoming unblockOrReturnCard request: cardNo=%s, idOfOrg=%s, longCardNo=%s",
+                cardNo, idOfOrg, longCardNo));
         if(longCardNo != null && longCardNo.equals(-1L)){ // Если АРМ прислал -1, то считать поле как NULL
             longCardNo = null;
         }
