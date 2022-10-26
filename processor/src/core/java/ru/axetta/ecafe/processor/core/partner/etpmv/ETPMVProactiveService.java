@@ -125,6 +125,7 @@ public class ETPMVProactiveService {
 
         //Пользователь портала отказывается от ЛП для обучающегося.
         if (StatusETPMessageType.REFUSAL.getCode().equals(code.toString())) {
+            daoService.saveProactiveMessageStatus(proactiveMessage, StatusETPMessageType.REFUSAL);
             if (proactiveMessage.getClient() != null) {
                 DiscountManager.disableAllDiscounts(proactiveMessage.getClient());
                 //ИСПП отправляет сообщение порталу об отказе от услуги ЛП пользователем со статусом 1080.1 через очередь ЕТП МВ pp.notification_status_out
