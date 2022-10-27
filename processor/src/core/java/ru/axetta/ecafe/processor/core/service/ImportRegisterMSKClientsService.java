@@ -68,18 +68,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     @Autowired
     ClientMskNSIService nsiService;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterMSKClientsService.class);
-    private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
     private static final long MILLISECONDS_IN_DAY = 86400000L;
     private static final int MAX_THREADS = 10;
-
-
-    /*@PostConstruct
-    private void clearOrgSyncsRegistryTable() {
-        if (RuntimeContext.getInstance().isMainNode()) {
-            DAOService.getInstance().clearOrgSyncsRegistryTable();
-        }
-    }*/
 
     protected RegistryChange getRegistryChangeClassInstance() {
         return new RegistryChange();
@@ -100,20 +92,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 .setOptionValueWithSave(Option.OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, dateFormat.format(date));
     }
 
-
-    private Date getLastUpdateDate() {
-        try {
-            String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_AUTOSYNC_UPD_TIME);
-            if (d == null || d.length() < 1) {
-                return new Date(0);
-            }
-            return dateFormat.parse(d);
-        } catch (Exception e) {
-            logError("Failed to parse date from options", e, null);
-        }
-        return new Date(0);
-    }
-
     public StringBuffer runSyncForOrg(long idOfOrg, boolean performChanges) throws Exception {
         Org org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
         if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
@@ -129,7 +107,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     public class WorkerThread implements Runnable {
 
-        private String command;
+        private final String command;
         private List<Org> orgs;
 
         public WorkerThread(String s) {
@@ -172,7 +150,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         }
                     }
                     if (attempt >= maxAttempts) {
-                        logError("Неудалось подключиться к сервису, превышено максимальное количество попыток ("
+                        logError("Не удалось подключиться к сервису, превышено максимальное количество попыток ("
                                 + maxAttempts + ")", null, null);
                     }
                 }
@@ -189,7 +167,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     protected List<List<Org>> buildOrgsPack(List<Org> orgs, int threadsCount) {
-        List<List<Org>> result = new ArrayList<List<Org>>();
+        List<List<Org>> result = new LinkedList<>();
 
         int l = 0;
         int i = 0;
@@ -200,7 +178,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             if (result.size() > l) {
                 list = result.get(l);
             } else {
-                list = new ArrayList<Org>();
+                list = new LinkedList<>();
                 result.add(list);
             }
             list.add(o);
@@ -226,7 +204,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             return;
         }
 
-        RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).checkRegistryChangesValidity();
+        RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
+                .checkRegistryChangesValidity();
 
         if (!isOn()) {
             return;
@@ -250,44 +229,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         setLastUpdateDate(new Date(System.currentTimeMillis()));
         log("Finished import register", null);
     }
-
-    /*public void prevRun() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            return;
-        }
-        List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
-        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                .checkRegistryChangesValidity();
-
-        int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
-        for (Org org : orgs) {
-            if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
-                continue;
-            }
-            int attempt = 0;
-            while (attempt < maxAttempts) {
-                try {
-                    RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                            .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
-                    break;
-                } catch (SocketTimeoutException ste) {
-                } catch (Exception e) {
-                    logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e, null);
-                    break;
-                } finally {
-                    attempt++;
-                }
-            }
-            if (attempt >= maxAttempts) {
-                logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts
-                        + ")", null, null);
-            }
-        }
-        //  Если была хотя бы одна неудачная загрузка данных с сервиса, время последный синхронизации не обновляем!
-        //if (allOperationsAreFinished) {
-        setLastUpdateDate(new Date(System.currentTimeMillis()));
-        //}
-    }*/
 
     @Transactional
     public void checkRegistryChangesValidity() {
@@ -344,22 +285,12 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     public List<Client> findClientsByMeshGuids(List<String> guids) {
         if(CollectionUtils.isEmpty(guids)){
-            return new ArrayList<Client>();
+            return new LinkedList<>();
         }
         javax.persistence.Query q = em.createQuery("from Client where meshGUID in :guids");
         q.setParameter("guids", guids);
         List<Client> result = q.getResultList();
-        return result != null ? result : new ArrayList<Client>();
-    }
-
-    public List<Client> findClientsByNSIGuids(List<String> guids) {
-        if(CollectionUtils.isEmpty(guids)){
-            return new ArrayList<Client>();
-        }
-        javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
-        q.setParameter("guids", guids);
-        List<Client> result = q.getResultList();
-        return result != null ? result : new ArrayList<Client>();
+        return result != null ? result : new LinkedList<>();
     }
 
     protected String getPupilGuid(String guid) {
@@ -402,83 +333,16 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
         }
 
-        List<String> pupilsNSIGuidList = new LinkedList<>();
-        for (ExpandedPupilInfo pupil : pupils) {
-            if(StringUtils.isNotEmpty(pupil.getMeshGUID())) {
-                pupilsNSIGuidList.add(getPupilGuid(pupil.getGuid()));
-            }
-        }
-
         List<Client> findByGuidsList = findClientsByMeshGuids(pupilsMeshGuidList);
         Map<String, Client> meshGuidMap = new HashMap<>();
         for(Client client : findByGuidsList){
             meshGuidMap.put(client.getMeshGUID(), client);
         }
 
-        findByGuidsList = findClientsByNSIGuids(pupilsNSIGuidList);
-        Map<String, Client> nsiGuidMap = new HashMap<>();
-        for(Client client : findByGuidsList){
-            nsiGuidMap.put(client.getClientGUID(), client);
-        }
-
-        //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
-        //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
-        /*
-        List<Client> currentClients = findClientsWithoutPredefinedForOrgAndFriendly(org);
-        if (deleteClientsIfNotFound) { // Заглушено в рамках логики функционала сверки с МЭШ.Контингент
-            //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
-            //  отправляем уведомление на email
-            List<Client> clientsToRemove = new ArrayList<Client>();
-            for (Client dbClient : currentClients) {
-                boolean found = false;
-                for (ExpandedPupilInfo pupil : pupils) {
-                    if (!StringUtils.isEmpty(getPupilGuid(emptyIfNull(pupil.getGuid()))) && getClientGuid(dbClient) != null && getPupilGuid(pupil.getGuid())
-                            .equals(getClientGuid(dbClient))) {
-                        found = true;
-                        break;
-                    }
-                }
-                try {
-                    ClientGroup currGroup = dbClient.getClientGroup();
-                    if (currGroup != null && isProperGroup(currGroup)) {
-                        break;
-                    }
-                    //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
-                    //  увеличиваем количество клиентов, подлежащих удалению
-                    Long currGroupId =
-                            currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if(currGroupId != null &&
-                       (currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) ||
-                        currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
-                        continue;
-                    }
-                    if (emptyIfNull(getClientGuid(dbClient)).equals("") || !found) {
-                        log(synchDate + "Удаление " +
-                                emptyIfNull(getClientGuid(dbClient)) + ", " + emptyIfNull(
-                                dbClient.getPerson().getSurname()) + " " +
-                                emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
-                                dbClient.getPerson().getSecondName()) + ", " +
-                                emptyIfNull(dbClient.getClientGroup() == null ? ""
-                                        : dbClient.getClientGroup().getGroupName()), logBuffer);
-                        addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, false);
-                    }
-                } catch (Exception e) {
-                    logError("Failed to delete client " + dbClient, e, logBuffer);
-                }
-            }
-        }*/
-
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
             if (pupil.deleted) {
                 Client dbClient = meshGuidMap.get(emptyIfNull(pupil.getMeshGUID()));
-                if (dbClient == null ) {
-                    dbClient = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
-                    if(dbClient != null && StringUtils.isNotEmpty(dbClient.getMeshGUID())){
-                        continue;
-                    }
-                }
                 if (dbClient == null || dbClient.isDeletedOrLeaving()) {
                     continue;
                 }
@@ -492,9 +356,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 FieldProcessor.Config fieldConfig;
                 boolean updateClient = false;
                 Client cl = meshGuidMap.get(getPupilGuid(emptyIfNull(pupil.getMeshGUID())));
-                if (cl == null) {
-                    cl = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
-                }
                 if (cl == null) {
                     fieldConfig = new ClientManager.ClientFieldConfig();
                 } else {
@@ -620,20 +481,20 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     public String getCategoriesString(String categoriesDSZN, String clientCategories,
             Map<Long, CategoryDiscount> categoryMap, Map<Integer, CategoryDiscountDSZN> categoryDSZNMap) {
-        List<Long> categoriesList = new ArrayList<Long>();
+        List<Long> categoriesList = new LinkedList<>();
         for(String c : clientCategories.split(",")) {
             if(StringUtils.isNotEmpty(c)) {
                 categoriesList.add(Long.valueOf(c));
             }
         }
-        List<Integer> categoriesDSZNList = new ArrayList<Integer>();
+        List<Integer> categoriesDSZNList = new LinkedList<>();
         for(String c : categoriesDSZN.split(",")) {
             if(StringUtils.isNotEmpty(c)) {
                 categoriesDSZNList.add(Integer.valueOf(c));
             }
         }
 
-        Set<Long> resultCategories = new TreeSet<Long>();
+        Set<Long> resultCategories = new TreeSet<>();
         for(Long c : categoriesList) {
             if(categoryMap.get(c) != null && !(categoryMap.get(c).getCategoriesDiscountDSZN().size() > 0)) {
                 resultCategories.add(c);
@@ -653,14 +514,14 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         if(StringUtils.isEmpty(newCategories) && StringUtils.isEmpty(oldCategories)) {
             return false;
         }
-        Set<String> newCategoriesSet = new HashSet<String>(Arrays.asList(newCategories.split(",")));
-        Set<String> oldCategoriesSet = new HashSet<String>(Arrays.asList(oldCategories.split(",")));
+        Set<String> newCategoriesSet = new HashSet<>(Arrays.asList(newCategories.split(",")));
+        Set<String> oldCategoriesSet = new HashSet<>(Arrays.asList(oldCategories.split(",")));
         return !newCategoriesSet.equals(oldCategoriesSet);
     }
 
     @SuppressWarnings("unchecked")
     public static Map<Long, CategoryDiscount> getCategoriesMap(Session session) {
-        Map<Long, CategoryDiscount> result = new HashMap<Long, CategoryDiscount>();
+        Map<Long, CategoryDiscount> result = new HashMap<>();
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
         List<CategoryDiscount> list = criteria.list();
         for(CategoryDiscount categoryDiscount : list) {
@@ -671,7 +532,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     @SuppressWarnings("unchecked")
     public static Map<Integer, CategoryDiscountDSZN> getCategoriesDSZNMap(Session session) {
-        Map<Integer, CategoryDiscountDSZN> result = new HashMap<Integer, CategoryDiscountDSZN>();
+        Map<Integer, CategoryDiscountDSZN> result = new HashMap<>();
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         List<CategoryDiscountDSZN> list = criteria.list();
         for(CategoryDiscountDSZN categoryDiscountDSZN : list) {
@@ -811,7 +672,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
 
             if (guardianInfoList != null && !guardianInfoList.isEmpty()) {
-                Set<RegistryChangeGuardians> registryChangeGuardiansSet = new HashSet<RegistryChangeGuardians>();
+                Set<RegistryChangeGuardians> registryChangeGuardiansSet = new HashSet<>();
 
                 for (GuardianInfo guardianInfo : guardianInfoList) {
                     RegistryChangeGuardians guardians = new RegistryChangeGuardians(guardianInfo.getFamilyName(),
@@ -870,8 +731,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     private static Set<Long> getCategoriesByDSZNCodes(Session session, String clientBenefitDSZN, String oldDiscounts) {
-        Set<Long> newDiscountsIds = new TreeSet<Long>();
-        List<Long> oldDiscountsIds = new ArrayList<Long>();
+        Set<Long> newDiscountsIds = new TreeSet<>();
+        List<Long> oldDiscountsIds = new LinkedList<>();
         for(String o : oldDiscounts.split(",")) {
             if(StringUtils.isNotEmpty(o)) {
                 oldDiscountsIds.add(Long.parseLong(o));
@@ -890,7 +751,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
 
         if(StringUtils.isNotEmpty(clientBenefitDSZN)) {
-            List<Integer> benefitsList = new ArrayList<Integer>();
+            List<Integer> benefitsList = new LinkedList<>();
             for(String s : clientBenefitDSZN.split(",")) {
                 if(StringUtils.isNotEmpty(s)) {
                     benefitsList.add(Integer.valueOf(s));
@@ -962,225 +823,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         sess.save(ch);
     }
 
-
-    /*@Transactional
-    public void parseClients(String synchDate, String date, Org org, List<ExpandedPupilInfo> pupils,
-            boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
-        log(synchDate + "Синхронизация списков начата для " + org.getOfficialName() + (performChanges ? ""
-                : " РЕЖИМ БЕЗ ПРИМЕНЕНИЯ ИЗМЕНЕНИЙ"), logBuffer);
-
-
-        //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
-        Session session = (Session) em.getDelegate();
-        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
-        List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
-        //orgsList.add(org);
-
-        List<String> pupilsGuidList = new ArrayList<String>();
-        for (ExpandedPupilInfo pupil : pupils) {
-            if(pupil.getGuid() != null && !pupil.getGuid().isEmpty()) {
-                pupilsGuidList.add(pupil.getGuid());
-            }
-        }
-
-        List<Client> findByGuidsList = DAOUtils.findClientsByGuids(em, pupilsGuidList);
-        Map<String, Client> guidMap = new HashMap<String, Client>();
-        for(Client client : findByGuidsList){
-            guidMap.put(client.getClientGUID(), client);
-        }
-
-        //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
-        //  отправляем уведомление на email
-        List<Client> clientsToRemove = new ArrayList<Client>();
-        for (Client dbClient : currentClients) {
-            boolean found = false;
-            for (ExpandedPupilInfo pupil : pupils) {
-                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
-                        .equals(dbClient.getClientGUID())) {
-                    found = true;
-                    break;
-                }
-            }
-            ClientGroup currGroup = dbClient.getClientGroup();
-            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
-            //  увеличиваем количество клиентов, подлежих удалению
-            Long currGroupId = currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
-                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
-                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
-                clientsToRemove.add(dbClient);
-            }
-        }
-        //log(synchDate + "Найдено " + (removedClientsCount) + " клиентов, подлженщих удалению");
-        if (clientsToRemove.size() > MAX_CLIENTS_PER_TRANSACTION && !manualCheckout) {
-            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org
-                    .getOfficialName() + " {" + org.getIdOfOrg()
-                    + "}. В целях безопасности автоматическое обновление прекращено.";
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            if (runtimeContext != null) {
-                try {
-                    String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
-                    String subject = "Синхронизация с Реестрами";
-                    List<File> files = new ArrayList<File>();
-                    runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
-                } catch (Exception e) {
-                    logError("Ошибка при отправке уведомления", e, logBuffer);
-                }
-            }
-            logError(text, null, logBuffer);
-            return;
-        }
-
-
-        //  Удаляем найденных клиентов
-        for (Client dbClient : clientsToRemove) {
-            ClientGroup clientGroup = DAOUtils
-                    .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
-                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-            if (clientGroup == null) {
-                clientGroup = DAOUtils.createClientGroup(session, dbClient.getOrg().getIdOfOrg(),
-                        ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-            }
-            log(synchDate + "Удаление " +
-                    emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname()) + " "
-                    +
-                    emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
-                    dbClient.getPerson().getSecondName()) + ", " +
-                    emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
-                    logBuffer);
-            if (performChanges) {
-                dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                session.save(dbClient);
-            }
-        }
-
-        //  Начинаем работать с поступившем списком клиентов - для начала, УДАЛЯЕМ
-        /*for (Client dbClient : currentClients) {
-            boolean found = false;
-            for (ExpandedPupilInfo pupil : pupils) {
-                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
-                        .equals(dbClient.getClientGUID())) {
-                    found = true;
-                    break;
-                }
-            }
-            ClientGroup currGroup = dbClient.getClientGroup();
-            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", то заносим его в эту группу
-            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
-                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()
-                            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
-                ClientGroup clientGroup = DAOUtils
-                        .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
-                                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                if (clientGroup == null) {
-                    clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(),
-                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                }
-                log(synchDate + "Удаление " +
-                        emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
-                        + " " +
-                        emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
-                        dbClient.getPerson().getSecondName()) + ", " +
-                        emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
-                if (performChanges) {
-                    dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                    session.save(dbClient);
-                }
-            }
-        }
-
-        //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
-        for (ExpandedPupilInfo pupil : pupils) {
-            FieldProcessor.Config fieldConfig;
-            boolean updateClient = false;
-            Client cl = guidMap.get(emptyIfNull(pupil.getGuid()));
-            if (cl == null) {
-                fieldConfig = new ClientManager.ClientFieldConfig();
-            } else {
-                fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-            }
-
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
-                    cl == null ? null : cl.getClientGUID(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
-                    cl == null ? null : cl.getPerson().getSurname(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
-                    cl == null ? null : cl.getPerson().getFirstName(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
-                    cl == null ? null : cl.getPerson().getSecondName(), updateClient);
-            if (pupil.getGroup() != null) {
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
-                        updateClient);
-            }
-            //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
-            boolean guidFound = false;
-            for (Org o : orgsList) {
-                if (o.getGuid().equals(pupil.get)) {
-                    guidFound = true;
-                    break;
-                }
-            }
-            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
-                Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
-                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
-                        cl.getPerson().getSurname()) + " " +
-                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
-                        + ", " +
-                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
-                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg(), logBuffer);
-                if (performChanges) {
-                    cl.setOrg(newOrg);
-                }
-                updateClient = true;
-            }
-
-
-            if (!updateClient) {
-                continue;
-            }
-            try {
-                //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
-                if (cl == null) {
-                    try {
-                        log(synchDate + "Добавление " + pupil.getGuid() + ", " +
-                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
-                                pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
-                        fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
-                                String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
-                        if (performChanges) {
-                            String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-                            ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
-                                    (ClientManager.ClientFieldConfig) fieldConfig, true, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
-                        }
-                    } catch (Exception e) {
-                        // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
-                        logError("Ошибка добавления клиента", e, logBuffer);
-                    }
-                    //  Иначе - обновляем клиента в БД
-                } else {
-                    log(synchDate + "Изменение " +
-                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
-                            cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на "
-                            +
-                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
-                            + emptyIfNull(pupil.getFirstName()) + " " +
-                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
-                    if (performChanges) {
-                        ClientManager
-                                .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig,
-                                        org, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session, true);
-                    }
-                }
-            } catch (Exception e) {
-                logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
-            }
-        }
-        log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
-    }*/
-
     public static class OrgRegistryGUIDInfo {
         Set<String> orgGuids;
         String guidInfo;
@@ -1190,7 +832,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOReadonlyService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
-            orgGuids = new HashSet<String>();
+            orgGuids = new HashSet<>();
             guidInfo = "";
             orgNSIIds = new HashSet<>();
             orgNSIIdsLong = new HashSet<>();
@@ -1259,7 +901,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             boolean fullNameValidation, String groupName, ClientsMobileHistory clientsMobileHistory, ClientGuardianHistory clientGuardianHistory) throws Exception {
         Session session = null;
         Transaction transaction = null;
-        List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
+        List<RegistryChangeCallback> result = new LinkedList<>();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             List<RegistryChange> registryChangeList = getRegistryChangeList(session, changesList); //получаем список объектов разногласий
@@ -1292,13 +934,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     transaction.commit();
                     transaction = null;
                     session.close();
-                    /*if (change.getIdOfClient() != null) {
-                        try {
-                            saveClientGuardians(change, iterator);
-                        } catch (Exception e) {
-                            logger.error("Error creating guardian: ", e);
-                        }
-                    }*/
                     result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), ""));
                 } catch (Exception e) {
                     logger.error("Error ClientRegistryChange: ", e);
@@ -1348,7 +983,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             }
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
 
-            Boolean migration = false;
+            boolean migration = false;
 
             String group = groupName == null ? change.getGroupName() : groupName;
             ClientGroup beforeMigrationGroup = null;
@@ -1362,7 +997,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
                     String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                     String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
-                    FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
+                    ClientManager.ClientFieldConfig createConfig = new ClientManager.ClientFieldConfig();
                     Long contractId = getNextContractIdFromList(iterator);
                     if (contractId != null) {
                         createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
@@ -1390,7 +1025,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
                     createConfig.setValue(ClientManager.FieldId.CREATED_FROM, Integer.toString(ClientCreatedFromType.REGISTRY.getValue()));
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation,
+                            createConfig, fullNameValidation,
                             session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate), clientsMobileHistory);
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
@@ -1467,7 +1102,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     checkGroupNamesToOrgs(session, group, change.getIdOfOrg());
 
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-                    FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
+                    ClientManager.ClientFieldConfigForUpdate modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                     setGuidFromChange(modifyConfig, change);
                     modifyConfig.setValue(ClientManager.FieldId.MESH_GUID, change.getMeshGUID());
                     modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
@@ -1481,7 +1116,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
-                    ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
+                    ClientManager.modifyClientTransactionFree(modifyConfig,
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
                             dbClient, session, true, clientsMobileHistory);
 
@@ -1546,7 +1181,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         if (deleteCommentsAdds != null && deleteCommentsAdds.length() > 0) {
             String comments = dbClient.getRemarks();
             if (comments==null) comments="";
-            if (comments.indexOf("{%") > -1) {
+            if (comments.contains("{%")) {
                 comments = comments.substring(0, comments.indexOf("{%")) + comments
                         .substring(comments.indexOf("%}") + 1);
             }
@@ -1723,7 +1358,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     private static List<GuardianInfo> emptyIfNull(List<GuardianInfo> list) {
-        return list.isEmpty() ? new ArrayList<GuardianInfo>() : list;
+        return list.isEmpty() ? new LinkedList<>() : list;
     }
 
     public static void log(String str, StringBuffer logBuffer) {
@@ -1747,13 +1382,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public static boolean isPupilIgnoredFromImport(String guid, String group) {
-        /*if (group != null && group.toLowerCase().startsWith("дошкол")) {
-            return true;
-        }*/
-        if (guid == null || guid.length() == 0) {
-            return true;
-        }
-        return false;
+        return guid == null || guid.length() == 0;
     }
 
     public static class ExpandedPupilInfo {
@@ -1775,7 +1404,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         public String meshGUID;
         public Long orgId;
 
-        public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
+        public List<GuardianInfo> guardianInfoList = new LinkedList<>();
 
         public boolean isDeleted() {
             return deleted;

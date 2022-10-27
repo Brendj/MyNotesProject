@@ -2505,10 +2505,10 @@ public class ClientManager {
                 }
                 boolean deactivateGuardianship = guardian.isParent() || guardian.isSotrudnikMsk() || guardian.isEmployee();
                 if (deactivateGuardianship) {
-                    Long version = generateNewClientGuardianVersion(session);
-                    ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
-                    clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
-                    clientGuardian.disable(version);
+                    //Long version = generateNewClientGuardianVersion(session);
+                    //ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    //clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
+                    //clientGuardian.disable(version);
                     if (guardian.isParent() && !otherChildrenExist) {
                         ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
@@ -2519,7 +2519,7 @@ public class ClientManager {
                         guardian.setClientRegistryVersion(clientRegistryVersion);
                         session.update(guardian);
                     }
-                    session.update(clientGuardian);
+                    //session.update(clientGuardian);
                 }
             }
         } catch (Exception e) {
