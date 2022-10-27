@@ -13,6 +13,7 @@ public class ResFoodBoxChangedItem {
     private Integer Res;
     private String error;
     private Long version;
+    private Integer state;
 
     public ResFoodBoxChangedItem() {
     }
@@ -23,6 +24,7 @@ public class ResFoodBoxChangedItem {
         XMLUtils.setAttributeIfNotNull(element, "Res", Res);
         XMLUtils.setAttributeIfNotNull(element, "Error", error);
         XMLUtils.setAttributeIfNotNull(element, "V", version);
+        XMLUtils.setAttributeIfNotNull(element, "State", state);
         return element;
     }
 
@@ -56,5 +58,13 @@ public class ResFoodBoxChangedItem {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

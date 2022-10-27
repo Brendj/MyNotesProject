@@ -1336,15 +1336,20 @@ public class DAOReadonlyService {
                 Object[] row = (Object[]) o;
                 Long startDate = ((Timestamp) row[1]).getTime();
                 Long endDate = ((Timestamp) row[2]).getTime();
-                if (date.getTime() >= startDate && date.getTime() <= endDate)
-                    dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+                if (date.getTime() >= startDate && date.getTime() <= endDate) {
+                    WtDish wtDish = entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue());
+                    if (!dishes.contains(wtDish))
+                        dishes.add(wtDish);
+                }
             }
         }
         else
         {
             for (Object o : list) {
                 Object[] row = (Object[]) o;
-                dishes.add(entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue()));
+                WtDish wtDish = entityManager.find(WtDish.class, ((BigInteger) row[0]).longValue());
+                if (!dishes.contains(wtDish))
+                    dishes.add(wtDish);
             }
         }
         return dishes;
@@ -1561,6 +1566,36 @@ public class DAOReadonlyService {
 
     public Client getClientByContractId(long contractId) {
         return DAOUtils.findClientByContractId(entityManager, contractId);
+    }
+
+    public Client getClientWithOrgByContractId(long contractid) {
+        try {
+            Query query = entityManager.createQuery("select c from Client c join fetch c.org where c.contractId = :contractid");
+            query.setParameter("contractid", contractid);
+            return (Client) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Client getClientWithOrgByMeshGuid(String meshguid) {
+        try {
+            Query query = entityManager.createQuery("select c from Client c join fetch c.org where c.meshGUID = :meshguid");
+            query.setParameter("meshguid", meshguid);
+            return (Client) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public FoodBoxOrgReq getFooboxOrgReq (Org org) {
+        try {
+            Query query = entityManager.createQuery("select fb from FoodBoxOrgReq fb where fb.org=:org");
+            query.setParameter("org", org);
+            return  (FoodBoxOrgReq) query.getSingleResult();
+        } catch (NoResultException  e) {
+            return null;
+        }
     }
 
     public List<Client> findClientsBySan(String san) {

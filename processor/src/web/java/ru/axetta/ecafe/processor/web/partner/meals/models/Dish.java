@@ -1,6 +1,9 @@
 package ru.axetta.ecafe.processor.web.partner.meals.models;
 
 
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
@@ -22,7 +25,19 @@ public class Dish {
         return this;
     }
 
-
+    public Dish(WtDish wtDish)
+    {
+        this.id = wtDish.getIdOfDish();
+        this.code = wtDish.getBarcode();
+        this.name = wtDish.getDishName();
+        this.price = wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
+        this.ingredients = wtDish.getComponentsOfDish();
+        this.calories = wtDish.getCalories();
+        this.weight = wtDish.getQty();
+        this.protein = wtDish.getProtein();
+        this.fat = wtDish.getFat();
+        this.carbohydrates = wtDish.getCarbohydrates();
+    }
 
     /**
      * Идентификатор блюда.
