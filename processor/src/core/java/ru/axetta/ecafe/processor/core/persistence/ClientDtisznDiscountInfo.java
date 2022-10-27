@@ -26,9 +26,10 @@ public class ClientDtisznDiscountInfo {
     private String source;
     private Boolean sendnotification;
     private Date archiveDate;
+    private Date updatedAt;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
-            Date dateStart, Date dateEnd, Date createdDate, String source, Long version) {
+            Date dateStart, Date dateEnd, Date createdDate, String source, Long version, Date updatedAt) {
         this.client = client;
         this.dtisznCode = dtisznCode;
         this.dtisznDescription = dtisznDescription;
@@ -42,6 +43,7 @@ public class ClientDtisznDiscountInfo {
         this.createdDateInternal = new Date();
         this.lastReceivedDate = new Date();
         this.source = source;
+        this.updatedAt = updatedAt;
     }
 
     public ClientDtisznDiscountInfo() {
@@ -182,5 +184,13 @@ public class ClientDtisznDiscountInfo {
 
     public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -622,6 +622,36 @@ public class DTSZNDiscountsReviseService {
             }
         }
 
+        final Set<Integer> dtsznCodes = new HashSet<>();
+
+        for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
+            dtsznCodes.add(item.getDsznCode());
+        }
+
+        List<ReviseDAOService.DiscountItem> discountItemListTemp
+                = new ArrayList<ReviseDAOService.DiscountItem>(discountItemList.getItems());
+
+        for (Integer dtsznCode : dtsznCodes) {
+            ReviseDAOService.DiscountItem prevMax = null;
+            for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
+                if(item.getDsznCode().equals(dtsznCode)){
+                    if(prevMax == null){
+                        prevMax = item;
+                        continue;
+                    }
+                    if(item.getUpdatedAt().after(prevMax.getUpdatedAt())){
+                        discountItemListTemp.remove(prevMax);
+                        prevMax = item;
+                    }
+                    else {
+                        discountItemListTemp.remove(item);
+                    }
+                }
+            }
+        }
+
+        discountItemList.setItems(discountItemListTemp);
+
         Date fireTime = new Date();
         Session session = null;
         Transaction transaction = null;
@@ -682,7 +712,7 @@ public class DTSZNDiscountsReviseService {
                     discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(), item.getTitle(),
                             item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
                                     : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
-                            item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                            item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt());
                     discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                             || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                     session.save(discountInfo);
@@ -692,6 +722,13 @@ public class DTSZNDiscountsReviseService {
                         // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
                         // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
                         boolean wasModified = false;
+
+                        if (discountInfo.getUpdatedAt() != null) {
+                            if (discountInfo.getUpdatedAt().before(item.getUpdatedAt())) {
+                                discountInfo.setUpdatedAt(item.getUpdatedAt());
+                                wasModified = true;
+                            }
+                        }
                         if (!discountInfo.getDateStart().equals(item.getSdDszn())) {
                             discountInfo.setDateStart(item.getSdDszn());
                             wasModified = true;
@@ -726,9 +763,14 @@ public class DTSZNDiscountsReviseService {
                         if (wasModified) {
                             discountInfo.setVersion(clientDTISZNDiscountVersion);
                             discountInfo.setLastUpdate(new Date());
+                            if (discountInfo.getUpdatedAt() == null) {
+                                discountInfo.setUpdatedAt(item.getUpdatedAt());
+                            }
                         }
                         discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_OU);
+
                         session.merge(discountInfo);
+
                         logger.info(String.format("ClientDtisznDiscountInfo OK. wasModified: %s", wasModified ? "true" : "false"));
                         if(wasModified){
                             service.saveChangeHistoryByDiscountInfo(session, discountInfo,
@@ -744,7 +786,7 @@ public class DTSZNDiscountsReviseService {
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
                                 item.getTitle(), item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
                                 : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
-                                item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                                item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion, item.getUpdatedAt());
                         discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
                                 || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                         session.save(discountInfo);
