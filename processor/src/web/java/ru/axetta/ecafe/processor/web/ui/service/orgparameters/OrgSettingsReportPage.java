@@ -75,6 +75,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allUseGovernmentContract = true;
     private Boolean allUseMealSchedule = true;
     private Boolean allNewСashierMode = true;
+    private Boolean allDisableSocCardsReg = true;
 
     private void resetSelectedColumns() {
         allUseWebArmAdmin = true;
@@ -225,6 +226,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     break;
                 case 15:
                     item.setNewСashierMode(allNewСashierMode);
+                    break;
+                case 16:
+                    item.setDisableSocCardsReg(allDisableSocCardsReg);
                     break;
             }
             item.change();
@@ -399,6 +403,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setOrgSettingsSyncParam(Boolean.TRUE);
                     org.setGovernmentContract(item.getGovernmentContract());
                     org.setNewСashierMode(item.getNewСashierMode());
+                    org.setDisableSocCardsReg(item.getDisableSocCardsReg());
                     session.update(org);
 
                     logger.info("Success");
@@ -640,5 +645,13 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllNewСashierMode(Boolean allNewСashierMode) {
         this.allNewСashierMode = allNewСashierMode;
+    }
+
+    public Boolean getAllDisableSocCardsReg() {
+        return allDisableSocCardsReg;
+    }
+
+    public void setAllDisableSocCardsReg(Boolean allDisableSocCardsReg) {
+        this.allDisableSocCardsReg = allDisableSocCardsReg;
     }
 }

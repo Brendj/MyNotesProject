@@ -322,6 +322,8 @@ rendered="#{mainPage.isEligibleToEditOrgs()}">
         <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.multiCardModeEnabled}" styleClass="input-text" />
         <h:outputText escape="true" value="Использовать длинные идентификаторы ЭИ" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.useLongCardNo}" styleClass="input-text"/>
+        <h:outputText escape="true" value="Запрет на регистрацию социальных карт" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.disableSocCardsReg}" styleClass="input-text"/>
     </h:panelGrid>
 
 <h:panelGrid id="orgEditGrid_password" styleClass="borderless-grid" columns="2">

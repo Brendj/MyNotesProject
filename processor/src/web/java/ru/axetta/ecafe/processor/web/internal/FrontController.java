@@ -1719,6 +1719,10 @@ public class FrontController extends HttpServlet {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            //Запрет регистрации социальных карт при включенном флаге задача #1282
+            if (org.getDisableSocCardsReg() && (type == 3 || type == 7 || type == 8)) {
+                throw new CardResponseItem.DisableSocCardsRegException(CardResponseItem.ERROR_DISABLE_SOC_CARDS_REG_MESSAGE);
+            }
             if (org.longCardNoIsOn() && longCardNo == null) {
                 throw new CardResponseItem.LongCardNoNotSpecified(CardResponseItem.ERROR_LONG_CARDNO_MATCH_ORG_MESSAGE);
             }
@@ -1816,6 +1820,9 @@ public class FrontController extends HttpServlet {
             return new CardResponseItem(CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE, CardResponseItem.ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE);
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
             logger.error("CardAlreadyExistInYourOrgException: ", e);
+            return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
+        } catch (CardResponseItem.DisableSocCardsRegException e) {
+            logger.error("DisableSocCardsRegException: ", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
         } catch (CardResponseItem.CardAlreadyExistSecondRegisterAllowed e) {
             logger.error("CardAlreadyExistSecondRegisterAllowed: ", e);

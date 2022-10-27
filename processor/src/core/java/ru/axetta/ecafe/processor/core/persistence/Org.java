@@ -181,6 +181,7 @@ public class Org implements Serializable {
     private Boolean useLongCardNo;
 	private Boolean newСashierMode;
     private Boolean usedFoodbox;
+    private Boolean disableSocCardsReg;
     private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
@@ -263,6 +264,7 @@ public class Org implements Serializable {
         this.governmentContract = false;
         this.useLongCardNo = false;
         this.usedFoodbox = false;
+        this.disableSocCardsReg = true;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1451,5 +1453,13 @@ public class Org implements Serializable {
 
     public void setFoodBoxParallels(Set<FoodBoxOrgParallel> foodBoxParallels) {
         this.foodBoxParallels = foodBoxParallels;
+    }
+
+    public Boolean getDisableSocCardsReg() {
+        return disableSocCardsReg;
+    }
+
+    public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
+        this.disableSocCardsReg = disableSocCardsReg;
     }
 }
