@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
@@ -2140,10 +2141,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                     Session session, Transaction transaction) throws Exception {
                 if (subBalanceNum.equals(0)) {
-                    processPurchaseList(client, data, objectFactory, session, endDate, startDate, null, mode);
+                    processPurchaseList(client.getIdOfClient(), data, objectFactory, session, endDate, startDate, null, mode);
                 }
                 if (subBalanceNum.equals(1)) {
-                    processPurchaseList(client, data, objectFactory, session, endDate, startDate,
+                    processPurchaseList(client.getIdOfClient(), data, objectFactory, session, endDate, startDate,
                             OrderTypeEnumType.SUBSCRIPTION_FEEDING, mode);
                 }
             }
@@ -2166,7 +2167,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                     public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                             Session session, Transaction transaction) throws Exception {
-                        processPurchaseList(client, data, objectFactory, session, endDate, startDate, null, mode);
+                        processPurchaseList(client.getIdOfClient(), data, objectFactory, session, endDate, startDate, null, mode);
                     }
                 }, handler);
 
@@ -2188,7 +2189,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                     public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                             Session session, Transaction transaction) throws Exception {
-                        processPurchaseList(client, data, objectFactory, session, endDate, startDate,
+                        processPurchaseList(client.getIdOfClient(), data, objectFactory, session, endDate, startDate,
                                 OrderTypeEnumType.SUBSCRIPTION_FEEDING, mode);
                     }
                 }, handler);
@@ -2200,20 +2201,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return purchaseListResult;
     }
 
-    private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
+    private void processPurchaseList(Long idOfClient, Data data, ObjectFactory objectFactory, Session session,
             Date endDate, Date startDate, OrderTypeEnumType orderType, Short mode)
             throws DatatypeConfigurationException {
         int nRecs = 0;
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
-        Criteria ordersCriteria = session.createCriteria(Order.class);
-        ordersCriteria.add(Restrictions.eq("client", client));
-        ordersCriteria.add(Restrictions.ge("createTime", startDate));
-        ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+        String orderTypeCondition = (orderType == null ? "" : " and o.orderType = :orderType ");
+        Query query = session.createQuery("select o from Order o where o.client.idOfClient = :client and o.createTime >= :startDate " +
+                "and o.createTime < :endDate " + orderTypeCondition+ " order by o.createTime");
+        query.setParameter("client", idOfClient);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", nextToEndDate);
         if (orderType != null) {
-            ordersCriteria.add(Restrictions.eq("orderType", orderType));
+            query.setParameter("orderType", orderType);
         }
-        ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-        List ordersList = ordersCriteria.list();
+        List ordersList = query.getResultList();
         PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
         for (Object o : ordersList) {
             if (nRecs++ > MAX_RECS_getPurchaseList) {
@@ -2306,7 +2308,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             int nRecs = 0;
             Date nextToEndDate = DateUtils.addDays(endDate, 1);
-            List<Order> ordersList = DAOReadExternalsService.getInstance()
+            List<OrderItem> ordersList = DAOReadExternalsService.getInstance()
                     .getClientOrdersByPeriod(client, startDate, nextToEndDate);
             if (ordersList.size() == 0) {
                 result.resultCode = RC_OK;
@@ -2314,7 +2316,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
                 return result;
             }
-            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
+            List<CompositeIdOfOrder> orders = getOrdersByOrderItems(ordersList);
+            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(orders);
 
             Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
             Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
@@ -2328,25 +2331,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
 
             Map<Long, Date> lastProcessMap = new HashMap<Long, Date>();
-            for (Object o : ordersList) {
+            for (OrderItem order : ordersList) {
                 if (nRecs++ > MAX_RECS_getPurchaseList) {
                     break;
                 }
-                Order order = (Order) o;
                 PurchaseWithDetailsExt purchaseWithDetailsExt = objectFactory.createPurchaseWithDetailsExt();
                 purchaseWithDetailsExt.setByCard(order.getSumByCard());
                 purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
                 purchaseWithDetailsExt.setTrdDiscount(order.getTrdDiscount());
                 purchaseWithDetailsExt.setDonation(order.getGrantSum());
-                purchaseWithDetailsExt.setSum(order.getRSum());
+                purchaseWithDetailsExt.setSum(order.getrSum());
                 purchaseWithDetailsExt.setByCash(order.getSumByCash());
                 purchaseWithDetailsExt.setLastUpdateDate(
-                        toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
-                if (order.getCard() == null) {
-                    purchaseWithDetailsExt.setIdOfCard(null);
-                } else {
-                    purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
-                }
+                        toXmlDateTime(getLastPaymentRegistryDate(order.getIdOfOrg(), lastProcessMap)));
+                purchaseWithDetailsExt.setIdOfCard(order.getIdOfCard());
                 purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
                 if (mode != null && mode == 1) {
                     purchaseWithDetailsExt.setState(order.getState());
@@ -2361,7 +2359,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
                     purchaseWithDetailsElementExt.setLastUpdateDate(
-                            toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                            toXmlDateTime(getLastPaymentRegistryDate(order.getIdOfOrg(), lastProcessMap)));
                     if (od.isComplex()) {
                         purchaseWithDetailsElementExt.setType(1);
                     } else if (od.isComplexItem()) {
@@ -2428,7 +2426,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             int nRecs = 0;
             Date nextToEndDate = DateUtils.addDays(endDate, 1);
-            List<Order> ordersList = DAOReadExternalsService.getInstance()
+            List<OrderItem> ordersList = DAOReadExternalsService.getInstance()
                     .getClientOrdersByPeriod(client, startDate, nextToEndDate);
             if (ordersList.size() == 0) {
                 result.resultCode = RC_OK;
@@ -2436,14 +2434,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
                 return result;
             }
-            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
+            List<CompositeIdOfOrder> orders = getOrdersByOrderItems(ordersList);
+            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(orders);
 
             // получить блюда для детализации заказов orderdetails
             Set<WtDish> dishes = DAOReadExternalsService.getInstance()
                     .getWtDishesByOrderDetails(detailsList, startDate, endDate);
 
             Map<Long, Date> lastProcessMap = new HashMap<>();
-            for (Order order : ordersList) {
+            for (OrderItem order : ordersList) {
                 if (nRecs++ > MAX_RECS_getPurchaseList) {
                     break;
                 }
@@ -2453,15 +2452,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
                 purchaseWithDetailsExt.setTrdDiscount(order.getTrdDiscount());
                 purchaseWithDetailsExt.setDonation(order.getGrantSum());
-                purchaseWithDetailsExt.setSum(order.getRSum());
+                purchaseWithDetailsExt.setSum(order.getrSum());
                 purchaseWithDetailsExt.setByCash(order.getSumByCash());
                 purchaseWithDetailsExt.setLastUpdateDate(
-                        toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
-                if (order.getCard() == null) {
-                    purchaseWithDetailsExt.setIdOfCard(null);
-                } else {
-                    purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
-                }
+                        toXmlDateTime(getLastPaymentRegistryDate(order.getIdOfOrg(), lastProcessMap)));
+                purchaseWithDetailsExt.setIdOfCard(order.getIdOfCard());
                 purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
                 if (mode != null && mode == 1) {
                     purchaseWithDetailsExt.setState(order.getState());
@@ -2477,7 +2472,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
                     purchaseWithDetailsElementExt.setLastUpdateDate(
-                            toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                            toXmlDateTime(getLastPaymentRegistryDate(order.getIdOfOrg(), lastProcessMap)));
                     if (od.isComplex()) {
                         purchaseWithDetailsElementExt.setType(1);
                     } else if (od.isComplexItem()) {
@@ -2534,6 +2529,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
+    private List<CompositeIdOfOrder> getOrdersByOrderItems(List<OrderItem> items) {
+        List<CompositeIdOfOrder> result = new ArrayList<>();
+        for (OrderItem item : items) {
+            result.add(new CompositeIdOfOrder(item.getIdOfOrg(), item.getIdOfOrder()));
+        }
+        return result;
+    }
+
     private Date getLastPaymentRegistryDate(Long idOfOrg, Map<Long, Date> map) {
         if (!map.containsKey(idOfOrg)) {
             map.put(idOfOrg,
@@ -2542,11 +2545,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return map.get(idOfOrg);
     }
 
-    private List<OrderDetail> findDetailsByOrder(Order order, List<OrderDetail> details) {
+    private List<OrderDetail> findDetailsByOrder(OrderItem order, List<OrderDetail> details) {
         List<OrderDetail> list = new ArrayList<OrderDetail>();
         for (OrderDetail detail : details) {
-            if (detail.getIdOfOrder().equals(order.getCompositeIdOfOrder().getIdOfOrder()) && detail
-                    .getCompositeIdOfOrderDetail().getIdOfOrg().equals(order.getCompositeIdOfOrder().getIdOfOrg())) {
+            if (detail.getIdOfOrder().equals(order.getIdOfOrder()) && detail
+                    .getCompositeIdOfOrderDetail().getIdOfOrg().equals(order.getIdOfOrg())) {
                 list.add(detail);
             }
         }
@@ -2571,10 +2574,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return null;
     }
 
-    private Set<Long> getOrgsByOrders(List<Order> ordersList) {
+    private Set<Long> getOrgsByOrders(List<OrderItem> ordersList) {
         Set set = new HashSet<Long>();
-        for (Order order : ordersList) {
-            set.add(order.getCompositeIdOfOrder().getIdOfOrg());
+        for (OrderItem order : ordersList) {
+            set.add(order.getIdOfOrg());
         }
         return set;
     }
