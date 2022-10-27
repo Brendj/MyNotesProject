@@ -79,6 +79,7 @@ public class Option {
             OPTION_MSK_NSI_AUTOSYNC_ON =10022,
             OPTION_MSK_NSI_AUTOSYNC_UPD_TIME =10023,
             OPTION_LAST_PROCESSED_WT_COMPLEX = 10024,
+            OPTION_LAST_PROCESSED_CARD_UPDATE = 10025,
 
             OPTION_MSK_NSI_URL=100024,
             OPTION_MSK_NSI_USER=100025,
@@ -238,6 +239,7 @@ public class Option {
             OPTION_EXTERNAL_URL, "http://localhost:8080",
             OPTION_BENEFITS_RECALC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, null,
             OPTION_LAST_PROCESSED_WT_COMPLEX, "0",
+            OPTION_LAST_PROCESSED_CARD_UPDATE, "0",
             OPTION_MSK_NSI_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService",
             OPTION_MSK_NSI_WSDL_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl",
             OPTION_MSK_NSI_USER, "UEK_SOAP",

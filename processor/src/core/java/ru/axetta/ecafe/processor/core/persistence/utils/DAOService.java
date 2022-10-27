@@ -1092,6 +1092,12 @@ public class DAOService {
         q.executeUpdate();
     }
 
+    public int setOrgCardSyncParam(List<Long> orgs) {
+        return entityManager.createQuery("update Org set cardSyncParam = true where idOfOrg in (:orgs)")
+                .setParameter("orgs", orgs)
+                .executeUpdate();
+    }
+
     @Transactional
     public void setSverkaEnabled(Boolean value) {
         String val_str = value ? "1" : "0";

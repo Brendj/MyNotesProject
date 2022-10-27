@@ -2940,6 +2940,15 @@ public class DAOReadonlyService {
         }
     }
 
+    public Date getLastProcessedCardUpdate() {
+        try {
+            String option = getOnlineOptionValue(Option.OPTION_LAST_PROCESSED_CARD_UPDATE);
+            return new Date(Long.parseLong(option));
+        } catch (Exception e) {
+            return new Date();
+        }
+    }
+
     @Transactional
     public String getDeletedLastedDateMenu() {
         try {
@@ -3582,4 +3591,30 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public List<Card> getCardsUpdatedBetweenDate(Date startDate, Date endDate) {
+        return entityManager.createQuery("select c from Card c where c.updateTime between :startDate and :endDate")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    public List<Long> findFriendlyOrgsIdsByListOrgs(Set<Long> orgs) {
+        List list = entityManager.createNativeQuery("select distinct friendlyorg from cf_friendly_organization where currentorg in (:list)")
+                .setParameter("list", orgs)
+                .getResultList();
+        List<Long> result = new ArrayList<>();
+        for (Object o : list) {
+            result.add(HibernateUtils.getDbLong(o));
+        }
+        return result;
+    }
+
+    public List<Card> getClientsForCardsUpdate(long idOfOrg, Date lastUpdate) {
+        return entityManager.createQuery("select c from Card c left join fetch c.client where c.updateTime >= :date and c.org.idOfOrg = :idOfOrg")
+                .setParameter("date", lastUpdate)
+                .setParameter("idOfOrg", idOfOrg)
+                .getResultList();
+    }
+
 }
