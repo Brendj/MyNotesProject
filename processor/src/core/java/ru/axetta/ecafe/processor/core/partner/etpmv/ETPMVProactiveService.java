@@ -129,7 +129,9 @@ public class ETPMVProactiveService {
             if (proactiveMessage.getClient() != null) {
                 DiscountManager.disableAllDiscounts(proactiveMessage.getClient());
                 //ИСПП отправляет сообщение порталу об отказе от услуги ЛП пользователем со статусом 1080.1 через очередь ЕТП МВ pp.notification_status_out
-                sendStatus(new Date().getTime(), proactiveMessage, StatusETPMessageType.REFUSE_USER, true);
+                StatusETPMessageType status = StatusETPMessageType.REFUSE_USER;
+                status.setFullName(proactiveMessage.getClient().getPerson().getFullName());
+                sendStatus(new Date().getTime(), proactiveMessage, status, true);
             } else {
                 sendToBK(message);
             }

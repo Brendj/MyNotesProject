@@ -1,6 +1,8 @@
 package ru.axetta.ecafe.processor.core.partner.etpmv.enums;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.lang.NonNull;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +14,11 @@ public enum StatusETPMessageType {
     /*3*/REFUSAL("8011", "Отказ", "Отказ от услуги", "Портал", "ИС ПП"),
     POSSIBLE_REJECTION("8021", "Возможен отказ", "Возможен отказ от услуги", "ИС ПП", "Портал"),
     REFUSE_TIMEOUT("8031", "Срок отказа истек", "Срок отказа от услуги истек", "ИС ПП", "Портал"),
-    REFUSE_USER("1080.1", "Отказ в предоставлении услуги", "Пользователь отказался от услуги", "ИС ПП", "Портал"),
+    REFUSE_USER("1080.1", "Отказ в предоставлении услуги","Вы отказались от предоставления питания за счет средств бюджета города Москвы Вашему ребенку (%s). При необходимости Вы сможете <a href=\"https://www.mos.ru/pgu/ru/app/dogm/100101/\">подать</a> заявление в установленные сроки самостоятельно", "ИС ПП", "Портал"),
     REFUSE_SYSTEM("1080.2", "Отказ в предоставлении услуги", "Отказ в предоставлении услуги по инициативе ведомства", "ИС ПП", "Портал");
 
     private final String code;
-    private final String description;
+    private String description;
     private final String note;
     private final String sender;
     private final String receiver;
@@ -80,5 +82,9 @@ public enum StatusETPMessageType {
 
     public String getReceiver() {
         return receiver;
+    }
+
+    public void setFullName(String fullName) {
+        this.description = String.format(description, fullName);
     }
 }
