@@ -13,7 +13,7 @@ import java.util.Map;
     "op",
     "value"
 })
-public class And {
+public class OpContainer {
 
     @JsonProperty("field")
     private String field;

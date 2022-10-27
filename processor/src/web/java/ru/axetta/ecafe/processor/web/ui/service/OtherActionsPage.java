@@ -8,6 +8,7 @@ import org.hibernate.Query;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.partner.mesh.MeshPersonsSyncService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
@@ -76,12 +77,13 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
     private Integer processedMeshGuids;
     private Boolean showProcessedMeshGuids = false;
     private SelectedOrgListType selectOrgType;
-    private List<OrgItem> orgItemsPreorder = new ArrayList<>(0);
-    private List<OrgItem> orgItemsRemoveDup = new ArrayList<>(0);
-    private List<OrgItem> orgItemsLoadMesh = new ArrayList<>(0);
+    private List<OrgItem> orgItemsPreorder = new LinkedList<>();
+    private List<OrgItem> orgItemsRemoveDup = new LinkedList<>();
+    private List<OrgItem> orgItemsLoadMesh = new LinkedList<>();
     protected String orgItemsPreorderFilter = "Не выбрано";
     protected String orgItemsRemoveDupFilter = "Не выбрано";
     protected String orgItemsLoadMeshFilter = "Не выбрано";
+    protected String orgItemsDelIrrPersonsFilter = "Не выбрано";
 
     private static class OrgItem {
         protected final Long idOfOrg;
@@ -1059,6 +1061,17 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
         }
     }
 
+    public void runDeleteIrrelevantPersons(){
+        try {
+            MeshPersonsSyncService service = RuntimeContext.getAppContext().getBean(MeshPersonsSyncService.class);
+            service.deleteIrrelevantPersons();
+
+            printMessage("Выполнено удаление неактуальных данных");
+        } catch (Exception e){
+            printError("Не удалось выполнить удаление неактуальных данных: " + e.getMessage());
+        }
+    }
+
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         switch (selectOrgType){
@@ -1191,5 +1204,13 @@ public class OtherActionsPage extends OnlineReportPage implements OrgListSelectP
 
     public void setOrgItemsLoadMeshFilter(String orgItemsLoadMeshFilter) {
         this.orgItemsLoadMeshFilter = orgItemsLoadMeshFilter;
+    }
+
+    public String getOrgItemsDelIrrPersonsFilter() {
+        return orgItemsDelIrrPersonsFilter;
+    }
+
+    public void setOrgItemsDelIrrPersonsFilter(String orgItemsDelIrrPersonsFilter) {
+        this.orgItemsDelIrrPersonsFilter = orgItemsDelIrrPersonsFilter;
     }
 }
