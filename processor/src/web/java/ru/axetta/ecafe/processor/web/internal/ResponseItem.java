@@ -71,6 +71,7 @@ public class ResponseItem implements Serializable {
             + "с включенным флагом использования длинных UID";
     public static final String ERROR_LONG_CARDNO_NOT_UNIQUE_MESSAGE = "Длинный UID карты уже существует";
     public static final String ERROR_DISABLE_SOC_CARDS_REG_MESSAGE = "Регистрация социальных карт временно приостановлена по техническим причинам";
+    public static final String ERROR_WRONG_TRANSITION_STATE_MESSAGE = "Карта выведена из оборота по техническим причинам или передана в пользование другой ОО";
     public int code;
     public String message;
 

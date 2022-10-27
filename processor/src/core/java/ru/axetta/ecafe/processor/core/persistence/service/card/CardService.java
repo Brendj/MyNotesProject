@@ -84,6 +84,22 @@ public class CardService {
         return cardWritableRepository.createCardSpecial(org, cardNo, cardPrintedNo, type, longCardNo, cardSignCertNum);
     }
 
+    public ResCardsOperationsRegistryItem fillClient(CardsOperationsRegistryItem o, long idOfOrg){
+        return cardUpdateResult(o, fillClient(o, o.getCardNo(), o.getIdOfClient(), idOfOrg));
+    }
+
+    public int fillClient(CardsOperationsRegistryItem o, long cardNo, long idOfClient, long idOfOrg){
+        return cardWritableRepository.fillClientOrVisitor(o, idOfOrg, 1);
+    }
+
+    public ResCardsOperationsRegistryItem fillVisitor(CardsOperationsRegistryItem o, long idOfOrg){
+        return cardUpdateResult(o, fillVisitor(o, o.getCardNo(), o.getIdOfClient(), idOfOrg));
+    }
+
+    public int fillVisitor(CardsOperationsRegistryItem o, long cardNo, long idOfClient, long idOfOrg){
+        return cardWritableRepository.fillClientOrVisitor(o, idOfOrg, 2);
+    }
+
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
         Card card = cardWritableRepository.findByCardNoWithoutClient(o.getCardNo(), idOfOrg);
@@ -237,6 +253,11 @@ public class CardService {
             );
         }
 
+        if (card.getTransitionState().equals(CardTransitionState.GIVEN_AWAY.getCode())) {
+            throw new CardTransitionStateException(
+                    String.format("UnblockOrReturnCard error: transition state = 1, cardNo=%d and idOfOrg=%d", cardNo, idOfOrg)
+            );
+        }
         if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
             unblock(card);
         } else if ((CardState.BLOCKED.getValue() == card.getState()) || (CardState.TEMPISSUED.getValue() == card.getState()) ||

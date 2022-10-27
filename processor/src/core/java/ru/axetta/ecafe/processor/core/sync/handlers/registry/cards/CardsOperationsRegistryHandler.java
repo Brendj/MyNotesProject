@@ -5,6 +5,9 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.CardTransitionState;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -62,6 +65,8 @@ public class CardsOperationsRegistryHandler {
         RuntimeContext runtimeContext;
         Session session = null;
         Transaction transaction = null;
+        int transitionState = 0;
+        int state = -1;
         try {
             runtimeContext = RuntimeContext.getInstance();
             session = runtimeContext.createReportPersistenceSession();
@@ -69,7 +74,10 @@ public class CardsOperationsRegistryHandler {
             if (VersionUtils.compareClientVersionForRegisterCard(session, idOfOrg) < 0) {
                 isOldArm = Boolean.TRUE;
             }
-            CardWritableRepository.getInstance().updateCardSync(idOfOrg, DAOUtils.findCardByCardNo(session, o.getCardNo()) , 0L);
+            Card card = DAOUtils.findCardByCardNo(session, o.getCardNo());
+            transitionState = card.getTransitionState();
+            state = card.getState();
+            CardWritableRepository.getInstance().updateCardSync(idOfOrg, card , 0L);
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -77,6 +85,22 @@ public class CardsOperationsRegistryHandler {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+        //#https://yt.iteco.dev/issue/ISPP-1283
+        if (transitionState == CardTransitionState.GIVEN_AWAY.getCode() && state != CardState.BLOCKED.getValue() &&
+                (o.getType() == 1 || o.getType() == 2 || o.getType() == 3 || o.getType() == 7)) {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+        }
+        if (transitionState == CardTransitionState.GIVEN_AWAY.getCode() && state == CardState.BLOCKED.getValue()) {
+            if (o.getType() == 7) {
+                return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+            }
+            if (o.getType() == 1 || o.getType() == 2) {
+                return cardService.fillClient(o, idOfOrg);
+            }
+            if (o.getType() == 3) {
+                return cardService.fillVisitor(o, idOfOrg);
+            }
         }
         switch (o.getType()){
             case 0:
