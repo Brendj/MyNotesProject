@@ -658,6 +658,8 @@
                         </rich:columnGroup>
                     </f:facet>
 
+                    <rich:collapsibleSubTable value="#{pass.chekerItemList}" var="cheker"
+                                              columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
                     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                         <h:outputText escape="true" value="#{row+1}" styleClass="output-text"/>
                     </rich:column>
@@ -683,9 +685,6 @@
                     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text"/>
                     </rich:column>
-
-                    <rich:collapsibleSubTable value="#{pass.chekerItemList}" var="cheker"
-                                              columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{cheker.cheker}" styleClass="output-text"/>
                         </rich:column>

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.core.utils.Base64;
@@ -3318,9 +3319,23 @@ public class FrontController extends HttpServlet {
             criteria.add(Restrictions.eq("meshGUID", childMeshGuid));
             Client child = (Client) criteria.uniqueResult();
 
-            if (guardian == null || child == null) {
+            if (child == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
                         GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+
+            if (guardian == null) {
+                PersonResponse personResponse = getMeshGuardiansService().searchPersonByMeshGuid(meshGuid);
+                if (!personResponse.getCode().equals(PersonListResponse.OK_CODE)) {
+                    return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND_MK,
+                            GuardianResponse.ERROR_CLIENT_NOT_FOUND_MK_MESSAGE);
+                }
+                ClientsMobileHistory clientsMobileHistory =
+                        new ClientsMobileHistory("soap метод addGuardianToClient");
+                clientsMobileHistory.setShowing("АРМ");
+                String remark = String.format("Создано в АРМ %s", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+                guardian = getMeshGuardiansService().createGuardianInternalByMeshGuardianPerson(persistenceSession, personResponse.getResponse(), child.getOrg(),
+                        remark, ClientCreatedFromType.ARM, clientsMobileHistory);
             }
             ClientGuardian clientGuardian = getClientGuardian(persistenceSession, guardian, child);
 
