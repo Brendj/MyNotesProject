@@ -2974,17 +2974,21 @@ public class FrontController extends HttpServlet {
 
             DocumentResponse documentResponse = new DocumentResponse(DocumentResponse.OK, DocumentResponse.OK_MESSAGE);
             if (client.getDulDetail() != null || !dulDetails.isEmpty()) {
-                List<DocumentItem> documentItems = new ArrayList<>();
+                List<DocumentResponseItem> documentItems = new ArrayList<>();
                 dulDetails.forEach(dulDetail -> {
-                    DocumentItem documentItem = new DocumentItem();
+                    DocumentResponseItem documentItem = new DocumentResponseItem();
                     documentItem.setIdDocument(dulDetail.getId());
                     documentItem.setDocumentTypeId(dulDetail.getDocumentTypeId());
                     documentItem.setSeries(dulDetail.getSeries());
                     documentItem.setNumber(dulDetail.getNumber());
                     documentItem.setSubdivisionCode(dulDetail.getSubdivisionCode());
                     documentItem.setIssuer(dulDetail.getIssuer());
-                    documentItem.setIssued(dulDetail.getIssued());
-                    documentItem.setExpiration(dulDetail.getExpiration());
+                    try {
+                        documentItem.setIssued(toXmlDateTime(dulDetail.getIssued()));
+                        documentItem.setExpiration(toXmlDateTime(dulDetail.getExpiration()));
+                    } catch (DatatypeConfigurationException e) {
+                        logger.error("Error convert date in getDocumentForClient", e);
+                    }
                     documentItems.add(documentItem);
                 });
                 documentResponse = new DocumentResponse(documentItems);
@@ -3218,7 +3222,7 @@ public class FrontController extends HttpServlet {
             client.setEmail(email);
             persistenceSession.update(client);
 
-            if (client.getMeshGUID() != null) {
+            if (client.getMeshGUID() != null && ClientManager.isClientGuardian(persistenceSession, client)) {
                 genderId = genderId == 0 ? 2 : 1;
                 PersonResponse personResponse = getMeshGuardiansService()
                         .changePerson(client.getMeshGUID(), firstName, patronymic, lastName, genderId, birthDate, snils);
@@ -3429,8 +3433,7 @@ public class FrontController extends HttpServlet {
             try {
                 guardianItem.setBirthDate(toXmlDateTime(r.getBirthDate()));
             } catch (DatatypeConfigurationException e) {
-                logger.error("Error parse birthDate", e);
-                throw new RuntimeException(e);
+                logger.error("Error convert date in fillingGuardianResponse", e);
             }
             guardianItem.setSnils(r.getSnils());
             guardianItem.setMobile(r.getMobile());

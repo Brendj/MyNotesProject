@@ -4,9 +4,9 @@ import java.util.List;
 
 public class DocumentResponse extends ResponseItem{
 
-    private List<DocumentItem> documentItems;
+    private List<DocumentResponseItem> documentItems;
 
-    public DocumentResponse(List<DocumentItem> documentItems) {
+    public DocumentResponse(List<DocumentResponseItem> documentItems) {
         this.code = OK;
         this.message = OK_MESSAGE;
         this.documentItems = documentItems;
@@ -19,11 +19,11 @@ public class DocumentResponse extends ResponseItem{
     public DocumentResponse() {
     }
 
-    public List<DocumentItem> getDocumentItems() {
+    public List<DocumentResponseItem> getDocumentItems() {
         return documentItems;
     }
 
-    public void setDocumentItems(List<DocumentItem> documentItems) {
+    public void setDocumentItems(List<DocumentResponseItem> documentItems) {
         this.documentItems = documentItems;
     }
 

@@ -24,8 +24,8 @@ public class GuardianItem {
     private String groupName;
     private String meshGuid;
     private Integer gender;
-    @XmlAttribute(name = "birthDate")
-    @XmlSchemaType(name = "dateTime")
+
+    @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar birthDate;
     private String email;
     private Integer degree;
