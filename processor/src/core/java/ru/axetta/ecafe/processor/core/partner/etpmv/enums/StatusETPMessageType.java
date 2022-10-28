@@ -17,7 +17,7 @@ public enum StatusETPMessageType {
 
     private final String code;
     private String description;
-    private final String note;
+    private String note;
     private final String sender;
     private final String receiver;
 
@@ -83,6 +83,6 @@ public enum StatusETPMessageType {
     }
 
     public void setFullName(String fullName) {
-        this.description = String.format(description, fullName);
+        this.note = String.format(note, fullName);
     }
 }
