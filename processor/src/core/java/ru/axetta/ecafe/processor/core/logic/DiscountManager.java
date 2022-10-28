@@ -20,6 +20,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -533,15 +534,21 @@ public class DiscountManager {
         Query query = session.createSQLQuery("SELECT t.idofcategorydiscount FROM cf_categorydiscounts_dszn t " +
                 "WHERE t.code IN (:dtisznCodeList)");
         query.setParameterList("dtisznCodeList", dtisznCodeList);
-        return query.list();
+        List list = query.list();
+        List<Long> result = new ArrayList<>();
+        for (Object value : list) {
+            result.add(((BigInteger)value).longValue());
+        }
+        return result;
     }
 
-    public static void disableAllDiscounts(Client client) {
+    public static void disableAllDiscounts(Long idOfClient) {
         Session session = null;
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+            Client client = session.get(Client.class, idOfClient);
             List<ClientDtisznDiscountInfo> list = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             if (list.size() == 0)

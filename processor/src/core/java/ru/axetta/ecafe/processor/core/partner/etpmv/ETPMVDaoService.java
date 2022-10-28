@@ -447,7 +447,8 @@ public class ETPMVDaoService {
 
     @Transactional
     public ProactiveMessage getProactiveMessage(String serviceNumber) {
-        Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
+        Query query = entityManager.createQuery("select d from ProactiveMessage d join fetch d.client c " +
+                "join fetch c.person where " +
                 "d.servicenumber=:servicenumber");
         query.setParameter("servicenumber", serviceNumber);
         try {
