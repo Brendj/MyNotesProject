@@ -3,10 +3,13 @@ package ru.axetta.ecafe.processor.web.internal;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.MeshDocumentResponse;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GuardianItem {
 
     private Long idOfClient;
@@ -21,7 +24,9 @@ public class GuardianItem {
     private String groupName;
     private String meshGuid;
     private Integer gender;
-    private Date birthDate;
+    @XmlAttribute(name = "birthDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar birthDate;
     private String email;
     private Integer degree;
     private Integer validationStateId;
@@ -128,11 +133,11 @@ public class GuardianItem {
         this.gender = gender;
     }
 
-    public Date getBirthDate() {
+    public XMLGregorianCalendar getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(XMLGregorianCalendar birthDate) {
         this.birthDate = birthDate;
     }
 
