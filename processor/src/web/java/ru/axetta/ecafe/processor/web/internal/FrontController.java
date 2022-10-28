@@ -44,6 +44,10 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayInputStream;
@@ -3456,6 +3460,7 @@ public class FrontController extends HttpServlet {
     }
 
     private List<GuardianItem> fillingGuardianResponse(PersonListResponse personListResponse) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         return personListResponse.getResponse().stream().map(r -> {
             GuardianItem guardianItem = new GuardianItem();
             guardianItem.setMeshGuid(r.getMeshGuid());
@@ -3463,7 +3468,12 @@ public class FrontController extends HttpServlet {
             guardianItem.setFirstName(r.getFirstName());
             guardianItem.setPatronymic(r.getSecondName());
             guardianItem.setGender(r.getMeshGender());
-            guardianItem.setBirthDate(r.getBirthDate());
+            try {
+                guardianItem.setBirthDate(toXmlDateTime(r.getBirthDate()));
+            } catch (DatatypeConfigurationException e) {
+                logger.error("Error parse birthDate", e);
+                throw new RuntimeException(e);
+            }
             guardianItem.setSnils(r.getSnils());
             guardianItem.setMobile(r.getMobile());
             guardianItem.setEmail(r.getEmail());
@@ -3518,6 +3528,19 @@ public class FrontController extends HttpServlet {
         criteria.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
         criteria.add(Restrictions.ne("deletedState", true));
         return (ClientGuardian) criteria.uniqueResult();
+    }
+
+    private XMLGregorianCalendar toXmlDateTime(Date date) throws DatatypeConfigurationException {
+        if (date == null) {
+            return null;
+        }
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        XMLGregorianCalendar xc = DatatypeFactory.newInstance()
+                .newXMLGregorianCalendarDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1,
+                        c.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+        xc.setTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+        return xc;
     }
 
 }
