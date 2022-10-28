@@ -373,8 +373,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.MESH_GUID,
                         getPupilGuid(pupil.getMeshGUID()), cl == null ? null : cl.getMeshGUID(), updateClient);
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
-                            getPupilGuid(pupil.getGuid()), cl == null ? null : getClientGuid(cl), updateClient);
+                //updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
+                //            getPupilGuid(pupil.getGuid()), cl == null ? null : getClientGuid(cl), updateClient);
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                         cl == null ? null : cl.getPerson().getSurname(), updateClient);
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
@@ -633,21 +633,21 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         }
 
         String meshGuid = fieldConfig.getValue(ClientManager.FieldId.MESH_GUID);
-        String clientGuid = emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
-        String name = trim(fieldConfig.getValue(ClientManager.FieldId.NAME), 64, clientGuid, "Имя ученика");
-        String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, clientGuid, "Отчество ученика");
-        String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
-        String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 256, clientGuid, "Наименование группы");
-        String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
-        String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
-        String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
+        //String clientGuid = emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+        String name = trim(fieldConfig.getValue(ClientManager.FieldId.NAME), 64, meshGuid, "Имя ученика");
+        String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, meshGuid, "Отчество ученика");
+        String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, meshGuid, "Фамилия ученика");
+        String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 256, meshGuid, "Наименование группы");
+        String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, meshGuid, "Пол");
+        String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, meshGuid, "Дата рождения");
+        String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, meshGuid, "Количество представителей");
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
-        String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, clientGuid, "Тип возрастной группы");
-        String parallel = trim(fieldConfig.getValue(ClientManager.FieldId.PARALLEL), 255, clientGuid, "Параллель");
+        String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, meshGuid, "Тип возрастной группы");
+        String parallel = trim(fieldConfig.getValue(ClientManager.FieldId.PARALLEL), 255, meshGuid, "Параллель");
 
         RegistryChange ch = getRegistryChangeClassInstance();
         ch.setMeshGUID(meshGuid);
-        ch.setClientGUID(clientGuid);
+        //ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
         ch.setSecondName(secondname);
         ch.setSurname(surname);
@@ -977,7 +977,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     protected void setGuidFromChange(FieldProcessor.Config fieldConfig, RegistryChange change) throws Exception {
-        fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+        //fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
     }
 
     public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation,
