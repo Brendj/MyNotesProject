@@ -436,33 +436,27 @@ public class EventNotificationService {
     }
 
     private EnterEventData getEnterEventData(Client destClient, String type, String[] values, Date eventTime, Integer passDirection, Client guardian) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        EnterEventData enterEventData = new EnterEventData();
-
+        EnterEventData enterEventData;
         if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
-            if (passDirection == null)
-                return null;
-            if ((passDirection == 0 || passDirection == 6))
-                enterEventData.setActionType(0);
-            else if ((passDirection == 1 || passDirection == 7))
-                enterEventData.setActionType(1);
-            else return null;
-            if (guardian != null)
-                enterEventData.setAgentId(guardian.getMeshGUID());
-        } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_ENTER_CULTURE)) {
-            enterEventData.setActionType(2);
-            enterEventData.setTicketStatus("0");
-            enterEventData.setOrganizationName(findValueInParams
-                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
-        } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
-            enterEventData.setActionType(2);
-            enterEventData.setTicketStatus("1");
-            enterEventData.setOrganizationName(findValueInParams
-                    (new String[]{ExternalEventNotificationService.PLACE_NAME}, values));
-        } else {
+            enterEventData = getEnterEventParam(values, passDirection);
+        } else if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
+            enterEventData = getEventMuseumParam(type, values);
+        } else if (type.equals(NOTIFICATION_ENTER_CULTURE) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
+            enterEventData = getEventCultureParam(type, values);
+        } else return null;
+        if (enterEventData == null) {
             return null;
         }
+        return getEnterEventCommonParam(destClient, enterEventData, eventTime, guardian, values);
+    }
+
+    private EnterEventData getEnterEventCommonParam(Client destClient, EnterEventData enterEventData, Date eventTime, Client guardian, String[] values) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String childPassCheckerId = findValueInParams(new String[]{"childPassCheckerId"}, values);
+
+        if (guardian != null) {
+            enterEventData.setAgentId(guardian.getMeshGUID());
+        }
         if (!childPassCheckerId.isEmpty()) {
             enterEventData.setAdmittedByStaffId(Integer.parseInt(childPassCheckerId));
         }
@@ -472,9 +466,50 @@ public class EventNotificationService {
             enterEventData.setPersonId(destClient.getMeshGUID());
         }
         enterEventData.setPersonId(destClient.getMeshGUID());
-        enterEventData.setOrganizationId(destClient.getOrg().getIdOfOrg().intValue());
         enterEventData.setOccurredAt(simpleDateFormat.format(eventTime));
         return enterEventData;
+    }
+
+    private EnterEventData getEventCultureParam(String type, String[] values) {
+        EnterEventData enterEventData = new EnterEventData();
+        String externalOrgName = getExternalOrgName(values);
+        enterEventData.setActionType(type.equals(NOTIFICATION_ENTER_CULTURE) ? 0 : 1);
+        if (externalOrgName != null) {
+            enterEventData.setOrganizationName(externalOrgName);
+        }
+        return enterEventData;
+    }
+
+    private EnterEventData getEventMuseumParam(String type, String[] values) {
+        EnterEventData enterEventData = new EnterEventData();
+        String externalOrgName = getExternalOrgName(values);
+        enterEventData.setActionType(2);
+        enterEventData.setTicketStatus(type.equals(NOTIFICATION_ENTER_MUSEUM) ? "0" : "1");
+        if (externalOrgName != null) {
+            enterEventData.setOrganizationName(externalOrgName);
+        }
+        return enterEventData;
+    }
+
+    private EnterEventData getEnterEventParam(String[] values, Integer passDirection) {
+        EnterEventData enterEventData = new EnterEventData();
+        if (passDirection == null)
+            return null;
+        if ((passDirection == 0 || passDirection == 6)) {
+            enterEventData.setActionType(0);
+        } else if ((passDirection == 1 || passDirection == 7)) {
+            enterEventData.setActionType(1);
+        } else return null;
+        Long organizationId = getSourceOrgIdFromValues(values);
+        if (organizationId != null) {
+            enterEventData.setOrganizationId(organizationId.intValue());
+        }
+        return enterEventData;
+    }
+
+    private String getExternalOrgName(String[] values) {
+        return findValueInParams
+                (new String[]{ExternalEventNotificationService.PLACE_NAME}, values);
     }
 
     private BalanceData getBalanceData(Client destClient, String type, String[] values, Date eventTime) {
