@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.springframework.util.ObjectUtils;
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -63,7 +64,15 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
     public static class Builder extends BasicReportJob.Builder {
 
         private final String templateFilename;
+        private List<String> clientGroupNames = new ArrayList<>();
 
+        public List<String> getClientGroupNames() {
+            return clientGroupNames;
+        }
+
+        public void setClientGroupNames(List<String> clientGroupNames) {
+            this.clientGroupNames = clientGroupNames;
+        }
         public static class ReportItem {
 
             private static String[] data = new String[31];
@@ -372,22 +381,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
 
-            //группа фильтр
-            String groupName;
-            if (reportProperties.getProperty("groupName") == null) {
-                groupName = null;
-            } else {
-                groupName = reportProperties.getProperty("groupName");
-            }
-
-            ArrayList<String> groupList = new ArrayList<String>();
-
-            if (groupName != null) {
-                String[] groups = StringUtils.split(groupName, ",");
-                for (String str : groups) {
-                    groupList.add(str);
-                }
-            }
             List<Client> clientList;
             if (clientsList.isEmpty()) {
                 Criteria clientCriteria = session.createCriteria(Client.class);
@@ -399,8 +392,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                     clientCriteria.add(Restrictions.in("idOfClient", clientsList));
                 }
                 //clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
-                if (!groupList.isEmpty()) {
-                    clientCriteria.add(Restrictions.in("cg.groupName", groupList));
+                if (!ObjectUtils.isEmpty(clientGroupNames)) {
+                    clientCriteria.add(Restrictions.in("cg.groupName", clientGroupNames));
                 }
                 if (typeConditionsValue != null) {
                     // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
@@ -455,8 +448,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
                 reportCrit.add(Restrictions.in("client.idOfClient", partitionClientIds));
                 reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
-                if (!groupList.isEmpty()) {
-                    reportCrit.add(Restrictions.in("cg.groupName", groupList));
+                if (!ObjectUtils.isEmpty(clientGroupNames)) {
+                    reportCrit.add(Restrictions.in("cg.groupName", clientGroupNames));
                 }
                 reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
                         .add(Projections.sqlGroupProjection("({alias}.evtDateTime/24/3600/1000)*24*3600*1000 as eventDay",

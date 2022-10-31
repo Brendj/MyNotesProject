@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.springframework.util.ObjectUtils;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -77,7 +78,15 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private final String templateFilename;
         private Long idOfOrg;
         private Boolean allFriendlyOrgs;
+        private List<String> clientGroupNames = new ArrayList<>();
 
+        public List<String> getClientGroupNames() {
+            return clientGroupNames;
+        }
+
+        public void setClientGroupNames(List<String> clientGroupNames) {
+            this.clientGroupNames = clientGroupNames;
+        }
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
@@ -129,11 +138,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
             eventsCondition = getEventsCondition(eventFilter);
 
-            String groupNameFilter = reportProperties.getProperty("groupName");
-            List<String> groupList = Collections.emptyList();
-            if(! StringUtils.isEmpty(groupNameFilter)){
-                groupList = Arrays.asList(StringUtils.split(groupNameFilter, ","));
-                clientGroupCondition = " and gr.groupname in (:groupList) ";
+            if(!ObjectUtils.isEmpty(clientGroupNames)){
+                clientGroupCondition = " and gr.groupname in (:clientGroupNames) ";
             }
 
             List<String> stringClientsList;
@@ -188,7 +194,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                  .setParameter("idOfOrg", idOfOrg);
 
             if(!clientGroupCondition.isEmpty()){
-                query.setParameterList("groupList", groupList);
+                query.setParameterList("clientGroupNames", clientGroupNames);
             }
 
             List<Object[]> data = query.list();

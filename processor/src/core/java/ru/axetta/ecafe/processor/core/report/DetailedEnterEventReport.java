@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.springframework.util.ObjectUtils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -91,7 +92,15 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
+        private List<String> clientGroupNames = new ArrayList<>();
 
+        public List<String> getClientGroupNames() {
+            return clientGroupNames;
+        }
+
+        public void setClientGroupNames(List<String> clientGroupNames) {
+            this.clientGroupNames = clientGroupNames;
+        }
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
@@ -157,26 +166,15 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                 friendlyOrgs = getFriendlyOrg(session, org);
             }
 
-            //группа фильтр
-            String groupName = reportProperties.getProperty("groupName");
-
-            ArrayList<String> groupList = new ArrayList<String>();
-
-            if (groupName != null && !groupName.equals("")) {
-                String[] groups = StringUtils.split(groupName, ",");
-                for (String str : groups) {
-                    groupList.add(str);
-                }
-            }
 
             String groupNameWhere = "";
 
-            if (!groupList.isEmpty()) {
+            if (!ObjectUtils.isEmpty(clientGroupNames)) {
                 int i = 0;
                 String groupNameQuery = "";
-                for (String group : groupList) {
+                for (String group : clientGroupNames) {
                     groupNameQuery = groupNameQuery + "'" + group + "'";
-                    if (i < groupList.size() - 1) {
+                    if (i < clientGroupNames.size() - 1) {
                         groupNameQuery = groupNameQuery + ", ";
                     }
                     i++;

@@ -130,7 +130,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-
+                builder.setClientGroupNames(getClientGroupsNames(persistenceSession, idOfOrg, allFriendlyOrgs));
                 builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -183,7 +183,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 if (idOfOrg == null) {
                     printError(String.format("Выберите организацию "));
                 }
-
+                builder.setClientGroupNames(getClientGroupsNames(persistenceSession, idOfOrg, allFriendlyOrgs));
                 builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -247,8 +247,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
             idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
         }
         properties.setProperty(DetailedEnterEventReport.P_ID_OF_CLIENTS, idOfClients);
-        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-        properties.setProperty("groupName", groupNamesString);
+
         return properties;
     }
 
@@ -272,66 +271,54 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         return clientFilter;
     }
 
-    public String getGroupNamesString(Session session, Long idOfOrg, Boolean allFriendlyOrgs) throws Exception {
+    public List<String> getClientGroupsNames(Session session, Long idOfOrg, Boolean allFriendlyOrgs) throws Exception {
 
-        String groupNamesString = "";
+        List<String> clientGroupNames = new ArrayList<>();
 
-        if (!clientFilter.getClientGroupId()
+        if(clientFilter.getClientGroupId()
                 .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
+            return clientGroupNames;
+        }
+        if (clientFilter.getClientGroupId()
+                .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
 
+            List<Long> groupIds = new ArrayList<Long>();
 
-            if (clientFilter.getClientGroupId()
-                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
-
-                List<Long> groupIds = new ArrayList<Long>();
-
-                for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
-                    if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
-                        groupIds.add(predefined.getValue());
-                    }
+            for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
+                if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                    groupIds.add(predefined.getValue());
                 }
-
-                List<ClientGroup> clientGroupList;
-
-                if (allFriendlyOrgs) {
-                    Org org = (Org) session.load(Org.class, idOfOrg);
-                    List<Long> idOfOrgList = new ArrayList<Long>();
-
-                    for (Org orgItem : org.getFriendlyOrg()) {
-                        idOfOrgList.add(orgItem.getIdOfOrg());
-                    }
-                    clientGroupList = getClientGroupByID(session, groupIds, idOfOrgList);
-                } else {
-                    clientGroupList = getClientGroupByID(session, groupIds, idOfOrg);
-                }
-
-                int i = 0;
-                for (ClientGroup clientGroup : clientGroupList) {
-                    groupNamesString = groupNamesString.concat(clientGroup.getGroupName());
-                    if (i < clientGroupList.size() - 2) {
-                        groupNamesString = groupNamesString.concat(",");
-                        i++;
-                    }
-                }
-            } else if (clientFilter.getClientGroupId()
-                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
-                int i = 0;
-                for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
-                    if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
-                        groupNamesString = groupNamesString.concat(predefined.getNameOfGroup());
-                        if (i < ClientGroup.Predefined.values().length - 2) {
-                            groupNamesString = groupNamesString.concat(",");
-                        }
-                        i++;
-                    }
-                }
-            } else {
-                ClientGroup.Predefined parse = ClientGroup.Predefined.parse(clientFilter.getClientGroupId());
-                groupNamesString = parse.getNameOfGroup();
             }
+
+            List<ClientGroup> clientGroupList;
+
+            if (allFriendlyOrgs) {
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                List<Long> idOfOrgList = new ArrayList<Long>();
+
+                for (Org orgItem : org.getFriendlyOrg()) {
+                    idOfOrgList.add(orgItem.getIdOfOrg());
+                }
+                clientGroupList = getClientGroupByID(session, groupIds, idOfOrgList);
+            } else {
+                clientGroupList = getClientGroupByID(session, groupIds, idOfOrg);
+            }
+            for (ClientGroup clientGroup : clientGroupList) {
+                clientGroupNames.add(clientGroup.getGroupName());
+            }
+        } else if (clientFilter.getClientGroupId()
+                .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
+            for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
+                if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                    clientGroupNames.add(predefined.getNameOfGroup());
+                }
+            }
+        } else {
+            ClientGroup.Predefined parse = ClientGroup.Predefined.parse(clientFilter.getClientGroupId());
+            clientGroupNames.add(parse.getNameOfGroup());
         }
 
-        return groupNamesString;
+        return clientGroupNames;
     }
 
     private List<ClientGroup> getClientGroupByID(Session session, List<Long> groupIds, List<Long> idOfOrgList) {
