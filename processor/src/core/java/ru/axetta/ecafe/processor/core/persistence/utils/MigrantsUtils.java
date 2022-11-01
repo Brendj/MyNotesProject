@@ -77,12 +77,15 @@ public class MigrantsUtils {
     }
 
 
-    public static List<Migrant> getMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
-        Criteria criteria = session.createCriteria(Migrant.class);
-        criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);
-        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("syncState", Migrant.NOT_SYNCHRONIZED));
-        return criteria.list();
+    public static List<Migrant> getMigrantsForOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("select m from Migrant m join fetch m.clientMigrate c "
+                + "join fetch c.person p "
+                + "join fetch m.orgRegistry o "
+                + "left join fetch c.clientGroup cg "
+                + "where m.orgVisit.idOfOrg = :idOfOrg and m.syncState = :syncState");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("syncState", Migrant.NOT_SYNCHRONIZED);
+        return query.list();
     }
 
     public static List<VisitReqResolutionHist> getResolutionsForMigrant(Session session, Migrant migrant) {

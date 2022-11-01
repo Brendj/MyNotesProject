@@ -89,7 +89,7 @@ public class Migrants implements SectionRequest{
         currentActiveIncome = new ArrayList<CompositeIdOfMigrant>();
         if(incomeMigrationRequestsNode != null) {
             String incomeCurrentActive = XMLUtils
-                    .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 100000);
+                    .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 1000000);
             if (incomeCurrentActive != null) {
                 if (incomeCurrentActive.length() > 0) {
                     String[] incomeIdsForOrg = incomeCurrentActive.split(";");
