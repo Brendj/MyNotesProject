@@ -7141,9 +7141,13 @@ public class Processor implements SyncProcessor {
                                 .attachSourceOrgIdToValues(idOfOrg, values); //РѕСЂРіР°РЅРёР·Р°С†РёСЏ РёР· РїР°РєРµС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
                         values = EventNotificationService.attachOrgAddressToValues(org.getAddress(), values);
                         values = EventNotificationService
-                                .attachOrgShortNameToValues(org.getShortNameInfoService(), values);
+                                .attachOrgShortNameInfoToValues(org.getShortNameInfoService(), values);
                         values = EventNotificationService
                                 .attachGenderToValues(clientFromEnterEvent.getGender(), values);
+                        values = EventNotificationService
+                                .attachNsiOrgIdToValues(org.getOrgIdFromNsi(), values);
+                        values = EventNotificationService
+                                .attachOrgShortNameToValues(org.getShortName(), values);
                         switch (org.getType()) {
                             case PROFESSIONAL:
                             case SCHOOL: {
