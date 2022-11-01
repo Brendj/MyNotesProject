@@ -92,7 +92,7 @@ public class EventNotificationService {
     public static final String DIRECTION_VALUES_KEY = "direction";
     public static final String ENTER_WITH_CHECKER_VALUES_KEY = "enterWithChecker";
     public static final String ORG_ADDRESS_KEY = "address";
-    public static final String ORG_SHORT_NAME_KEY = "shortnameinfoservice";
+    public static final String ORG_SHORT_NAME_INFO_KEY = "shortnameinfoservice";
     public static final String CLIENT_GENDER_KEY = "gender";
     public static final String CLIENT_GENDER_VALUE_MALE = "male";
     public static final String CLIENT_GENDER_VALUE_FEMALE = "female";
@@ -106,6 +106,9 @@ public class EventNotificationService {
     public static final String PARAM_DATE = "date";
     public static final String PARAM_AMOUNT_BUY_ALL = "amountBuyAll";
     public static final String PARAM_FRATION = "FRation";
+    public static final String ORG_NSI_ID = "orgNsiId";
+    public static final String ORG_SHORT_NAME_KEY = "shortname";
+
 
     @Resource
     SMSService smsService;
@@ -237,6 +240,20 @@ public class EventNotificationService {
                     + "[empDate] в [empTimeH]</b> [surname] [name] вышел из здания культуры по адресу: [address]([shortnameinfoservice]).\n"
                     + "</body>\n" + "</html>"
     };                       // короткое имя школы
+
+    public static String[] attachNsiOrgIdToValues(Long orgIdFromNsi, String[] values) {
+        if (orgIdFromNsi == null) {
+            return values;
+        }
+        return attachToValues(ORG_NSI_ID, "" + orgIdFromNsi, values);
+    }
+
+    public static String[] attachOrgShortNameToValues(String shortName, String[] values) {
+        if (StringUtils.isEmpty(shortName)) {
+            return values;
+        }
+        return attachToValues(ORG_SHORT_NAME_KEY, shortName, values);
+    }
 
     String getDefaultText(String name) {
         for (int n = 0; n < DEFAULT_MESSAGES.length; n += 2) {
@@ -472,27 +489,22 @@ public class EventNotificationService {
 
     private EnterEventData getEventCultureParam(String type, String[] values) {
         EnterEventData enterEventData = new EnterEventData();
-        String externalOrgName = getExternalOrgName(values);
         enterEventData.setActionType(type.equals(NOTIFICATION_ENTER_CULTURE) ? 0 : 1);
-        if (externalOrgName != null) {
-            enterEventData.setOrganizationName(externalOrgName);
-        }
+        enterEventData.setOrganizationName(getExternalOrgName(values));
         return enterEventData;
     }
 
     private EnterEventData getEventMuseumParam(String type, String[] values) {
         EnterEventData enterEventData = new EnterEventData();
-        String externalOrgName = getExternalOrgName(values);
         enterEventData.setActionType(2);
         enterEventData.setTicketStatus(type.equals(NOTIFICATION_ENTER_MUSEUM) ? "0" : "1");
-        if (externalOrgName != null) {
-            enterEventData.setOrganizationName(externalOrgName);
-        }
+        enterEventData.setOrganizationName(getExternalOrgName(values));
         return enterEventData;
     }
 
     private EnterEventData getEnterEventParam(String[] values, Integer passDirection) {
         EnterEventData enterEventData = new EnterEventData();
+        Long organizationNsiId = getSourceOrgNsiIdFromValues(values);
         if (passDirection == null)
             return null;
         if ((passDirection == 0 || passDirection == 6)) {
@@ -500,9 +512,11 @@ public class EventNotificationService {
         } else if ((passDirection == 1 || passDirection == 7)) {
             enterEventData.setActionType(1);
         } else return null;
-        Long organizationId = getSourceOrgIdFromValues(values);
-        if (organizationId != null) {
-            enterEventData.setOrganizationId(organizationId.intValue());
+
+        if (organizationNsiId != null) {
+            enterEventData.setOrganizationId(organizationNsiId.intValue());
+        } else {
+            enterEventData.setOrganizationName(getOrgShortName(values));
         }
         return enterEventData;
     }
@@ -510,6 +524,11 @@ public class EventNotificationService {
     private String getExternalOrgName(String[] values) {
         return findValueInParams
                 (new String[]{ExternalEventNotificationService.PLACE_NAME}, values);
+    }
+
+    private String getOrgShortName(String[] values) {
+        return findValueInParams
+                (new String[]{ORG_SHORT_NAME_KEY}, values);
     }
 
     private BalanceData getBalanceData(Client destClient, String type, String[] values, Date eventTime) {
@@ -938,11 +957,11 @@ public class EventNotificationService {
         return attachToValues(ORG_ADDRESS_KEY, address, values);
     }
 
-    public static final String[] attachOrgShortNameToValues(String shortName, String[] values) {
+    public static final String[] attachOrgShortNameInfoToValues(String shortName, String[] values) {
         if (StringUtils.isEmpty(shortName)) {
             return values;
         }
-        return attachToValues(ORG_SHORT_NAME_KEY, shortName, values);
+        return attachToValues(ORG_SHORT_NAME_INFO_KEY, shortName, values);
     }
 
     public static final String[] attachGenderToValues(Integer gender, String[] values) {
@@ -991,6 +1010,14 @@ public class EventNotificationService {
 
     public static Long getSourceOrgIdFromValues(String[] values) {
         String id = findValueInParams(new String[]{SOURCE_ORG_VALUES_KEY}, values);
+        if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+            return null;
+        }
+        return Long.parseLong(id);
+    }
+
+    public static Long getSourceOrgNsiIdFromValues(String[] values) {
+        String id = findValueInParams(new String[]{ORG_NSI_ID}, values);
         if (id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }
@@ -1299,9 +1326,9 @@ public class EventNotificationService {
         if (!StringUtils.isEmpty(orgAddress)) {
             empType.getParameters().put(ORG_ADDRESS_KEY, orgAddress);
         }
-        String orgShortName = findValueInParams(new String[]{ORG_SHORT_NAME_KEY}, values);
+        String orgShortName = findValueInParams(new String[]{ORG_SHORT_NAME_INFO_KEY}, values);
         if (!StringUtils.isEmpty(orgShortName)) {
-            empType.getParameters().put(ORG_SHORT_NAME_KEY, orgShortName);
+            empType.getParameters().put(ORG_SHORT_NAME_INFO_KEY, orgShortName);
         }
     }
 
