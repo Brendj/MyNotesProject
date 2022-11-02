@@ -140,8 +140,23 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             outMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
             outMigReqHisItem.setInitiator(vReqHis.getInitiator());
             outcomeMigrationRequestsHistoryItems.add(outMigReqHisItem);
-            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
-            session.save(vReqHis);
+        }
+        List<VisitReqResolutionHist> param = new ArrayList<>();
+        for (VisitReqResolutionHist vReqHis : visitReqResolutionHistList1) {
+            param.add(vReqHis);
+            if (param.size() == 1000) {
+                Query query = session.createQuery("update VisitReqResolutionHist v set syncState = :syncState where v in :list");
+                query.setParameter("syncState", VisitReqResolutionHist.SYNCHRONIZED);
+                query.setParameterList("list", param);
+                query.executeUpdate();
+                param.clear();
+            }
+        }
+        if (param.size() > 0) {
+            Query query = session.createQuery("update VisitReqResolutionHist v set syncState = :syncState where v in :list");
+            query.setParameter("syncState", VisitReqResolutionHist.SYNCHRONIZED);
+            query.setParameterList("list", param);
+            query.executeUpdate();
         }
     }
 
@@ -175,8 +190,23 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
             inMigReqHisItem.setInitiator(vReqHis.getInitiator());
             incomeMigrationRequestsHistoryItems.add(inMigReqHisItem);
-            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
-            session.save(vReqHis);
+        }
+        List<VisitReqResolutionHist> param = new ArrayList<>();
+        for (VisitReqResolutionHist vReqHis : visitReqResolutionHistList) {
+            param.add(vReqHis);
+            if (param.size() == 1000) {
+                Query query = session.createQuery("update VisitReqResolutionHist v set syncState = :syncState where v in :list");
+                query.setParameter("syncState", VisitReqResolutionHist.SYNCHRONIZED);
+                query.setParameterList("list", param);
+                query.executeUpdate();
+                param.clear();
+            }
+        }
+        if (param.size() > 0) {
+            Query query = session.createQuery("update VisitReqResolutionHist v set syncState = :syncState where v in :list");
+            query.setParameter("syncState", VisitReqResolutionHist.SYNCHRONIZED);
+            query.setParameterList("list", param);
+            query.executeUpdate();
         }
     }
 
@@ -184,6 +214,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             throws Exception {
         ResIncomeMigrationRequestsItem inMigReqItem;
         List<Migrant> migrantList = MigrantsUtils.getMigrantsForOrg(session, migrants.getIdOfOrg());
+        List<Migrant> param = new ArrayList<>();
         for(Migrant migrant : migrantList){
             inMigReqItem = new ResIncomeMigrationRequestsItem(migrant);
             inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
@@ -209,10 +240,21 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem.setSection(migrant.getSection());
             inMigReqItem.setResolutionCodeGroup(migrant.getResolutionCodeGroup());
             incomeMigrationRequestsItems.add(inMigReqItem);
-            migrant.setSyncState(Migrant.SYNCHRONIZED);
-            session.save(migrant);
+            param.add(migrant);
+            if (param.size() == 1000) {
+                Query query = session.createQuery("update Migrant m set syncState = :syncState where m in :list");
+                query.setParameter("syncState", Migrant.SYNCHRONIZED);
+                query.setParameterList("list", param);
+                query.executeUpdate();
+                param.clear();
+            }
         }
-        session.flush();
+        if (param.size() > 0) {
+            Query query = session.createQuery("update Migrant m set syncState = :syncState where m in :list");
+            query.setParameter("syncState", Migrant.SYNCHRONIZED);
+            query.setParameterList("list", param);
+            query.executeUpdate();
+        }
     }
 
     private void processResOutMigReqItems(List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems)
@@ -234,7 +276,6 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 outcomeMigrationRequestsItems.add(outMigReqItem);
             }
         }
-        session.flush();
     }
 
     private boolean processInMigReqHisItems(
