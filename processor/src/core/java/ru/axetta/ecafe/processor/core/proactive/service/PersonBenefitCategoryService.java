@@ -73,6 +73,7 @@ public class PersonBenefitCategoryService {
                     RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
                     DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
                     StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+                    status2.setFullName(client.getPerson().getFullName());
                     RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
                 } else {
                     categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
@@ -161,7 +162,9 @@ public class PersonBenefitCategoryService {
                  ClientDtisznDiscountInfo info = DAOUtils
                         .getDTISZNDiscountInfoByClientAndCode(session, proactiveMessage.getClient(), proactiveMessage.getDtisznCode().longValue());
                 DiscountManager.removeDtisznDiscount(session, info.getClient(), info.getDtisznCode().intValue(), true, info);
-                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, StatusETPMessageType.REFUSE_SYSTEM, true);
+                StatusETPMessageType status = StatusETPMessageType.REFUSE_SYSTEM;
+                status.setFullName(info.getClient().getPerson().getFullName());
+                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, true);
             }
             transaction.commit();
             transaction = null;
