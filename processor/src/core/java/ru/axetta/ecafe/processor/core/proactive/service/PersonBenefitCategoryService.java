@@ -8,19 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVProactiveService;
-import ru.axetta.ecafe.processor.core.partner.etpmv.ETPProaktivClient;
 import ru.axetta.ecafe.processor.core.partner.etpmv.enums.StatusETPMessageType;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
@@ -71,16 +67,24 @@ public class PersonBenefitCategoryService {
                 if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).before(new Date())) {
                     //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
                     List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
-                            getBean(ETPMVDaoService.class).getProactiveMessage(client, categoryCode);
+                            getBean(ETPMVDaoService.class).getProactiveMessages(client, categoryCode);
                     StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
-                    for (ProactiveMessage proactiveMessage: proactiveMessages) {
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
+                    if (proactiveMessages.isEmpty())
+                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
+                    else {
+                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
+                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
+                        }
                     }
                     DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
                     StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
                     status2.setFullName(client.getPerson().getFullName());
-                    for (ProactiveMessage proactiveMessage: proactiveMessages) {
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+                    if (proactiveMessages.isEmpty())
+                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
+                    else {
+                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
+                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+                        }
                     }
                 } else {
                     Date startDate = format.get().parse(benefit.getBegin_date());
@@ -139,7 +143,7 @@ public class PersonBenefitCategoryService {
                 for (Client guard: clients)
                 {
                     //Получаем данные по льготе, созданные ранее
-                    ProactiveMessage proactiveMessage = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getProactiveMessage(clientDtisznDiscountInfo.getClient(), guard, clientDtisznDiscountInfo.getDtisznCode().intValue());
+                    ProactiveMessage proactiveMessage = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getProactiveMessages(clientDtisznDiscountInfo.getClient(), guard, clientDtisznDiscountInfo.getDtisznCode().intValue());
                     if (proactiveMessage != null)
                         RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, StatusETPMessageType.REFUSE_TIMEOUT, true);
                 }

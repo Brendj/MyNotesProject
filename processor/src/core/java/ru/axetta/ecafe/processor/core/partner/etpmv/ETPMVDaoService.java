@@ -446,7 +446,7 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public ProactiveMessage getProactiveMessage(String serviceNumber) {
+    public ProactiveMessage getProactiveMessages(String serviceNumber) {
         Query query = entityManager.createQuery("select d from ProactiveMessage d join fetch d.client c " +
                 "join fetch c.person where " +
                 "d.servicenumber=:servicenumber");
@@ -460,7 +460,7 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public ProactiveMessage getProactiveMessage(Client client, Client guardian, Integer dtisznCode) {
+    public ProactiveMessage getProactiveMessages(Client client, Client guardian, Integer dtisznCode) {
         Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
                 "d.client=:client and d.guardian=:guardian and d.dtisznCode=:dtisznCode");
         query.setParameter("client", client);
@@ -475,7 +475,7 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public List<ProactiveMessage> getProactiveMessage(Client client, Integer dtisznCode) {
+    public List<ProactiveMessage> getProactiveMessages(Client client, Integer dtisznCode) {
         Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
                 "d.client=:client and d.dtisznCode=:dtisznCode");
         query.setParameter("client", client);
@@ -483,8 +483,8 @@ public class ETPMVDaoService {
         try {
             return (ArrayList<ProactiveMessage>) query.getResultList();
         } catch (NoResultException e) {
-            logger.error("Error in getProactiveMessage: " + e);
-            return null;
+            logger.error("Error in getProactiveMessages: " + e);
+            return new ArrayList<>();
         }
     }
 
