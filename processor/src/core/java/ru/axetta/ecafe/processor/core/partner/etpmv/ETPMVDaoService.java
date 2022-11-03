@@ -477,9 +477,10 @@ public class ETPMVDaoService {
     @Transactional
     public List<ProactiveMessage> getProactiveMessages(Client client, Integer dtisznCode) {
         Query query = entityManager.createQuery("select d from ProactiveMessage d where " +
-                "d.client=:client and d.dtisznCode=:dtisznCode");
+                "d.client=:client and d.dtisznCode=:dtisznCode and d.status<>:status");
         query.setParameter("client", client);
         query.setParameter("dtisznCode", dtisznCode);
+        query.setParameter("status", StatusETPMessageType.REFUSE_USER);
         try {
             return (ArrayList<ProactiveMessage>) query.getResultList();
         } catch (NoResultException e) {
