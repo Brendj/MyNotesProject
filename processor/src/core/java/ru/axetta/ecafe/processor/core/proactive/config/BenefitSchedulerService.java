@@ -88,7 +88,7 @@ public class BenefitSchedulerService {
             Scheduler scheduler = sfb.getScheduler();
 
             CronTrigger triggerSync = new CronTrigger(DELETE_BENEFIT_EXPIRATION, Scheduler.DEFAULT_GROUP);
-            triggerSync.setCronExpression(syncScheduleSync);
+            triggerSync.setCronExpression(syncScheduleDel);
             if (scheduler.getTrigger(DELETE_BENEFIT_EXPIRATION, Scheduler.DEFAULT_GROUP) != null) {
                 scheduler.deleteJob(DELETE_BENEFIT_EXPIRATION, Scheduler.DEFAULT_GROUP);
             }
