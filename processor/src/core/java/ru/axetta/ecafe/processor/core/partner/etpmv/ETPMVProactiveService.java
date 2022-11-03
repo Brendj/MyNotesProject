@@ -277,7 +277,7 @@ public class ETPMVProactiveService {
     }
 
     public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotificationStatus) throws Exception {
-        String serviceNumber = proactiveMessage == null ? generateServiceNumber() : proactiveMessage.getServicenumber();
+        String serviceNumber = proactiveMessage.getServicenumber();
         logger.info("Sending status to proaktiv ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status);
         boolean success = false;

@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
 import ru.axetta.ecafe.processor.core.persistence.proactive.ProactiveMessage;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.BenefitCategoryChange;
 import ru.axetta.ecafe.processor.core.proactive.kafka.model.response.PersonBenefitCategoryChanges;
@@ -66,17 +67,21 @@ public class PersonBenefitCategoryService {
             for (BenefitCategoryChange benefit : responseData.getBenefit_category_changes()) {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
+                categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                 if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).before(new Date())) {
                     //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
-                    String serviceNumber = RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).generateServiceNumber();
-                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
-                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
-                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
-                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
-                    status2.setFullName(client.getPerson().getFullName());
-                    RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
+                    List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
+                            getBean(ETPMVDaoService.class).getProactiveMessage(client, categoryCode);
+                    for (ProactiveMessage proactiveMessage: proactiveMessages)
+                    {
+                        StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
+                        DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
+                        StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+                        status2.setFullName(client.getPerson().getFullName());
+                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+                    }
                 } else {
-                    categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
                     Date startDate = format.get().parse(benefit.getBegin_date());
                     endDate = format.get().parse(benefit.getEnd_date());
                     DiscountManager.addDtisznDiscount(session, client, categoryCode, startDate, endDate, true, DiscountChangeHistory.MODIFY_BY_PROACTIVE);
