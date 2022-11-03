@@ -72,13 +72,14 @@ public class PersonBenefitCategoryService {
                     //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
                     List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
                             getBean(ETPMVDaoService.class).getProactiveMessage(client, categoryCode);
-                    for (ProactiveMessage proactiveMessage: proactiveMessages)
-                    {
-                        StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+                    for (ProactiveMessage proactiveMessage: proactiveMessages) {
                         RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
-                        DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
-                        StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
-                        status2.setFullName(client.getPerson().getFullName());
+                    }
+                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
+                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+                    status2.setFullName(client.getPerson().getFullName());
+                    for (ProactiveMessage proactiveMessage: proactiveMessages) {
                         RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
                     }
                 } else {
