@@ -121,7 +121,7 @@ public class ETPMVProactiveService {
         Integer code = statusType.getStatusCode();
         ETPMVDaoService daoService = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class);
         daoService.saveEtpPacket(serviceNumber, message, ETPMessageType.PROACTIVE);
-        ProactiveMessage proactiveMessage = daoService.getProactiveMessage(serviceNumber);
+        ProactiveMessage proactiveMessage = daoService.getProactiveMessages(serviceNumber);
 
         //Пользователь портала отказывается от ЛП для обучающегося.
         if (StatusETPMessageType.REFUSAL.getCode().equals(code.toString())) {
@@ -277,7 +277,14 @@ public class ETPMVProactiveService {
     }
 
     public void sendStatus(long begin_time, ProactiveMessage proactiveMessage, StatusETPMessageType status, Boolean isNotificationStatus) throws Exception {
-        String serviceNumber = proactiveMessage.getServicenumber();
+        String serviceNumber;
+        Boolean saveProactiveMessageStatus = true;
+        if (proactiveMessage == null) {
+            serviceNumber = generateServiceNumber();
+            saveProactiveMessageStatus = false;
+        }
+        else
+            serviceNumber = proactiveMessage.getServicenumber();
         logger.info("Sending status to proaktiv ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status);
         boolean success = false;
@@ -297,7 +304,7 @@ public class ETPMVProactiveService {
             logger.error("Error in sendStatus: ", e);
         }
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveOutgoingMessage(serviceNumber, message, success, "");
-        if (success) {
+        if (success && saveProactiveMessageStatus) {
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveProactiveMessageStatus(proactiveMessage, status);
         }
     }
