@@ -3068,6 +3068,9 @@ public class FrontController extends HttpServlet {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
+            if (!StringUtils.isBlank(snils)) {
+                snils = snils.replaceAll("[\\D]", "");
+            }
             if (genderId != 0 && genderId != 1) {
                 throw new Exception("Неверный пол");
             }
@@ -3151,7 +3154,10 @@ public class FrontController extends HttpServlet {
                     dulDetails.add(getDulDetailFromDocumentItem(item));
                 }
             }
-            if (snils != null && !snils.isEmpty() && DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
+            if (!StringUtils.isBlank(snils)) {
+                snils = snils.replaceAll("[\\D]", "");
+            }
+            if (!StringUtils.isBlank(snils) && DAOReadonlyService.getInstance().findClientsBySan(snils).size() > 0) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_SNILS_EXISTS, ResponseItem.ERROR_SNILS_EXISTS_MESSAGE);
             }
 
@@ -3203,6 +3209,9 @@ public class FrontController extends HttpServlet {
             if (lastName == null && snils == null && mobile == null) {
                 return new GuardianResponse(GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED,
                         GuardianResponse.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            }
+            if (!StringUtils.isBlank(snils)) {
+                snils = snils.replaceAll("[\\D]", "");
             }
             List<Client> clients = ClientManager
                     .findGuardianByNameOrMobileOrSun(persistenceSession, firstName, lastName, patronymic, mobile, snils);
@@ -3257,6 +3266,7 @@ public class FrontController extends HttpServlet {
             }
             try {
                 if (!StringUtils.isBlank(snils)) {
+                    snils = snils.replaceAll("[\\D]", "");
                     ClientManager.checkSanIsExist(persistenceSession, snils, client.getIdOfClient());
                 }
             } catch (Exception e) {
