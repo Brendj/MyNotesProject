@@ -3250,6 +3250,19 @@ public class FrontController extends HttpServlet {
                 throw new Exception("Неверный пол");
 
             Client client = persistenceSession.get(Client.class, idOfClient);
+
+            if (client == null) {
+                return new GuardianResponse(GuardianResponse.ERROR_CLIENT_NOT_FOUND,
+                        GuardianResponse.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            }
+            try {
+                if (!StringUtils.isBlank(snils)) {
+                    ClientManager.checkSanIsExist(persistenceSession, snils, client.getIdOfClient());
+                }
+            } catch (Exception e) {
+                return new GuardianResponse(GuardianResponse.ERROR_SNILS_EXISTS, GuardianResponse.ERROR_SNILS_EXISTS_MESSAGE);
+            }
+
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             String oldMobile = client.getMobile();
             String oldEmail = client.getEmail();

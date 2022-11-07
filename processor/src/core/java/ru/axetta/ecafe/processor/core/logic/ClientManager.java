@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
+import org.springframework.lang.NonNull;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -2606,7 +2609,6 @@ public class ClientManager {
         q.executeUpdate();
     }
 
-    //todo уточнить как найти представителя
     public static boolean isClientGuardian(Session session, Client client) {
         if (client.getIdOfClientGroup() < 1100000000L)
             return false;
@@ -2619,18 +2621,22 @@ public class ClientManager {
         return !criteria.list().isEmpty();
     }
 
-    @SuppressWarnings("unchecked")
     public static void validateSan(Session session, String san, Long idOfClient) throws Exception {
         if (!checkSanNumber(san))
             throw new Exception("Неверный номер СНИЛС");
 
+        checkSanIsExist(session, san, idOfClient);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void checkSanIsExist(Session session, @NonNull String san, @NonNull Long idOfClient) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("san", san));
         criteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         List<Client> clients = (List<Client>) criteria.list();
 
         for (Client foundClient : clients) {
-            if (foundClient.getSan().equals(san) && !foundClient.getIdOfClient().equals(idOfClient)) {
+            if (Objects.equals(foundClient.getSan(), san) && !foundClient.getIdOfClient().equals(idOfClient)) {
                 throw new Exception("Клиент с введенным значением СНИЛС уже существует");
             }
         }
