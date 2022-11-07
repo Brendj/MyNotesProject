@@ -13,7 +13,6 @@
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" fetch="select"/>
-        <property name="dtisznCode" column="DTISZNCode" type="long"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="discountDateStart" column="DiscountDateStart" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="discountDateEnd" column="DiscountDateEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -35,9 +34,26 @@
         <property name="idOfDocOrder" column="IdOfDocOrder" type="string" length="128"/>
         <property name="docOrderDate" column="DocOrderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="version" column="Version" type="long" not-null="true"/>
+        <property name="validDoc" column="validdoc" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="validGuardianShip" column="validguardianship" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="docConfirmed" column="docconfirmed" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodMezhvedState</param>
+            </type>
+        </property>
+        <property name="guardianshipConfirmed" column="guardianshipconfirmed" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodMezhvedState</param>
+            </type>
+        </property>
         <set name="applicationForFoodHistories" inverse="true" cascade="all">
             <key column="idOfApplicationForFood"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodHistory"/>
         </set>
+        <set name="dtisznCodes" inverse="true" cascade="all">
+            <key column="idOfApplicationForFood"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDiscount"/>
+        </set>
+
     </class>
 </hibernate-mapping>

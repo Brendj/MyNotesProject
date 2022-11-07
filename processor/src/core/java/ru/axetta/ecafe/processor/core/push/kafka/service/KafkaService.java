@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.Message;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public class KafkaService {
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
     public static final String MESH_KAFKA_ENABLE_PROPERTY = "ecafe.processing.mesh.kafka.enable";
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    protected final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     public KafkaService(KafkaTemplate<String, Object> kafkaTemplate) {

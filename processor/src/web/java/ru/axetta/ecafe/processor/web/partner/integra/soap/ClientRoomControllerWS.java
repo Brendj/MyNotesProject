@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import org.aspectj.weaver.ast.Or;
-import org.springframework.stereotype.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
@@ -10787,14 +10785,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.setApplicationExists(Boolean.FALSE);
             } else {
                 if (applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DELIVERY_ERROR, null))
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DELIVERY_ERROR))
                         || applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                                ApplicationForFoodDeclineReason.NO_DOCS)) || applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                                ApplicationForFoodDeclineReason.NO_APPROVAL)) || applicationForFood.getStatus()
-                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) {
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_BENEFIT)) || applicationForFood.getStatus()
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_GUARDIANSHIP)) || applicationForFood.getStatus()
+                        .equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED_PASSPORT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss");
@@ -10864,11 +10859,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new ClientNotFoundException(String.format("Unable to find client with guid={%s}", clientGuid));
             }
 
-            DAOUtils.createApplicationForFood(persistenceSession, client, otherDiscount ? null : categoryDiscount,
+            DAOUtils.createApplicationForFood(persistenceSession, client, otherDiscount ? null : Arrays.asList(categoryDiscount.intValue()),
                     mobilePhone, guardianName, guardianSecondName, guardianSurname, serviceNumber,
-                    ApplicationForFoodCreatorType.PORTAL);
+                    ApplicationForFoodCreatorType.PORTAL, null, null);
             DAOUtils.updateApplicationForFood(persistenceSession, client,
-                    new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+                    new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
 
             //if (!otherDiscount) {
             //    DAOUtils.updateApplicationForFood(persistenceSession, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
@@ -10898,8 +10893,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result updateStatusOfApplicationForFood(@WebParam(name = "state") Integer stateCode,
             @WebParam(name = "declineReason") Integer declineReasonCode,
             @WebParam(name = "serviceNumber") String serviceNumber) {
-        ApplicationForFoodDeclineReason declineReason = ApplicationForFoodDeclineReason.fromInteger(declineReasonCode);
-        ApplicationForFoodState state = ApplicationForFoodState.fromCode(stateCode);
+        String code = stateCode.toString();
+        if (declineReasonCode != null &&declineReasonCode > 0) {
+            code += "." + declineReasonCode.toString();
+        }
+        ApplicationForFoodState state = ApplicationForFoodState.fromCode(code);
         if (state == null) {
             return new Result(RC_INVALID_DATA, "Не известный код состояния заявления");
         }
@@ -10909,7 +10907,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         Result result = new Result();
-        ApplicationForFoodStatus status = new ApplicationForFoodStatus(state, declineReason);
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(state);
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -10920,13 +10918,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new Exception(
                         "Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
             }
-            RuntimeContext.getAppContext().getBean(ETPMVService.class)
-                    .sendStatus(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState(),
-                            status.getDeclineReason());
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            RuntimeContext.getAppContext().getBean(ETPMVService.class)
+                    .sendStatusAsync(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState());
         } catch (Exception e) {
             logger.error(String.format("Can't update ApplicationForFood serviceNumber = %s", serviceNumber), e);
             result.resultCode = RC_INTERNAL_ERROR;

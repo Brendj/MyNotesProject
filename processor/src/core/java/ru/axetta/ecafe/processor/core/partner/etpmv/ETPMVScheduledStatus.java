@@ -4,18 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
-import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDeclineReason;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
 
 public class ETPMVScheduledStatus {
     private String serviceNumber;
     private ApplicationForFoodState state;
-    private ApplicationForFoodDeclineReason reason;
 
-    public ETPMVScheduledStatus(String serviceNumber, ApplicationForFoodState state, ApplicationForFoodDeclineReason reason) {
+    public ETPMVScheduledStatus(String serviceNumber, ApplicationForFoodState state) {
         this.serviceNumber = serviceNumber;
         this.state = state;
-        this.reason = reason;
     }
 
     public String getServiceNumber() {
@@ -34,11 +31,4 @@ public class ETPMVScheduledStatus {
         this.state = state;
     }
 
-    public ApplicationForFoodDeclineReason getReason() {
-        return reason;
-    }
-
-    public void setReason(ApplicationForFoodDeclineReason reason) {
-        this.reason = reason;
-    }
 }

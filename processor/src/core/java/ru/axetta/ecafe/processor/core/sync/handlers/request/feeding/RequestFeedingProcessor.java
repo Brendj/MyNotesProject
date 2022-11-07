@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding> {
 
@@ -51,20 +53,22 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                         continue;
                     }
 
-                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(
-                            ApplicationForFoodState.fromCode(item.getStatus()),
-                            ApplicationForFoodDeclineReason.fromInteger(item.getDeclineReason()));
+                    String strStatus = item.getStatus().toString();
+                    if (item.getDeclineReason() != null && item.getDeclineReason() > 0) {
+                        strStatus += "." + item.getDeclineReason().toString();
+                    }
+                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(strStatus));
                     if (null == applicationForFood) {
                         try {
                             applicationForFood = DAOUtils
-                                    .createApplicationForFood(session, client, item.getDtisznCode(),
+                                    .createApplicationForFood(session, client, Arrays.asList(item.getDtisznCode()),
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(),
-                                            item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
+                                            item.getServNumber(), ApplicationForFoodCreatorType.PORTAL, null, null);
                             etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                     applicationForFood.getStatus()));
                             ApplicationForFoodStatus st = new ApplicationForFoodStatus(
-                                    ApplicationForFoodState.REGISTERED, null);
+                                    ApplicationForFoodState.REGISTERED);
                             applicationForFood = DAOUtils
                                     .updateApplicationForFoodByServiceNumber(session, item.getServNumber(), st);
                             etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, st));
@@ -72,7 +76,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             logger.error(String.format(
                                     "Unable to create application for food {idOfClient=%d, DTSZNCode=%d, "
                                             + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
-                                    item.getIdOfClient(), item.getDtisznCode(), item.getApplicantPhone(),
+                                    item.getIdOfClient(), item.getDtisznCode(),
+                                    item.getApplicantPhone(),
                                     item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(),
                                     item.getServNumber()), e);
                             resItem = new ResRequestFeedingItem();
@@ -85,15 +90,14 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     } else {
                         try {
                             ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
-                            if (!oldStatus.equals(status) && applicationForFood.getDtisznCode() == null && status
+                            if (!oldStatus.equals(status) && applicationForFood.isInoe() && status
                                     .getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
                                 //если Иное и новый статус 1075, то искусственно создаем статус 1052
                                 DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING),
                                         nextHistoryVersion);
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING,
-                                                status.getDeclineReason())));
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING)));
                                 if (CalendarUtils.betweenDate(new Date(), item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate())) {
                                     DiscountManager.addOtherDiscountForClient(session, client);
                                 }
@@ -101,14 +105,13 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
 
                             applicationForFood = DAOUtils
                                     .updateApplicationForFoodByServiceNumberFullWithVersion(session,
-                                            item.getServNumber(), client, item.getDtisznCode(), status,
+                                            item.getServNumber(), client, status,
                                             item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), nextVersion,
                                             nextHistoryVersion, item.getDocOrderDate(), item.getIdOfDocOrder());
                             if (!oldStatus.equals(status)) {
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
-                                        new ApplicationForFoodStatus(status.getApplicationForFoodState(),
-                                                status.getDeclineReason())));
+                                        new ApplicationForFoodStatus(status.getApplicationForFoodState())));
                             }
                         } catch (ApplicationForFoorStatusExistsException e) {
                             logger.error("Error in processing entity: " + e.getMessage());
@@ -158,7 +161,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 ApplicationForFoodHistory history = DAOUtils
                         .getLastApplicationForFoodHistory(session, applicationForFood);
                 RequestFeedingItem resItem = null;
-                if (null == applicationForFood.getDtisznCode()) { //Тип льготы - Иное
+                if (applicationForFood.isInoe()) { //Тип льготы - Иное
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(),
                                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);

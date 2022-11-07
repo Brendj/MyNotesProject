@@ -5,8 +5,11 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
@@ -17,10 +20,9 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService.DATA_SOURCE_TYPE_MARKER_OU;
 
 public class DiscountManager {
 
@@ -29,6 +31,7 @@ public class DiscountManager {
     public static final String DELETE_INOE_COMMENT = "Удалено по причине окончания периода";
     public static final String RESERV_DISCOUNT = "Резерв";
     private static final String PROPERTY_DOU_DISCOUNT_DELETE = "ecafe.processor.clientMigrationHistory.dou.discountDelete";
+    private static Map<Integer, Integer> discountPriorityMap = null;
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
@@ -79,6 +82,13 @@ public class DiscountManager {
         //long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
         //client.setClientRegistryVersion(clientRegistryVersion);
         //session.update(client);
+    }
+
+    public static CategoryDiscount getCategoryDiscountByDtisznCode(Session session, Integer dtisznCode) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("code", dtisznCode));
+        CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN)criteria.uniqueResult();
+        return categoryDiscountDSZN.getCategoryDiscount();
     }
 
     private static CategoryDiscount getCategoryDiscountByCode(Session session, Long idOfCategoryDiscount) {
@@ -176,6 +186,77 @@ public class DiscountManager {
         }
     }
 
+    public static Integer getDiscountPriority(Long dsznCode) {
+        if (discountPriorityMap == null) {
+            discountPriorityMap = new HashMap<>();
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOReadonlyService.getInstance().getCategoryDiscountDSZNList();
+            for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
+                discountPriorityMap.put(categoryDiscountDSZN.getCode(), categoryDiscountDSZN.getPriority());
+            }
+        }
+        return discountPriorityMap.get(dsznCode.intValue()) == null ? 0 : discountPriorityMap.get(dsznCode.intValue());
+    }
+
+    public static void rebuildAppointedMSPByClient(Session session, Client client) {
+        List<ClientDtisznDiscountInfo> list = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+        if (list.size() == 0) return;
+        ClientDtisznDiscountInfo oldAppointedMSP = list.stream()
+                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP()).findFirst().orElse(null);
+        Collections.sort(list);
+        ClientDtisznDiscountInfo newAppointedMSP = list.get(list.size()-1);
+        if (oldAppointedMSP == null) {
+            newAppointedMSP.setAppointedMSP(true);
+            session.update(newAppointedMSP);
+        } else if (!oldAppointedMSP.equals(newAppointedMSP)) {
+            oldAppointedMSP.setAppointedMSP(false);
+            newAppointedMSP.setAppointedMSP(true);
+            session.update(oldAppointedMSP);
+            session.update(newAppointedMSP);
+        }
+    }
+
+    public static void addDtisznDiscount(Session session, Client client, Integer dtisznCode, Date startDate, Date endDate, boolean rebuild) throws Exception {
+        ClientDtisznDiscountInfo discountInfo = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, dtisznCode.longValue());
+        Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+        if (null == discountInfo) {
+            CategoryDiscountDSZN categoryDiscountDSZN = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                    .getCategoryDiscountDSZNByCode(dtisznCode);
+            String title = categoryDiscountDSZN == null ? "" : categoryDiscountDSZN.getDescription();
+            discountInfo = new ClientDtisznDiscountInfo(client, dtisznCode.longValue(), title,
+                    ClientDTISZNDiscountStatus.CONFIRMED, startDate, endDate,
+                    new Date(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+            discountInfo.setArchived(false);
+            session.save(discountInfo);
+        } else {
+            discountInfo.setDateStart(startDate);
+            discountInfo.setDateEnd(endDate);
+            discountInfo.setArchived(false);
+            discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+            discountInfo.setLastUpdate(new Date());
+            discountInfo.setVersion(clientDTISZNDiscountVersion);
+            RuntimeContext.getAppContext().getBean(ClientDiscountHistoryService.class).saveChangeHistoryByDiscountInfo(session, discountInfo,
+                    DiscountChangeHistory.MODIFY_IN_SERVICE);
+            session.update(discountInfo);
+        }
+        addDiscount(session, client, getCategoryDiscountByDtisznCode(session, dtisznCode), DiscountChangeHistory.MODIFY_IN_SERVICE);
+        if (rebuild) {
+            rebuildAppointedMSPByClient(session, client);
+        }
+    }
+
+    public static ClientDtisznDiscountInfo getAppointedClientDtisznDiscount(Client client) {
+        if (CollectionUtils.isEmpty(client.getCategoriesDSZN())) return null;
+        ClientDtisznDiscountInfo info = client.getCategoriesDSZN().stream()
+                .filter(i -> i.getAppointedMSP() != null && i.getAppointedMSP() && (i.getArchived() == null || !i.getArchived())).findFirst().orElse(null);
+        if (info != null) return info;
+        List<ClientDtisznDiscountInfo> infos = new ArrayList(client.getCategoriesDSZN());
+        Collections.sort(infos);
+        for (int i = infos.size()-1; i >= 0; i--) {
+            if (!infos.get(i).isArchivedNullSafe()) return infos.get(i);
+        }
+        return null;
+    }
+
     public static void archiveApplicationForFood(Session session, ApplicationForFood applicationForFood, Long newVersion) {
         if (!applicationForFood.getArchived() && isEligibleToDelete(session, applicationForFood)) {
             applicationForFood.setArchived(true);
@@ -190,13 +271,18 @@ public class DiscountManager {
 
     public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
         CategoryDiscountDSZN categoryDiscountDSZN;
-        if (item.getDtisznCode() == null) {
-            ///для льготы Иное
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
-        } else {
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        boolean result = true;
+        for (ApplicationForFoodDiscount discount : item.getDtisznCodes()) {
+            if (discount.getDtisznCode() == null) {
+                ///для льготы Иное
+                categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
+            } else {
+                categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, discount.getDtisznCode().longValue());
+            }
+            if (!categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete()) result = false;
         }
-        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
+
+        return result;
     }
 
     public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
@@ -284,6 +370,37 @@ public class DiscountManager {
         if (newDiscounts.equals(client.getCategories())) return;
 
         renewDiscounts(session, client, newDiscounts, client.getCategories(), historyComment);
+    }
+
+    //0 элемент - льготы ИСПП, 1 - ДСЗН
+    public static String[] getClientDiscountsAsArray(Client client, List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        String[] result = {"", ""};
+        ClientDtisznDiscountInfo info = getAppointedClientDtisznDiscount(client);
+        if (info != null) {
+            result[0] = getISPPDiscounts(client, info, categoryDiscountDSZNList);
+            result[1] = info.getDtisznCode().toString();
+        } else {
+            result[0] = getClientDiscountsAsString(client);
+        }
+        return result;
+    }
+
+    private static String getISPPDiscounts(Client client, ClientDtisznDiscountInfo info,
+                                    List<CategoryDiscountDSZN> categoryDiscountDSZNList) {
+        String result = "";
+        for (CategoryDiscount cd : client.getCategories()) {
+            if (categoryDiscountDSZNList.stream().anyMatch(cdDszn -> cdDszn.getCategoryDiscount().equals(cd)
+                    && info.getDtisznCode().equals(cdDszn.getCode().longValue()))) {
+                result += cd.getIdOfCategoryDiscount() + ",";
+            }
+            if (!categoryDiscountDSZNList.stream().anyMatch(cdDszn -> cdDszn.getCategoryDiscount().equals(cd))) {
+                result += cd.getIdOfCategoryDiscount() + ",";
+            }
+        }
+        if (result.length() > 0) {
+            result = result.substring(0, result.length()-1);
+        }
+        return result;
     }
 
     public static String getClientDiscountsAsString(Client client) {

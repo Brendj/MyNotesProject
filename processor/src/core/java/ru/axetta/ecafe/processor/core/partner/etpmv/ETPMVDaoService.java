@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.core.push.model.AbstractPushData;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.DocValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.request.GuardianshipValidationRequest;
+import ru.axetta.ecafe.processor.core.zlp.kafka.response.Errors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -100,6 +104,19 @@ public class ETPMVDaoService {
         entityManager.persist(etpBKMessage);
     }
 
+    public List<ApplicationForFood> findApplicationsForFoodSendedMezhvedRequest(Session session) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.status in (:status1, :status2) and a.archived = false ");
+        query.setParameter("status1", new ApplicationForFoodStatus(ApplicationForFoodState.GUARDIANSHIP_VALIDITY_REQUEST_SENDED));
+        query.setParameter("status2", new ApplicationForFoodStatus(ApplicationForFoodState.DOC_VALIDITY_REQUEST_SENDED));
+        return query.getResultList();
+    }
+
+    public List<ApplicationForFood> findApplicationsForFoodSendedBenefitRequest(Session session) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.status = :status and a.archived = false");
+        query.setParameter("status", new ApplicationForFoodStatus(ApplicationForFoodState.BENEFITS_VALIDITY_REQUEST_SENDED));
+        return query.getResultList();
+    }
+
     @Transactional(readOnly = true)
     public ApplicationForFood findApplicationForFood(String guid) {
         Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.meshGUID = :guid order by a.createdDate desc");
@@ -113,15 +130,21 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void createApplicationForGood(Client client, Long dtisznCode, String mobile,
-            String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
-            ApplicationForFoodCreatorType creatorType) throws Exception {
+    public ApplicationForFood findApplicationForFoodByServiceNumber(String serviceNumber) {
         Session session = entityManager.unwrap(Session.class);
-        DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
-                guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
-        DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-        if (dtisznCode == null) {
-            DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
+        return DAOUtils.findApplicationForFoodByServiceNumber(session, serviceNumber);
+    }
+
+    @Transactional
+    public void createApplicationForGood(Client client, List<Integer> dtisznCodes, String mobile,
+            String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
+            ApplicationForFoodCreatorType creatorType, Boolean validDoc, Boolean validGuardianship) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        DAOUtils.createApplicationForFood(session, client, dtisznCodes, mobile,
+                guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType, validDoc, validGuardianship);
+        DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
+        if (dtisznCodes == null) {
+            DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED));
         }
     }
 
@@ -134,11 +157,18 @@ public class ETPMVDaoService {
     }
 
     @Transactional(readOnly = true)
-    public Long getDSZNBenefit(String benefit) {
+    public Integer getDSZNBenefit(String benefit) {
         Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPCode = :benefit");
         query.setParameter("benefit", Long.parseLong(benefit));
         query.setMaxResults(1);
-        return new Long((Integer)query.getSingleResult());
+        return (Integer)query.getSingleResult();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Integer> getDSZNBenefits(List<String> benefits) {
+        Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPTextCode in (:benefits)");
+        query.setParameter("benefits", benefits);
+        return query.getResultList();
     }
 
     @Transactional(readOnly = true)
@@ -174,14 +204,27 @@ public class ETPMVDaoService {
 
     @Transactional
     public List<ApplicationForFood> getDataForAISContingent() {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c where a.sendToAISContingent = false "
-                + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe)) "
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join fetch a.dtisznCodes codes "
+                + " where a.sendToAISContingent = false and a.serviceNumber like :old_format "
+                + " and ((codes.dtisznCode <> null and a.status = :statusDtiszn) or (codes.dtisznCode = null and a.status = :statusInoe)) "
                 + " and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :group_employees or c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :group_displaced)");
-        query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-        query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED));
+        query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK));
         query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
         query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        query.setParameter("old_format", "%" + ETPMVService.ISPP_ID + "%");
         return query.getResultList();
+    }
+
+    @Transactional
+    public void updateApplicationForFoodWithStatus(Long idOfApplicationForFood,
+                                                   ApplicationForFoodStatus status) throws Exception  {
+        Session session = entityManager.unwrap(Session.class);
+        Long applicationVersion = getApplicationForFoodNextVersion();
+        Long historyVersion = getApplicationForFoodHistoryNextVersion();
+        ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+        DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status,
+                        applicationVersion, historyVersion, true);
     }
 
     @Transactional
@@ -206,14 +249,16 @@ public class ETPMVDaoService {
             query.setParameter("guid", meshGuid);
         }
         List<ApplicationForFood> apps = query.getResultList();
-        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED);
         for (ApplicationForFood applicationForFood : apps) {
             try {
-                if (applicationForFood.getDtisznCode() != null) {
+                if (!applicationForFood.isInoe()) {
                     result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status,
                             nextVersion, historyVersion));
                 } else {
-                    if (ApplicationForFoodState.DENIED != applicationForFood.getStatus().getApplicationForFoodState()) {
+                    if (ApplicationForFoodState.DENIED_BENEFIT != applicationForFood.getStatus().getApplicationForFoodState()
+                    && ApplicationForFoodState.DENIED_GUARDIANSHIP != applicationForFood.getStatus().getApplicationForFoodState()
+                    && ApplicationForFoodState.DENIED_PASSPORT != applicationForFood.getStatus().getApplicationForFoodState()) {
                         DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
                     }
                 }
@@ -224,4 +269,135 @@ public class ETPMVDaoService {
         return result;
     }
 
+    @Transactional
+    public String getOriginalMessageFromApplicationForFood(ApplicationForFood applicationForFood) {
+        List<String> list = entityManager.createQuery("select m.etpMessagePayload from EtpIncomingMessage m where m.etpMessageId = :messageId")
+                .setParameter("messageId", applicationForFood.getServiceNumber())
+                .getResultList();
+        return list.get(0);
+    }
+
+    @Transactional
+    public void saveMezhvedRequest(AbstractPushData request, String jsonString, Long idOfApplicationForFood) {
+        ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+        AppMezhvedRequest appMezhvedRequest = new AppMezhvedRequest(request, jsonString, applicationForFood);
+        entityManager.persist(appMezhvedRequest);
+        if (request instanceof GuardianshipValidationRequest) {
+            applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }
+        /*if (request instanceof BenefitValidationRequest) {
+            applicationForFood.setGuardianshipConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }*/
+        if (request instanceof DocValidationRequest) {
+            applicationForFood.setDocConfirmed(ApplicationForFoodMezhvedState.REQUEST_SENT);
+            entityManager.merge(applicationForFood);
+        }
+    }
+
+    @Transactional
+    public AppMezhvedRequest updateMezhvedRequest(String requestId, List<Errors> errors, String message) {
+        Query query = entityManager.createQuery("select a from AppMezhvedRequest a " +
+                "where a.requestId = :requestId");
+        query.setParameter("requestId", requestId);
+        AppMezhvedRequest appMezhvedRequest = (AppMezhvedRequest)query.getSingleResult();
+        if (errors != null)
+            appMezhvedRequest.setResponseType(AppMezhvedResponseType.ERROR);
+        else
+            appMezhvedRequest.setResponseType(AppMezhvedResponseType.OK);
+        appMezhvedRequest.setResponsePayload(message);
+        appMezhvedRequest.setResponseDate(new Date());
+        appMezhvedRequest.setLastUpdate(new Date());
+
+        appMezhvedRequest = entityManager.merge(appMezhvedRequest);
+        appMezhvedRequest.getApplicationForFood().getDtisznCodes().size();
+        return appMezhvedRequest;
+    }
+
+    @Transactional
+    public ApplicationForFood getApplicationForFoodWithDtisznCodes(String serviceNumber) {
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.dtisznCodes codes "
+                + " where a.serviceNumber = :serviceNumber");
+        query.setParameter("serviceNumber", serviceNumber);
+        try {
+            return (ApplicationForFood) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public ApplicationForFood getApplicationForFoodWithPerson(String serviceNumber) {
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c join fetch c.person " +
+                "where a.serviceNumber = :serviceNumber");
+        query.setParameter("serviceNumber", serviceNumber);
+        return (ApplicationForFood)query.getSingleResult();
+    }
+
+    @Transactional
+    public ClientDtisznDiscountInfo getClientDtisznDiscountInfoAppointed(Client client) {
+        Query query = entityManager.createQuery("select info from ClientDtisznDiscountInfo info where info.client = :client " +
+                "and info.archived = false and info.appointedMSP = true");
+        query.setParameter("client", client);
+        query.setMaxResults(1);
+        try {
+            return (ClientDtisznDiscountInfo) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Transactional
+    public CategoryDiscountDSZN getCategoryDiscountDSZNByCode(Integer code) {
+        Query query = entityManager.createQuery("select d from CategoryDiscountDSZN d where d.code=:code");
+        query.setParameter("code", code);
+        try {
+            return (CategoryDiscountDSZN) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+
+    @Transactional
+    public void saveMezvedKafkaError(String msg, String topic, Integer type, String error, Long idOfApplicationForFood) {
+        try{
+            ApplicationForFood applicationForFood = entityManager.find(ApplicationForFood.class, idOfApplicationForFood);
+            AppMezhvedErrorSendKafka appMezhvedErrorSendKafka = new AppMezhvedErrorSendKafka(msg, topic, type, error, applicationForFood);
+            entityManager.persist(appMezhvedErrorSendKafka);
+        } catch (Exception e)
+        {
+            logger.error("Error in saveMezvedKafkaError: " + e);
+        }
+    }
+
+    @Transactional
+    public List<AppMezhvedErrorSendKafka> getMezvedKafkaError() {
+        try{
+            Query query = entityManager.createQuery("select a from AppMezhvedErrorSendKafka a join fetch a.applicationForFood c");
+            return query.getResultList();
+        } catch (Exception e)
+        {
+            logger.error("Error in getMezvedKafkaError: " + e);
+        }
+        return null;
+    }
+
+    @Transactional
+    public void updateMezhvedKafkaError(AppMezhvedErrorSendKafka appMezhvedErrorSendKafka, Boolean success) {
+        try {
+            if (!success) {
+                //Если не удалось отправить повторно, то просто обновляем время
+                appMezhvedErrorSendKafka.setUpdatedate(new Date());
+                entityManager.merge(appMezhvedErrorSendKafka);
+            } else {
+                //Если отправка успешна, то убираем запись из таблицы
+                entityManager.remove(appMezhvedErrorSendKafka);
+            }
+        } catch (Exception e)
+        {
+            logger.error("Error in updateMezhvedKafkaError: " + e);
+        }
+    }
 }

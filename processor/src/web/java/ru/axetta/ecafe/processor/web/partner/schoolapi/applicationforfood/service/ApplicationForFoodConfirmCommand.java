@@ -65,7 +65,7 @@ public class ApplicationForFoodConfirmCommand {
         requestFeedingItem.setIdOfDocOrder(docOrderId);
         requestFeedingItem.setOtherDiscountStartDate(discountStartDate);
         requestFeedingItem.setOtherDiscountEndDate(discountEndDate);
-        requestFeedingItem.setStatus(ApplicationForFoodState.OK.getCode());
+        requestFeedingItem.setStatus(Integer.valueOf(ApplicationForFoodState.OK.getCode()));
         requestFeedingItem.setDeclineReason(null);
         requestFeedingItem.setResCode(RequestFeedingItem.ERROR_CODE_ALL_OK);
         return requestFeedingItem;
@@ -83,7 +83,7 @@ public class ApplicationForFoodConfirmCommand {
                         "ApplicationForFood with record ID = '" + recordId + "' was not found");
             }
             if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.RESUME
-                    || applicationForFood.getDtisznCode() != null) {
+                    || !applicationForFood.isInoe()) {
                 throw WebApplicationException.badRequest(400,
                         "ApplicationForFood with record ID = '" + recordId + "' confirm not available due its state");
             }

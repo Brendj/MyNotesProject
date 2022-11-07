@@ -59,7 +59,7 @@ public class ApplicationForFoodConfirmDocumentsCommand {
     private RequestFeedingItem createRequestFeedingItem(ApplicationForFood applicationForFood) {
         RequestFeedingItem requestFeedingItem = new RequestFeedingItem(applicationForFood,
                 new Date(System.currentTimeMillis()));
-        requestFeedingItem.setStatus(ApplicationForFoodState.RESUME.getCode());
+        requestFeedingItem.setStatus(Integer.valueOf(ApplicationForFoodState.RESUME.getCode()));
         requestFeedingItem.setResCode(RequestFeedingItem.ERROR_CODE_ALL_OK);
         return requestFeedingItem;
     }
@@ -76,7 +76,7 @@ public class ApplicationForFoodConfirmDocumentsCommand {
                         "ApplicationForFood with record ID = '" + recordId + "' was not found");
             }
             if (applicationForFood.getStatus().getApplicationForFoodState() != ApplicationForFoodState.PAUSED
-                    || applicationForFood.getDtisznCode() != null) {
+                    || !applicationForFood.isInoe()) {
                 throw WebApplicationException.badRequest(400, "ApplicationForFood with record ID = '" + recordId
                         + "' confirm documents not available due its state");
             }

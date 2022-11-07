@@ -400,6 +400,12 @@
                 </f:facet>
                 <h:outputText escape="true" value="#{clientDiscount.status}" styleClass="output-text"/>
             </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Назначена МСП" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.appointedMSP}" styleClass="output-text"/>
+            </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам" styleClass="output-text" />

@@ -601,14 +601,14 @@ public class ClientViewPage extends BasicWorkspacePage {
             for(ClientDtisznDiscountInfo discountInfo : clientDiscountsDTiSZNList){
                 ClientDiscountItem item = new ClientDiscountItem(null, null, discountInfo.getIdOfClientDTISZNDiscountInfo(),
                         discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(), discountInfo.getStatus().getValue(), discountInfo.getDateStart(),
-                        discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode());
+                        discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode(), discountInfo.getAppointedMSP());
                 result.add(item);
             }
         } else if(CollectionUtils.isEmpty(clientDiscountsDTiSZNList)){
             for(CategoryDiscount categoryDiscount : clientDiscountsList){
                 ClientDiscountItem item = new ClientDiscountItem(categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
                         null, null, null, null, null, null, client.getLastDiscountsUpdate(),
-                        client.getDiscountMode());
+                        client.getDiscountMode(), null);
                 result.add(item);
             }
         } else {
@@ -624,7 +624,7 @@ public class ClientViewPage extends BasicWorkspacePage {
                                     categoryDiscount.getCategoryName(), discountInfo.getIdOfClientDTISZNDiscountInfo(),
                                     discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(),
                                     discountInfo.getStatus().getValue(), discountInfo.getDateStart(), discountInfo.getDateEnd(), client.getLastDiscountsUpdate(),
-                                    client.getDiscountMode());
+                                    client.getDiscountMode(), discountInfo.getAppointedMSP());
                             result.add(item);
                             findSuitable = true;
                             break;
@@ -634,7 +634,7 @@ public class ClientViewPage extends BasicWorkspacePage {
                 if(!findSuitable){
                     ClientDiscountItem item = new ClientDiscountItem(categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
                             null, null, null, null, null, null, client.getLastDiscountsUpdate(),
-                            client.getDiscountMode());
+                            client.getDiscountMode(), null);
                     result.add(item);
                 }
             }
@@ -650,7 +650,7 @@ public class ClientViewPage extends BasicWorkspacePage {
                 if(!findSuitableItem){
                     ClientDiscountItem item = new ClientDiscountItem(null, null, discountInfo.getIdOfClientDTISZNDiscountInfo(),
                             discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(), discountInfo.getStatus().getValue(), discountInfo.getDateStart(),
-                            discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode());
+                            discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode(), discountInfo.getAppointedMSP());
                     result.add(item);
                 }
             }
