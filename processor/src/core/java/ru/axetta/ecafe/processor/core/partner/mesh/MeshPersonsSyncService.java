@@ -163,10 +163,11 @@ public class MeshPersonsSyncService {
                 Education education = findEducation(person, trainingForms);
                 if (education == null) {
                     Query query = session.createQuery("update MeshSyncPerson m" +
-                            " set m.lastupdateRest = :lastupdateRest, m.deletestate = :deletestate" +
+                            " set m.lastupdateRest = :lastupdateRest, m.deletestate = :deletestate, m.invaliddata = :invaliddata" +
                             " where m.personguid = :personguid");
                     query.setParameter("lastupdateRest", now);
                     query.setParameter("deletestate", true);
+                    query.setParameter("invaliddata", false);
                     query.setParameter("personguid", personguid);
                     query.executeUpdate();
 
