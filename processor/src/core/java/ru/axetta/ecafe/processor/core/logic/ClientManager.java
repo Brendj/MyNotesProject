@@ -2038,6 +2038,17 @@ public class ClientManager {
         }
     }
 
+    public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
+                                        ClientGuardianHistory clientGuardianHistory) {
+        Long newGuardiansVersions = generateNewClientGuardianVersion(session);
+        for (ClientGuardianItem item : clientWards) {
+            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
+        }
+    }
+
     /* Добавить список опекунов клиента */
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians,
                                             ClientGuardianHistory clientGuardianHistory) {
@@ -2046,7 +2057,7 @@ public class ClientManager {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), false);
+                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
         }
     }
 
@@ -2054,7 +2065,7 @@ public class ClientManager {
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
                                            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
                                            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType,
-                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType, Boolean informing) {
+                                           ClientGuardianHistory clientGuardianHistory, ClientGuardianRoleType roleType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -2067,7 +2078,7 @@ public class ClientManager {
             clientGuardian.setCreatedFrom(createdWhere);
             clientGuardian.setRepresentType(representType);
             clientGuardian.setRoleType(roleType);
-            clientGuardian.setDisabled(informing);
+            clientGuardian.setDisabled(disabled);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -2237,17 +2248,6 @@ public class ClientManager {
         }
         if (enabled) {
             dbSettings.add(newSetting);
-        }
-    }
-
-    public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
-                                        ClientGuardianHistory clientGuardianHistory) {
-        Long newGuardiansVersions = generateNewClientGuardianVersion(session);
-        for (ClientGuardianItem item : clientWards) {
-            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
-                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
-                    clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()), false);
         }
     }
 

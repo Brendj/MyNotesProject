@@ -3337,15 +3337,19 @@ public class FrontController extends HttpServlet {
 
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
                 ClientManager.addGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(), newGuardiansVersions,
-                        true, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
+                        !informing, ClientGuardianRelationType.fromInteger(relation), ClientManager.getNotificationSettings(),
                         ClientCreatedFromType.ARM, ClientGuardianRepresentType.fromInteger(typeOfLegalRepresent), clientGuardianHistory,
-                        ClientGuardianRoleType.fromInteger(agentTypeId), !informing);
+                        ClientGuardianRoleType.fromInteger(agentTypeId));
 
                 MeshAgentResponse personResponse = getMeshGuardiansService().addGuardianToClient(meshGuid, childMeshGuid, agentTypeId);
                 if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                     logger.error(String.format("Error in addGuardianToClient %s: %s", personResponse.getCode(), personResponse.getMessage()));
                     return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
                 }
+            } else {
+                clientGuardian.setDisabled(!informing);
+                clientGuardian.setLastUpdate(new Date());
+                persistenceSession.update(clientGuardian);
             }
             if (!idOfOrg.equals(guardian.getOrg().getIdOfOrg()) && !DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), org)
                     && MigrantsUtils.findActiveMigrant(persistenceSession, idOfOrg, guardian.getIdOfClient()) == null) {
