@@ -2767,16 +2767,10 @@ public class ClientManager {
         }
     }
 
-    public static void guardianToLeaving(Session session, Client guardian) throws Exception {
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-        clientGuardianHistory.setReason(HISTORY_LABEL);
-
+    public static void guardianToLeaving(Session session, Client guardian, ClientGuardianHistory clientGuardianHistory) throws Exception {
         if (!guardian.isDeletedOrLeaving()) {
             ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
-                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL, clientGuardianHistory);
             guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             guardian.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
             session.update(guardian);
