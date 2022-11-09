@@ -1626,7 +1626,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
                 //Перенос в группу выбывшие в случае удаления связок с опекунами
                 List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, idsOfGuardian, true);
-                if (guardianWards.stream().noneMatch(g -> g.getIdOfClient().equals(idsOfGuardian))) {
+                if (guardianWards.isEmpty()) {
                     guardianToLeaving(persistenceSession, guardian);
                 }
             }
