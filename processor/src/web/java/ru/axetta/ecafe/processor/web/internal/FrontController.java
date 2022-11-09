@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
@@ -62,6 +63,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.guardianToLeaving;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadWardsByClient;
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyFreeDocumentParams;
@@ -3456,6 +3459,15 @@ public class FrontController extends HttpServlet {
             Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
             ClientManager.removeGuardianByClient(persistenceSession, child.getIdOfClient(), guardian.getIdOfClient(),
                     newGuardiansVersions, clientGuardianHistory);
+
+            //Перенос в группу выбывшие в случае удаления связок с опекунами
+            if (guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+                List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, guardian.getIdOfClient(), true);
+                if (guardianWards.isEmpty()) {
+                    guardianToLeaving(persistenceSession, guardian);
+                }
+            }
+
             MeshAgentResponse personResponse = getMeshGuardiansService().deleteGuardianToClient(agentMeshGuid, childMeshGuid);
             if (!personResponse.getCode().equals(PersonResponse.OK_CODE)) {
                 return new GuardianResponse(personResponse.getCode(), personResponse.getMessage());
