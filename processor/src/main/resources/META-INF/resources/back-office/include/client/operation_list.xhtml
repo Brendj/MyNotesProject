@@ -618,71 +618,74 @@
                                 value="#{mainPage.clientOperationListPage.clientPasses}"
                                 rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer"
                                 rows="8"
-                                columns="11">
+                                columns="12">
 
                     <f:facet name="header">
                         <rich:columnGroup>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="№" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="ID OO" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Название ОО" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Адрес" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Наименование события" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Дата и время" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Тип карты" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Направление" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Кто отметил" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header" >
                                 <h:outputText escape="true" value="Группа отметившего" styleClass="column-header"/>
                             </rich:column>
-                            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                            <rich:column headerClass="column-header">
                                 <h:outputText escape="true" value="Л/с отметившего" styleClass="column-header"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header" >
+                                <h:outputText escape="true" value="Номер телефона отметившего" styleClass="column-header"/>
                             </rich:column>
                         </rich:columnGroup>
                     </f:facet>
 
                     <rich:collapsibleSubTable value="#{pass.chekerItemList}" var="cheker"
                                               columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{row+1}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.idOfOrg}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.shortAddress}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.enterName}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.enterTime}" styleClass="output-text"
                                       converter="timeMinuteConverter"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.cardType}" styleClass="output-text"/>
                     </rich:column>
-                    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                    <rich:column headerClass="column-header" >
                         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text"/>
                     </rich:column>
                         <rich:column headerClass="column-header">
@@ -699,6 +702,9 @@
                                 <f:setPropertyActionListener value="#{cheker.idOfClient}"
                                                              target="#{mainPage.selectedIdOfClient}"/>
                             </a4j:commandLink>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{cheker.mobile}" styleClass="output-text"/>
                         </rich:column>
                     </rich:collapsibleSubTable>
 

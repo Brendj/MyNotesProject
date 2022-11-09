@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
+import org.apache.commons.lang.StringUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
@@ -44,16 +45,18 @@ public class ClientPassItem implements Comparable {
             Client cheker = (Client) session.get(Client.class, checkerId);
             this.chekerItemList.add(new ClientChekerPassItem(cheker.getIdOfClient(), cheker.getContractId(),
                     cheker.getPerson().getFullName(),
-                    (null != cheker.getClientGroup()) ? cheker.getClientGroup().getGroupName() : ""));
+                    (null != cheker.getClientGroup()) ? cheker.getClientGroup().getGroupName() : "",
+                    StringUtils.defaultIfEmpty(cheker.getMobile(), "")));
         }
         if (guardianId != null) {
             Client guardian = (Client) session.get(Client.class, guardianId);
             this.chekerItemList.add(new ClientChekerPassItem(guardian.getIdOfClient(), guardian.getContractId(),
                     guardian.getPerson().getFullName(),
-                    (null != guardian.getClientGroup()) ? guardian.getClientGroup().getGroupName() : ""));
+                    (null != guardian.getClientGroup()) ? guardian.getClientGroup().getGroupName() : "",
+                    StringUtils.defaultIfEmpty(guardian.getMobile(), "")));
         }
         if(checkerId == null && guardianId == null) {
-            this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " "));
+            this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " ", ""));
         }
 
         Card card = null;
@@ -131,7 +134,7 @@ public class ClientPassItem implements Comparable {
                 this.direction = getDirection(EnterEvent.EXIT);
             }
         }
-        this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " ")); // empty row for JSP
+        this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " ", ""));
     }
 
     @Override
@@ -217,12 +220,14 @@ public class ClientPassItem implements Comparable {
         private Long contractId;
         private String cheker;
         private String groupName;
+        private String mobile;
 
-        public ClientChekerPassItem(Long idOfClient, Long contractId, String cheker, String groupName) {
+        public ClientChekerPassItem(Long idOfClient, Long contractId, String cheker, String groupName, String mobile) {
             this.idOfClient = idOfClient;
             this.contractId = contractId;
             this.cheker = cheker;
             this.groupName = groupName;
+            this.mobile = mobile;
         }
 
         public Long getIdOfClient() {
@@ -255,6 +260,14 @@ public class ClientPassItem implements Comparable {
 
         public void setGroupName(String groupName) {
             this.groupName = groupName;
+        }
+
+        public String getMobile() {
+            return mobile;
+        }
+
+        public void setMobile(String mobile) {
+            this.mobile = mobile;
         }
     }
 
