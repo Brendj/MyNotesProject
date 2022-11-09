@@ -65,7 +65,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.guardianToLeaving;
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadWardsByClient;
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -3328,6 +3327,11 @@ public class FrontController extends HttpServlet {
                 String remark = String.format("Создано в АРМ %s", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
                 guardian = getMeshGuardiansService().createGuardianInternalByMeshGuardianPerson(persistenceSession, personResponse.getResponse(), child.getOrg(),
                         remark, ClientCreatedFromType.ARM, clientsMobileHistory);
+            } else {
+                if (guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                    guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                    persistenceSession.merge(guardian);
+                }
             }
             ClientGuardian clientGuardian = getClientGuardian(persistenceSession, guardian, child);
 
@@ -3422,7 +3426,7 @@ public class FrontController extends HttpServlet {
             if (guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
                 List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, guardian.getIdOfClient(), true);
                 if (guardianWards.isEmpty()) {
-                    guardianToLeaving(persistenceSession, guardian);
+                    ClientManager.guardianToLeaving(persistenceSession, guardian, clientGuardianHistory);
                 }
             }
 

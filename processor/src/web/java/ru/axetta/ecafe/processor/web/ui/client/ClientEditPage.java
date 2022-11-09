@@ -1298,6 +1298,26 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         setClientGuardianItemChange(originalClientWardItems, this.clientWardItems);
         setClientGuardianItemChange(originalClientGuardianItems, this.clientGuardianItems);
 
+        //Перенос выбывших в группу родителей при создании связки
+        if (this.idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+            if (this.clientWardItems.stream().anyMatch(ClientGuardianItem::getIsNew)) {
+                client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            }
+        }
+
+        //Перенос выбывших в группу родителей при создании связки
+        List<Client> newGuardians = this.clientGuardianItems
+                .stream()
+                .filter(ClientGuardianItem::getIsNew)
+                .map(c -> persistenceSession.get(Client.class, c.getIdOfClient()))
+                .filter(c -> c.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()))
+                .collect(Collectors.toList());
+
+        for (Client newGuardian : newGuardians) {
+            newGuardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            persistenceSession.merge(newGuardian);
+        }
+
         //Создание связи с опекунами в ИСПП
         addGuardiansISPP(persistenceSession, client);
         //Удаление связи с опекунами в ИСПП
@@ -1389,11 +1409,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         DiscountManager.deleteDOUDiscountsIfNeedAfterSetAgeTypeGroup(persistenceSession, client);
 
         persistenceSession.update(client);
-
-        //Перенос в группу выбывшие в случае удаления связок с опекунами
-        if (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-            guardianToLeaving(persistenceSession, client);
-        }
 
         fill(persistenceSession, client);
 
@@ -1575,6 +1590,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекаемый",
                     client.getIdOfClient()));
             removeWardsByClient(persistenceSession, client.getIdOfClient(), this.removeListWardItems, clientGuardianHistory);
+
+            //Перенос в группу выбывшие в случае удаления связок с опекунами
+            if (this.clientWardItems.isEmpty() && client.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+                ClientManager.guardianToLeaving(persistenceSession, client, clientGuardianHistory);
+            }
+
         }
     }
 
@@ -1620,13 +1641,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     .stream().map(ClientGuardianItem::getIdOfClient).collect(Collectors.toList());
             for (Long idsOfGuardian : idsOfGuardians) {
                 Client guardian = persistenceSession.load(Client.class, idsOfGuardian);
-                if (!guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
-                    continue;
-                }
-                //Перенос в группу выбывшие в случае удаления связок с опекунами
-                List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, idsOfGuardian, true);
-                if (guardianWards.isEmpty()) {
-                    guardianToLeaving(persistenceSession, guardian);
+                if (guardian.getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+                    //Перенос в группу выбывшие в случае удаления связок с опекунами
+                    List<ClientGuardianItem> guardianWards = loadWardsByClient(persistenceSession, idsOfGuardian, true);
+                    if (guardianWards.isEmpty()) {
+                        ClientManager.guardianToLeaving(persistenceSession, guardian, clientGuardianHistory);
+                    }
                 }
             }
         }
