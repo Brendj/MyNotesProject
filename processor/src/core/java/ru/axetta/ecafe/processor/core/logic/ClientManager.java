@@ -33,7 +33,9 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import javax.faces.context.FacesContext;
 import javax.persistence.criteria.*;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotEmpty;
@@ -45,6 +47,7 @@ import java.util.regex.Pattern;
 public class ClientManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
+    public static final String HISTORY_LABEL = "Удаление последнего опекаемого у представителя";
 
     public enum FieldId {
         CONTRACT_ID, PASSWORD,
@@ -2765,6 +2768,23 @@ public class ClientManager {
     public static void validateEmail(String email) throws Exception {
         if (!Pattern.matches("(^;|^,|\\S){1,}@([a-z0-9\\-\\_.]|[а-я]){1,}.([a-z]{2,6}|рф|рус|бел|москва|укр|онлайн|ею|бг|сайт|срб|дети|каз|мкд|мон|орг|ком|католик)", email)) {
             throw new Exception("Неверный формат электронной почты");
+        }
+    }
+
+    public static void guardianToLeaving(Session session, Client guardian) throws Exception {
+        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
+        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
+        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
+        clientGuardianHistory.setReason(HISTORY_LABEL);
+
+        if (!guardian.isDeletedOrLeaving()) {
+            ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
+            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            guardian.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
+            session.update(guardian);
+            logger.info(String.format("Deleted client id = %s", guardian.getIdOfClient()));
         }
     }
 

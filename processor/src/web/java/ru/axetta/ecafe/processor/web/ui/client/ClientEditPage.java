@@ -64,7 +64,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private static final Logger logger = LoggerFactory.getLogger(ClientEditPage.class);
     private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
     private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
-    public static final String HISTORY_LABEL = "Удаление последнего опекаемого у представителя";
 
     private String fax;
 
@@ -1633,22 +1632,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-    private void guardianToLeaving(Session session, Client guardian) throws Exception {
-        ClientGuardianHistory clientGuardianHistory = new ClientGuardianHistory();
-        clientGuardianHistory.setUser(MainPage.getSessionInstance().getCurrentUser());
-        clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
-        clientGuardianHistory.setReason(HISTORY_LABEL);
-
-        if (!guardian.isDeletedOrLeaving()) {
-            ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), HISTORY_LABEL + " (пользователь " + FacesContext.getCurrentInstance()
-                            .getExternalContext().getRemoteUser() + ")", clientGuardianHistory);
-            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            guardian.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
-            session.update(guardian);
-            logger.info(String.format("Deleted client id = %s", guardian.getIdOfClient()));
-        }
-    }
 
     private void removeGuardiansMK(Client client) throws Exception {
         if (this.removeListGuardianItems != null && !this.removeListGuardianItems.isEmpty()) {
