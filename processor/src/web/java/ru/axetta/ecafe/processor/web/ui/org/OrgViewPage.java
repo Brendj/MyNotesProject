@@ -122,6 +122,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean useWebArmAdmin;
 
     private Boolean goodDateCheck;
+    private Boolean usePlanWebArm;
 
     private Long orgIdFromNsi;
     private Boolean governmentContract;
@@ -317,6 +318,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
+        this.usePlanWebArm = org.getUsePlanWebArm();
 
         this.useWebArm = org.getUseWebArm();
         this.useWebArmAdmin = org.getUseWebArmAdmin();
@@ -956,5 +958,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
         this.disableSocCardsReg = disableSocCardsReg;
+    }
+
+    public Boolean getUsePlanWebArm() {
+        return usePlanWebArm;
+    }
+
+    public void setUsePlanWebArm(Boolean usePlanWebArm) {
+        this.usePlanWebArm = usePlanWebArm;
     }
 }

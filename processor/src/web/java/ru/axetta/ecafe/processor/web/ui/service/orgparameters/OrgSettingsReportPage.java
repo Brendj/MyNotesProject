@@ -76,10 +76,12 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean allUseMealSchedule = true;
     private Boolean allNewСashierMode = true;
     private Boolean allDisableSocCardsReg = true;
+    private Boolean allUsePlanWebArm;
 
     private void resetSelectedColumns() {
         allUseWebArmAdmin = true;
         allUseWebArm = true;
+        allUsePlanWebArm = true;
         allUsePaydableSubscriptionFeeding = true;
         allVariableFeeding = true;
         allPreordersEnabled = true;
@@ -103,6 +105,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         for(OrgSettingsReportItem item : items){
             allUseWebArmAdmin &= item.getUseWebArmAdmin();
             allUseWebArm &= item.getUseWebArm();
+            allUsePlanWebArm &= item.getUsePlanWebArm();
             allUsePaydableSubscriptionFeeding &= item.getUsePaydableSubscriptionFeeding();
             allVariableFeeding &= item.getVariableFeeding();
             allPreordersEnabled &= item.getPreordersEnabled();
@@ -229,6 +232,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     break;
                 case 16:
                     item.setDisableSocCardsReg(allDisableSocCardsReg);
+                    break;
+                case 17:
+                    item.setUsePlanWebArm(allUsePlanWebArm);
                     break;
             }
             item.change();
@@ -404,6 +410,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setGovernmentContract(item.getGovernmentContract());
                     org.setNewСashierMode(item.getNewСashierMode());
                     org.setDisableSocCardsReg(item.getDisableSocCardsReg());
+                    org.setUsePlanWebArm(item.getUsePlanWebArm());
                     session.update(org);
 
                     logger.info("Success");
@@ -653,5 +660,13 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllDisableSocCardsReg(Boolean allDisableSocCardsReg) {
         this.allDisableSocCardsReg = allDisableSocCardsReg;
+    }
+
+    public Boolean getAllUsePlanWebArm() {
+        return allUsePlanWebArm;
+    }
+
+    public void setAllUsePlanWebArm(Boolean allUsePlanWebArm) {
+        this.allUsePlanWebArm = allUsePlanWebArm;
     }
 }

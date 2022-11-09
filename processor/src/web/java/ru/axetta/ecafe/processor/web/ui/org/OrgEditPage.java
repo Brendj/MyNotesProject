@@ -155,6 +155,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean useWebArm;
     private Boolean useWebArmAdmin;
     private Boolean goodDateCheck;
+    private Boolean usePlanWebArm;
     private Long orgIdFromNsi = null;
     private Boolean useMealSchedule;
     private Boolean newСashierMode;
@@ -627,6 +628,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.workInSummerTime = org.getIsWorkInSummerTime();
         this.useLongCardNo = org.getUseLongCardNo() == null ? false : org.getUseLongCardNo();
         this.disableSocCardsReg = org.getDisableSocCardsReg();
+        this.usePlanWebArm = org.getUsePlanWebArm();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -1480,6 +1482,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
         this.disableSocCardsReg = disableSocCardsReg;
+    }
+
+    public Boolean getUsePlanWebArm() {
+        return usePlanWebArm;
+    }
+
+    public void setUsePlanWebArm(Boolean usePlanWebArm) {
+        this.usePlanWebArm = usePlanWebArm;
     }
 
     public static class ContragentItem {

@@ -57,6 +57,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private Boolean useMealSchedule;
     private Boolean newСashierMode;
     private Boolean disableSocCardsReg;
+    private Boolean usePlanWebArm;
 
     //FeedingSetting Info
     private Long idOfSetting = -1L;
@@ -140,6 +141,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
         this.mainBuilding = org.isMainBuilding();
         this.newСashierMode = org.getNewСashierMode();
+        this.usePlanWebArm = org.getUsePlanWebArm();
     }
 
     private String buildOrgCategoriesString(Set<CategoryOrg> categories) {
@@ -534,5 +536,13 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
         this.disableSocCardsReg = disableSocCardsReg;
+    }
+
+    public Boolean getUsePlanWebArm() {
+        return usePlanWebArm;
+    }
+
+    public void setUsePlanWebArm(Boolean usePlanWebArm) {
+        this.usePlanWebArm = usePlanWebArm;
     }
 }

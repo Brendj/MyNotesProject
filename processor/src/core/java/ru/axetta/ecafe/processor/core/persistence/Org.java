@@ -182,6 +182,7 @@ public class Org implements Serializable {
 	private Boolean newСashierMode;
     private Boolean usedFoodbox;
     private Boolean disableSocCardsReg;
+    private Boolean usePlanWebArm;
     private Set<FoodBoxOrgParallel> foodBoxParallels;
 
     /*@PostUpdate
@@ -265,6 +266,7 @@ public class Org implements Serializable {
         this.useLongCardNo = false;
         this.usedFoodbox = false;
         this.disableSocCardsReg = true;
+        this.usePlanWebArm = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1461,5 +1463,13 @@ public class Org implements Serializable {
 
     public void setDisableSocCardsReg(Boolean disableSocCardsReg) {
         this.disableSocCardsReg = disableSocCardsReg;
+    }
+
+    public Boolean getUsePlanWebArm() {
+        return usePlanWebArm;
+    }
+
+    public void setUsePlanWebArm(Boolean usePlanWebArm) {
+        this.usePlanWebArm = usePlanWebArm;
     }
 }
