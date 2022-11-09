@@ -111,18 +111,17 @@ public class ClientData {
     public void setFoodboxAllowed(Boolean foodboxAllowed) {
         this.foodboxAllowed = foodboxAllowed;
     }
-    public ClientData foodboxAvailablе(Boolean foodboxAvailablе) {
-        this.foodboxAvailable = foodboxAvailablе;
+    public ClientData foodboxAvailable(Boolean foodboxAvailable) {
+        this.foodboxAvailable = foodboxAvailable;
         return this;
     }
 
 
-
     /**
      * Признак доступности использования фудбокса для образовательной организации
-     * @return foodboxAvailablе
+     * @return foodboxAvailable
      **/
-    public Boolean isFoodboxAvailablе() {
+    public Boolean isFoodboxAvailable() {
         return foodboxAvailable;
     }
     public void setFoodboxAvailable(Boolean foodboxAvailable) {
@@ -160,7 +159,7 @@ public class ClientData {
         sb.append("    preorderAllowed: ").append(toIndentedString(preorderAllowed)).append("\n");
         sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
         sb.append("    foodboxAllowed: ").append(toIndentedString(foodboxAllowed)).append("\n");
-        sb.append("    foodboxAvailablе: ").append(toIndentedString(foodboxAvailable)).append("\n");
+        sb.append("    foodboxAvailable: ").append(toIndentedString(foodboxAvailable)).append("\n");
         sb.append("}");
         return sb.toString();
     }
