@@ -79,10 +79,10 @@ public class ETPMVProactiveService {
     }
 
     private int getMessageType(String message) throws Exception {
-        if (message.contains(":CoordinateMessage")) {
+        if (message.contains("CoordinateMessage")) {
             return COORDINATE_MESSAGE;
         }
-        if (message.contains(":CoordinateStatusMessage")) {
+        if (message.contains("CoordinateStatusMessage")) {
             return COORDINATE_STATUS_MESSAGE;
         }
         throw new Exception("Unknown message type");
