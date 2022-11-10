@@ -874,7 +874,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
                     client.getIdOfClient()));
-            addWardsByClient(persistenceSession, client.getIdOfClient(), clientWardItems, clientGuardianHistory);
+            addWardsByClient(persistenceSession, client, clientWardItems, clientGuardianHistory);
 
         } else if (isParentGroup())
             throw new Exception("Не выбраны \"Опекаемые\"");

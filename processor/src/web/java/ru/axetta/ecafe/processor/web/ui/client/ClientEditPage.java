@@ -1565,7 +1565,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекаемый",
                     client.getIdOfClient()));
-            addGuardiansByClient(persistenceSession, client.getIdOfClient(), this.clientGuardianItems,
+            addGuardiansByClient(persistenceSession, client, this.clientGuardianItems,
                     clientGuardianHistory);
         }
     }
@@ -1624,7 +1624,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
         clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
                 client.getIdOfClient()));
-        addWardsByClient(persistenceSession, client.getIdOfClient(), this.clientWardItems, clientGuardianHistory);
+        addWardsByClient(persistenceSession, client, this.clientWardItems, clientGuardianHistory);
     }
 
     private void removeGuardiansISPP(Session persistenceSession, Client client) throws Exception {
@@ -1634,7 +1634,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGuardianHistory.setWebAdress(MainPage.getSessionInstance().getSourceWebAddress());
             clientGuardianHistory.setReason(String.format("Связка удалена на карточке клиента id = %s как опекун",
                     client.getIdOfClient()));
-            removeGuardiansByClient(persistenceSession, client.getIdOfClient(), this.removeListGuardianItems, clientGuardianHistory);
+            removeGuardiansByClient(persistenceSession, client, this.removeListGuardianItems, clientGuardianHistory);
 
             //Проверка на наличие активных связок у удаленных опекунов
             List<Long> idsOfGuardians = this.removeListGuardianItems
