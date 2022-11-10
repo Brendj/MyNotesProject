@@ -2010,11 +2010,13 @@ public class ClientManager {
     }
 
     /* Удалить список опекунов клиента */
-    public static void removeGuardiansByClient(Session session, Long idOfClient,
+    public static void removeGuardiansByClient(Session session, Client client,
                                                List<ClientGuardianItem> clientGuardians, ClientGuardianHistory clientGuardianHistory) {
         Long version = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
-            removeGuardianByClient(session, idOfClient, item.getIdOfClient(), version, clientGuardianHistory);
+            removeGuardianByClient(session, client.getIdOfClient(), item.getIdOfClient(), version, clientGuardianHistory);
+            MigrantsUtils.disableMigrantRequestIfExists(
+                    session, client.getOrg().getIdOfOrg(), item.getIdOfClient());
         }
     }
 
@@ -2024,6 +2026,9 @@ public class ClientManager {
         Long version = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
             removeGuardianByClient(session, item.getIdOfClient(), idOfClient, version, clientGuardianHistory);
+            Client child = (Client) session.get(Client.class, item.getIdOfClient());
+            MigrantsUtils.disableMigrantRequestIfExists(
+                    session, child.getOrg().getIdOfOrg(), idOfClient);
         }
     }
 
@@ -2041,26 +2046,34 @@ public class ClientManager {
         }
     }
 
-    public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards,
+    public static void addWardsByClient(Session session, Client client, List<ClientGuardianItem> clientWards,
                                         ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
-            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
+            addGuardianByClient(session, item.getIdOfClient(), client.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
+            Client child = (Client) session.get(Client.class, item.getIdOfClient());
+            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                    session, client, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
         }
     }
 
     /* Добавить список опекунов клиента */
-    public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians,
+    public static void addGuardiansByClient(Session session, Client client, List<ClientGuardianItem> clientGuardians,
                                             ClientGuardianHistory clientGuardianHistory) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
-            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
+            addGuardianByClient(session, client.getIdOfClient(), item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
+            Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
+            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                    session, guardian, client.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
         }
     }
 
