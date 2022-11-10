@@ -194,6 +194,9 @@
                             <h:outputText escape="true" value="Использовать Web-АРМ поставщика питания" />
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                            <h:outputText escape="true" value="Включить план питания на тонком клиенте" />
+                        </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
                             <h:outputText escape="true" value="Абонементное питание" />
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
@@ -253,6 +256,11 @@
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
                             <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseWebArm}" disabled="false">
                                 <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(0)}"/>
+                            </h:selectBooleanCheckbox>
+                        </rich:column>
+                        <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                            <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUsePlanWebArm}" disabled="false">
+                                <a4j:ajax render="orgSettingsTable" event="change" listener="#{orgSettingsReportPage.doMarkAll(17)}"/>
                             </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -406,6 +414,11 @@
                 </rich:column>
                 <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
                     <h:selectBooleanCheckbox value="#{item.useWebArm}" styleClass="checkboxes">
+                        <a4j:ajax event="change" listener="#{item.change()}"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+                    <h:selectBooleanCheckbox value="#{item.usePlanWebArm}" styleClass="checkboxes">
                         <a4j:ajax event="change" listener="#{item.change()}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>

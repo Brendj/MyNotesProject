@@ -297,6 +297,7 @@
         <property name="newСashierMode" column="newСashierMode" type="boolean"/>
 	    <property name="usedFoodbox" column="usedFoodbox" type="boolean"/>
         <property name="disableSocCardsReg" column="disableSocCardsReg" not-null="true" type="boolean"/>
+        <property name="usePlanWebArm" column="usePlanWebArm" not-null="true" type="boolean"/>
         <set name="foodBoxParallels" inverse="true" cascade="all">
             <key column="idoforg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.foodbox.FoodBoxOrgParallel"/>

@@ -71,7 +71,7 @@ public class OrganizationStructure implements AbstractToElement {
                     getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
                     o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getShortAddress(),
                     o.getOrgStructureVersion(), o.multiCardModeIsEnabled(), o.getPreorderlp(), o.getUseWebArm(),
-                    o.getUseLongCardNo(), o.getUseWebArmAdmin());
+                    o.getUseLongCardNo(), o.getUseWebArmAdmin(), org.getUsePlanWebArm());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
@@ -82,7 +82,8 @@ public class OrganizationStructure implements AbstractToElement {
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
                     org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),
-                    org.getPreorderlp(), org.getUseWebArm(), org.getUseLongCardNo(), org.getUseWebArmAdmin());
+                    org.getPreorderlp(), org.getUseWebArm(), org.getUseLongCardNo(), org.getUseWebArmAdmin(),
+                    org.getUsePlanWebArm());
             organizationItemMap.put(org.getIdOfOrg(), item);
         }
     }
@@ -121,13 +122,14 @@ public class OrganizationStructure implements AbstractToElement {
         private final Boolean useWebArm;
         private final Boolean useLongCardId;
         private final Boolean useWebArmAdmin;
+        private final Boolean usePlanWebArm;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService,
                 String officialName, String shortName, String chief, String address, Boolean useSubscriptionFeeding,
                 Long configurationId, Long defaultSupplier, Boolean isFriendly, String nCounty, Integer state,
                 Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress,
                 Long version, Boolean multiCardModeEnabled, Boolean preorderlp, Boolean useWebArm,
-                                          Boolean useLongCardId, Boolean useWebArmAdmin) {
+                                          Boolean useLongCardId, Boolean useWebArmAdmin, Boolean usePlanWebArm) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -151,6 +153,7 @@ public class OrganizationStructure implements AbstractToElement {
             this.useWebArm = useWebArm;
             this.useLongCardId = useLongCardId;
             this.useWebArmAdmin = useWebArmAdmin;
+            this.usePlanWebArm = usePlanWebArm;
         }
 
         public Element toElement(Document document) throws Exception {
@@ -182,11 +185,16 @@ public class OrganizationStructure implements AbstractToElement {
             element.setAttribute("UseWebArm", useWebArm ? "1" : "0");
             element.setAttribute("UseLongCardId", BooleanUtils.toBoolean(useLongCardId) ? "1" : "0");
             element.setAttribute("UseWebArmAdmin", useWebArmAdmin ? "1" : "0");
+            element.setAttribute("UsePlanWebArm", usePlanWebArm ? "1" : "0");
             return element;
         }
 
         public Boolean getPreorderlp() {
             return preorderlp;
+        }
+
+        public Boolean getUsePlanWebArm() {
+            return usePlanWebArm;
         }
     }
 
