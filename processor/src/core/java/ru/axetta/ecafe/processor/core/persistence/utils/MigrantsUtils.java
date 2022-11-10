@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -555,6 +556,30 @@ public class MigrantsUtils {
         Migrant migrant = findMigrant(session, orgVisitId, clientMigrateId);
         if (null != migrant) {
             disableMigrant(migrant.getCompositeIdOfMigrant());
+        }
+    }
+
+    public static void createMigrantRequestForGuardianIfNoPass(
+            Session session,
+            Client client,
+            Org orgVisit,
+            MigrantInitiatorEnum initiator,
+            VisitReqResolutionHistInitiatorEnum resInitiator,
+            int years) {
+        if (!client.getOrg().getIdOfOrg().equals(orgVisit.getIdOfOrg())) {
+            if (!DAOUtils.isFriendlyOrganizations(session, client.getOrg(), orgVisit)) {
+                if (MigrantsUtils.findActiveMigrant(
+                        session, orgVisit.getIdOfOrg(), client.getIdOfClient()) == null) {
+                    ClientManager.createMigrationForGuardianWithConfirm(
+                            session,
+                            client,
+                            new Date(),
+                            orgVisit,
+                            initiator,
+                            resInitiator,
+                            years);
+                }
+            }
         }
     }
 }

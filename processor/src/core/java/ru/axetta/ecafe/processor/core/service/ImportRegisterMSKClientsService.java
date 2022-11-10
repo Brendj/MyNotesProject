@@ -1282,9 +1282,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                 }
                 if (guardian.isActiveAdultGroup()) {
-                    if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                        createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
-                    }
+                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                            session, guardian, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR, 12);
                 }
                 if (guardian.isLeaving()){
                     guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
@@ -1404,7 +1404,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (guardian.getOrg().getIdOfOrg().equals(beforeMigrateOrgId) ||
                         MigrantsUtils.findActiveMigrant(
                         session, beforeMigrateOrgId, guardian.getIdOfClient()) != null){
-                    createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
+                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                            session, guardian, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR, 12);
                 }
             }
         }
@@ -1423,39 +1425,24 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                             session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
                 }
                 else if (guardian.isActiveAdultGroup()) {
-                    createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
+                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                            session, guardian, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR, 12);
                 }
 
             }
             else {
-                // Представитель отсутвует в ОО2
-                if (!guardian.getOrg().getIdOfOrg().equals(child.getOrg().getIdOfOrg())) {
-                    if (MigrantsUtils.findActiveMigrant(
-                            session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
-                        createMigrantRequestForGuardianIfNoPass(session, guardian, child.getOrg());
-                    }
+                // Представитель отсутвует в ОО2 и у него есть активная заявка в ОО1
+                if (MigrantsUtils.findActiveMigrant(
+                        session, beforeMigrateOrgId, guardian.getIdOfClient()) != null) {
+                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                            session, guardian, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR, 12);
                 }
 
                 MigrantsUtils.disableMigrantRequestIfExists(
                         session, beforeMigrateOrgId, guardian.getIdOfClient());
 
-            }
-        }
-    }
-
-
-    private void createMigrantRequestForGuardianIfNoPass(Session session, Client client, Org orgVisit) {
-        if (!DAOUtils.isFriendlyOrganizations(session, client.getOrg(), orgVisit)) {
-            if(MigrantsUtils.findActiveMigrant(
-                    session, orgVisit.getIdOfOrg(), client.getIdOfClient()) == null) {
-                ClientManager.createMigrationForGuardianWithConfirm(
-                        session,
-                        client,
-                        new Date(),
-                        orgVisit,
-                        MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                        VisitReqResolutionHistInitiatorEnum.INITIATOR_REESTR,
-                        12);
             }
         }
     }
