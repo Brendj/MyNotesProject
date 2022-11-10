@@ -25,7 +25,7 @@ CREATE TABLE CF_Dul_Detail
     Series VARCHAR(64),
     Number VARCHAR(64) NOT NULL,
     Subdivision_Code VARCHAR(64),
-    Issuer VARCHAR(64),
+    Issuer VARCHAR(256),
     issued INT8,
     Expiration INT8,
     CreateDate INT8 NOT NULL,
