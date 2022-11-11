@@ -455,7 +455,6 @@ public class DTSZNDiscountsReviseService {
     private ApplicationForFoodDiscount getApplicationForFoodDiscountByInfo(ApplicationForFood application,
                                                                            ClientDtisznDiscountInfo info) {
         for (ApplicationForFoodDiscount discount : application.getDtisznCodes()) {
-            if (!discount.getConfirmed()) continue;
             if ((discount.getDtisznCode() == null && info.getDtisznCode().equals(0L))
             || discount.getDtisznCode().equals(info.getDtisznCode().intValue())) {
                 return discount;
