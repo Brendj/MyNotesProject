@@ -278,6 +278,7 @@ public class ETPMVService {
                 }
                 Client client = applicationForFood.getClient();
                 ApplicationForFoodState applicationForFoodState = applicationForFood.getStatus().getApplicationForFoodState();
+                boolean send_status = false;
                 //заявление найдено и оно в статусе "заявление зарегистрировано" в одном из следующих статусов 1050, 1052, 1075, 7704.х (7704.1...10), 7705.х (7705.1...10) и не в архиве
                 if (!applicationForFood.getArchived() && (applicationForFoodState == ApplicationForFoodState.REGISTERED ||
                         applicationForFoodState == ApplicationForFoodState.RESULT_PROCESSING ||
@@ -298,7 +299,8 @@ public class ETPMVService {
                     }
                     DAOUtils.updateApplicationForFood(persistenceSession, applicationForFood.getClient(), new ApplicationForFoodStatus(
                             ApplicationForFoodState.WITHDRAWN));
-                    sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
+                    send_status = true;
+
                     //sendToBK(message);
                     DiscountManager.rebuildAppointedMSPByClient(persistenceSession, client);
                 } else {
@@ -310,6 +312,7 @@ public class ETPMVService {
                 daoService.updateEtpPacketWithSuccess(serviceNumber);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
+                if (send_status) sendStatus(begin_time, serviceNumber, ApplicationForFoodState.WITHDRAWN, null);
             } catch (Exception e) {
                 logger.error("Error in processCoordinateStatusMessage", e);
             } finally {
