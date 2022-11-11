@@ -221,7 +221,7 @@ public class MealsController extends Application {
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
         //Логика всех проверок по клиенту
-        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId());
+        mealsPOJO = mealsService.verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId(), mealsPOJO);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO.getResponseEntity();
 
