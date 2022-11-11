@@ -113,7 +113,9 @@ public class BenefitService {
             Long historyVersion;
             for (ClientDtisznDiscountInfo info : list) {
                 ApplicationForFood applicationForFood = DAOUtils.findActiveApplicationForFoodByClient(session, info.getClient());
-                if (applicationForFood == null || !applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
+                if (applicationForFood == null
+                        || !applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.OK)
+                        || !applicationForFood.isNewFormat()) {
                     continue;
                 }
                 applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
