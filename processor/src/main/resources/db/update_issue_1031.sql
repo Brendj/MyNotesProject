@@ -32,7 +32,9 @@ comment on column cf_applications_for_food_discount.appointedMSP is 'По льг
 insert into cf_applications_for_food_discount(idofapplicationforfood, dtiszncode)
 select idofapplicationforfood, dtiszncode from cf_applications_for_food;
 
-alter table cf_applications_for_food drop column dtiszncode,
+--Колонку cf_applications_for_food.dtiszncode пока не удаляем
+--drop column dtiszncode
+alter table cf_applications_for_food
     add column validdoc integer,
     add column validguardianship integer,
     add column docconfirmed integer not null default 0,
