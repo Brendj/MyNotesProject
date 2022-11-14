@@ -278,6 +278,10 @@ public class MeshClientProcessorService {
                         guardian.setUpdateTime(new Date());
                         session.merge(guardian);
                     }
+
+                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                            session, guardian, child.getOrg(),MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
                 }
             }
             List<Client> guardians = ClientManager.findGuardiansByClient(session, child.getIdOfClient(), true);
