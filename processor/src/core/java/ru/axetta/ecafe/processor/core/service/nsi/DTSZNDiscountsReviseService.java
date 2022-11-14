@@ -977,6 +977,7 @@ public class DTSZNDiscountsReviseService {
                             info);
                     builder.withArchived(true);
                     builder.save(session, nextVersion);
+                    DiscountManager.rebuildAppointedMSPByClient(session, info.getClient());
 
                     if (!info.getDtisznCode().equals(0L)) {
                         transaction.commit();
