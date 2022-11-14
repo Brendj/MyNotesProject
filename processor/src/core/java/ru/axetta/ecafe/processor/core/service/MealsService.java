@@ -182,9 +182,8 @@ public class MealsService {
         session.update(foodBoxOrgReq);
     }
 
-    public MealsPOJO verifyClient(Long contractId, String personId)
+    public MealsPOJO verifyClient(Long contractId, String personId, MealsPOJO mealsPOJO)
     {
-        MealsPOJO mealsPOJO = new MealsPOJO();
         Client client = null;
         if (contractId != null) {
             client = daoReadonlyService.getClientWithOrgByContractId(contractId);
@@ -205,11 +204,11 @@ public class MealsService {
     {
         MealsPOJO mealsPOJO = new MealsPOJO();
 
-        verifyClientId(contractIdStr, personIdStr, mealsPOJO);
+        mealsPOJO = verifyClientId(contractIdStr, personIdStr, mealsPOJO);
         if (mealsPOJO.getResponseEntity() != null)
             return mealsPOJO;
 
-        mealsPOJO = verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId());
+        mealsPOJO = verifyClient(mealsPOJO.getContractId(), mealsPOJO.getPersonId(), mealsPOJO);
 
         return mealsPOJO;
     }
@@ -346,12 +345,12 @@ public class MealsService {
         return mealsPOJO;
     }
 
-    private void verifyClientId(String contractIdStr, String personIdStr, MealsPOJO mealsPOJO)
+    private MealsPOJO verifyClientId(String contractIdStr, String personIdStr, MealsPOJO mealsPOJO)
     {
         if (contractIdStr.isEmpty() && personIdStr.isEmpty()) {
             mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
                     body(responseResult.emptyContractIdAndPersonId()));
-            return;
+            return mealsPOJO;
         }
         if (!contractIdStr.isEmpty()) {
             Long contractId;
@@ -360,13 +359,14 @@ public class MealsService {
             } catch (Exception e) {
                 mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).
                         body(responseResult.wrongFormatContractId(contractIdStr, e)));
-                return;
+                return mealsPOJO;
             }
             mealsPOJO.setContractId(contractId);
         } else
         {
             mealsPOJO.setPersonId(personIdStr);
         }
+        return mealsPOJO;
     }
 
     public MealsPOJO mainLogicNewPreorder(Session session, FoodboxOrder foodboxOrders, Client client, String xrequestStr, MealsPOJO mealsPOJO)
