@@ -147,6 +147,7 @@ public class CancelledFoodBoxService {
                     session.merge(foodBoxCells);
                 }
                 foodBoxPreorder.setPosted(2);
+                foodBoxPreorder.setCellNumber(null);
                 session.merge(foodBoxPreorder);
                 it.remove();
                 logger.info("Удаление фудбокс заказа " + foodBoxPreorder.getIdFoodBoxPreorder());

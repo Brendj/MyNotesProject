@@ -68,6 +68,7 @@ public class MealsService {
     };
 
     private Integer countunlocketed;
+    private Integer countunlocketedbutCancelled;
     private Integer countFree = 0;
     private List<WtDish> wtDishes;
     private List <FoodBoxPreorderAvailable> foodBoxPreorderAvailables;
@@ -373,7 +374,7 @@ public class MealsService {
     {
         mealsPOJO.setCreated(false);
         //Если количество свободных ячеек не позволяет создавать новый заказ
-        if (countFree <= countunlocketed) {
+        if (countFree <= (countunlocketed + countunlocketedbutCancelled)) {
             mealsPOJO.setResponseEntity(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).
                     body(responseResult.errorCell(client.getOrg().getIdOfOrg())));
             return mealsPOJO;
@@ -719,6 +720,7 @@ public class MealsService {
             countFree = 0;
             Set<FoodBoxCells> foodBoxCells = daoReadonlyService.getFoodBoxCellsByOrg(client.getOrg());
             countunlocketed = daoReadonlyService.getFoodBoxPreordersUnallocated(client.getOrg());
+            countunlocketedbutCancelled = daoReadonlyService.getFoodBoxPreordersCancelledButLocated(client.getOrg());
             for (FoodBoxCells foodBoxCells1 : foodBoxCells) {
                 //Считаем количество свободных ячеек в фудбоксах
                 countFree += (foodBoxCells1.getTotalcellscount() - foodBoxCells1.getBusycells());
