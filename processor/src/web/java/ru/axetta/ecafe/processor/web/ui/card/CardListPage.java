@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.card;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -68,6 +69,9 @@ public class CardListPage extends BasicWorkspacePage implements OrgSelectPage.Co
         private final Long contractId;
         private final Date contractTime;
         private final Integer contractState;
+        private final String clientGroup;
+        private final String orgShortAdress;
+        private final String orgDistrict;
 
         public ClientItem(Client client) {
             this.idOfClient = client.getIdOfClient();
@@ -77,6 +81,9 @@ public class CardListPage extends BasicWorkspacePage implements OrgSelectPage.Co
             this.contractId = client.getContractId();
             this.contractTime = client.getContractTime();
             this.contractState = client.getContractState();
+            this.clientGroup = client.getClientGroup() != null ? client.getClientGroup().getGroupName() : "";
+            this.orgShortAdress = client.getOrg().getShortAddress();
+            this.orgDistrict = client.getOrg().getDistrict();
         }
 
         public Long getIdOfClient() {
@@ -116,6 +123,12 @@ public class CardListPage extends BasicWorkspacePage implements OrgSelectPage.Co
                             person.getSecondName()));
             return stringBuilder.toString();
         }
+
+        public String getClientGroup() { return clientGroup;}
+
+        public String getOrgShortAdress() { return orgShortAdress;}
+
+        public String getOrgDistrict() { return orgDistrict;}
     }
 
     public static class Item {
