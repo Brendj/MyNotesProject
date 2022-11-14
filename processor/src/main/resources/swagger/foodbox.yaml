@@ -1318,7 +1318,7 @@ components:
         foodboxAllowed:
           type: boolean
           description: Признак разрешения представителем на использование фудбокса ребёнком
-        foodboxAvailablе:
+        foodboxAvailable:
           type: boolean
           description: Признак доступности использования фудбокса для образовательной организации
     ExpenseConstraints:

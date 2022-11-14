@@ -8,4 +8,4 @@ Name | Type | Description | Notes
 **preorderAllowed** | **Boolean** | Признак согласия представителя на получение услуги предзаказа. |  [optional]
 **balance** | **Long** | Баланс в копейках. | 
 **foodboxAllowed** | **Boolean** | Признак разрешения представителем на использование фудбокса ребёнком |  [optional]
-**foodboxAvailablе** | **Boolean** | Признак доступности использования фудбокса для образовательной организации |  [optional]
+**foodboxAvailable** | **Boolean** | Признак доступности использования фудбокса для образовательной организации |  [optional]
