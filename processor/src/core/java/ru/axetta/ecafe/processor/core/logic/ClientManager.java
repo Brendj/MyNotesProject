@@ -2050,10 +2050,12 @@ public class ClientManager {
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
-            Client child = (Client) session.get(Client.class, item.getIdOfClient());
-            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
-                    session, client, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            if (item.getIsNew()) {
+                Client child = (Client) session.get(Client.class, item.getIdOfClient());
+                MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                        session, client, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                        VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            }
         }
     }
 
@@ -2066,10 +2068,12 @@ public class ClientManager {
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
-            Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
-            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
-                    session, guardian, client.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            if (item.getIsNew()) {
+                Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
+                MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                        session, guardian, client.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                        VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            }
         }
     }
 
