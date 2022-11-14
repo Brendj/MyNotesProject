@@ -329,6 +329,7 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
             return new MeshContactResponse(contactListResponse.getCode(), contactListResponse.message);
         //Сохраняем контакты
         for (ModifyContactsItem contact : contacts) {
+            boolean isUpdate = false;
             for (ContactsIdResponse contactsIdResponse : contactListResponse.getContactResponse()) {
                 if (contactsIdResponse.getContactType().equals(contact.getTypeId())
                         && contactsIdResponse.getContactValue().equals(contact.getOldValue())) {
@@ -338,10 +339,11 @@ public class MeshGuardiansService extends MeshPersonsSyncService {
                         meshContactResponse = modifyPersonContact(meshGuid, contact.getTypeId(), contact.getNewValue(),
                                 contactsIdResponse.getContactId());
                     }
+                    isUpdate = true;
                     break;
                 }
             }
-            if (!StringUtils.isBlank(contact.getNewValue()) && StringUtils.isBlank(contact.getOldValue())) {
+            if (!StringUtils.isBlank(contact.getNewValue()) && !isUpdate) {
                 meshContactResponse = createPersonContact(meshGuid, contact.getTypeId(), contact.getNewValue());
             }
             if (!meshContactResponse.getCode().equals(PersonListResponse.OK_CODE))
