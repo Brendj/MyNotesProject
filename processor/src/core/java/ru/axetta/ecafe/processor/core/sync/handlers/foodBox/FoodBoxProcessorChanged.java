@@ -61,7 +61,8 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             foodBoxPreorder.setError(foodBoxPreorderChangedItem.getError());
             foodBoxPreorder.setIdOfFoodBox(foodBoxPreorderChangedItem.getIdOfFoodBox());
             foodBoxPreorder.setCellNumber(foodBoxPreorderChangedItem.getCellNumber());
-            if (foodBoxPreorder.getPosted() == 0 && foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW) && foodBoxPreorder.getIdOfFoodBox() != null) {
+            foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
+            if (foodBoxPreorder.getPosted() == 0 && foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.LOADED) && foodBoxPreorder.getIdOfFoodBox() != null) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Забираем ячейку
                 logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
@@ -83,7 +84,6 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 foodBoxPreorder.setPosted(1);
             }
 
-            foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
             if (foodBoxPreorder.getPosted() == 1 && (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
