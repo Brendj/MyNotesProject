@@ -3416,6 +3416,20 @@ public class DAOReadonlyService {
         }
     }
 
+    //т.е. получаем заказы, которые аннулированы, но нвыгружены т.е. ячейка занята
+    public Integer getFoodBoxPreordersCancelledButLocated(Org org) {
+        try {
+            Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "
+                    + "where fb.org = :org and (fb.posted = 2) and fb.cellNumber is not null");
+            query.setParameter("org", org);
+            List<FoodBoxPreorder> foodBoxPreorders = query.getResultList();
+            return foodBoxPreorders.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public FoodBoxPreorder getFoodBoxPreorderByExternalId(String externalId) {
         try {
             Query query = entityManager.createQuery("SELECT fb from FoodBoxPreorder fb "

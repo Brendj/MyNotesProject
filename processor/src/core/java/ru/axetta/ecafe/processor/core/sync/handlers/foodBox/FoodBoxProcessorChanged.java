@@ -46,7 +46,8 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                         foodBoxPreorderChangedItem.getId()));
                 return resFoodBoxChanged;
             }
-            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED) && foodBoxPreorder.getCancelReason().equals(2))
+            if (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED) &&
+                    foodBoxPreorder.getCellNumber() == null && foodBoxPreorder.getCancelReason().equals(2))
             {
                 //Если предзаказ уже был отменен по окончанию срока жизни на процессинге
                 ResFoodBoxChangedItem resFoodBoxChangedItem = new ResFoodBoxChangedItem();
@@ -61,7 +62,8 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
             foodBoxPreorder.setError(foodBoxPreorderChangedItem.getError());
             foodBoxPreorder.setIdOfFoodBox(foodBoxPreorderChangedItem.getIdOfFoodBox());
             foodBoxPreorder.setCellNumber(foodBoxPreorderChangedItem.getCellNumber());
-            if (foodBoxPreorder.getPosted() == 0 && foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.NEW) && foodBoxPreorder.getIdOfFoodBox() != null) {
+            foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
+            if (foodBoxPreorder.getPosted() == 0 && foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.LOADED) && foodBoxPreorder.getIdOfFoodBox() != null) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Забираем ячейку
                 logger.info(String.format("Заказ: %s забрал ячеку для орг %s", foodBoxPreorderChangedItem.getId(), idOfOrg.toString()));
@@ -83,7 +85,6 @@ public class FoodBoxProcessorChanged extends AbstractProcessor<ResFoodBoxChanged
                 foodBoxPreorder.setPosted(1);
             }
 
-            foodBoxPreorder.setState(foodBoxPreorderChangedItem.getState());
             if (foodBoxPreorder.getPosted() == 1 && (foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.EXECUTED) || foodBoxPreorder.getState().equals(FoodBoxStateTypeEnum.CANCELED))) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 //Освобождаем ячейку
