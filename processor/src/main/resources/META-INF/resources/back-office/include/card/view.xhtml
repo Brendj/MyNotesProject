@@ -19,6 +19,12 @@
                 <f:setPropertyActionListener value="#{mainPage.cardViewPage.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}"/>
             </a4j:commandLink>
+            <h:outputText escape="true" value="" styleClass="output-text"/>
+            <h:outputText escape="true" value="#{mainPage.cardViewPage.client.person.firstName}
+                          #{mainPage.cardViewPage.client.person.secondName}
+                          #{mainPage.cardViewPage.client.person.surname}; #{mainPage.cardViewPage.client.clientGroup};
+                          #{mainPage.cardViewPage.client.orgShortName}; #{mainPage.cardViewPage.client.orgShortAdress};
+                          #{mainPage.cardViewPage.client.orgDistrict}" styleClass="output-text"/>
             <h:outputText escape="true" value="Номер карты" styleClass="output-text"/>
             <h:inputText value="#{mainPage.cardViewPage.cardNo}" converter="cardNoConverter" readonly="true"
                          styleClass="input-text"/>

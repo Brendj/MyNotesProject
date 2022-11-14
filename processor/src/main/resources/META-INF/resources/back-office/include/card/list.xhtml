@@ -119,6 +119,30 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <f:facet name="header">
+                        <h:outputText escape="true" value="Группа"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.client.clientGroup}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Организация"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.client.orgShortName} " styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Адрес"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.client.orgShortAdress} " styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Округ"/>
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.client.orgDistrict}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
                         <h:outputText escape="true" value="Последние изменения"/>
                     </f:facet>
                     <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter"

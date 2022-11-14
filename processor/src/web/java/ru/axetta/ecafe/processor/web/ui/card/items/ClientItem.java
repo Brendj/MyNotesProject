@@ -20,6 +20,9 @@ public class ClientItem {
     private Long contractId;
     private Date contractTime;
     private Integer contractState;
+    private String orgShortAdress;
+    private String orgDistrict;
+    private String clientGroup;
 
     public String getShortName() {
         if (contractId == null) {
@@ -61,6 +64,9 @@ public class ClientItem {
         this.contractId = client.getContractId();
         this.contractTime = client.getContractTime();
         this.contractState = client.getContractState();
+        this.orgShortAdress = client.getOrg().getShortAddress();
+        this.orgDistrict = client.getOrg().getDistrict();
+        this.clientGroup = client.getClientGroup().getGroupName();
     }
 
     public Long getIdOfClient() {
@@ -94,4 +100,10 @@ public class ClientItem {
     public long getIdOfOrg() {
         return idOfOrg;
     }
+
+    public String getOrgShortAdress() { return orgShortAdress;}
+
+    public String getOrgDistrict() { return orgDistrict;}
+
+    public String getClientGroup() { return clientGroup;}
 }
