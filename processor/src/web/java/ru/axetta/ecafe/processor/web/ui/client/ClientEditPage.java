@@ -1720,35 +1720,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return false;
     }
 
-    private void validateExistingGuardians(List<ClientGuardianItem> items) throws Exception {
-        if (items.isEmpty()) {
-            return;
-        }
-        StringBuilder notValidGuardianSB = new StringBuilder();
-        StringBuilder notValidRepresentative = new StringBuilder();
-        StringBuilder notValidGuardianRoleSB = new StringBuilder();
-        for (ClientGuardianItem item : items) {
-            if (item.getRelation().equals(-1) || item.getRelation().equals(ClientGuardianRelationType.UNDEFINED.getCode())) {
-                notValidGuardianSB.append(item.getPersonName()).append(" ");
-            }
-            if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
-                notValidRepresentative.append(item.getPersonName()).append(" ");
-            }
-            if (item.getRole().equals(-1)) {
-                notValidGuardianRoleSB.append(item.getPersonName()).append(" ");
-            }
-        }
-        if (notValidGuardianSB.length() > 0) {
-            throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
-        }
-        if (notValidRepresentative.length() > 0) {
-            throw new Exception("У следующих опекунов не указана роль представителя: " + notValidRepresentative.toString());
-        }
-        if (notValidGuardianRoleSB.length() > 0) {
-            throw new Exception("У следующих опекунов не указан вид представительства: " + notValidGuardianRoleSB.toString());
-        }
-    }
-
     private void resetNewFlags() {
         for (ClientGuardianItem item : clientGuardianItems) {
             item.setIsNew(false);
