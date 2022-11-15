@@ -64,28 +64,30 @@ public class PersonBenefitCategoryService {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
                 categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
-                if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).before(new Date())) {
-                    //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
-                    List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
-                            getBean(ETPMVDaoService.class).getProactiveMessages(client, categoryCode);
-                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
-                    if (proactiveMessages.isEmpty())
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
-                    else {
-                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
-                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
-                        }
-                    }
+                Date end_Date = format.get().parse(benefit.getEnd_date());
+                if (!benefit.getIs_actual() ||
+                        CalendarUtils.betweenDate(new Date(), CalendarUtils.startOfDay(end_Date), CalendarUtils.endOfDay(end_Date))) {
+//                    //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
+//                    List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
+//                            getBean(ETPMVDaoService.class).getProactiveMessages(client, categoryCode);
+//                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+//                    if (proactiveMessages.isEmpty())
+//                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
+//                    else {
+//                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
+//                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
+//                        }
+//                    }
                     DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
-                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
-                    status2.setFullName(client.getPerson().getFullName());
-                    if (proactiveMessages.isEmpty())
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
-                    else {
-                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
-                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
-                        }
-                    }
+//                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+//                    status2.setFullName(client.getPerson().getFullName());
+//                    if (proactiveMessages.isEmpty())
+//                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
+//                    else {
+//                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
+//                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+//                        }
+//                    }
                 } else {
                     Date startDate = format.get().parse(benefit.getBegin_date());
                     endDate = format.get().parse(benefit.getEnd_date());
