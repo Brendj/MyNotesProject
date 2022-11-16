@@ -10114,7 +10114,7 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
             setSelectedIdOfClient(null);
             selectedClientGroupPage.getMainMenuComponent().setRendered(false);
-            showClientListPage();
+            //showClientListPage();
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиент удален", null));
         } catch (Exception e) {
             logger.error("Failed to remove client", e);
@@ -10124,8 +10124,6 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }
@@ -10206,6 +10204,13 @@ public class MainPage implements Serializable {
 
     public Object removeClientFromList() {
         clientListPage.removeClientFromList(selectedIdOfClient);
+        return null;
+    }
+
+    public Object removeClientFromEdit() {
+        showClientListPage();
+        clientListPage.removeClientFromList(selectedIdOfClient);
+
         return null;
     }
 

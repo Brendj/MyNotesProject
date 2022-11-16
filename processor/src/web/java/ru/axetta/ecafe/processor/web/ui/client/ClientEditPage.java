@@ -1346,7 +1346,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getCategories().remove(categoryDiscount);
             }
         }
-        persistenceSession.delete(client);
+//        persistenceSession.delete(client);
+
+//        Client client = DAOUtils.findClient(persistenceSession, idOfClient);
+        ClientGroup cg = DAOUtils.findClientGroup(persistenceSession, new CompositeIdOfClientGroup(
+                client.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        if (cg == null) {
+            cg = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                    ClientGroup.Predefined.CLIENT_DELETED);
+        }
+        ClientManager.createClientGroupMigrationHistory(persistenceSession, client, client.getOrg(), cg.getCompositeIdOfClientGroup().getIdOfClientGroup(),
+                cg.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                        .getExternalContext().getRemoteUser(), null);
+        client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersion(persistenceSession));
+        setClientGroupName(cg.getGroupName());
+        persistenceSession.update(client);
     }
 
     private void fill(Session session, Client client) throws Exception {

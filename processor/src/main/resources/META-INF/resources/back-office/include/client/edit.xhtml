@@ -503,7 +503,8 @@
                                styleClass="command-button"/>
 
             <a4j:commandButton value="Удалить"
-                               onclick="#{rich:component('clientDeletePanel')}.show();"
+                               oncomplete="#{rich:component('removedClientDeletePanel')}.show()"
+                               render="removedClientDeletePanel"
                                styleClass="command-button">
             </a4j:commandButton>
             <a4j:commandButton value="Отзыв ПД" action="#{mainPage.clientEditPage.deletePDClient()}"
@@ -517,4 +518,33 @@
                            warnClass="warn-messages"/>
         </h:panelGrid>
     </h:panelGrid>
+    <rich:popupPanel modal="true" id="removedClientDeletePanel" autosized="true" width="200"
+                     headerClass="modal-panel-header">
+        <f:facet name="header">
+            <h:outputText value="Удаление клиента" styleClass="output-text"/>
+        </f:facet>
+        <h:form id="removedClientDeleteForm" styleClass="borderless-form">
+            <table class="borderless-grid" width="100%">
+                <tr>
+                    <td style="text-align: center;">
+                        <h:outputText value="Вы уверены в том, что хотите удалить этого клиента?" styleClass="output-text"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        <h:panelGroup styleClass="borderless-div">
+                            <a4j:commandButton value="Да" action="#{mainPage.removeClient}"
+                                               oncomplete="#{rich:component('removedClientDeletePanel')}.hide();"
+                                               render="mainMenu, workspaceTogglePanel, clientGuardianEditTable,
+                                               clientWardEditTable"
+                                               styleClass="command-button">
+                            </a4j:commandButton>
+                            <a4j:commandButton value="Отмена" styleClass="command-button"
+                                               onclick="#{rich:component('removedClientDeletePanel')}.hide();return false;"/>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </rich:popupPanel>
 </ui:composition>
