@@ -454,7 +454,6 @@ public class DTSZNDiscountsReviseService {
     private ApplicationForFoodDiscount getApplicationForFoodDiscountByInfo(ApplicationForFood application,
                                                                            ClientDtisznDiscountInfo info) {
         for (ApplicationForFoodDiscount discount : application.getDtisznCodes()) {
-            if (!discount.getConfirmed()) continue;
             if ((discount.getDtisznCode() == null && info.getDtisznCode().equals(0L))
             || discount.getDtisznCode().equals(info.getDtisznCode().intValue())) {
                 return discount;
@@ -982,6 +981,7 @@ public class DTSZNDiscountsReviseService {
                             info);
                     builder.withArchived(true);
                     builder.save(session, nextVersion);
+                    DiscountManager.rebuildAppointedMSPByClient(session, info.getClient());
 
                     if (!info.getDtisznCode().equals(0L)) {
                         transaction.commit();
