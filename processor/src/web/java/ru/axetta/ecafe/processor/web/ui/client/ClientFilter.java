@@ -164,6 +164,7 @@ public class ClientFilter {
     private boolean showDeleted;
     private boolean includeFriendlyOrg = true;
     private String mobileNumber;
+    private String phoneNumber;
     private String email;
     private Long permanentOrgId;
     private Integer limit = 0;
@@ -188,6 +189,12 @@ public class ClientFilter {
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    public String getPhoneNumber() { return phoneNumber;}
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -309,6 +316,8 @@ public class ClientFilter {
     public boolean isEmpty() {
         if (ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && person.isEmpty() && contractPerson.isEmpty()
+                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(phoneNumber) && StringUtils.isEmpty(email)
+                && StringUtils.isEmpty(filterClientGUID) && StringUtils.isEmpty(filterClientMESHGUID)
                 && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID)
                 && StringUtils.isEmpty(filterClientMESHGUID) && StringUtils.isEmpty(san)) {
             if (!org.isEmpty() && org.getIdOfOrg().equals(getPermanentOrgId()) || org.isEmpty()) {
@@ -335,6 +344,7 @@ public class ClientFilter {
         person = new PersonItem();
         contractPerson = new PersonItem();
         mobileNumber = null;
+        phoneNumber = null;
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
         clientGroupId = ClientGroupMenu.CLIENT_ALL;
@@ -431,6 +441,9 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(this.mobileNumber)) {
             criteria.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobileNumber), MatchMode.ANYWHERE));
+        }
+        if (StringUtils.isNotEmpty(this.phoneNumber)) {
+            criteria.add(Restrictions.ilike("phone", PhoneNumberCanonicalizator.canonicalize(phoneNumber), MatchMode.ANYWHERE));
         }
         if (StringUtils.isNotEmpty(this.email)) {
             criteria.add(Restrictions.ilike("email", email, MatchMode.ANYWHERE));
