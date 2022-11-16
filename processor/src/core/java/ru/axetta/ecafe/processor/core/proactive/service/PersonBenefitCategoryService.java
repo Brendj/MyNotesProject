@@ -64,26 +64,34 @@ public class PersonBenefitCategoryService {
                 if (!Objects.equals(benefit.getBenefit_category_code(), DSZN_MOS_CODE))
                     continue;
                 categoryCode = Integer.parseInt(benefit.getBenefit_category_code());
-                if (!benefit.getIs_actual() || format.get().parse(benefit.getEnd_date()).before(new Date())) {
-                    //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
-                    List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
-                            getBean(ETPMVDaoService.class).getProactiveMessages(client, categoryCode);
-                    StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
-                    if (proactiveMessages.isEmpty())
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
-                    else {
-                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
-                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
-                        }
+                Date endBenefDate = format.get().parse(benefit.getEnd_date());
+                if (!benefit.getIs_actual() || endBenefDate.before(new Date())) {
+                    if (endBenefDate.before(CalendarUtils.startOfDay(new Date())))
+                    {
+                        //Если льгота удалена ещё раньше, то сегодня просто удаляем льготу, не отправляя статусы
+                        DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
                     }
-                    DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
-                    StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
-                    status2.setFullName(client.getPerson().getFullName());
-                    if (proactiveMessages.isEmpty())
-                        RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
                     else {
-                        for (ProactiveMessage proactiveMessage : proactiveMessages) {
-                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+                        //удаление льготы по https://yt.iteco.dev/issue/ISPP-1149
+                        List<ProactiveMessage> proactiveMessages = RuntimeContext.getAppContext().
+                                getBean(ETPMVDaoService.class).getProactiveMessages(client, categoryCode);
+                        StatusETPMessageType status = StatusETPMessageType.REFUSE_TIMEOUT;
+                        if (proactiveMessages.isEmpty())
+                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status, false);
+                        else {
+                            for (ProactiveMessage proactiveMessage : proactiveMessages) {
+                                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status, false);
+                            }
+                        }
+                        DiscountManager.removeDtisznDiscount(session, client, Integer.valueOf(DSZN_MOS_CODE), true, null);
+                        StatusETPMessageType status2 = StatusETPMessageType.REFUSE_SYSTEM;
+                        status2.setFullName(client.getPerson().getFullName());
+                        if (proactiveMessages.isEmpty())
+                            RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), null, status2, false);
+                        else {
+                            for (ProactiveMessage proactiveMessage : proactiveMessages) {
+                                RuntimeContext.getAppContext().getBean(ETPMVProactiveService.class).sendStatus(System.currentTimeMillis(), proactiveMessage, status2, false);
+                            }
                         }
                     }
                 } else {

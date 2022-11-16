@@ -34,6 +34,7 @@ import javax.faces.model.SelectItem;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.addWardsByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.validateExistingGuardians;
 
 /**
  * Created by IntelliJ IDEA.
@@ -706,6 +707,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             ClientManager.validateEmail(this.email);
         }
         ClientManager.validateFio(this.person.surname, this.person.firstName, this.person.secondName);
+        ClientManager.validateExistingGuardians(this.clientWardItems);
+
 //        ClientManager.isUniqueFioAndMobileOrEmail(persistenceSession, null, this.person.surname,
 //                this.person.firstName, this.mobile, this.email);
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
@@ -869,8 +872,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                 if (StringUtils.isEmpty(clientWardItem.getMeshGuid())) {
                     throw new Exception(String.format("У опекаемого %s не указан meshGuid", clientWardItem.getPersonName()));
                 }
-                if (clientWardItem.getRole() == -1)
-                    throw new Exception("У опекаемого не заполнено поле \"Вид представительства\"");
             }
             clientGuardianHistory.setReason(String.format("Создана/отредактирована связка на карточке клиента id = %s как опекун",
                     client.getIdOfClient()));

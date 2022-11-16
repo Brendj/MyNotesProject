@@ -237,7 +237,10 @@ public class MeshClientProcessorService {
                                 ClientGuardianRoleType.fromInteger(meshGuardian.getAgentTypeId()), disabled,
                                 child.getIdOfClient(), ClientCreatedFromType.DEFAULT,
                                 ClientGuardianRepresentType.UNKNOWN.getCode(), clientGuardianHistory);
-                        activeRelation = true;
+
+                        MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                                session, guardian, child.getOrg(),MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                                VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
                     } else {
                         if (clientGuardian.getDeletedState()) {
                             clientGuardian.initializateClientGuardianHistory(clientGuardianHistory);
@@ -256,7 +259,10 @@ public class MeshClientProcessorService {
                             }
                             clientGuardian.setDisabled(disabled);
                             session.merge(clientGuardian);
-                            activeRelation = true;
+
+                            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                                    session, guardian, child.getOrg(),MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
                         }
 
                         if (clientGuardian.getRoleType().getCode() != meshGuardian.getAgentTypeId()) {
@@ -267,7 +273,7 @@ public class MeshClientProcessorService {
                     }
                     // Если представитель в группе "Выбывшие" и имеет активную связку с обучающимся,
                     // то переводим представителю в группу "Родители"
-                    if(guardian.isLeaving() && activeRelation) {
+                    if(guardian.isLeaving() && !clientGuardian.getDeletedState()) {
                         guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
                         ClientManager.createClientGroupMigrationHistoryLite(
                                 session, guardian, child.getOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getValue(),
@@ -278,10 +284,6 @@ public class MeshClientProcessorService {
                         guardian.setUpdateTime(new Date());
                         session.merge(guardian);
                     }
-
-                    MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
-                            session, guardian, child.getOrg(),MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                            VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
                 }
             }
             List<Client> guardians = ClientManager.findGuardiansByClient(session, child.getIdOfClient(), true);

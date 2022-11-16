@@ -2050,10 +2050,12 @@ public class ClientManager {
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
-            Client child = (Client) session.get(Client.class, item.getIdOfClient());
-            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
-                    session, client, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            if (item.getIsNew()) {
+                Client child = (Client) session.get(Client.class, item.getIdOfClient());
+                MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                        session, client, child.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                        VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            }
         }
     }
 
@@ -2066,10 +2068,12 @@ public class ClientManager {
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
                     item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()),
                     clientGuardianHistory, ClientGuardianRoleType.fromInteger(item.getRole()));
-            Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
-            MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
-                    session, guardian, client.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
-                    VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            if (item.getIsNew()) {
+                Client guardian = (Client) session.get(Client.class, item.getIdOfClient());
+                MigrantsUtils.createMigrantRequestForGuardianIfNoPass(
+                        session, guardian, client.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING,
+                        VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP, 12);
+            }
         }
     }
 
@@ -2788,6 +2792,35 @@ public class ClientManager {
             guardian.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
             session.update(guardian);
             logger.info(String.format("Deleted client id = %s", guardian.getIdOfClient()));
+        }
+    }
+
+    public static void validateExistingGuardians(List<ClientGuardianItem> items) throws Exception {
+        if (items.isEmpty()) {
+            return;
+        }
+        StringBuilder notValidGuardianSB = new StringBuilder();
+        StringBuilder notValidRepresentative = new StringBuilder();
+        StringBuilder notValidGuardianRoleSB = new StringBuilder();
+        for (ClientGuardianItem item : items) {
+            if (item.getRelation().equals(-1) || item.getRelation().equals(ClientGuardianRelationType.UNDEFINED.getCode())) {
+                notValidGuardianSB.append(item.getPersonName()).append(" ");
+            }
+            if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
+                notValidRepresentative.append(item.getPersonName()).append(" ");
+            }
+            if (item.getRole().equals(-1)) {
+                notValidGuardianRoleSB.append(item.getPersonName()).append(" ");
+            }
+        }
+        if (notValidGuardianSB.length() > 0) {
+            throw new Exception("Не указана степень родства: " + notValidGuardianSB);
+        }
+        if (notValidRepresentative.length() > 0) {
+            throw new Exception("Не указана роль представителя: " + notValidRepresentative);
+        }
+        if (notValidGuardianRoleSB.length() > 0) {
+            throw new Exception("Не указан вид представительства: " + notValidGuardianRoleSB);
         }
     }
 
