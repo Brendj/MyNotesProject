@@ -109,15 +109,16 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
                 consumer.setMessageListener(this);
                 jmsConnection.setExceptionListener(this);
 
-                queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status", "SAMPLE.STATUS_INC"));
-                consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
-                consumerStatus.setMessageListener(this);
-
                 bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.bk", "SAMPLE.APPLICATION_INC.BK"));
                 consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
 
-                bkStatusQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status.bk", "SAMPLE.STATUS_INC.BK"));
-                producerStatusBK = jmsProducerSession.createProducer(bkStatusQueueConsumer);
+                if (properties.getProperty("ecafe.processor.zlp.newMode", "false").equals("true")) {
+                    queueStatusConsumer = jmsStatusSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status", "SAMPLE.STATUS_INC"));
+                    consumerStatus = jmsStatusSession.createConsumer(queueStatusConsumer);
+                    consumerStatus.setMessageListener(this);
+                    bkStatusQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.status.bk", "SAMPLE.STATUS_INC.BK"));
+                    producerStatusBK = jmsProducerSession.createProducer(bkStatusQueueConsumer);
+                }
             }
 
             producer = jmsProducerSession.createProducer(queueProducer);
