@@ -4,6 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import org.apache.commons.lang.StringUtils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
@@ -12,11 +20,10 @@ import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientDiscount
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
-import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
-import ru.axetta.ecafe.processor.core.report.ClientSmsList;
+import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
 
@@ -29,7 +36,13 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -61,6 +74,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private ApplicationForFoodReportItem currentApplicationForFood;
     private List<BankSubscription> bankSubscriptions;
     private List<ClientsMobileHistory> clientsMobileHistories = new ArrayList<ClientsMobileHistory>();
+    private List<PreorderJournalReportItem> clientPreorders = new ArrayList<>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -260,6 +274,18 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         for (ApplicationForFood applicationForFood : applicationForFoodList) {
             applicationsForFood.add(new ApplicationForFoodReportItem(session, applicationForFood));
         }
+
+        criteria = session.createCriteria(PreorderComplex.class);
+        criteria.add(Restrictions.ge("preorderDate", startTime));
+        criteria.add(Restrictions.le("preorderDate", endTime));
+        criteria.add(Restrictions.eq("client", client));
+        criteria.addOrder(Order.asc("preorderDate"));
+        List<PreorderComplex> res3 = (List<PreorderComplex>) criteria.list();
+        Integer i = 1;
+        clientPreorders.clear();
+        for (PreorderComplex preorderComplex : res3) {
+            clientPreorders.add(new PreorderJournalReportItem(i++, preorderComplex, "<br/>"));
+        }
     }
 
     public List<ApplicationForFoodReportItem> getApplicationsForFood() {
@@ -346,5 +372,87 @@ public class ClientOperationListPage extends BasicWorkspacePage {
 
     public void setClientsMobileHistories(List<ClientsMobileHistory> clientsMobileHistories) {
         this.clientsMobileHistories = clientsMobileHistories;
+    }
+
+    public List<PreorderJournalReportItem> getClientPreorders() {
+        return clientPreorders;
+    }
+
+    public void setClientPreorders(List<PreorderJournalReportItem> clientPreorders) {
+        this.clientPreorders = clientPreorders;
+    }
+
+    public void exportClientPreordersToXLS(ActionEvent actionEvent){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String templateFilename = checkIsExistFile(".jasper");
+        if (StringUtils.isEmpty(templateFilename)) return ;
+        Date generateTime = new Date();
+        PreorderJournalReport.Builder builder = new PreorderJournalReport.Builder(templateFilename);
+        Properties properties = new Properties();
+        String idOfClients = idOfClient.toString();
+        properties.setProperty(PreorderJournalReport.P_ID_OF_CLIENTS, idOfClients);
+        properties.setProperty(PreorderJournalReport.P_LINE_SEPARATOR, "\n");
+        builder.setReportProperties(properties);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report =  builder.build(persistenceSession, startTime, endTime, null);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        if(report!=null){
+            try {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                String filename = buildFileName(generateTime, report);
+                response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            }
+        }
+    }
+    private String checkIsExistFile(String suffix) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFileName = PreorderJournalReport.class.getSimpleName() + suffix;
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return null;
+        }
+        return templateFilename;
+    }
+
+    private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = basicReportJob.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", "PreorderJournalReport", reportDistinctText, format);
     }
 }
