@@ -3093,12 +3093,29 @@ public class FrontController extends HttpServlet {
                 List<String> meshGuidList = personListResponse.getResponse()
                         .stream().map(MeshGuardianPerson::getMeshGuid).collect(Collectors.toList());
 
-                Query query = persistenceSession.createQuery("select c.meshGUID from Client c "
+                Query query = persistenceSession.createQuery("select c from Client c "
                         + "where meshGuid in :meshGuidList");
                 query.setParameter("meshGuidList", meshGuidList);
-                List<String> list = query.list();
-                personListResponse.getResponse().forEach(p -> p.setAlreadyInISPP(list.contains(p.getMeshGuid())));
-                guardianResponse.setPersonsList(fillingGuardianResponse(personListResponse));
+                List<Client> list = query.list();
+
+                //Убираем из ответа тестовые учетные записи и выставляем флаг наличия в испп
+                PersonListResponse response = new PersonListResponse().okResponse();
+                response.setResponse(new ArrayList<>());
+                boolean isDontShowToExternal = false;
+
+                for (MeshGuardianPerson meshGuardianPerson : personListResponse.getResponse()) {
+                    for (Client client : list) {
+                        if (client.getMeshGUID().equals(meshGuardianPerson.getMeshGuid())) {
+                            if (client.isDontShowToExternal())
+                                isDontShowToExternal = true;
+                            meshGuardianPerson.setAlreadyInISPP(true);
+                        }
+                    }
+                    if (!isDontShowToExternal)
+                        response.getResponse().add(meshGuardianPerson);
+                }
+                response.getResponse().forEach(p -> p.setAlreadyInISPP(p.getAlreadyInISPP() != null));
+                guardianResponse.setPersonsList(fillingGuardianResponse(response));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
