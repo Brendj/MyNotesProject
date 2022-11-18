@@ -787,7 +787,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             if (!ClientManager.checkSanNumber(this.san))
                 throw new Exception("Неверный номер СНИЛС");
         }
-        client.setSan(this.san);
+        client.setSan(StringUtils.isBlank(this.san) ? null : this.san);
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
 

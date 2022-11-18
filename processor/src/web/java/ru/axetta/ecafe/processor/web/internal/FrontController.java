@@ -3257,7 +3257,7 @@ public class FrontController extends HttpServlet {
             client.getPerson().setSurname(lastName);
             client.getPerson().setFirstName(firstName);
             client.getPerson().setSecondName(patronymic == null ? "" : patronymic);
-            client.setSan(snils);
+            client.setSan(StringUtils.isBlank(snils) ? null : snils);
             client.setGender(genderId);
             client.setBirthDate(birthDate);
             client.setMobile(mobile);
