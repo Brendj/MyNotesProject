@@ -782,11 +782,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
 
-        if (this.san != null && !this.san.isEmpty()) {
+        if (!StringUtils.isBlank(this.san)) {
             this.san = this.san.replaceAll("[\\D]", "");
             if (!ClientManager.checkSanNumber(this.san))
                 throw new Exception("Неверный номер СНИЛС");
+            checkSnils(persistenceSession, this.san, client);
         }
+
         client.setSan(StringUtils.isBlank(this.san) ? null : this.san);
         client.setSpecialMenu(this.specialMenu);
         ClientParallel.addFoodBoxModifire(client);
@@ -814,9 +816,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
-            }
-            if (this.san != null && !this.san.isEmpty()) {
-                checkSnils(persistenceSession, this.san, client);
             }
             addGuardianToClient(persistenceSession, clientGuardianHistory, client);
 

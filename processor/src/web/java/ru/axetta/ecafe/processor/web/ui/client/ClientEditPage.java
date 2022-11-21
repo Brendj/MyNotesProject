@@ -1234,7 +1234,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 throw new Exception("Не заполнено поле \"СНИЛС\" или \"Документы\"");
             }
         }
-        if (this.san != null && !this.san.isEmpty()) {
+        if (!StringUtils.isBlank(this.san)) {
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
         }
