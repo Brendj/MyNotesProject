@@ -1547,7 +1547,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 for (Client guardian : guardians) {
                     List<Client> children = ClientManager.findChildsByClient(
-                            session, guardian.getIdOfClient(), true, operation.equals(DELETE_OPERATION));
+                            session, guardian.getIdOfClient(), true, false);
                     if (ObjectUtils.isEmpty(children)) {
                         logger.error(String.format("processClientGuardians(): Не удалось найти детей представителя c MЭШ.GUID: %s в ИСПП",
                                 child.getMeshGUID().toString()));
@@ -1695,7 +1695,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
     private void processDeleteOperationForGuardian(Session session, Client child, Client guardian, List<Client> children,
                                                    ClientGuardianHistory clientGuardianHistory) throws Exception {
-        if (children.size() > 1) {
+        if (children.size() > 0) {
             Org newOrg = null;
 
             for (Client childItem : children) {
