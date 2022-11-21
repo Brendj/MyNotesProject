@@ -1072,7 +1072,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setLimit(this.limit);
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
-        client.setSan(this.san);
+        client.setSan(StringUtils.isBlank(this.san) ? null : this.san);
         client.setBalanceToNotify(this.balanceToNotify);
 
         if (this.externalId == null || this.externalId == 0) {
@@ -1238,7 +1238,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             this.san = this.san.replaceAll("[\\D]", "");
             ClientManager.validateSan(persistenceSession, this.san, idOfClient);
         }
-        client.setSan(this.san);
+        client.setSan(StringUtils.isBlank(this.san) ? null : this.san);
         client.setOrg(org);
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);

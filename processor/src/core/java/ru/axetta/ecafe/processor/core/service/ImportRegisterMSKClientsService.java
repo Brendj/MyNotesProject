@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import org.springframework.util.ObjectUtils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
@@ -1181,8 +1182,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 }
                 for (Client guardian : guardians) {
                     List<Client> children = ClientManager.findChildsByClient(
-                            session, guardian.getIdOfClient(), true, false);
-                    if (children.isEmpty()) {
+                            session, guardian.getIdOfClient(), true, operation.equals(DELETE_OPERATION));
+                    if (ObjectUtils.isEmpty(children)) {
                         logger.error(String.format("processClientGuardians(): Не удалось найти детей представителя c MЭШ.GUID: %s в ИСПП",
                                 child.getMeshGUID().toString()));
                         return;
