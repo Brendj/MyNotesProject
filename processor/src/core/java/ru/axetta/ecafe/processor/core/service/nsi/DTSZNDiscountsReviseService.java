@@ -747,35 +747,36 @@ public class DTSZNDiscountsReviseService {
             }
         }
 
-        final Set<Integer> dtsznCodes = new HashSet<>();
+        if (!StringUtils.isEmpty(guid)) {
+            final Set<Integer> dtsznCodes = new HashSet<>();
 
-        for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
-            dtsznCodes.add(item.getDsznCode());
-        }
-
-        List<ReviseDAOService.DiscountItem> discountItemListTemp
-                = new ArrayList<ReviseDAOService.DiscountItem>(discountItemList.getItems());
-
-        for (Integer dtsznCode : dtsznCodes) {
-            ReviseDAOService.DiscountItem prevMax = null;
             for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
-                if(item.getDsznCode().equals(dtsznCode)){
-                    if(prevMax == null){
-                        prevMax = item;
-                        continue;
-                    }
-                    if(item.getUpdatedAt().after(prevMax.getUpdatedAt())){
-                        discountItemListTemp.remove(prevMax);
-                        prevMax = item;
-                    }
-                    else {
-                        discountItemListTemp.remove(item);
+                dtsznCodes.add(item.getDsznCode());
+            }
+
+            List<ReviseDAOService.DiscountItem> discountItemListTemp
+                    = new ArrayList<ReviseDAOService.DiscountItem>(discountItemList.getItems());
+
+            for (Integer dtsznCode : dtsznCodes) {
+                ReviseDAOService.DiscountItem prevMax = null;
+                for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
+                    if (item.getDsznCode().equals(dtsznCode)) {
+                        if (prevMax == null) {
+                            prevMax = item;
+                            continue;
+                        }
+                        if (item.getUpdatedAt().after(prevMax.getUpdatedAt())) {
+                            discountItemListTemp.remove(prevMax);
+                            prevMax = item;
+                        } else {
+                            discountItemListTemp.remove(item);
+                        }
                     }
                 }
             }
-        }
 
-        discountItemList.setItems(discountItemListTemp);
+            discountItemList.setItems(discountItemListTemp);
+        }
 
         Date fireTime = new Date();
         Session session = null;
