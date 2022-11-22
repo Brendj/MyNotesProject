@@ -2644,7 +2644,6 @@ public class ClientManager {
     public static void validateSan(Session session, String san, Long idOfClient) throws Exception {
         if (!checkSanNumber(san))
             throw new Exception("Неверный номер СНИЛС");
-
         checkSanIsExist(session, san, idOfClient);
     }
 
