@@ -817,6 +817,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
+            if (StringUtils.isEmpty(this.mobile)){
+                throw new Exception("Не заполнено поле \"Мобильный телефон\"");
+            }
             addGuardianToClient(persistenceSession, clientGuardianHistory, client);
 
             MeshAgentResponse personResponse = getMeshGuardiansService()
