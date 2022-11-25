@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.partner.mesh.guardians.*;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.service.DulDetailService;
 import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.core.utils.Base64;
@@ -3161,7 +3160,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             if (checkCreateMeshPersonParameters(idOfOrg, firstName, lastName, genderId, birthDate, snils, childMeshGuid, agentTypeId,
-                    relation, typeOfLegalRepresent, informing, documents)) {
+                    relation, typeOfLegalRepresent, informing, documents, mobile)) {
                 return new GuardianMeshGuidResponse(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED, ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
             }
             if (genderId != 0 && genderId != 1)
@@ -3508,12 +3507,12 @@ public class FrontController extends HttpServlet {
 
     private boolean checkCreateMeshPersonParameters(Long idOfOrg, String firstName, String lastName, Integer genderId,
                                                     Date birthDate, String snils, String childMeshGuid, Integer agentTypeId,
-                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing, List<DocumentItem> documents) throws FrontControllerException {
+                                                    Integer relation, Integer typeOfLegalRepresent, Boolean informing, List<DocumentItem> documents, String mobile) throws FrontControllerException {
         return idOfOrg == null || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || genderId == null
                 || birthDate == null || StringUtils.isEmpty(childMeshGuid) || agentTypeId == null
                 || relation == null || typeOfLegalRepresent == null || informing == null ||
                 (StringUtils.isEmpty(snils) && (documents == null || documents.isEmpty() ||
-                        checkDocumentsForRequiredFields(documents)));
+                        checkDocumentsForRequiredFields(documents))) || StringUtils.isEmpty(mobile);
     }
 
     private boolean checkDocumentsForRequiredFields(List<DocumentItem> documents) {

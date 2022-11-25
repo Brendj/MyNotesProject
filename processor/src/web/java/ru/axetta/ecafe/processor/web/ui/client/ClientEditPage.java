@@ -1327,6 +1327,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (!this.clientWardItems.isEmpty() && isGuardianGroup(client) ||
                 (this.clientWardItems.isEmpty() && !this.removeListWardItems.isEmpty() && isGuardianGroup(client))) {
 
+            if (StringUtils.isEmpty(this.mobile)){
+                throw new Exception("Не заполнено поле \"Мобильный телефон\"");
+            }
             if (birthDate == null) {
                 throw new Exception("Не заполнено поле \"Дата рождения\"");
             }
