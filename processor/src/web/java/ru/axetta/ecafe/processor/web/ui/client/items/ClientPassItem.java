@@ -162,6 +162,15 @@ public class ClientPassItem implements Comparable {
         return chekerItemList;
     }
 
+    public String getChekerItemListAtString() {
+        String chekerItemListAtString = "";
+        for (ClientChekerPassItem chekerItem: chekerItemList) {
+            chekerItemListAtString = chekerItemListAtString + chekerItem.cheker + " | " + chekerItem.groupName
+                    + " | " + chekerItem.contractId + "; ";
+        }
+        return chekerItemListAtString;
+    }
+
     public Integer getChekerItemListCount() {
         return chekerItemList.size() + 1;
     }

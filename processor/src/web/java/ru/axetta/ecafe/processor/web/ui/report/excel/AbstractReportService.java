@@ -5,9 +5,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 public abstract class AbstractReportService<T> {
@@ -111,5 +109,118 @@ public abstract class AbstractReportService<T> {
                 cell.setCellStyle(cs);
             }
         }
+    }
+
+    public static void mergeExcels(Workbook sourceExcel, Workbook destExcel) {
+        for(int sheetIndex = 0; sheetIndex < sourceExcel.getNumberOfSheets(); ++sheetIndex) {
+            Sheet sheet = sourceExcel.getSheetAt(sheetIndex);
+            if (destExcel.getSheet(sheet.getSheetName()) != null) {
+                destExcel.removeSheetAt(destExcel.getSheetIndex(sheet.getSheetName()));
+            }
+
+            Sheet outputSheet = destExcel.createSheet(sheet.getSheetName());
+            copySheets(outputSheet, sheet, true);
+        }
+
+    }
+
+    public static void copySheets(Sheet newSheet, Sheet sheet, boolean copyStyle) {
+        int maxColumnNum = 0;
+        Map<Integer, CellStyle> styleMap = copyStyle ? new HashMap() : null;
+
+        int i;
+        List<CellRangeAddress> mergedRegions = new ArrayList<CellRangeAddress>();
+        for(i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); ++i) {
+            Row srcRow = sheet.getRow(i);
+            Row destRow = newSheet.createRow(i);
+            if (srcRow != null) {
+                copyRow(sheet, newSheet, srcRow, destRow, styleMap, mergedRegions);
+                if (srcRow.getLastCellNum() > maxColumnNum) {
+                    maxColumnNum = srcRow.getLastCellNum();
+                }
+            }
+        }
+
+        for(i = 0; i <= maxColumnNum; ++i) {
+            newSheet.setColumnWidth(i, sheet.getColumnWidth(i));
+        }
+
+    }
+
+    public static void copyRow(Sheet srcSheet, Sheet destSheet, Row srcRow, Row destRow, Map<Integer, CellStyle> styleMap, List<CellRangeAddress> mergedRegions ) {
+        destRow.setHeight(srcRow.getHeight());
+
+        for(int j = srcRow.getFirstCellNum(); j <= srcRow.getLastCellNum(); ++j) {
+            if (j >= 0) {
+                Cell oldCell = srcRow.getCell(j);
+                Cell newCell = destRow.getCell(j);
+                if (oldCell != null) {
+                    if (newCell == null) {
+                        newCell = destRow.createCell(j);
+                    }
+
+                    copyCell(oldCell, newCell, styleMap);
+                    CellRangeAddress mergedRegion = getMergedRegion(srcSheet, srcRow.getRowNum(), (short)oldCell.getColumnIndex());
+                    if (mergedRegion != null) {
+                        CellRangeAddress newMergedRegion = new CellRangeAddress(mergedRegion.getFirstRow(),  mergedRegion.getLastRow(), mergedRegion.getFirstColumn(), mergedRegion.getLastColumn());
+                        //if (isNewMergedRegion(newMergedRegion, mergedRegions)) {
+                            mergedRegions.add(newMergedRegion);
+                            destSheet.addMergedRegion(newMergedRegion);
+                        //}
+                    }
+                }
+            }
+        }
+
+    }
+
+    public static void copyCell(Cell oldCell, Cell newCell, Map<Integer, CellStyle> styleMap) {
+        if (styleMap != null) {
+            if (oldCell.getSheet().getWorkbook() == newCell.getSheet().getWorkbook()) {
+                newCell.setCellStyle(oldCell.getCellStyle());
+            } else {
+                int stHashCode = oldCell.getCellStyle().hashCode();
+                CellStyle newCellStyle = (CellStyle)styleMap.get(stHashCode);
+                if (newCellStyle == null) {
+                    newCellStyle = newCell.getSheet().getWorkbook().createCellStyle();
+                    newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
+                    styleMap.put(stHashCode, newCellStyle);
+                }
+
+                newCell.setCellStyle(newCellStyle);
+            }
+        }
+
+        switch(oldCell.getCellType()) {
+            case 0:
+                newCell.setCellValue(oldCell.getNumericCellValue());
+                break;
+            case 1:
+                newCell.setCellValue(oldCell.getStringCellValue());
+                break;
+            case 2:
+                newCell.setCellFormula(oldCell.getCellFormula());
+                break;
+            case 3:
+                newCell.setCellType(3);
+                break;
+            case 4:
+                newCell.setCellValue(oldCell.getBooleanCellValue());
+                break;
+            case 5:
+                newCell.setCellErrorValue(oldCell.getErrorCellValue());
+        }
+
+    }
+
+    public static CellRangeAddress getMergedRegion(Sheet sheet, int rowNum, short cellNum) {
+        for(int i = 0; i < sheet.getNumMergedRegions(); ++i) {
+            CellRangeAddress merged = sheet.getMergedRegion(i);
+            if (merged.isInRange(rowNum, cellNum)) {
+                return merged;
+            }
+        }
+
+        return null;
     }
 }

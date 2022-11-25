@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -35,6 +36,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.web.ui.report.excel.*;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -43,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -75,6 +78,24 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<BankSubscription> bankSubscriptions;
     private List<ClientsMobileHistory> clientsMobileHistories = new ArrayList<ClientsMobileHistory>();
     private List<PreorderJournalReportItem> clientPreorders = new ArrayList<>();
+
+    private List<AccountTransaction> accountTransactions;
+    private List<AccountTransfer> accountTransfer;
+    private List<AccountRefund> accountRefund;
+    private final AccountTransactionListService accountTransactionListService =
+            new AccountTransactionListService("transaction.xlsx", "Операции по счету");
+    private final СlientPaymentListService clientPaymentListService =
+            new СlientPaymentListService("payment.xlsx", "Зачисления");
+    private final AccountTransferListService accountTransferListService =
+            new AccountTransferListService("transfer.xlsx", "Переводы");
+    private final ClientOrderListService clientOrderListService =
+            new ClientOrderListService("order.xlsx", "Покупки");
+    private final AccountRefundListService accountRefundListService =
+            new AccountRefundListService("refund.xlsx", "Возвраты");
+    private final ClientSmsListService clientSmsListService =
+            new ClientSmsListService("sms.xlsx", "Сообщения");
+    private final ClientPassesListService clientPassesListService =
+            new ClientPassesListService("passes.xlsx", "Проходы");
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -199,6 +220,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             }
             accountTransactionList.add(accTrans);
         }
+        buildReport();
 
         Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
         bankSubscriptionCriteria.add(Restrictions.eq("client", client))
@@ -463,4 +485,37 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         String format = timeFormat.format(generateTime);
         return String.format("%s-%s-%s", "PreorderJournalReport", reportDistinctText, format);
     }
+
+    public void buildReport() throws Exception {
+        this.accountTransactions = getAccountTransactionList();
+        this.accountTransfer = getAccountTransferList();
+        this.accountRefund = getAccountRefundList();
+    }
+
+    public void buildExcelList(FacesContext facesContext) throws Exception {
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                .getResponse();
+        try {
+            Workbook wbTransaction = accountTransactionListService.buildReport(accountTransactions);
+            Workbook wbPayment = clientPaymentListService.buildReport(clientPaymentList.getItems());
+            Workbook wbTransfer = accountTransferListService.buildReport(accountTransfer);
+            Workbook wbOrder = clientOrderListService.buildReport(clientOrderList.getItems());
+            Workbook wbRefund = accountRefundListService.buildReport(accountRefund);
+            Workbook wbSms = clientSmsListService.buildReport(clientSmsList.getItems());
+            Workbook wbPasses = clientPassesListService.buildReport(clientPasses);
+
+            AbstractReportService.mergeExcels(wbPayment, wbTransaction);
+            AbstractReportService.mergeExcels(wbTransfer, wbTransaction);
+            AbstractReportService.mergeExcels(wbOrder, wbTransaction);
+            AbstractReportService.mergeExcels(wbRefund, wbTransaction);
+            AbstractReportService.mergeExcels(wbSms, wbTransaction);
+            AbstractReportService.mergeExcels(wbPasses, wbTransaction);
+
+            WriteExcelHelper.saveExcelReport(wbTransaction, response);
+        } catch (NullPointerException e) {
+            printError("Нет данных для выгрузки отчета");
+        }
+    }
+
+
 }
