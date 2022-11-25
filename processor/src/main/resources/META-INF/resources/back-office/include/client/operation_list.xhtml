@@ -64,9 +64,13 @@
                 <h:outputText escape="true" value="Окончание периода" styleClass="output-text"/>
                 <rich:calendar value="#{mainPage.clientOperationListPage.endTime}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
                 <a4j:commandButton value="Показать" action="#{mainPage.showClientOperationListPage(true)}"
                                    render="mainMenu, workspaceTogglePanel" status="clientOperationListGenerateStatus"
                                    styleClass="command-button"/>
+                <h:commandButton value="Выгрузить в Excel" action="#{mainPage.buildClientOperationReportExcel}"
+                                 styleClass="command-button"/>
                 <a4j:status id="clientOperationListGenerateStatus">
                     <f:facet name="start">
                         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
@@ -1427,8 +1431,6 @@
                         </f:facet>
                     </rich:dataTable>
                 </h:form>
-                <h:commandButton value="Выгрузить в Excel" action="#{mainPage.buildClientOperationReportExcel}"
-                                 styleClass="command-button"/>
             </h:panelGrid>
             <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                            warnClass="warn-messages"/>
