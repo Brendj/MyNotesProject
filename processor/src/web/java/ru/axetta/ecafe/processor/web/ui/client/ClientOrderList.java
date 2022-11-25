@@ -212,6 +212,15 @@ public class ClientOrderList {
             return state;
         }
 
+        public String listDetailsAtString() {
+            String detailsAtString = "";
+            for (Detail detail: details) {
+                detailsAtString = detailsAtString + detail.itemCode + " |  " + detail.menuDetailName + " | " + detail.rPrice.toString() +
+                " | " + detail.menuOutput + " | " + detail.qty.toString() + " | " + detail.rootMenu + "; ";
+            }
+            return detailsAtString;
+        }
+
     }
 
     private List<Item> items = Collections.emptyList();

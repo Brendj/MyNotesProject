@@ -10204,6 +10204,18 @@ public class MainPage implements Serializable {
         return "showAllComplexCSVList";
     }
 
+    public void buildClientOperationReportExcel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            clientOperationListPage.buildExcelList(facesContext);
+        } catch (Exception e) {
+            logger.error("Failed to build client operation report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        }
+    }
+
     public Object removeClientFromList() {
         clientListPage.removeClientFromList(selectedIdOfClient);
         return null;
