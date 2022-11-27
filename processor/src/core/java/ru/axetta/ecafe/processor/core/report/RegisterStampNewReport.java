@@ -123,7 +123,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             List<RegisterStampReportItem> waterItems = new ArrayList<RegisterStampReportItem>();
             List<String> headerName = new ArrayList<String>();
             List<RegisterStampReportItem> headerItem = new ArrayList<RegisterStampReportItem>();
-            TreeMap<String, RegisterStampReportItem> headerMap = new TreeMap<String, RegisterStampReportItem>();
 
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
@@ -146,7 +145,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                     data.getList511().add(itemEmpty);
                     data.getList511().add(totalEmpty);
 
-//                    headerMap.put(itemEmpty.getLevel4(), itemEmpty);
                     headerName.add(itemEmpty.getLevel4());
                     headerItem.add(itemEmpty);
                 } else {
@@ -211,9 +209,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                         }
 
                         if (StringUtils.isNotEmpty(item.getLevel4()) && !headerName.contains(item.getLevel4())) {
-                            headerName.add(item.getLevel4());
                             headerItem.add(item);
-//                            headerMap.put(item.getLevel4(), item);
                         }
                     }
 
@@ -293,7 +289,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                         }
 
                         if (StringUtils.isNotEmpty(item.getLevel4()) && !headerName.contains(item.getLevel4())) {
-                            headerName.add(item.getLevel4());
                             headerItem.add(item);
                         }
                     }
@@ -312,19 +307,20 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
 
             List<RegisterStampReportItem> header = new ArrayList<RegisterStampReportItem>();
             for (RegisterStampReportItem item : data.getList153()) {
-                if (!header.contains(item.getLevel4())) {
+                if (!headerName.contains(item.getLevel4())) {
                     header.add(item);
+                    headerName.add(item.getLevel4());
                 }
             }
             data.setHeaderList(header);
 
-            List<RegisterStampReportItem> list153Totals = totals(headerMap.keySet(), data.getList153());
-            List<RegisterStampReportItem> list37Totals = totals(headerMap.keySet(), data.getList37());
-            List<RegisterStampReportItem> list14Totals = totals(headerMap.keySet(), data.getList14());
-            List<RegisterStampReportItem> list511Totals = totals(headerMap.keySet(), data.getList511());
+            List<RegisterStampReportItem> list153Totals = totals(headerName, data.getList153());
+            List<RegisterStampReportItem> list37Totals = totals(headerName, data.getList37());
+            List<RegisterStampReportItem> list14Totals = totals(headerName, data.getList14());
+            List<RegisterStampReportItem> list511Totals = totals(headerName, data.getList511());
             List<RegisterStampReportItem> listWaterTotals = totalWater("Вода питьевая", waterItems);
 
-            List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerMap.keySet());
+            List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerName);
 
             List<RegisterStampReportItem> allTotalsByAllCategory = new ArrayList<RegisterStampReportItem>();
 
@@ -402,9 +398,8 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         return true;
     }
 
-    public static List<RegisterStampReportItem> totals (Set<String> headerList, List<RegisterStampReportItem> mainList) {
+    public static List<RegisterStampReportItem> totals (List<String> headerList, List<RegisterStampReportItem> mainList) {
         List<RegisterStampReportItem> totals = new ArrayList<RegisterStampReportItem>();
-//        Set<String> goodName = allGoodNameExists(headerList);
 
         for (String good: headerList) {
             Long sumByGood = 0L;
@@ -442,9 +437,8 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         return totals;
     }
 
-    public static List<RegisterStampReportItem> emptyGlobalTotal(Set<String> headerList) {
+    public static List<RegisterStampReportItem> emptyGlobalTotal(List<String> headerList) {
         List<RegisterStampReportItem> emptyTotals = new ArrayList<RegisterStampReportItem>();
-//        Set<String> goodName = allGoodNameExists(headerList);
 
         for (String good: headerList) {
             RegisterStampReportItem tot = new RegisterStampReportItem();
