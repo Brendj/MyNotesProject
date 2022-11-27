@@ -53,11 +53,9 @@
                 <h:selectBooleanCheckbox value="#{registerStampNewPage.includeActDiscrepancies}">
                     <a4j:ajax event="change" render="registerStampNewReportPanel"/>
                 </h:selectBooleanCheckbox>
-
-
             </h:panelGrid>
-
         </rich:togglePanel>
+
         <h:panelGrid styleClass="borderless-grid" columns="3">
             <a4j:commandButton value="Генерировать отчет" action="#{registerStampNewPage.buildReportHTML}"
                                render="registerStampNewReportPanel"
@@ -67,12 +65,12 @@
                                render="registerStampNewReportPanelGrid"
                                styleClass="command-button" />
         </h:panelGrid>
+
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
-
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
 

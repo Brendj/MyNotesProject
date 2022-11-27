@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.WtComplexItem;
+import ru.axetta.ecafe.processor.core.service.spb.HeaderHandler;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -120,7 +121,9 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             GoodItem emptyGoodItem = new GoodItem();
 
             List<RegisterStampReportItem> waterItems = new ArrayList<RegisterStampReportItem>();
-            Map<String, RegisterStampReportItem> headerMap = new TreeMap<String, RegisterStampReportItem>();
+            List<String> headerName = new ArrayList<String>();
+            List<RegisterStampReportItem> headerItem = new ArrayList<RegisterStampReportItem>();
+            TreeMap<String, RegisterStampReportItem> headerMap = new TreeMap<String, RegisterStampReportItem>();
 
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
@@ -143,7 +146,9 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                     data.getList511().add(itemEmpty);
                     data.getList511().add(totalEmpty);
 
-                    headerMap.put(itemEmpty.getLevel4(), itemEmpty);
+//                    headerMap.put(itemEmpty.getLevel4(), itemEmpty);
+                    headerName.add(itemEmpty.getLevel4());
+                    headerItem.add(itemEmpty);
                 } else {
                     for (GoodItem goodItem: allGoods){
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
@@ -205,8 +210,10 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             waterItems.add(total1);
                         }
 
-                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet().contains(item.getLevel4())) {
-                            headerMap.put(item.getLevel4(), item);
+                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerName.contains(item.getLevel4())) {
+                            headerName.add(item.getLevel4());
+                            headerItem.add(item);
+//                            headerMap.put(item.getLevel4(), item);
                         }
                     }
 
@@ -281,33 +288,43 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             Long val1 = service
                                     .buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(), idOfComplex, withOutActDiscrepancies);
                             RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup,
-                                    dietType, val1, "Итого", null, CalendarUtils.addDays(endTime, 1), orderType);
-                            total1.setLevel4("Вода питьевая");
+                                    "Вода питьевая", val1, "Итого", null, CalendarUtils.addDays(endTime, 1), orderType);
                             waterItems.add(total1);
                         }
 
-                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet().contains(item.getLevel4())) {
-                            headerMap.put(item.getLevel4(), item);
+                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerName.contains(item.getLevel4())) {
+                            headerName.add(item.getLevel4());
+                            headerItem.add(item);
                         }
                     }
                 }
 
-                if (!addWaterCategory(headerMap))
+                if (!addWaterCategory(headerItem))
                     return null;
 
                 calendar.add(Calendar.DATE,1);
             }
 
-            List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(headerMap.values());
-            data.setHeaderList(headerList);
+            data.getList153().addAll(addItemsByGoodNamesNE(headerItem, data.getList153()));
+            data.getList37().addAll(addItemsByGoodNamesNE(headerItem, data.getList37()));
+            data.getList14().addAll(addItemsByGoodNamesNE(headerItem, data.getList14()));
+            data.getList511().addAll(addItemsByGoodNamesNE(headerItem, data.getList511()));
 
-            List<RegisterStampReportItem> list153Totals = totals(headerList, data.getList153());
-            List<RegisterStampReportItem> list37Totals = totals(headerList, data.getList37());
-            List<RegisterStampReportItem> list14Totals = totals(headerList, data.getList14());
-            List<RegisterStampReportItem> list511Totals = totals(headerList, data.getList511());
+            List<RegisterStampReportItem> header = new ArrayList<RegisterStampReportItem>();
+            for (RegisterStampReportItem item : data.getList153()) {
+                if (!header.contains(item.getLevel4())) {
+                    header.add(item);
+                }
+            }
+            data.setHeaderList(header);
+
+            List<RegisterStampReportItem> list153Totals = totals(headerMap.keySet(), data.getList153());
+            List<RegisterStampReportItem> list37Totals = totals(headerMap.keySet(), data.getList37());
+            List<RegisterStampReportItem> list14Totals = totals(headerMap.keySet(), data.getList14());
+            List<RegisterStampReportItem> list511Totals = totals(headerMap.keySet(), data.getList511());
             List<RegisterStampReportItem> listWaterTotals = totalWater("Вода питьевая", waterItems);
 
-            List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerList);
+            List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerMap.keySet());
 
             List<RegisterStampReportItem> allTotalsByAllCategory = new ArrayList<RegisterStampReportItem>();
 
@@ -326,32 +343,27 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             }
 
             if (!data.getList153().isEmpty()) {
-                List<RegisterStampReportItem> listHeader153 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 1,5-3 л.");
+                List<RegisterStampReportItem> listHeader153 = doAnotherCaption(headerItem, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 1,5-3 л.");
                 data.setList153Header(listHeader153);
             }
 
             if (!data.getList37().isEmpty()) {
-                List<RegisterStampReportItem> listHeader37 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 3-7 л.");
+                List<RegisterStampReportItem> listHeader37 = doAnotherCaption(headerItem, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 3-7 л.");
                 data.setList37Header(listHeader37);
             }
 
             if (!data.getList14().isEmpty()) {
-                List<RegisterStampReportItem> listHeader14 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы начального общего образования");
+                List<RegisterStampReportItem> listHeader14 = doAnotherCaption(headerItem, "Контингент питающихся: обучающиеся, осваивающие образовательные программы начального общего образования");
                 data.setList14Header(listHeader14);
             }
 
             if (!data.getList511().isEmpty()) {
-                List<RegisterStampReportItem> listHeader511 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы основного и среднего общего образования");
+                List<RegisterStampReportItem> listHeader511 = doAnotherCaption(headerItem, "Контингент питающихся: обучающиеся, осваивающие образовательные программы основного и среднего общего образования");
                 data.setList511Header(listHeader511);
             }
 
-            List<RegisterStampReportItem> listTotalAllHeader = doAnotherCaption(headerList, " ");
+            List<RegisterStampReportItem> listTotalAllHeader = doAnotherCaption(headerItem, " ");
             data.setListTotalAllHeader(listTotalAllHeader);
-
-            data.getList153().addAll(addItemsByGoodNamesNE(headerList, data.getList153()));
-            data.getList37().addAll(addItemsByGoodNamesNE(headerList, data.getList37()));
-            data.getList14().addAll(addItemsByGoodNamesNE(headerList, data.getList14()));
-            data.getList511().addAll(addItemsByGoodNamesNE(headerList, data.getList511()));
 
             Collections.sort(data.getList14());
             Collections.sort(data.getList37());
@@ -365,14 +377,14 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         }
     }
 
-    public static Boolean addWaterCategory (Map<String, RegisterStampReportItem> headerMap) {
+    public static Boolean addWaterCategory (List<RegisterStampReportItem> header) {
 
-        if (headerMap.values().isEmpty())
+        if (header.isEmpty())
             return false;
 
         String waterName = "Вода питьевая";
 
-        List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(headerMap.values());
+        List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(header);
 
         RegisterStampReportItem waterItem = new RegisterStampReportItem();
         waterItem.setLevel1(headerList.get(0).getLevel1());
@@ -381,21 +393,20 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         waterItem.setLevel4(waterName);
         waterItem.setQty(0L);
         waterItem.setDate(headerList.get(0).getDate());
-        waterItem.setNumber(headerList.get(0).getNumber());
         waterItem.setDateTime(headerList.get(0).getDateTime());
         waterItem.setOrderType(headerList.get(0).getOrderType());
         waterItem.setDatePlusNumber(headerList.get(0).getDatePlusNumber());
 
-        headerMap.put(waterItem.getLevel4(), waterItem);
+        header.add(waterItem);
 
         return true;
     }
 
-    public static List<RegisterStampReportItem> totals (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> mainList) {
+    public static List<RegisterStampReportItem> totals (Set<String> headerList, List<RegisterStampReportItem> mainList) {
         List<RegisterStampReportItem> totals = new ArrayList<RegisterStampReportItem>();
-        Set<String> goodName = allGoodNameExists(headerList);
+//        Set<String> goodName = allGoodNameExists(headerList);
 
-        for (String good: goodName) {
+        for (String good: headerList) {
             Long sumByGood = 0L;
             for (RegisterStampReportItem registerStampReportItem : mainList) {
                 if (registerStampReportItem.getLevel4().equals(good) && registerStampReportItem.getDatePlusNumber().equals("Итого")) {
@@ -431,11 +442,11 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         return totals;
     }
 
-    public static List<RegisterStampReportItem> emptyGlobalTotal(List<RegisterStampReportItem> headerList) {
+    public static List<RegisterStampReportItem> emptyGlobalTotal(Set<String> headerList) {
         List<RegisterStampReportItem> emptyTotals = new ArrayList<RegisterStampReportItem>();
-        Set<String> goodName = allGoodNameExists(headerList);
+//        Set<String> goodName = allGoodNameExists(headerList);
 
-        for (String good: goodName) {
+        for (String good: headerList) {
             RegisterStampReportItem tot = new RegisterStampReportItem();
             tot.setLevel4(good);
             tot.setQty(0L);
@@ -468,31 +479,31 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         for (String str : goodName) {
             for (RegisterStampReportItem reportItem : data) {
 
-                RegisterStampReportItem itemEmpty = new RegisterStampReportItem();
-                itemEmpty.setLevel1(reportItem.getLevel1());
-                itemEmpty.setLevel2(reportItem.getLevel2());
-                itemEmpty.setLevel3(reportItem.getLevel3());
-                itemEmpty.setLevel4(str);
-                itemEmpty.setQty(0L);
-                itemEmpty.setDate(reportItem.getDate());
-                itemEmpty.setNumber(reportItem.getNumber());
-                itemEmpty.setDateTime(reportItem.getDateTime());
-                itemEmpty.setOrderType(reportItem.getOrderType());
-                itemEmpty.setDatePlusNumber(reportItem.getDatePlusNumber());
-                dataNew.add(itemEmpty);
+                    RegisterStampReportItem itemEmpty = new RegisterStampReportItem();
+                    itemEmpty.setLevel1(reportItem.getLevel1());
+                    itemEmpty.setLevel2(reportItem.getLevel2());
+                    itemEmpty.setLevel3(reportItem.getLevel3());
+                    itemEmpty.setLevel4(str);
+                    itemEmpty.setQty(0L);
+                    itemEmpty.setDate(reportItem.getDate());
+                    itemEmpty.setNumber(reportItem.getNumber());
+                    itemEmpty.setDateTime(reportItem.getDateTime());
+                    itemEmpty.setOrderType(reportItem.getOrderType());
+                    itemEmpty.setDatePlusNumber(reportItem.getDatePlusNumber());
+                    dataNew.add(itemEmpty);
 
-                RegisterStampReportItem totalEmpty = new RegisterStampReportItem();
-                totalEmpty.setLevel1(reportItem.getLevel1());
-                totalEmpty.setLevel2(reportItem.getLevel2());
-                totalEmpty.setLevel3(reportItem.getLevel3());
-                totalEmpty.setLevel4(str);
-                totalEmpty.setQty(0L);
-                totalEmpty.setDate("Итого");
-                totalEmpty.setNumber(reportItem.getNumber());
-                totalEmpty.setDateTime(reportItem.getDateTime());
-                totalEmpty.setOrderType(reportItem.getOrderType());
-                totalEmpty.setDatePlusNumber("Итого");
-                dataNew.add(totalEmpty);
+                    RegisterStampReportItem totalEmpty = new RegisterStampReportItem();
+                    totalEmpty.setLevel1(reportItem.getLevel1());
+                    totalEmpty.setLevel2(reportItem.getLevel2());
+                    totalEmpty.setLevel3(reportItem.getLevel3());
+                    totalEmpty.setLevel4(str);
+                    totalEmpty.setQty(0L);
+                    totalEmpty.setDate("Итого");
+                    totalEmpty.setNumber(reportItem.getNumber());
+                    totalEmpty.setDateTime(reportItem.getDateTime());
+                    totalEmpty.setOrderType(reportItem.getOrderType());
+                    totalEmpty.setDatePlusNumber("Итого");
+                    dataNew.add(totalEmpty);
             }
         }
         return dataNew;
